@@ -1,0 +1,268 @@
+﻿@using Microsoft.Extensions.Configuration
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
+@inject TeamsFx teamsfx
+@inject TeamsUserCredential teamsUserCredential
+@inject MicrosoftTeams MicrosoftTeams
+@inject IWebHostEnvironment HostEnvironment
+@inject IConfiguration Configuration
+@inject NavigationManager MyNavigationManager
+
+
+
+@if (isLoading)
+{
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <FluentProgressRing />
+    </div>
+}
+else
+{
+
+    <style>
+        div {
+            float: left;
+            padding: 15px;
+        }
+
+        .div1 {
+        }
+
+        .div2 {
+        }
+    </style>
+
+
+
+    <div class="welcome page">
+
+
+      @*  <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+            <div class="avatar">
+                <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+            </div>
+            <div class="info">
+                <h5>Monkey D Luffy</h5>
+                <p>500 XP</p>
+            </div>
+        </div>*@
+
+       @* <div class="div1">
+            <img src="hello.png" style="height:80px;width:80px;float:left" />
+        </div>
+
+        <div class="div2" style="margin-top: 30px;">
+            <h4>Welcome to My Kudos Dashboard</h4>
+        </div>*@
+
+      
+
+        <div style="clear:both;padding-left: 0px;">
+   
+             
+
+            <div class="row row-cols-1 row-cols-md-3 mb-3 text-center" >
+                <div class="col col-lg-2 ">
+                    <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Profile</h4>
+                        </div>
+                        <div class="card-body">
+
+
+                            <div class="profile" >
+                                <div class="avatar" style="float:none" >
+                                    <img src="profiles/luffy.png" style="height:80px;width:80px;border-radius: 50%;align-content:center" />
+                                </div>
+                                <div class="info" >
+                                    <h5>Monkey D Luffy</h5>
+                                    <h2  class="card-title pricing-card-title">500<small class="text-muted fw-light">XP</small></h2>
+                                </div>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </div>
+            <div class="col">
+                    <div class="card mb-3 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <div class="card-header py-3" >
+                        <h4 class="my-0 fw-normal" >👏 Kudos</h4>
+                    </div>
+                    <div class="card-body " >
+
+
+                            <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="padding-left: 0px;padding-right: 0px;padding-bottom: 0px;">
+
+                                 <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+                                <div class="avatar">
+                                    <img src="profiles/nami.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                </div>
+                                    <div class="info" style="padding-bottom: 0px;padding-top: 0px;">
+                                    <h5>Nami Cat Burglar</h5>
+                                        <div class="text-wrap" style="width: 16rem;">
+                                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">LEADERSHIP</spam> kudos</spam>
+                                        </div>
+                                </div>
+                                 <div class="card-body" style="padding-top: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
+
+                                        <div class="text-wrap" >
+                                            Thank you Nami for selecting and scheduling guest speakers to our Tell The Truth Tue...
+                                        </div>
+
+                                       <Button class="w-40 btn btn-lg btn-outline-primary">Read More</Button>
+
+                                       
+                                    </div>
+                            </div>
+
+                                <div class="profile" >
+                                <div class="avatar">
+                                    <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                </div>
+                                    <div class="info" style="padding-bottom: 0px;padding-top: 0px;">
+                                    <h5>Monkey D Luffy</h5>
+                                        @*<spam class="card-title pricing-card-title" >received a <br/><spam style="font-weight: bold">GROWTH MINDSET</spam> kudos</spam>*@
+
+                                        <div class="text-wrap" style="width: 16rem;">
+                                             <spam class="card-title pricing-card-title" >received a <spam style="font-weight: bold">GROWTH MINDSET</spam> kudos</spam>
+                                        </div>
+
+                                </div>
+
+                                    <div class="card-body" style="padding-top: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
+
+                                        <div class="text-wrap" >
+                                            Thank you for working with us on the Connected Use Case workshop brainstorming session...
+                                        </div>
+
+                                       <Button class="w-40 btn btn-lg btn-outline-primary">Read More</Button>
+
+                                       
+                                    </div>
+                            </div>
+                            
+
+                           
+
+                            <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+                                <div class="avatar">
+                                    <img src="profiles/zoro.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                </div>
+                                <div class="info">
+                                    <h5>Roronoa Zoro</h5>
+                                     <h2 class="card-title pricing-card-title">350<small class="text-muted fw-light">XP</small></h2>
+                                </div>
+                            </div>
+
+                        </div>
+                               
+                    </div>
+                </div>
+            </div>
+
+                <div class="col">
+                    <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">🥇 Top Contributors</h4>
+                        </div>
+                        <div class="card-body w-auto" style:"">
+
+
+                            <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="min-width: 350px;">
+
+                                  <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+                                    <div class="avatar">
+                                        <img src="profiles/zoro.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                    </div>
+                                    <div class="info">
+                                        <h5>Roronoa Zoro</h5>
+                                        <h2 class="card-title pricing-card-title">650<small class="text-muted fw-light">XP</small></h2>
+                                    </div>
+                                </div>
+
+                                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+                                    <div class="avatar">
+                                        <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                    </div>
+                                    <div class="info" style="width:200px">
+                                        <h5>Monkey D Luffy</h5>
+                                        <h2 class="card-title pricing-card-title">500<small class="text-muted fw-light">XP</small></h2>
+                                    </div>
+                                </div>
+
+                                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+                                    <div class="avatar">
+                                        <img src="profiles/nami.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                    </div>
+                                    <div class="info">
+                                        <h5>Nami Cat Burglar</h5>
+                                        <h2 class="card-title pricing-card-title">400<small class="text-muted fw-light">XP</small></h2>
+                                    </div>
+                                </div>
+
+                              
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                
+
+    
+        </div>
+            <div style="clear:both">
+                <FluentButton style="height:auto;width:auto">
+                    Give Kudos
+                    <FluentIcon Name="@FluentIcons.Handshake" Slot="start" Size="@IconSize.Size32" Filled=false />
+                </FluentButton>
+            </div>
+
+
+        </div>
+    
+    </div>
+
+
+
+
+
+}
+
+@code {
+    string? listboxValue;
+    string userName;
+    string errorMessage;
+    bool isInTeams;
+    bool isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            isInTeams = await MicrosoftTeams.IsInTeams();
+
+            if (isInTeams)
+            {
+                var user = await teamsUserCredential.GetUserInfoAsync();
+                userName = user.DisplayName;
+            }
+            else
+            {
+                errorMessage = "Not running in Microsoft Teams.";
+            }
+
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetEnvironmentName()
+    {
+        return HostEnvironment.IsDevelopment() ? "local environment" : "Azure environment";
+    }
+}
+

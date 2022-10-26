@@ -1,0 +1,29 @@
+{
+    "appName": "MyKudosDashboard",
+    "projectId": "6a4d7133-be0a-429a-bb80-401bde132a7e",
+    "version": "2.1.0",
+    "isFromSample": false,
+    "solutionSettings": {
+        "name": "fx-solution-azure",
+        "version": "1.0.0",
+        "hostType": "Azure",
+        "azureResources": [],
+        "capabilities": [
+            "Tab"
+        ],
+        "activeResourcePlugins": [
+            "fx-resource-frontend-hosting",
+            "fx-resource-identity",
+            "fx-resource-aad-app-for-teams",
+            "fx-resource-local-debug",
+            "fx-resource-appstudio",
+            "fx-resource-cicd",
+            "fx-resource-api-connector"
+        ]
+    },
+    "programmingLanguage": "csharp",
+    "pluginSettings": {
+        "projectFilePath": "c:\\github\\kudos\\MyKudosDashboard\\MyKudosDashboard\\MyKudosDashboard.csproj"
+    },
+    "isFirstTimeOpenProject": false
+}
