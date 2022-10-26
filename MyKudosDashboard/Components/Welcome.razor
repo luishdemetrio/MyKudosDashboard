@@ -34,34 +34,15 @@ else
 
 
 
-    <div class="welcome page">
-
-
-      @*  <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-            <div class="avatar">
-                <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-            </div>
-            <div class="info">
-                <h5>Monkey D Luffy</h5>
-                <p>500 XP</p>
-            </div>
-        </div>*@
-
-       @* <div class="div1">
-            <img src="hello.png" style="height:80px;width:80px;float:left" />
-        </div>
-
-        <div class="div2" style="margin-top: 30px;">
-            <h4>Welcome to My Kudos Dashboard</h4>
-        </div>*@
+    <div class="welcome page" style="padding-top: 0px">
 
       
 
-        <div style="clear:both;padding-left: 0px;">
-   
-             
+        <div style="clear:both;padding-left: 0px;padding-top: 0px">
 
-            <div class="row row-cols-1 row-cols-md-3 mb-3 text-center" >
+
+
+            <div class="row row-cols-1 row-cols-md-3 mb-3 text-center" style="padding-top: 0px">
                 <div class="col col-lg-2 ">
                     <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
                         <div class="card-header py-3">
@@ -112,6 +93,18 @@ else
 
                                        <Button class="w-40 btn btn-lg btn-outline-primary">Read More</Button>
 
+                                        <div style="float:right">
+                                            <FluentButton style="margin-left:20px;">
+                                                <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                                3
+                                            </FluentButton>
+
+                                            <FluentButton style="margin-left:20px;">
+                                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                                1
+                                            </FluentButton>
+                                            </div>
+                                      
                                        
                                     </div>
                             </div>
@@ -149,10 +142,22 @@ else
                                 <div class="avatar">
                                     <img src="profiles/zoro.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
                                 </div>
-                                <div class="info">
+                                    <div class="info" style="padding-bottom: 0px;padding-top: 0px;">
                                     <h5>Roronoa Zoro</h5>
-                                     <h2 class="card-title pricing-card-title">350<small class="text-muted fw-light">XP</small></h2>
+                                        <div class="text-wrap" style="width: 16rem;">
+                                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">THANK YOU</spam> kudos</spam>
+                                        </div>
                                 </div>
+                                  <div class="card-body" style="padding-top: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
+
+                                        <div class="text-wrap" >
+                                            Thank you for doing an AMAZING job during the demo for Straw Pirates today. It w...
+                                        </div>
+
+                                       <Button class="w-40 btn btn-lg btn-outline-primary">Read More</Button>
+
+                                       
+                                    </div>
                             </div>
 
                         </div>
