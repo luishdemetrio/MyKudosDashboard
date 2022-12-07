@@ -19,13 +19,14 @@
     <PackageReference Include="bootstrap" Version="5.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
     <PackageReference Include="Microsoft.Graph" Version="4.45.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.5.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.6.0" />
     <PackageReference Include="Microsoft.TeamsFx" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include=".fx\states\" />
+    <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\badges\" />
   </ItemGroup>
 

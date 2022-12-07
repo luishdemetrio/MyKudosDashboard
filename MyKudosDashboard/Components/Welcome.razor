@@ -36,10 +36,14 @@ else
 
     <div class="welcome page" style="padding-top:0px">
 
-        <div class="row align-items-start" style="clear: both;height:95vh;">
+         
+
+        <div class="row align-items-start" style="clear: both;height:90vh;">
+            
 
             <div class="col-2" style="height:100%;min-width:300px">
 
+                <!-- PROFILE -->
                 <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
 
                         <div class="card-header py-3">
@@ -50,11 +54,16 @@ else
 
                             <div class="profile" >
                                 <div class="avatar" style="float:none" >
-                                    <img src="profiles/luffy.png" style="height:80px;width:80px;border-radius: 50%;align-content:center" />
+                                    <img src="profiles/luffy.png" style="height:80px;width:80px;border-radius: 50%;align-content:left" />
                                 </div>
                                 <div class="info" >
                                     <h5>Monkey D Luffy</h5>
-                                    <h2  class="card-title pricing-card-title">500<small class="text-muted fw-light">XP</small></h2>
+                                    <h2  class="card-title pricing-card-title">
+                                        500
+                                        <small class="text-muted fw-light">XP</small>
+                                    
+                                        </h2>
+                                
                                 </div>
                                 
                                 <div style="clear:both;">
@@ -64,9 +73,16 @@ else
                                     <img src="badges/badge02.png" style="height:80px;width:80px;"/>
                                     <img src="badges/badge03.png" style="height:80px;width:80px;" />
                                 </div>
-                            </div>
 
+                          
                         </div>
+                        
+                        </div>
+
+                    <FluentButton style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel()) >
+                        <span>Send Kudos</span>
+                        <FluentIcon Name="@FluentIcons.Send" Slot="start" Size="@IconSize.Size24" Filled=true />
+                    </FluentButton>
                     </div>
                 </div>
 
@@ -75,6 +91,7 @@ else
                 <div class="card mb-3 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
                     <div class="card-header py-3" >
                     <h4 class="my-0 fw-normal" >👏 Kudos</h4>
+                       
                 </div>
 
                         <div class="card-body " >
@@ -88,87 +105,88 @@ else
 
 
                                     <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll">
-                                                    <div class="profile" data-is-focusable="true">
-                                                        <div class="avatar">
-                                                            <img src="profiles/nami.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                        
+                                        <div class="profile" data-is-focusable="true">
+                                            <div class="avatar">
+                                                <img src="profiles/nami.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                            </div>
+
+                                            <div class="info" >
+
+                                                <ul class="list-unstyled ">
+                                                    <li>
+                                                        <h5>Nami Cat Burglar</h5>
+                                                    </li>
+
+                                                    <li>
+                                                        <div class="text-wrap" style="width: 16rem;">
+                                                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">LEADERSHIP</spam> kudos</spam>
                                                         </div>
-
-                                                        <div class="info" >
-
-                                                            <ul class="list-unstyled ">
-                                                                <li>
-                                                                    <h5>Nami Cat Burglar</h5>
-                                                                </li>
-
-                                                                <li>
-                                                                    <div class="text-wrap" style="width: 16rem;">
-                                                                        <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">LEADERSHIP</spam> kudos</spam>
-                                                                    </div>
-                                                                </li>
-                                                                <li>
-                                                                    <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Sogeking</spam></spam>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                                    </li>
+                                                    <li>
+                                                        <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Sogeking</spam></spam>
+                                                    </li>
+                                                </ul>
+                                            </div>
 
                                             <div class="card-body" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
 
                                                 <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
                                                                 Thank you Nami for selecting and scheduling guest speakers to our Tell The Truth Tue...
-                                                            </div>
+                                                </div>
 
-                                                            <div style="float:right">
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.CodeText" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    Read more
-                                                                </FluentButton>
+                                                <div style="float:right">
+                                                    <FluentButton style="margin-left:20px;">
+                                                        <FluentIcon Name="@FluentIcons.CodeText" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                                        Read more
+                                                    </FluentButton>
 
-                                                                <FluentButton  id="likes" style="margin-left:20px;" @onclick=Like>
-                                                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" Filled=@_like />
-                                                                    @_numberOfLikes
-                                                                </FluentButton>
+                                                    <FluentButton  id="likes" style="margin-left:20px;" @onclick=Like>
+                                                        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" Filled=@_like />
+                                                        @_numberOfLikes
+                                                    </FluentButton>
 
-                                                                <FluentTooltip Anchor="likes" Position=TooltipPosition.Bottom>
-                                                                     <ul class="list-unstyled ">
-                                                                        <li>Monkey D Luffy</li>
-                                                                        <li>Roronoa Zoro</li>
-                                                                        <li>Nico Robin</li>
-                                                                    </ul>
-                                                                </FluentTooltip>
+                                                    <FluentTooltip Anchor="likes" Position=TooltipPosition.Bottom>
+                                                            <ul class="list-unstyled ">
+                                                            <li>Monkey D Luffy</li>
+                                                            <li>Roronoa Zoro</li>
+                                                            <li>Nico Robin</li>
+                                                        </ul>
+                                                    </FluentTooltip>
                                                                     
 
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    1
-                                                                </FluentButton>
+                                                    <FluentButton style="margin-left:20px;">
+                                                        <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                                        1
+                                                    </FluentButton>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                            <div class="profile" data-is-focusable="true">
+                                                <div class="avatar">
+                                                    <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                                </div>
+
+                                                <div class="info" >
+
+                                                    <ul class="list-unstyled ">
+                                                        <li>
+                                                            <h5>Monkey D Luffy</h5>
+                                                        </li>
+
+                                                        <li>
+                                                            <div class="text-wrap" style="width: 16rem;">
+                                                                <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">GROWTH MINDSET</spam> kudos</spam>
                                                             </div>
-
-
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="profile" data-is-focusable="true">
-                                                        <div class="avatar">
-                                                            <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                                        </div>
-
-                                                        <div class="info" >
-
-                                                            <ul class="list-unstyled ">
-                                                                <li>
-                                                                    <h5>Monkey D Luffy</h5>
-                                                                </li>
-
-                                                                <li>
-                                                                    <div class="text-wrap" style="width: 16rem;">
-                                                                        <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">GROWTH MINDSET</spam> kudos</spam>
-                                                                    </div>
-                                                                </li>
-                                                                <li>
-                                                                    <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Nico Robin</spam></spam>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                                        </li>
+                                                        <li>
+                                                            <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Nico Robin</spam></spam>
+                                                        </li>
+                                                    </ul>
+                                                </div>
 
                                             <div class="card-body" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
 
@@ -252,12 +270,18 @@ else
                                    
                                 </FluentTabPanel>
                             <FluentTabPanel>
+                                <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll">
+
                                 👻
+                               </div>
                             </FluentTabPanel>
                             <FluentTabPanel>
-                                👻
+                                <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll;min-width:100px">
+
+                                    👻
+                                </div>
                             </FluentTabPanel>
-                            <div>Testing</div>
+                            
                     </FluentTabs>
 
                            
@@ -334,16 +358,23 @@ else
                         </div>
                     </div>
                 </div>
-                
+
+            <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden />
+
+@*            <FluentDialog  id="foo" aria-label="Simple dialog" Modal="true" style="--dialog-height: 560px;--dialog-width: 680px;padding: 2rem" @ondismiss=OnDismiss>
+                <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden />
+                <button @onclick="OnCloseModalParameterButtonClick">Close dialog updating the variable</button>
+            </FluentDialog>
+
+            <p>ModalHidden value: @sendKudosIsHidden</p>
+
+            <button @onclick="OnOpenModalParameterButtonClick">Open dialog with variable</button>
+*@
+         
         </div>
-          
-        
-    
+
+
 </div>
-
-
-
-
 
 }
 
@@ -353,6 +384,18 @@ else
     string errorMessage;
     bool isInTeams;
     bool isLoading = true;
+
+    private SendKudos sendKudosPanel;
+    private bool sendKudosIsHidden = true;
+
+    private void OnOpenModalParameterButtonClick() => sendKudosIsHidden = false;
+    private void OnCloseModalParameterButtonClick() => sendKudosIsHidden = true;
+
+    private void OnDismiss()
+    {
+        sendKudosIsHidden = true;
+
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -374,13 +417,11 @@ else
 
             isLoading = false;
             StateHasChanged();
+    
         }
     }
 
-    private string GetEnvironmentName()
-    {
-        return HostEnvironment.IsDevelopment() ? "local environment" : "Azure environment";
-    }
+   
     private bool _like;
     private int _numberOfLikes = 3;
 
@@ -391,7 +432,18 @@ else
         if (_like)
             _numberOfLikes++;
         else
-        _numberOfLikes--;
+            _numberOfLikes--;
+    }
+
+    private void OpenSendKudosPanel()
+    {
+       
+
+        sendKudosPanel.Show(() =>
+      {
+          sendKudosIsHidden = true;
+      
+      });
     }
 }
 

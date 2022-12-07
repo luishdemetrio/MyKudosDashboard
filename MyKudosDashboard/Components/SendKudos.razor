@@ -1,0 +1,232 @@
+﻿
+<style>
+
+    fluent-card {
+        padding: 5px;
+        margin: 5px;
+        height: 55px
+    }
+
+    fluent-horizontal-scroll {
+        max-width: 620px;
+        margin-top: 20px;
+        margin-left: 0px;
+        margin-right: 10px;
+        
+    }
+
+    .both-gradient {
+        --scroll-fade-next: var(--fill-color);
+        --scroll-fade-previous: var(--fill-color)
+    }
+</style>
+
+<FluentDialog @ref=SendKudosFluentDialog TrapFocus="true" aria-label="Simple dialog" Modal="true" class="both-gradient"  style="--dialog-height: 560px;--dialog-width: 680px;" @ondismiss=OnDismiss>
+
+
+<div style="margin:10px;">
+
+          <h5>👏 Send Kudos to people</h5>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td scope="row">
+
+                      
+                        <p>Select colleague</p>
+                        <FluentSearch @ref=searchTest style="width: 100%;"
+                        @oninput=handleSearchInput
+                                      Value="@searchValue"
+                                      Placeholder="Search for people" />
+
+                        </td>
+
+                </tr>
+                <tr>
+                    <td scope="row">
+
+                        <p>Title</p>
+                        
+                        <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient" >
+
+                            <FluentCard style="width:138px;">
+                                <div>
+                                    <h3 style="; float: left;">🏆</h3>
+                                    <span style="float: right;padding-top:5px;padding-left:5px">Awesome</span>
+                                </div>
+                            </FluentCard>
+
+
+                            <FluentCard style="width:144px;">
+                                <div>
+                                    <h3 style="float: left;">✨</h3>
+                                    <span style="float: right;padding-top:5px;padding-left:5px">Thank you</span>
+                                </div>
+                            </FluentCard>
+
+                            <FluentCard style="width:180px;">
+                                <div>
+                                    <h3 style=" float: left;">🎉</h3>
+                                    <span style="float: right;padding-top:5px;padding-left:5px">Congratulations</span>
+                                </div>
+                            </FluentCard>
+
+                            <FluentCard style="width:130px;">
+                                <div>
+                                    <h3 style=" float: left;">🏅</h3>
+                                    <span style="float: right;padding-top:5px;padding-left:5px">Achiever</span>
+                                </div>
+                            </FluentCard>
+
+                            
+                            <FluentCard style="width:180px;">
+                                <div>
+                                    <h3 style=" float: left;">💡</h3>
+                                    <span style="float: right;padding-top:5px;padding-left:5px">Problem solver</span>
+                                </div>
+                            </FluentCard>
+
+                            <FluentCard style="width:134px;">
+                                <div>
+                                    <h3 style="float: left;">🦁</h3>
+                                    <span style="float: right;padding-top:5px">Courage</span>
+                                </div>
+                            </FluentCard>
+
+                            <FluentCard style="width:160px;">
+                                <div>
+                                    <h3 style=" float: left;">🏀</h3>
+                                    <span style="float: right;padding-top:5px">Team player</span>
+                                </div>
+                            </FluentCard>
+
+                        </FluentHorizontalScroll>
+                        
+                    </td>
+                   
+                </tr>
+
+                <tr>
+                    <td scope="row" >
+
+                        <p>Message</p>
+                        @*<FluentTextArea  style="width: 100%;height:200px" ></FluentTextArea>*@
+                        
+                        <div class="input-group">
+                           
+                            <textarea class="form-control" aria-label="With textarea" style="height:160px"></textarea>
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td scope="row" >
+
+                        <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=Hide>Cancel</button>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </table>
+
+        
+    </div>
+
+</FluentDialog>
+
+
+
+@code {
+
+    [Parameter]
+    public bool ModalHidden { get; set; } = true;
+
+    public delegate void CloseModalParameterButtonClick();
+
+    public CloseModalParameterButtonClick closeModalParameter;
+
+    private FluentDialog SendKudosFluentDialog;
+
+    
+
+    public void Show(CloseModalParameterButtonClick closeModalParameterButtonClick)
+    {
+
+        closeModalParameter = closeModalParameterButtonClick;
+
+        ModalHidden = false;
+
+        SendKudosFluentDialog!.Show();
+          StateHasChanged();
+
+    }
+
+    public void Hide()
+    {
+        SendKudosFluentDialog!.Hide();
+
+        //closeModalParameter?.Invoke();
+
+        //ModalHidden = true;
+        //StateHasChanged();
+    }
+
+    private void OnDismiss()
+    {
+        Hide();
+
+    }
+
+    FluentSearch searchTest;
+    string searchValue = string.Empty;
+
+    List<string> searchData = new()
+    {
+        "Monkey D. Luffy",
+        "Nami",
+        "Nico Robin",
+        "Sandy",
+        "Zoro",
+        "Sogeking"
+    };
+
+    List<string> searchResults = defaultResults();
+
+    static string defaultResultsText = "no results";
+    static List<string> defaultResults()
+    {
+        return new() { defaultResultsText };
+    }
+
+    void handleSearchInput(ChangeEventArgs args)
+    {
+        if (args is not null && args.Value is not null)
+        {
+            string searchTerm = args.Value.ToString()!.ToLower();
+
+            if (searchTerm.Length > 0)
+            {
+                List<string> temp = searchData.Where(str => str.ToLower().Contains(searchTerm)).Select(str => str).ToList();
+                if (temp.Count() > 0)
+                {
+                    searchResults = temp;
+                }
+                else
+                {
+                    searchResults = defaultResults();
+                }
+            }
+        }
+    }
+
+}
