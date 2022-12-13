@@ -1,5 +1,8 @@
 ﻿@using MyKudosDashboard.Helper;
+@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
+
+@inject ISendKudosView SendKudosView;
 
 <style>
 
@@ -136,25 +139,7 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
-    private List<UserViewModel> users;
-
-    private List<Recognition> recognitions;
-
-    private record Recognition {
-
-
-        public string Emoji { get; set; }
-        public string Description { get; set; }
-        public bool IsSelected { get; set; }
-
-        public Recognition(string emoji, string description, bool isSelected )
-        {
-            Emoji = emoji;
-            Description = description;
-            IsSelected = isSelected;
-
-        }
-    }
+    private IEnumerable<RecognitionViewModel> recognitions;
 
     private UserViewModel SelectedEmployee { get; set; }
 
@@ -165,51 +150,29 @@
         var settings = Settings.LoadSettings();
         GraphHelper.InitializeGraphForAppOnlyAuth(settings);
 
-
-        recognitions = new();
-
-        recognitions.Add(new Recognition("🏆", "Awesome", false ));
-        recognitions.Add(new Recognition("✨", "Thank you", false));
-        recognitions.Add(new Recognition("🎉", "Congratulations", false));
-        recognitions.Add(new Recognition("🏅", "Achiever", false));
-        recognitions.Add(new Recognition("💡", "Problem Solver", false));
-        recognitions.Add(new Recognition("🦁", "Courage", false));
-        recognitions.Add(new Recognition("🏀", "Team Player", false));
+        recognitions = SendKudosView.GetRecognitions();
 
     }
 
-    private void RecognitionClick(Recognition recognition)
+    private void RecognitionClick(RecognitionViewModel recognition)
     {
-
-        recognitions.ForEach(i => i.IsSelected = false);
-
+        foreach (var item in recognitions)
+        {
+            item.IsSelected = false;
+        }
+        
         recognition.IsSelected = !recognition.IsSelected;
 
     }
 
     private async Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
     {
-
         var settings = Settings.LoadSettings();        
 
-        await GetUsersAsync(searchText);
+        return await SendKudosView.GetUsersAsync(searchText);
 
-        return users;
     }
 
-    async Task GetUsersAsync(string name)
-    {
-        var graphUsers = await GraphHelper.GetUsers(name);
-
-        var photos = await GraphHelper.GetUserPhotos(graphUsers);
-
-        users = (from graphUser in graphUsers.value
-                join photo in photos.responses
-                    on graphUser.id equals photo.id
-                 select new UserViewModel(graphUser.id, graphUser.displayName, "data:image/png;base64," + photo.body)).ToList();
-                        
-    }
-        
 
     public delegate void CloseModalParameterButtonClick();
 
