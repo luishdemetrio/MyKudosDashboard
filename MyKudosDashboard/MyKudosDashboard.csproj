@@ -1,28 +1,67 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+
+
   <PropertyGroup>
+
     <TargetFramework>net6.0</TargetFramework>
+
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>0c2b76e5-2ac8-420f-9240-a837ffaacc9d</UserSecretsId>
+
   </PropertyGroup>
 
+
+
   <ItemGroup>
+
     <ProjectCapability Include="TeamsFx" />
+
   </ItemGroup>
 
+
+
   <ItemGroup>
+
     <None Include=".fx/**/*" />
+
     <None Remove="build/**/*" />
+
     <Content Remove="build/**/*" />
+
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="bootstrap" Version="5.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
-    <PackageReference Include="Microsoft.Graph" Version="4.45.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.6.0" />
-    <PackageReference Include="Microsoft.TeamsFx" Version="1.1.0" />
+    <None Include="appsettings*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
+
+    <PackageReference Include="bootstrap" Version="5.2.2" />
+
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
+
+    <PackageReference Include="Microsoft.Graph" Version="4.48.0" />
+
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.10" />
+
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.6.0" />
+
+    <PackageReference Include="Microsoft.TeamsFx" Version="1.1.0" />
+
+    <PackageReference Include="Radzen.Blazor" Version="4.4.4" />
+
+    <PackageReference Include="RestSharp" Version="108.0.3" />
+
+  </ItemGroup>
+
+
 
   <ItemGroup>
     <Folder Include=".fx\states\" />
@@ -30,4 +69,7 @@
     <Folder Include="wwwroot\badges\" />
   </ItemGroup>
 
+
+
 </Project>
+

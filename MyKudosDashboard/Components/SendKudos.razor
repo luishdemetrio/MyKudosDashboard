@@ -1,4 +1,8 @@
-﻿
+﻿@using MyKudosDashboard.Helper;
+@*@using Microsoft.Graph;
+@using Microsoft.Identity.Web;
+@inject GraphServiceClient graphClient;
+@inject ITokenAcquisition _tokenAcquisition*@
 <style>
 
     fluent-card {
@@ -26,85 +30,111 @@
 
 <div style="margin:10px;">
 
-          <h5>👏 Send Kudos to people</h5>
+        <h5>👏 Send Kudos to people</h5>
 
         <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
             <tbody>
                 <tr>
                     <td scope="row">
-
                       
-                        <p>Select colleague</p>
-                        <FluentSearch @ref=searchTest style="width: 100%;"
-                        @oninput=handleSearchInput
-                                      Value="@searchValue"
-                                      Placeholder="Search for people" />
+                        <p style="margin-bottom: 5px;">Select colleague</p>
+                    
+                         <BlazoredTypeahead SearchMethod="@SearchEmployees"
+                                           @bind-Value="@SelectedEmployee"
+                                           Debounce="500">
+                            <SelectedTemplate>
+                                @context.Name
+                            </SelectedTemplate>
+                            <ResultTemplate>
+                                @context.Name 
+                            </ResultTemplate>
+                            <NotFoundTemplate>
+                                Sorry, there weren't any search results.
+                            </NotFoundTemplate>
+                        </BlazoredTypeahead>
+                   
 
-                        </td>
+                    </td>
 
                 </tr>
                 <tr>
                     <td scope="row">
 
-                        <p>Title</p>
+                        <p style="margin-bottom: 5px;">Title</p>
                         
-                        <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient" >
+                        <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient"  >
 
-                            <FluentCard style="width:138px;">
-                                <div>
-                                    <h3 style="; float: left;">🏆</h3>
-                                    <span style="float: right;padding-top:5px;padding-left:5px">Awesome</span>
+                            @foreach (var item in recognitions)
+                            {
+                                
+                                    using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1));
+
+                                    var size = graphics.MeasureString(@item.Description, new System.Drawing.Font("Segoe UI", 16, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
+
+
+                                <div class="@(item.IsSelected ? "card border border-primary" : "card")" style="width:@(@size.Width + 40)px;height: 55px">
+                                            <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:medium">
+                                            <h3 style="float: left;">@item.Emoji</h3>
+                                            <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:0px" @onclick=@(() => RecognitionClick(item))>@item.Description</span>
+                                            </div>
+                                        </div>
+                                    
+                                
+                                
+                            }
+
+                          @*  <div class="card" style="width:138px;height: 55px">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
+                                    <h3 style="float: left;">🏆</h3>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Awesome</span>
                                 </div>
-                            </FluentCard>
+                            </div>
 
 
-                            <FluentCard style="width:144px;">
-                                <div>
+                            <div class="card" style="width:144px;height: 55px">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
                                     <h3 style="float: left;">✨</h3>
-                                    <span style="float: right;padding-top:5px;padding-left:5px">Thank you</span>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Thank you</span>
                                 </div>
-                            </FluentCard>
+                            </div>
+                     
 
-                            <FluentCard style="width:180px;">
-                                <div>
-                                    <h3 style=" float: left;">🎉</h3>
-                                    <span style="float: right;padding-top:5px;padding-left:5px">Congratulations</span>
+                            <div class="card" style="width:182px;height: 55px">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
+                                    <h3 style="float: left;">🎉</h3>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Congratulations</span>
                                 </div>
-                            </FluentCard>
+                            </div>
 
-                            <FluentCard style="width:130px;">
-                                <div>
-                                    <h3 style=" float: left;">🏅</h3>
-                                    <span style="float: right;padding-top:5px;padding-left:5px">Achiever</span>
+                            <div class="card" style="width:132px;height: 55px">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
+                                    <h3 style="float: left;">🏅</h3>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Achiever</span>
                                 </div>
-                            </FluentCard>
+                            </div>
 
-                            
-                            <FluentCard style="width:180px;">
-                                <div>
-                                    <h3 style=" float: left;">💡</h3>
-                                    <span style="float: right;padding-top:5px;padding-left:5px">Problem solver</span>
+
+                            <div class="card" style="width:182px;height: 55px">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
+                                    <h3 style="float: left;">💡</h3>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Problem solver</span>
                                 </div>
-                            </FluentCard>
-
-                            <FluentCard style="width:134px;">
-                                <div>
+                            </div>
+                            <div class="card" style="width:134px;height: 55px">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
                                     <h3 style="float: left;">🦁</h3>
-                                    <span style="float: right;padding-top:5px">Courage</span>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Courage</span>
                                 </div>
-                            </FluentCard>
+                            </div>
 
-                            <FluentCard style="width:160px;">
-                                <div>
-                                    <h3 style=" float: left;">🏀</h3>
-                                    <span style="float: right;padding-top:5px">Team player</span>
+
+                            <div @ref=TeamPlayerCard class="card border border-primary" style="width:160px;height: 55px;">
+                                <div class="card-body" style="padding:0px;padding-top:2px">
+                                    <h3 style="float: left;">🏀</h3>
+                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px" @onclick=RecognitionClick>Team player</span>
                                 </div>
-                            </FluentCard>
+                            </div>*@
+
 
                         </FluentHorizontalScroll>
                         
@@ -115,8 +145,7 @@
                 <tr>
                     <td scope="row" >
 
-                        <p>Message</p>
-                        @*<FluentTextArea  style="width: 100%;height:200px" ></FluentTextArea>*@
+                        <p style="margin-bottom: 5px;">Message</p>
                         
                         <div class="input-group">
                            
@@ -128,9 +157,10 @@
                 </tr>
 
                 <tr>
+                   
                     <td scope="row" >
-
-                        <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=Hide>Cancel</button>
+                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=Hide>📩 Send</button>
+                        <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=Hide>✖️ Cancel</button>
 
                     </td>
 
@@ -151,13 +181,92 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
+    private List<Recognition> recognitions;
+
+    private class Recognition {
+
+
+        public string Emoji { get; set; }
+        public string Description { get; set; }
+        public bool IsSelected { get; set; }
+
+        public Recognition(string emoji, string description, bool isSelected )
+        {
+            Emoji = emoji;
+            Description = description;
+            IsSelected = isSelected;
+
+        }
+    }
+
+    private record Person (string Name, string email);
+
+
+    private List<Person> Employees { get; set; }
+    private Person SelectedEmployee { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var settings = Settings.LoadSettings();
+        GraphHelper.InitializeGraphForAppOnlyAuth(settings);
+
+        Employees = new();
+        recognitions = new();
+
+        recognitions.Add(new Recognition("🏆", "Awesome", false ));
+        recognitions.Add(new Recognition("✨", "Thank you", false));
+        recognitions.Add(new Recognition("🎉", "Congratulations", false));
+        recognitions.Add(new Recognition("🏅", "Achiever", false));
+        recognitions.Add(new Recognition("💡", "Problem Solver", false));
+        recognitions.Add(new Recognition("🦁", "Courage", false));
+        recognitions.Add(new Recognition("🏀", "Team Player", false));
+
+    }
+
+    private void RecognitionClick(Recognition recognition)
+    {
+
+        recognitions.ForEach(i => i.IsSelected = false);
+
+        recognition.IsSelected = !recognition.IsSelected;
+
+    }
+
+    private async Task<IEnumerable<Person>> SearchEmployees(string searchText)
+    {
+
+        var settings = Settings.LoadSettings();        
+
+        await GetUsersAsync(searchText);
+
+        return Employees.Where(e => e.Name.ToLower().Contains(searchText.ToLower()));
+    }
+
+
+
+    async Task GetUsersAsync(string name)
+    {
+
+        var userPage = await GraphHelper.GetUsers(name);
+
+        Employees.Clear();
+
+        foreach (var user in userPage.value)
+        {
+            Employees.Add(new Person(user.displayName, user.userPrincipalName));
+
+        }
+
+    }
+
+
     public delegate void CloseModalParameterButtonClick();
 
     public CloseModalParameterButtonClick closeModalParameter;
 
     private FluentDialog SendKudosFluentDialog;
-
-    
 
     public void Show(CloseModalParameterButtonClick closeModalParameterButtonClick)
     {
@@ -174,59 +283,12 @@
     public void Hide()
     {
         SendKudosFluentDialog!.Hide();
-
-        //closeModalParameter?.Invoke();
-
-        //ModalHidden = true;
-        //StateHasChanged();
     }
 
     private void OnDismiss()
     {
         Hide();
-
     }
 
-    FluentSearch searchTest;
-    string searchValue = string.Empty;
-
-    List<string> searchData = new()
-    {
-        "Monkey D. Luffy",
-        "Nami",
-        "Nico Robin",
-        "Sandy",
-        "Zoro",
-        "Sogeking"
-    };
-
-    List<string> searchResults = defaultResults();
-
-    static string defaultResultsText = "no results";
-    static List<string> defaultResults()
-    {
-        return new() { defaultResultsText };
-    }
-
-    void handleSearchInput(ChangeEventArgs args)
-    {
-        if (args is not null && args.Value is not null)
-        {
-            string searchTerm = args.Value.ToString()!.ToLower();
-
-            if (searchTerm.Length > 0)
-            {
-                List<string> temp = searchData.Where(str => str.ToLower().Contains(searchTerm)).Select(str => str).ToList();
-                if (temp.Count() > 0)
-                {
-                    searchResults = temp;
-                }
-                else
-                {
-                    searchResults = defaultResults();
-                }
-            }
-        }
-    }
 
 }

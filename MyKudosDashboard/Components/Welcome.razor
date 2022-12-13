@@ -83,6 +83,9 @@ else
                         <span>Send Kudos</span>
                         <FluentIcon Name="@FluentIcons.Send" Slot="start" Size="@IconSize.Size24" Filled=true />
                     </FluentButton>
+
+                   
+
                     </div>
                 </div>
 
@@ -146,7 +149,7 @@ else
                                                         @_numberOfLikes
                                                     </FluentButton>
 
-                                                    <FluentTooltip Anchor="likes" Position=TooltipPosition.Bottom>
+                                                    <FluentTooltip Anchor="likes" Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
                                                             <ul class="list-unstyled ">
                                                             <li>Monkey D Luffy</li>
                                                             <li>Roronoa Zoro</li>
@@ -361,15 +364,7 @@ else
 
             <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden />
 
-@*            <FluentDialog  id="foo" aria-label="Simple dialog" Modal="true" style="--dialog-height: 560px;--dialog-width: 680px;padding: 2rem" @ondismiss=OnDismiss>
-                <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden />
-                <button @onclick="OnCloseModalParameterButtonClick">Close dialog updating the variable</button>
-            </FluentDialog>
 
-            <p>ModalHidden value: @sendKudosIsHidden</p>
-
-            <button @onclick="OnOpenModalParameterButtonClick">Open dialog with variable</button>
-*@
          
         </div>
 
@@ -378,7 +373,10 @@ else
 
 }
 
+
 @code {
+
+
     string? listboxValue;
     string userName;
     string errorMessage;
@@ -417,7 +415,8 @@ else
 
             isLoading = false;
             StateHasChanged();
-    
+
+
         }
     }
 
