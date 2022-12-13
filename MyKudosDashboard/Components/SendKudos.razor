@@ -1,8 +1,6 @@
 ﻿@using MyKudosDashboard.Helper;
-@*@using Microsoft.Graph;
-@using Microsoft.Identity.Web;
-@inject GraphServiceClient graphClient;
-@inject ITokenAcquisition _tokenAcquisition*@
+@using MyKudosDashboard.Models;
+
 <style>
 
     fluent-card {
@@ -25,8 +23,7 @@
     }
 </style>
 
-<FluentDialog @ref=SendKudosFluentDialog TrapFocus="true" aria-label="Simple dialog" Modal="true" class="both-gradient"  style="--dialog-height: 560px;--dialog-width: 680px;" @ondismiss=OnDismiss>
-
+<FluentDialog @ref=SendKudosFluentDialog TrapFocus="true" aria-label="Simple dialog" Modal="true" class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;" @ondismiss=OnDismiss>
 
 <div style="margin:10px;">
 
@@ -41,12 +38,22 @@
                     
                          <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
-                                           Debounce="500">
-                            <SelectedTemplate>
-                                @context.Name
+                                           Debounce="500" style="witdh:80px"
+                                           >
+                            <SelectedTemplate >
+                                <div>
+                                    <img src=@context.Photo
+                                         style="height: 26px;width: 26px;border-radius: 50%"  />
+                                    <span style="margin-left:5px">@context.Name</span>
+                                </div>
+                                
                             </SelectedTemplate>
-                            <ResultTemplate>
-                                @context.Name 
+                            <ResultTemplate >
+                                <div>
+                                    <img src=@context.Photo
+                                         style="height: 26px;width: 26px;border-radius: 50%;" />
+                                    <span style="margin-left:5px">@context.Name</span>
+                                </div>
                             </ResultTemplate>
                             <NotFoundTemplate>
                                 Sorry, there weren't any search results.
@@ -67,9 +74,9 @@
                             @foreach (var item in recognitions)
                             {
                                 
-                                    using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1));
+                                using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1));
 
-                                    var size = graphics.MeasureString(@item.Description, new System.Drawing.Font("Segoe UI", 16, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
+                                var size = graphics.MeasureString(@item.Description, new System.Drawing.Font("Segoe UI", 16, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
 
 
                                 <div class="@(item.IsSelected ? "card border border-primary" : "card")" style="width:@(@size.Width + 40)px;height: 55px">
@@ -82,58 +89,6 @@
                                 
                                 
                             }
-
-                          @*  <div class="card" style="width:138px;height: 55px">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">🏆</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Awesome</span>
-                                </div>
-                            </div>
-
-
-                            <div class="card" style="width:144px;height: 55px">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">✨</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Thank you</span>
-                                </div>
-                            </div>
-                     
-
-                            <div class="card" style="width:182px;height: 55px">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">🎉</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Congratulations</span>
-                                </div>
-                            </div>
-
-                            <div class="card" style="width:132px;height: 55px">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">🏅</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Achiever</span>
-                                </div>
-                            </div>
-
-
-                            <div class="card" style="width:182px;height: 55px">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">💡</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Problem solver</span>
-                                </div>
-                            </div>
-                            <div class="card" style="width:134px;height: 55px">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">🦁</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px">Courage</span>
-                                </div>
-                            </div>
-
-
-                            <div @ref=TeamPlayerCard class="card border border-primary" style="width:160px;height: 55px;">
-                                <div class="card-body" style="padding:0px;padding-top:2px">
-                                    <h3 style="float: left;">🏀</h3>
-                                    <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:5px" @onclick=RecognitionClick>Team player</span>
-                                </div>
-                            </div>*@
 
 
                         </FluentHorizontalScroll>
@@ -181,9 +136,11 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
+    private List<UserViewModel> users;
+
     private List<Recognition> recognitions;
 
-    private class Recognition {
+    private record Recognition {
 
 
         public string Emoji { get; set; }
@@ -199,11 +156,7 @@
         }
     }
 
-    private record Person (string Name, string email);
-
-
-    private List<Person> Employees { get; set; }
-    private Person SelectedEmployee { get; set; }
+    private UserViewModel SelectedEmployee { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -212,7 +165,7 @@
         var settings = Settings.LoadSettings();
         GraphHelper.InitializeGraphForAppOnlyAuth(settings);
 
-        Employees = new();
+
         recognitions = new();
 
         recognitions.Add(new Recognition("🏆", "Awesome", false ));
@@ -234,33 +187,29 @@
 
     }
 
-    private async Task<IEnumerable<Person>> SearchEmployees(string searchText)
+    private async Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
     {
 
         var settings = Settings.LoadSettings();        
 
         await GetUsersAsync(searchText);
 
-        return Employees.Where(e => e.Name.ToLower().Contains(searchText.ToLower()));
+        return users;
     }
-
-
 
     async Task GetUsersAsync(string name)
     {
+        var graphUsers = await GraphHelper.GetUsers(name);
 
-        var userPage = await GraphHelper.GetUsers(name);
+        var photos = await GraphHelper.GetUserPhotos(graphUsers);
 
-        Employees.Clear();
-
-        foreach (var user in userPage.value)
-        {
-            Employees.Add(new Person(user.displayName, user.userPrincipalName));
-
-        }
-
+        users = (from graphUser in graphUsers.value
+                join photo in photos.responses
+                    on graphUser.id equals photo.id
+                 select new UserViewModel(graphUser.id, graphUser.displayName, "data:image/png;base64," + photo.body)).ToList();
+                        
     }
-
+        
 
     public delegate void CloseModalParameterButtonClick();
 

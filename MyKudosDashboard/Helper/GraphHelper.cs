@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
+using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -75,26 +76,16 @@ public class GraphHelper
     }
 
 
-    public class Users
-    {
-        public string odatacontext { get; set; }
-        public Value[] value { get; set; }
-    }
-
-    public class Value
-    {
-        public string displayName { get; set; }
-        public string userPrincipalName { get; set; }
-        
-    }
 
 
-    public static async Task<Users> GetUsers(string name)
+
+
+    public static async Task<GraphUsersDTO> GetUsers(string name)
     {
 
-        Users r = new();
+        GraphUsersDTO r = new();
 
-        var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=displayname,userprincipalname");
+        var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
 
         var request = new RestRequest();
 
@@ -103,13 +94,52 @@ public class GraphHelper
         request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
 
         RestResponse response = client.Execute(request);
-        
+
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            r = JsonConvert.DeserializeObject<Users>(response.Content)!;
+            r = JsonConvert.DeserializeObject<GraphUsersDTO>(response.Content)!;
 
         }
 
         return r;
     }
+
+    public static async Task<GraphUserPhotos> GetUserPhotos(GraphUsersDTO users)
+    {
+
+        GraphUserPhotos photos = new();
+
+        var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
+
+        var request = new RestRequest();
+
+        request.Method = Method.Post;
+        request.AddHeader("ConsistencyLevel", "eventual");
+        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+
+
+        List<GraphBatchRequestDTO> batch = new();
+
+        foreach (var item in users.value)
+        {
+            batch.Add(new GraphBatchRequestDTO(item.id, "GET", $"users/{item.id}/photos/48x48/$value"));
+        }
+
+        var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            photos = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
+
+        }
+
+        return photos;
+    }
+
+
+   
+
 }
