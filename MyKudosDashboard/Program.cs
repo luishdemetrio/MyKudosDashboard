@@ -2,6 +2,7 @@ using Microsoft.Fast.Components.FluentUI;
 using Microsoft.Identity.Web;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
+using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
 using Radzen;
 
@@ -27,6 +28,9 @@ builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
+
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 
 //// Add MS GRAPH services to the container.
 //builder.Services

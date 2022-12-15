@@ -5,6 +5,9 @@ using MyKudos.Dashboard.App.Interface;
 using MyKudos.Dashboard.App.Services;
 using MyKudos.Dashboard.Data.Context;
 using MyKudos.Dashboard.Data.Repository;
+using MyKudos.Dashboard.Domain.CommandHandlers;
+using MyKudos.Dashboard.Domain.Commands;
+using MyKudos.Dashboard.Domain.Events;
 using MyKudos.Dashboard.Domain.Interfaces;
 using MyKudos.Domain.Core.Bus;
 using MyKudos.Infra.Bus;
@@ -42,8 +45,20 @@ public class DependencyContainer
 
         services.AddTransient<IRecognitionRepository, RecognitionRepository>();
 
-       
+        //Subscriptions
         
+
+        //Domain Events
+        
+
+
+        //Domain Banking Commands
+        services.AddTransient<IRequestHandler<CreateSendKudosCommand, bool>, SendKudosCommandHandler>();
+
+        //Application Services
+        services.AddTransient<IKudosService, KudosService>();
+        
+
     }
 
 }

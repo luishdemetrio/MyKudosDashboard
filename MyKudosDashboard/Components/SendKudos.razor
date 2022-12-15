@@ -107,7 +107,7 @@
                         
                         <div class="input-group">
                            
-                            <textarea class="form-control" aria-label="With textarea" style="height:160px"></textarea>
+                            <textarea class="form-control" aria-label="With textarea" style="height:160px" @onchange="KudosMessageChanged"  ></textarea>
                         </div>
 
                     </td>
@@ -117,7 +117,7 @@
                 <tr>
                    
                     <td scope="row" >
-                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=Hide>📩 Send</button>
+                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick>📩 Send</button>
                         <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=Hide>✖️ Cancel</button>
 
                     </td>
@@ -143,6 +143,8 @@
 
     private UserViewModel SelectedEmployee { get; set; }
 
+    private string KudosMessage;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -160,7 +162,7 @@
         {
             item.IsSelected = false;
         }
-        
+
         recognition.IsSelected = !recognition.IsSelected;
 
     }
@@ -173,6 +175,25 @@
 
     }
 
+    private void KudosMessageChanged(ChangeEventArgs args)
+    {
+        KudosMessage = args.Value.ToString();
+    }
+
+    private void SendKudosClick()
+    {
+        KudosViewModel kudos = new()
+            {
+                PersonId = SelectedEmployee.Id,
+                TitleId = recognitions.Where(r=> r.IsSelected).FirstOrDefault().Id,
+                Message = KudosMessage 
+            };
+
+        if (SendKudosView.Send(kudos))
+        {
+            Hide();
+        }
+    }
 
     public delegate void CloseModalParameterButtonClick();
 

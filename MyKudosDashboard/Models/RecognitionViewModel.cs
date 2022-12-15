@@ -2,8 +2,7 @@
 
 public class RecognitionViewModel
 {
-
-
+    public string Id { get; set; }
     public string Emoji { get; set; }
     public string Description { get; set; }
     public bool IsSelected { get; set; }

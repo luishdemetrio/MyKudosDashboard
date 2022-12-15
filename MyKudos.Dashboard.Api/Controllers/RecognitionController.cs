@@ -7,19 +7,19 @@ namespace MyKudos.Dashboard.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class Kudos : ControllerBase
+public class RecognitionController : ControllerBase
 {
 
     private readonly IRecognitionService _recognitionService;
 
 
-    public Kudos(IRecognitionService recognitionService)
+    public RecognitionController(IRecognitionService recognitionService)
     {
         _recognitionService = recognitionService;
     }
 
-    [HttpGet(Name = "GetAccounts")]
-    public IEnumerable<Recognition> Get()
+    [HttpGet(Name = "GetRecognitions")]
+    public IEnumerable<Domain.Models.Recognition> Get()
     {
         return _recognitionService.GetRecognitions();
     }

@@ -70,7 +70,6 @@
 
   <ItemGroup>
     <Folder Include=".fx\states\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\badges\" />
   </ItemGroup>
