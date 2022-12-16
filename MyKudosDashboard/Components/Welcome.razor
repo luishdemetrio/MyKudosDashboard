@@ -1,14 +1,15 @@
 ﻿@using Microsoft.Extensions.Configuration
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Hosting
+@using MyKudosDashboard.Interfaces;
+
 @inject TeamsFx teamsfx
 @inject TeamsUserCredential teamsUserCredential
 @inject MicrosoftTeams MicrosoftTeams
 @inject IWebHostEnvironment HostEnvironment
 @inject IConfiguration Configuration
 @inject NavigationManager MyNavigationManager
-
-
+@inject IWelcomeView WelcomeView;
 
 @if (isLoading)
 {
@@ -54,10 +55,11 @@ else
 
                             <div class="profile" >
                                 <div class="avatar" style="float:none" >
-                                    <img src="profiles/luffy.png" style="height:80px;width:80px;border-radius: 50%;align-content:left" />
+                                    <img src=@userPhoto style="height:80px;width:80px;border-radius: 50%;align-content:left" />
+                                @*<img src="profiles/luffy.png" style="height:80px;width:80px;border-radius: 50%;align-content:left" />*@
                                 </div>
                                 <div class="info" >
-                                    <h5>Monkey D Luffy</h5>
+                                    <h5>@user.DisplayName</h5>
                                     <h2  class="card-title pricing-card-title">
                                         500
                                         <small class="text-muted fw-light">XP</small>
@@ -362,9 +364,7 @@ else
                     </div>
                 </div>
 
-            <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden />
-
-
+            <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden UserProfile=@user/>
          
         </div>
 
@@ -376,12 +376,13 @@ else
 
 @code {
 
+    UserInfo user;
 
-    string? listboxValue;
-    string userName;
     string errorMessage;
     bool isInTeams;
     bool isLoading = true;
+
+    private string userPhoto;
 
     private SendKudos sendKudosPanel;
     private bool sendKudosIsHidden = true;
@@ -405,8 +406,8 @@ else
 
             if (isInTeams)
             {
-                var user = await teamsUserCredential.GetUserInfoAsync();
-                userName = user.DisplayName;
+                user = await teamsUserCredential.GetUserInfoAsync();
+                userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
             }
             else
             {
@@ -438,7 +439,7 @@ else
     {
        
 
-        sendKudosPanel.Show(() =>
+      sendKudosPanel.Show( () =>
       {
           sendKudosIsHidden = true;
       

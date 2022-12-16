@@ -1,4 +1,4 @@
-﻿using MyKudos.Dashboard.App.Interface;
+﻿using MyKudos.Dashboard.App.Interfaces;
 using MyKudos.Dashboard.Domain.Interfaces;
 using MyKudos.Dashboard.Domain.Models;
 

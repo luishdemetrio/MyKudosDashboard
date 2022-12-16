@@ -1,7 +1,7 @@
 ﻿
 using MyKudos.Dashboard.Domain.Models;
 
-namespace MyKudos.Dashboard.App.Interface;
+namespace MyKudos.Dashboard.App.Interfaces;
 
 public interface IRecognitionService
 {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MyKudos.Dashboard.App.Interface;
+using MyKudos.Dashboard.App.Interfaces;
 using MyKudos.Dashboard.App.Services;
 using MyKudos.Dashboard.Data.Context;
 using MyKudos.Dashboard.Data.Repository;
@@ -11,6 +11,12 @@ using MyKudos.Dashboard.Domain.Events;
 using MyKudos.Dashboard.Domain.Interfaces;
 using MyKudos.Domain.Core.Bus;
 using MyKudos.Infra.Bus;
+using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.App.Services;
+using MyKudos.Kudos.Data.Context;
+using MyKudos.Kudos.Data.Repository;
+using MyKudos.Kudos.Domain.EventHandlers;
+using MyKudos.Kudos.Domain.Interfaces;
 
 namespace MyKudos.Infra.IoC;
 
@@ -26,38 +32,50 @@ public class DependencyContainer
             return new RabbitMQBus(sp.GetService<IMediator>(), scopeFactory);
         });
 
+        //Domain Banking Commands
+        services.AddTransient<IRequestHandler<CreateSendKudosCommand, bool>, SendKudosCommandHandler>();
+
         //Application services
         services.AddTransient<IRecognitionService, RecognitionService>();
+        services.AddTransient<IDashboardKudosService, DashboardKudosService>();
+        services.AddTransient<IKudosService, KudosService>();
 
         //Data
-
         services.AddTransient<RecognitionDbContext>(_ =>
         {
             var options = new DbContextOptionsBuilder<RecognitionDbContext>()
               .UseCosmos(
                       "https://mykudos.documents.azure.com:443/",
                       "pPT5EVtJyAh0Lk4N7ywHk2ZgPTSepeH6YvbUYw2R6msjLeCQLHMs1KfhOE5xPdoHUQVR3vMFiXvmACDbOWmCqA==",
-                      databaseName: "kudosdb")
+                      databaseName: "dashboard-db")
               .Options;
 
             return new RecognitionDbContext(options);
         });
 
+        services.AddTransient<KudosDbContext>(_ =>
+        {
+            var options = new DbContextOptionsBuilder<KudosDbContext>()
+              .UseCosmos(
+                      "https://mykudos.documents.azure.com:443/",
+                      "pPT5EVtJyAh0Lk4N7ywHk2ZgPTSepeH6YvbUYw2R6msjLeCQLHMs1KfhOE5xPdoHUQVR3vMFiXvmACDbOWmCqA==",
+                      databaseName: "kudos-db")
+              .Options;
+
+            return new KudosDbContext(options);
+        });
+
         services.AddTransient<IRecognitionRepository, RecognitionRepository>();
+        services.AddTransient<IKudosRepository, KudosRepository>();
 
         //Subscriptions
-        
+        services.AddTransient<SendKudosEventHandler>();
 
         //Domain Events
-        
+        services.AddTransient<IEventHandler<MyKudos.Kudos.Domain.Events.SendKudosCreatedEvent>, MyKudos.Kudos.Domain.EventHandlers.SendKudosEventHandler>();
 
 
-        //Domain Banking Commands
-        services.AddTransient<IRequestHandler<CreateSendKudosCommand, bool>, SendKudosCommandHandler>();
 
-        //Application Services
-        services.AddTransient<IKudosService, KudosService>();
-        
 
     }
 

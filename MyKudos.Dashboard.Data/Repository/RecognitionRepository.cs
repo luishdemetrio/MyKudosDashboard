@@ -1,4 +1,6 @@
-﻿using MyKudos.Dashboard.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using MyKudos.Dashboard.Data.Context;
+using MyKudos.Dashboard.Data.Data;
 using MyKudos.Dashboard.Domain.Interfaces;
 using MyKudos.Dashboard.Domain.Models;
 
@@ -21,15 +23,6 @@ public sealed class RecognitionRepository : IRecognitionRepository
 
     }
 
-    //private void CheckAndSeedDatabaseAsync()
-    //{
-        //var options = new DbContextOptionsBuilder<RecognitionDbContext>()
-        //    .UseCosmos(
-        //            "https://mykudos.documents.azure.com:443/",
-        //            "pPT5EVtJyAh0Lk4N7ywHk2ZgPTSepeH6YvbUYw2R6msjLeCQLHMs1KfhOE5xPdoHUQVR3vMFiXvmACDbOWmCqA==",
-        //            databaseName: "kudosdb")
-        //    .Options;
+   
 
-        //await RecognitionDbContext.CheckAndSeedDatabaseAsync(options);
-    //}
 }

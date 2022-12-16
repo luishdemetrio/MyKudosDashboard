@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MyKudos.Dashboard.App.Interface;
+using MyKudos.Dashboard.App.Interfaces;
 using MyKudos.Dashboard.Domain.Models;
 
 
@@ -10,15 +10,15 @@ namespace MyKudos.Dashboard.Api.Controllers;
 public class KudosController : ControllerBase
 {
 
-    private readonly IKudosService _kudosService;
+    private readonly IDashboardKudosService _kudosService;
 
-    public KudosController(IKudosService kudosService)
+    public KudosController(IDashboardKudosService kudosService)
     {
         _kudosService = kudosService;
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] Kudos kudos)
+    public IActionResult Post([FromBody] KudosLog kudos)
     {
 
         _kudosService.Send(kudos);

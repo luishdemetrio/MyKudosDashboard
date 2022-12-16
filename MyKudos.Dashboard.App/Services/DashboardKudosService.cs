@@ -1,29 +1,31 @@
 ﻿
-using MyKudos.Dashboard.App.Interface;
+using MyKudos.Dashboard.App.Interfaces;
 using MyKudos.Dashboard.Domain.Commands;
 using MyKudos.Dashboard.Domain.Models;
 using MyKudos.Domain.Core.Bus;
 
 namespace MyKudos.Dashboard.App.Services;
 
-public class KudosService : IKudosService
+public class DashboardKudosService : IDashboardKudosService
 {
 
     private readonly IEventBus _bus;
 
-    public KudosService(IEventBus bus)
+    public DashboardKudosService(IEventBus bus)
     {
         _bus = bus;
     }
 
-    public void Send(Kudos kudos)
+    public void Send(KudosLog kudos)
     {
 
         var createSendKudosCommand = new CreateSendKudosCommand
             (
-                kudos.PersonId,
+                kudos.FromPersonId,
+                kudos.ToPersonId,
                 kudos.TitleId,
-                kudos.Message
+                kudos.Message,
+                kudos.Date
             );
 
         _bus.SendCommand( createSendKudosCommand );

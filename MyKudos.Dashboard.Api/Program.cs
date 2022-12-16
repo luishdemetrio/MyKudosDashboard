@@ -17,6 +17,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(typeof(Program));
 
+
+
 DependencyContainer.RegisterServices(builder.Services);
 
 var app = builder.Build();

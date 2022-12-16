@@ -26,7 +26,9 @@
     }
 </style>
 
-<FluentDialog @ref=SendKudosFluentDialog TrapFocus="true" aria-label="Simple dialog" Modal="true" class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;" @ondismiss=OnDismiss>
+<FluentDialog   @ref=SendKudosFluentDialog
+                TrapFocus="true" aria-label="Simple dialog" Modal="true" 
+                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;" @ondismiss=OnDismiss>
 
 <div style="margin:10px;">
 
@@ -139,6 +141,9 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
+    [Parameter]
+    public UserInfo UserProfile { get; set; }
+
     private IEnumerable<RecognitionViewModel> recognitions;
 
     private UserViewModel SelectedEmployee { get; set; }
@@ -184,7 +189,8 @@
     {
         KudosViewModel kudos = new()
             {
-                PersonId = SelectedEmployee.Id,
+                FromPersonId = UserProfile.ObjectId,
+                ToPersonId = SelectedEmployee.Id,
                 TitleId = recognitions.Where(r=> r.IsSelected).FirstOrDefault().Id,
                 Message = KudosMessage 
             };
@@ -201,7 +207,9 @@
 
     private FluentDialog SendKudosFluentDialog;
 
-    public void Show(CloseModalParameterButtonClick closeModalParameterButtonClick)
+    
+
+    public async void Show(CloseModalParameterButtonClick closeModalParameterButtonClick)
     {
 
         closeModalParameter = closeModalParameterButtonClick;
@@ -209,12 +217,13 @@
         ModalHidden = false;
 
         SendKudosFluentDialog!.Show();
-          StateHasChanged();
+       // await InvokeAsync(() => StateHasChanged());
 
     }
 
     public void Hide()
     {
+        ModalHidden = true;
         SendKudosFluentDialog!.Hide();
     }
 

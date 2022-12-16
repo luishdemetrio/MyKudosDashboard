@@ -2,7 +2,9 @@
 {
     public class KudosViewModel
     {
-        public string PersonId { get; set; }
+        public string FromPersonId { get; set; }
+
+        public string ToPersonId { get; set; }
 
         public string TitleId { get; set; }
 

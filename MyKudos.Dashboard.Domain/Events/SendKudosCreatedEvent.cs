@@ -5,16 +5,22 @@ namespace MyKudos.Dashboard.Domain.Events;
 
 public class SendKudosCreatedEvent : Event
 {
-    public string PersonId { get; set; }
+    public string FromPersonId { get; set; }
+
+    public string ToPersonId { get; set; }
 
     public string TitleId { get; set; }
 
     public string? Message { get; set; }
 
-    public SendKudosCreatedEvent(string personId, string titleId, string? message)
+    public DateTime? Date { get; set; }
+
+    public SendKudosCreatedEvent(string fromPersonId, string toPersonId, string titleId, string? message, DateTime? date)
     {
-        PersonId = personId;
+        FromPersonId = fromPersonId;
+        ToPersonId = toPersonId;        
         TitleId = titleId;
         Message = message;
+        Date = date;
     }
 }

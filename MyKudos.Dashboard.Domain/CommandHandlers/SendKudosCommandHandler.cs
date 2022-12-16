@@ -20,7 +20,7 @@ public class SendKudosCommandHandler : IRequestHandler<CreateSendKudosCommand, b
 
         //publish message to RabbitMQ
 
-        _bus.Publish(new SendKudosCreatedEvent(request.PersonId, request.TitleId, request.Message));
+        _bus.Publish(new SendKudosCreatedEvent(request.FromPersonId, request.ToPersonId, request.TitleId, request.Message, request.Date));
 
         return Task.FromResult(true);
     }

@@ -139,7 +139,28 @@ public class GraphHelper
         return photos;
     }
 
+    public static async Task<string> GetUserPhoto(string userid)
+    {
 
-   
+        string photo = string.Empty;
+
+        var client = new RestClient("https://graph.microsoft.com/beta/users/{userid}/photos/48x48/$value");
+
+        var request = new RestRequest();
+
+        request.Method = Method.Get;
+        request.AddHeader("ConsistencyLevel", "eventual");
+        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            photo = "data:image/png;base64," + response.Content;
+
+        }
+        return photo;
+    }
+
 
 }

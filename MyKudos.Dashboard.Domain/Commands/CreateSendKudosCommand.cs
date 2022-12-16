@@ -4,10 +4,12 @@ namespace MyKudos.Dashboard.Domain.Commands;
 
 public class CreateSendKudosCommand : SendKudosCommand
 {
-    public CreateSendKudosCommand(string? personId, string? titleId, string? message)
+    public CreateSendKudosCommand(string? fromPersonId, string? toPersonId, string? titleId, string? message, DateTime? date)
     {
-        PersonId = personId;
+        FromPersonId = fromPersonId;
+        ToPersonId  = toPersonId;
         TitleId = titleId;
         Message = message;
+        Date = date;
     }
 }

@@ -15,6 +15,9 @@
     <ProjectReference Include="..\MyKudos.Dashboard.Data\MyKudos.Dashboard.Data.csproj" />
     <ProjectReference Include="..\MyKudos.Domain.Core\MyKudos.Domain.Core.csproj" />
     <ProjectReference Include="..\MyKudos.Infra.Bus\MyKudos.Infra.Bus.csproj" />
+    <ProjectReference Include="..\MyKudos.Kudos.App\MyKudos.Kudos.App.csproj" />
+    <ProjectReference Include="..\MyKudos.Kudos.Data\MyKudos.Kudos.Data.csproj" />
+    <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
   </ItemGroup>
 
 </Project>
