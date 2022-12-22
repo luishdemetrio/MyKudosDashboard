@@ -1,4 +1,4 @@
-﻿using MyKudosDashboard.Helper;
+﻿
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
@@ -6,11 +6,13 @@ namespace MyKudosDashboard.Views;
 
 public class SendKudosView : ISendKudosView
 {
-    private IDashboardService _dashboardService;
+    private IGatewayService _dashboardService;
+    private IGraphService _graphHelper;
 
-    public SendKudosView(IDashboardService dashboardService)
+    public SendKudosView(IGatewayService dashboardService, IGraphService graphHelper)
     {
         _dashboardService = dashboardService;
+        _graphHelper = graphHelper;
     }
 
     public IEnumerable<RecognitionViewModel> GetRecognitions()
@@ -22,12 +24,12 @@ public class SendKudosView : ISendKudosView
     public async Task<IEnumerable<UserViewModel>> GetUsersAsync(string name)
     {
 
-        var graphUsers = await GraphHelper.GetUsers(name);
+        var graphUsers = await _graphHelper.GetUsers(name);
 
         if (graphUsers.value.Count()  == 0)
             return new List<UserViewModel>();
 
-        var photos = await GraphHelper.GetUserPhotos(graphUsers);
+        var photos = await _graphHelper.GetUserPhotos(graphUsers);
                 
 
         return (from graphUser in graphUsers.value

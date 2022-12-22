@@ -1,14 +1,10 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MyKudos.Dashboard.App.Interfaces;
-using MyKudos.Dashboard.App.Services;
-using MyKudos.Dashboard.Data.Context;
-using MyKudos.Dashboard.Data.Repository;
-using MyKudos.Dashboard.Domain.CommandHandlers;
-using MyKudos.Dashboard.Domain.Commands;
-using MyKudos.Dashboard.Domain.Events;
-using MyKudos.Dashboard.Domain.Interfaces;
+using MyKudos.Recognition.App.Interfaces;
+using MyKudos.Recognition.App.Services;
+using MyKudos.Recognition.Data.Context;
+using MyKudos.Recognition.Data.Repository;
 using MyKudos.Domain.Core.Bus;
 using MyKudos.Infra.Bus;
 using MyKudos.Kudos.App.Interfaces;
@@ -17,6 +13,9 @@ using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Data.Repository;
 using MyKudos.Kudos.Domain.EventHandlers;
 using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Recognition.Domain.Interfaces;
+using MyKudos.Recognition.Domain.Commands;
+using MyKudos.Recognition.Domain.CommandHandlers;
 
 namespace MyKudos.Infra.IoC;
 
@@ -37,7 +36,6 @@ public class DependencyContainer
 
         //Application services
         services.AddTransient<IRecognitionService, RecognitionService>();
-        services.AddTransient<IDashboardKudosService, DashboardKudosService>();
         services.AddTransient<IKudosService, KudosService>();
 
         //Data

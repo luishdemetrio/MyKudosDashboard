@@ -1,5 +1,4 @@
-﻿@using MyKudosDashboard.Helper;
-@using MyKudosDashboard.Interfaces;
+﻿@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
 @inject ISendKudosView SendKudosView;
@@ -154,8 +153,8 @@
     {
         await base.OnInitializedAsync();
 
-        var settings = Settings.LoadSettings();
-        GraphHelper.InitializeGraphForAppOnlyAuth(settings);
+        //var settings = Settings.LoadSettings();
+        //GraphHelper.InitializeGraphForAppOnlyAuth(settings);
 
         recognitions = SendKudosView.GetRecognitions();
 

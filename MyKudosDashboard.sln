@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra.IoC", "Infra.IoC", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Infra.IoC", "MyKudos.Infra.IoC\MyKudos.Infra.IoC.csproj", "{DE04E6AD-D3A9-43A7-A22F-1AB6903F2D16}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dashboard", "Dashboard", "{51723E8F-D29B-4283-BA19-DA78B7BFB665}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Recognition", "Recognition", "{51723E8F-D29B-4283-BA19-DA78B7BFB665}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{52647330-D1FC-4D53-8125-B0E90A28AF0F}"
 EndProject
@@ -31,13 +31,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{58202626-E190-4216-B531-81C19B06BD7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Dashboard.Api", "MyKudos.Dashboard.Api\MyKudos.Dashboard.Api.csproj", "{CFFB4E82-216D-460D-A5E5-227E910E72CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Recognition.Api", "MyKudos.Recognition.Api\MyKudos.Recognition.Api.csproj", "{CFFB4E82-216D-460D-A5E5-227E910E72CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Dashboard.Domain", "MyKudos.Dashboard.Domain\MyKudos.Dashboard.Domain.csproj", "{F558B345-A3EC-454F-A228-B01DF4314118}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Recognition.Domain", "MyKudos.Recognition.Domain\MyKudos.Recognition.Domain.csproj", "{F558B345-A3EC-454F-A228-B01DF4314118}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Dashboard.App", "MyKudos.Dashboard.App\MyKudos.Dashboard.App.csproj", "{38BE8C6F-82CC-4B14-9BF9-E964774A60BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Recognition.App", "MyKudos.Recognition.App\MyKudos.Recognition.App.csproj", "{38BE8C6F-82CC-4B14-9BF9-E964774A60BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Dashboard.Data", "MyKudos.Dashboard.Data\MyKudos.Dashboard.Data.csproj", "{4E108403-20CA-4063-B803-9527C7D3B7E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Recognition.Data", "MyKudos.Recognition.Data\MyKudos.Recognition.Data.csproj", "{4E108403-20CA-4063-B803-9527C7D3B7E6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudos", "Kudos", "{304F2498-4826-4DAC-B2A9-A12BB960889B}"
 EndProject
@@ -49,13 +49,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{EDC8426F-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{2A077BED-C841-433F-BBDB-E64B3931FEFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.Kudos.Api", "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj", "{F20983EF-9AD8-4BB8-B455-1F8C75E7E90B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Api", "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj", "{F20983EF-9AD8-4BB8-B455-1F8C75E7E90B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.Kudos.App", "MyKudos.Kudos.App\MyKudos.Kudos.App.csproj", "{53A19812-9E8F-4C4E-8BF2-462D8B563406}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.App", "MyKudos.Kudos.App\MyKudos.Kudos.App.csproj", "{53A19812-9E8F-4C4E-8BF2-462D8B563406}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.Kudos.Data", "MyKudos.Kudos.Data\MyKudos.Kudos.Data.csproj", "{54C5E7BE-8690-40D6-A053-296B642EF98E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Data", "MyKudos.Kudos.Data\MyKudos.Kudos.Data.csproj", "{54C5E7BE-8690-40D6-A053-296B642EF98E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.Kudos.Domain", "MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj", "{B8950AEC-6BA2-48EB-9392-91C7B7723979}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Domain", "MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj", "{B8950AEC-6BA2-48EB-9392-91C7B7723979}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{5064F191-2C6D-45B5-A6FB-FD0D80DD271D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.Gateway", "MyKudos.Gateway\MyKudos.Gateway.csproj", "{783C6345-2433-439E-B5FB-C7F841980818}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,12 +117,17 @@ Global
 		{B8950AEC-6BA2-48EB-9392-91C7B7723979}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8950AEC-6BA2-48EB-9392-91C7B7723979}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8950AEC-6BA2-48EB-9392-91C7B7723979}.Release|Any CPU.Build.0 = Release|Any CPU
+		{783C6345-2433-439E-B5FB-C7F841980818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{783C6345-2433-439E-B5FB-C7F841980818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{783C6345-2433-439E-B5FB-C7F841980818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{783C6345-2433-439E-B5FB-C7F841980818}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A8A35840-E19E-4E19-9FBA-2E4E9FA6AEE6} = {8F3B1B63-87E1-4799-A9E1-B48E073428C1}
+		{CCD07EAB-287B-42EA-8046-9F6B1CA75E86} = {3EB25CCC-2EDC-4532-AB5F-8757D4268257}
 		{3CC59EB4-394B-4228-99E0-D7CA97732F48} = {CCD07EAB-287B-42EA-8046-9F6B1CA75E86}
 		{1D3A9AA1-63B6-4803-BEAE-19C09E8B8B5C} = {3EB25CCC-2EDC-4532-AB5F-8757D4268257}
 		{DE04E6AD-D3A9-43A7-A22F-1AB6903F2D16} = {F8F5912C-9F4B-47BF-B234-9FD5E6057C47}
@@ -140,6 +149,8 @@ Global
 		{53A19812-9E8F-4C4E-8BF2-462D8B563406} = {1116B24A-8FCD-46B9-9B18-4CBE1F5844A4}
 		{54C5E7BE-8690-40D6-A053-296B642EF98E} = {EDC8426F-AC47-4292-9453-A1BD92AB3B38}
 		{B8950AEC-6BA2-48EB-9392-91C7B7723979} = {2A077BED-C841-433F-BBDB-E64B3931FEFE}
+		{5064F191-2C6D-45B5-A6FB-FD0D80DD271D} = {48B2AD56-595E-4519-AD18-616A721CD82A}
+		{783C6345-2433-439E-B5FB-C7F841980818} = {5064F191-2C6D-45B5-A6FB-FD0D80DD271D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B9FD23DD-B31F-4099-924D-9B4DC9ADA1DE}

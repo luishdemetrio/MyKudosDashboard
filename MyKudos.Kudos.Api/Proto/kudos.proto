@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option csharp_namespace = "MyKudos.Kudos.gRPC";
+
+message KudosRequest{};
+
+message KudosResponse {
+	string FromPersonId = 1;
+	string ToPersonId = 2;
+	string TitleId = 3;
+	string Message = 4;
+	string  Date = 5;
+}
+
+message PaginatedKudosResponse{
+	repeated KudosResponse data = 1;
+}
+
+service KudosService {
+
+rpc GetKudos (KudosRequest) returns (PaginatedKudosResponse);
+}

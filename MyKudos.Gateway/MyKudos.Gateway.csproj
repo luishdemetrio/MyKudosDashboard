@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\MyKudos.Kudos.Api\Proto\kudos.proto" GrpcServices="Client">
+      <Link>Protos\kudos.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\MyKudos.Recognition.Api\Proto\recognition.proto" GrpcServices="Client">
+      <Link>Protos\recognition.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+</Project>

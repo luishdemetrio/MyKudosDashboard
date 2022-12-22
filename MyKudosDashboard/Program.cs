@@ -27,9 +27,15 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
+//Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
+builder.Services.AddScoped<IWelcomeView, WelcomeView>();
 
-builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IGraphService, GraphService>();
+
+//Services
+
+builder.Services.AddScoped<IGatewayService, GatewayService>();
 
 
 //// Add MS GRAPH services to the container.

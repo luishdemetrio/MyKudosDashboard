@@ -1,12 +1,17 @@
-﻿using MyKudosDashboard.Helper;
-using MyKudosDashboard.Interfaces;
+﻿using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 
 public class WelcomeView : IWelcomeView
 {
+    private IGraphService _graphHelper;
+
+    public WelcomeView(IGraphService graphHelper)
+    {
+        _graphHelper = graphHelper;
+    }
     public async Task<string> GetUserPhoto(string userid)
     {
-        return await GraphHelper.GetUserPhoto(userid);
+        return await _graphHelper.GetUserPhoto(userid);
     }
 }
