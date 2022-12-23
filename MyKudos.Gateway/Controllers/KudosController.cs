@@ -21,10 +21,18 @@ public class KudosController : Controller
     {
         var results = new List<Models.Kudos>();
 
-        var channel = GrpcChannel.ForAddress(_kudosServiceUrl);
-        var client = new KudosServiceClient(channel);
+        var client = new KudosServiceClient(
+                            GrpcChannel.ForAddress(_kudosServiceUrl)
+                         );
 
         var items = client.GetKudos(new KudosRequest());
+
+        var from= items.Data.Select(u => u.FromPersonId).Distinct().ToList();
+
+        from.AddRange(items.Data.Select(u =>u.ToPersonId).Distinct());
+
+        from.Distinct().ToArray();
+
 
         foreach (var item in items.Data)
         {
@@ -33,6 +41,11 @@ public class KudosController : Controller
 
         return results;
 
+
+    }
+
+    private void GetEmployeeNames()
+    {
 
     }
 }

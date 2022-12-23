@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyKudos.Domain.Core.Bus;
 using MyKudos.Infra.IoC;
+using MyKudos.Kudos.Api.Grpc;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.EventHandlers;
 using MyKudos.Kudos.Domain.Events;
@@ -17,6 +18,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(typeof(Program));
 
+builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 DependencyContainer.RegisterServices(builder.Services);
 
@@ -37,6 +39,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 ConfigureEventBus(app);
+
+app.MapGrpcService<KudosGrpc>();
 
 app.Run();
 

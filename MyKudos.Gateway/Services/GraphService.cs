@@ -1,13 +1,14 @@
 ﻿using Azure.Core;
 using Azure.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Graph;
-using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
+using MyKudos.Gateway.Interfaces;
+using MyKudos.Gateway.Models;
 using Newtonsoft.Json;
 using RestSharp;
-using System.IO;
+using System.Text.Json;
 
-namespace MyKudosDashboard.Services;
+namespace MyKudos.Gateway.Services;
 
 public class GraphService : IGraphService
 {
@@ -18,11 +19,11 @@ public class GraphService : IGraphService
     // Client configured with app-only authentication
     private static GraphServiceClient _appClient;
 
-    //
+    private record Settings(string? ClientId, string? ClientSecret, string? TenantId);
 
-    public GraphService()
+    public GraphService(IConfiguration configuration)
     {
-        var settings = Settings.LoadSettings(); ;
+        var settings = configuration.GetRequiredSection("Settings").Get<Settings>();
 
         if (_clientSecretCredential == null)
         {
@@ -53,10 +54,10 @@ public class GraphService : IGraphService
 
 
 
-    public async Task<GraphUsersDTO> GetUsers(string name)
+    public async Task<GraphUsers> GetUsers(string name)
     {
 
-        GraphUsersDTO r = new();
+        GraphUsers r = new();
 
         var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
 
@@ -70,14 +71,16 @@ public class GraphService : IGraphService
 
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            r = JsonConvert.DeserializeObject<GraphUsersDTO>(response.Content)!;
+            r = JsonConvert.DeserializeObject<GraphUsers>(response.Content)!;
 
         }
 
         return r;
     }
 
-    public async Task<GraphUserPhotos> GetUserPhotos(GraphUsersDTO users)
+
+
+    public async Task<GraphUserPhotos> GetUserPhotos(GraphUsers users)
     {
 
         GraphUserPhotos photos = new();
@@ -91,11 +94,11 @@ public class GraphService : IGraphService
         request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
 
 
-        List<GraphBatchRequestDTO> batch = new();
+        List<GraphBatchRequest> batch = new();
 
         foreach (var item in users.value)
         {
-            batch.Add(new GraphBatchRequestDTO(item.id, "GET", $"users/{item.id}/photos/48x48/$value"));
+            batch.Add(new GraphBatchRequest(item.Id, "GET", $"users/{item.Id}/photos/48x48/$value"));
         }
 
         var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
@@ -106,6 +109,7 @@ public class GraphService : IGraphService
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             photos = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
+          
 
         }
 
@@ -116,10 +120,10 @@ public class GraphService : IGraphService
     {
 
 
-        System.IO.Stream photo =  await _appClient.Users[userid].Photos["48x48"].Content
+        System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
             .Request()
             .GetAsync();
-        
+
         using MemoryStream ms = new MemoryStream();
         photo.CopyTo(ms);
 
@@ -127,29 +131,49 @@ public class GraphService : IGraphService
 
     }
 
+    public async Task<List<GraphUser>> GetUserInfo(string[] users)
+    {
+
+        var result = new List<GraphUser>();
+
+        var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
+
+        var request = new RestRequest();
+
+        request.Method = Method.Post;
+        request.AddHeader("ConsistencyLevel", "eventual");
+        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
 
 
+        List<GraphBatchRequest> batch = new();
 
-    //public static Task<IGraphServiceUsersCollectionPage> GetUsersAsync(string name)
-    //{
-   
-    //    return _appClient.Users
-    //        .Request()
-    //        .Filter($"startswith(displayname,'{name}')")
-    //        .Select(u => new
-    //        {
-    //            // Only request specific properties
-    //            u.DisplayName,
-    //            u.Id,
-    //            u.Mail
-    //        })
-    //        // Get at most 25 results
-    //        .Top(25)
-    //        // Sort by display name
-    //        .GetAsync();
-    //}
+        foreach (var item in users)
+        {
+            batch.Add(new GraphBatchRequest(item, "GET", $"users/{item}/?$select=id,displayName"));
+        }
 
+        var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
 
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            using var items = JsonDocument.Parse(response.Content);
+
+            foreach (JsonElement item in items.RootElement.EnumerateArray())
+            {
+                result.Add(new GraphUser()
+                {
+                    Id = item.GetProperty("id").ToString(),
+                    DisplayName = item.GetProperty("displayName").ToString()                    
+                });
+            }
+
+        }
+
+        return result;
+    }
 
 
 
