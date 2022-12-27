@@ -1,7 +1,7 @@
 ﻿namespace MyKudos.Gateway.Models;
 
 public record Kudos (
-    Guid id,
+    string id,
     string SentBy,
     string SentTo,
     string Title,

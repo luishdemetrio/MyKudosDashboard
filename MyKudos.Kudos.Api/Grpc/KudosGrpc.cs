@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.gRPC;
 using static MyKudos.Kudos.gRPC.KudosService;
@@ -15,7 +16,8 @@ public class KudosGrpc : KudosServiceBase
         _kudosService = kudosService;
     }
 
-    public override Task<PaginatedKudosResponse> GetKudos(KudosRequest request, ServerCallContext context)
+
+    public override Task<PaginatedKudosResponse> GetKudos(Empty request, ServerCallContext context)
     {
         PaginatedKudosResponse kudos = new();
 
@@ -26,11 +28,12 @@ public class KudosGrpc : KudosServiceBase
 
             kudos.Data.Add(new KudosResponse()
             {
+                 Id = item.Id.ToString(),
                  FromPersonId = item.FromPersonId,
                  ToPersonId = item.ToPersonId,
                  TitleId = item.TitleId,
                  Message = item.Message,
-                 Date = item.Date.ToString()
+                 Date = item.Date.ToTimestamp()
             });
 
         }

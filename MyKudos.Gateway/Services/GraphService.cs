@@ -10,6 +10,13 @@ using System.Text.Json;
 
 namespace MyKudos.Gateway.Services;
 
+public class Settings
+{
+    public string? ClientId { get; set; }
+    public string? ClientSecret { get; set; }
+    public string? TenantId { get; set; }
+}
+
 public class GraphService : IGraphService
 {
 
@@ -18,8 +25,6 @@ public class GraphService : IGraphService
 
     // Client configured with app-only authentication
     private static GraphServiceClient _appClient;
-
-    private record Settings(string? ClientId, string? ClientSecret, string? TenantId);
 
     public GraphService(IConfiguration configuration)
     {
@@ -109,7 +114,7 @@ public class GraphService : IGraphService
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             photos = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
-          
+
 
         }
 
@@ -131,7 +136,7 @@ public class GraphService : IGraphService
 
     }
 
-    public async Task<List<GraphUser>> GetUserInfo(string[] users)
+    public async Task<List<GraphUser>> GetUserInfoAsync(string[] users)
     {
 
         var result = new List<GraphUser>();
@@ -161,13 +166,18 @@ public class GraphService : IGraphService
         {
             using var items = JsonDocument.Parse(response.Content);
 
-            foreach (JsonElement item in items.RootElement.EnumerateArray())
+
+            foreach (var item in items.RootElement.EnumerateObject())
             {
-                result.Add(new GraphUser()
+                foreach (var user in item.Value.EnumerateArray())
                 {
-                    Id = item.GetProperty("id").ToString(),
-                    DisplayName = item.GetProperty("displayName").ToString()                    
-                });
+                    result.Add(new GraphUser()
+                    {
+                        Id = user.GetProperty("body").GetProperty("id").ToString(),
+                        DisplayName = user.GetProperty("body").GetProperty("displayName").ToString()
+                    });
+                }
+
             }
 
         }
@@ -175,6 +185,24 @@ public class GraphService : IGraphService
         return result;
     }
 
+
+    //public class Rootobject
+    //{
+    //    public Respons[] responses { get; set; }
+    //}
+
+    //public class Respons
+    //{
+    //    public Body body { get; set; }
+    //}
+
+    
+
+    //public class Body
+    //{
+    //    public string id { get; set; }
+    //    public string displayName { get; set; }
+    //}
 
 
 }

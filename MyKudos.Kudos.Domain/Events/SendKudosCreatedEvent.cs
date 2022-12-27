@@ -13,9 +13,9 @@ public class SendKudosCreatedEvent : Event
 
     public string? Message { get; set; }
 
-    public DateTime? Date { get; set; }
+    public DateTime Date { get; set; }
 
-    public SendKudosCreatedEvent(string fromPersonId, string ToPerson, string titleId, string? message, DateTime? date)
+    public SendKudosCreatedEvent(string fromPersonId, string ToPerson, string titleId, string? message, DateTime date)
     {
         FromPersonId = fromPersonId;
         ToPersonId = ToPersonId;

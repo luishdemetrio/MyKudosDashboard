@@ -2,14 +2,20 @@ syntax = "proto3";
 
 option csharp_namespace = "MyKudos.Kudos.gRPC";
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+
+
 message KudosRequest{};
 
 message KudosResponse {
-	string FromPersonId = 1;
-	string ToPersonId = 2;
-	string TitleId = 3;
-	string Message = 4;
-	string  Date = 5;
+	string Id = 1;
+	string FromPersonId = 2;
+	string ToPersonId = 3;
+	string TitleId = 4;
+	string Message = 5;
+	google.protobuf.Timestamp  Date = 6;
 }
 
 message PaginatedKudosResponse{
@@ -18,5 +24,5 @@ message PaginatedKudosResponse{
 
 service KudosService {
 
-rpc GetKudos (KudosRequest) returns (PaginatedKudosResponse);
+rpc GetKudos (google.protobuf.Empty) returns (PaginatedKudosResponse);
 }

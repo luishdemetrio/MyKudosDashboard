@@ -1,5 +1,8 @@
-﻿using Grpc.Net.Client;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc;
+using MyKudos.Gateway.Interfaces;
+using MyKudos.Gateway.Models;
 using MyKudos.Kudos.gRPC;
 using static MyKudos.Kudos.gRPC.KudosService;
 
@@ -11,35 +14,50 @@ public class KudosController : Controller
 {
     private readonly string _kudosServiceUrl;
 
-    public KudosController(IConfiguration config)
+    private readonly IGraphService _graphService;
+
+    public KudosController(IConfiguration config, IGraphService graphService)
     {
         _kudosServiceUrl = config["kudosServiceUrl"];
+        _graphService = graphService;
     }
 
     [HttpGet(Name = "GetKudos")]
-    public IEnumerable<Models.Kudos> Get()
+    public async Task<IEnumerable<Models.Kudos>> Get()
     {
-        var results = new List<Models.Kudos>();
+       // var kudos = new List<Models.Kudos>();
 
         var client = new KudosServiceClient(
                             GrpcChannel.ForAddress(_kudosServiceUrl)
                          );
 
-        var items = client.GetKudos(new KudosRequest());
+        var kudos = client.GetKudos(new Empty());
 
-        var from= items.Data.Select(u => u.FromPersonId).Distinct().ToList();
+        var from= kudos.Data.Select(u => u.FromPersonId).Distinct().ToList();
 
-        from.AddRange(items.Data.Select(u =>u.ToPersonId).Distinct());
-
-        from.Distinct().ToArray();
+        from.AddRange(kudos.Data.Select(u =>u.ToPersonId).Distinct());
 
 
-        foreach (var item in items.Data)
-        {
-            
-        }
+        List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
+        
 
-        return results;
+        var result = from kudo in kudos.Data
+                     join userTo in users
+                        on kudo.ToPersonId equals userTo.Id
+                     join userFrom in users
+                        on kudo.FromPersonId equals userFrom.Id
+                    select new Models.Kudos(
+                        id : kudo.Id,
+                        SentBy: userFrom.DisplayName,
+                        SentTo: userTo.DisplayName,
+                        Title: kudo.TitleId,
+                        Message: kudo.Message,
+                        SendOn: DateTime.Now
+                    );
+
+
+
+                return result;
 
 
     }

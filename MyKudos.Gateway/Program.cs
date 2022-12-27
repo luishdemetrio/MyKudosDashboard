@@ -1,3 +1,6 @@
+using MyKudos.Gateway.Interfaces;
+using MyKudos.Gateway.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+builder.Services.AddScoped<IGraphService, GraphService>();
 
 var app = builder.Build();
 
