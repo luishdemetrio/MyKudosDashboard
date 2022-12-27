@@ -19,6 +19,15 @@ namespace MyKudos.Kudos.Api.Controllers
         }
 
 
+        [HttpPost]
+        public IActionResult Post([FromBody] KudosLog kudos)
+        {
+
+            _kudosService.Send(kudos);
+
+            return Ok(kudos);
+        }
+
         [HttpGet(Name = "GetKudos")]
         public IEnumerable<KudosLog> Get()
         {

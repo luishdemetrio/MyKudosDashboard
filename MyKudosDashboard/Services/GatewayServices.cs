@@ -37,14 +37,37 @@ public class GatewayService : IGatewayService
         }
 
         return recognitions;
-
-        
+                
     }
 
-    public bool SendKudos(KudosViewModel kudos)
+
+    public IEnumerable<KudosResponse> GetKudos()
+    {
+        List<KudosResponse> kudos = new();
+
+        var uri = $"{_gatewayServiceUrl}kudos";
+
+        var client = new RestClient(uri);
+
+        var request = new RestRequest();
+
+        request.Method = Method.Get;
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            kudos = JsonConvert.DeserializeObject<IEnumerable<KudosResponse>>(response.Content).ToList();
+        }
+
+        return kudos;
+    }
+
+
+    public bool SendKudos(KudosRequest kudos)
     {
         
-        var uri = "https://localhost:7097/kudos";
+        var uri = $"{_gatewayServiceUrl}kudos";
 
         var client = new RestClient(uri);
 

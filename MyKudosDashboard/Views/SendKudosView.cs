@@ -38,8 +38,9 @@ public class SendKudosView : ISendKudosView
                  select new UserViewModel(graphUser.id, graphUser.displayName, "data:image/png;base64," + photo.body));
     }
 
-    public bool Send(KudosViewModel kudos)
+    public bool Send(KudosRequest kudos)
     {
+     
         return _dashboardService.SendKudos(kudos);
     }
 }

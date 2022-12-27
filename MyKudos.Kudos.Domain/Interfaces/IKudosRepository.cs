@@ -8,5 +8,5 @@ public interface IKudosRepository
 
     IEnumerable<KudosLog> GetKudos();
 
-    void Add(KudosLog kudos);
+    bool Add(KudosLog kudos);
 }

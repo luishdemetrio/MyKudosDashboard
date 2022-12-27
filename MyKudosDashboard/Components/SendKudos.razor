@@ -137,11 +137,11 @@
 
 @code {
 
-    [Parameter]
-    public bool ModalHidden { get; set; } = true;
+        [Parameter]
+        public bool ModalHidden { get; set; } = true;
 
-    [Parameter]
-    public UserInfo UserProfile { get; set; }
+        [Parameter]
+        public UserInfo UserProfile { get; set; }
 
     private IEnumerable<RecognitionViewModel> recognitions;
 
@@ -186,13 +186,12 @@
 
     private void SendKudosClick()
     {
-        KudosViewModel kudos = new()
-            {
-                FromPersonId = UserProfile.ObjectId,
-                ToPersonId = SelectedEmployee.Id,
-                TitleId = recognitions.Where(r=> r.IsSelected).FirstOrDefault().Id,
-                Message = KudosMessage 
-            };
+        KudosRequest kudos = new(
+                From : UserProfile.ObjectId,
+                To : SelectedEmployee.Id,
+                TitleId : recognitions.Where(r=> r.IsSelected).FirstOrDefault().Id,
+                Message : KudosMessage 
+            );
 
         if (SendKudosView.Send(kudos))
         {

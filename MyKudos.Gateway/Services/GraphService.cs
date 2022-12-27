@@ -24,7 +24,7 @@ public class GraphService : IGraphService
     private ClientSecretCredential _clientSecretCredential;
 
     // Client configured with app-only authentication
-    private static GraphServiceClient _appClient;
+    private GraphServiceClient _appClient;
 
     public GraphService(IConfiguration configuration)
     {
@@ -35,14 +35,12 @@ public class GraphService : IGraphService
             _clientSecretCredential = new ClientSecretCredential(
                 settings.TenantId, settings.ClientId, settings.ClientSecret);
         }
-
-        if (_appClient == null)
-        {
-            _appClient = new GraphServiceClient(_clientSecretCredential,
-                // Use the default scope, which will request the scopes
-                // configured on the app registration
-                new[] { "https://graph.microsoft.com/.default" });
-        }
+        
+        _appClient = new GraphServiceClient(_clientSecretCredential,
+            // Use the default scope, which will request the scopes
+            // configured on the app registration
+            new[] { "https://graph.microsoft.com/.default" });
+        
     }
 
     public async Task<string> GetAppOnlyTokenAsync()
@@ -74,7 +72,7 @@ public class GraphService : IGraphService
 
         RestResponse response = client.Execute(request);
 
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             r = JsonConvert.DeserializeObject<GraphUsers>(response.Content)!;
 
@@ -85,10 +83,10 @@ public class GraphService : IGraphService
 
 
 
-    public async Task<GraphUserPhotos> GetUserPhotos(GraphUsers users)
+    public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] users)
     {
 
-        GraphUserPhotos photos = new();
+        List<GraphUserPhoto> photos = new();
 
         var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
 
@@ -101,9 +99,9 @@ public class GraphService : IGraphService
 
         List<GraphBatchRequest> batch = new();
 
-        foreach (var item in users.value)
+        foreach (var item in users)
         {
-            batch.Add(new GraphBatchRequest(item.Id, "GET", $"users/{item.Id}/photos/48x48/$value"));
+            batch.Add(new GraphBatchRequest(item, "GET", $"users/{item}/photos/64x64/$value"));
         }
 
         var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
@@ -111,10 +109,23 @@ public class GraphService : IGraphService
 
         RestResponse response = client.Execute(request);
 
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            photos = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
+           
+            using var items = JsonDocument.Parse(response.Content);
 
+            foreach (var item in items.RootElement.EnumerateObject())
+            {
+                foreach (var user in item.Value.EnumerateArray())
+                {
+                    photos.Add(new GraphUserPhoto(
+                        id: user.GetProperty("id").ToString(),
+                        photo: user.GetProperty("body").ToString()
+                        )) ;
+                    
+                }
+
+            }
 
         }
 
@@ -123,7 +134,6 @@ public class GraphService : IGraphService
 
     public async Task<string> GetUserPhoto(string userid)
     {
-
 
         System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
             .Request()
@@ -162,7 +172,7 @@ public class GraphService : IGraphService
 
         RestResponse response = client.Execute(request);
 
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
             using var items = JsonDocument.Parse(response.Content);
 
@@ -186,23 +196,7 @@ public class GraphService : IGraphService
     }
 
 
-    //public class Rootobject
-    //{
-    //    public Respons[] responses { get; set; }
-    //}
-
-    //public class Respons
-    //{
-    //    public Body body { get; set; }
-    //}
-
     
-
-    //public class Body
-    //{
-    //    public string id { get; set; }
-    //    public string displayName { get; set; }
-    //}
 
 
 }

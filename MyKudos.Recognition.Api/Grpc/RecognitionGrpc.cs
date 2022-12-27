@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using MyKudos.Recognition.App.Interfaces;
 using MyKudos.Recognition.gRPC;
 using static MyKudos.Recognition.gRPC.RecognitionService;
@@ -16,8 +17,8 @@ public class RecognitionGrpc : RecognitionServiceBase
         _recognitionService = recognitionService;
     }
 
-
-    public override Task<PaginatedRecognitionsResponse> GetRecognitions(RecognitionRequest request, ServerCallContext context)
+    
+    public override Task<PaginatedRecognitionsResponse> GetRecognitions(Empty request, ServerCallContext context)
     {
         PaginatedRecognitionsResponse recognitions = new();
 

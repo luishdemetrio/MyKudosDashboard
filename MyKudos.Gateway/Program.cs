@@ -11,6 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGraphService, GraphService>();
+builder.Services.AddScoped<IRecognitionService, RecognitionService>();
+builder.Services.AddScoped<IKudosService, KudosService>();
 
 var app = builder.Build();
 

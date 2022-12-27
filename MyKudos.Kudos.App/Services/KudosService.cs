@@ -25,6 +25,6 @@ public class KudosService : IKudosService
 
     public bool Send(KudosLog kudos)
     {
-        throw new NotImplementedException();
+        return _kudosRepository.Add(kudos);
     }
 }

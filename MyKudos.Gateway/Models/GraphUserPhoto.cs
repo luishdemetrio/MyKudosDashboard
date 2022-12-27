@@ -1,8 +1,4 @@
 ﻿namespace MyKudos.Gateway.Models;
 
-public record GraphUserPhoto(string id, string body);
+public record GraphUserPhoto(string id, string photo);
 
-public class GraphUserPhotos
-{
-    public GraphUserPhoto[] responses { get; set; }
-}

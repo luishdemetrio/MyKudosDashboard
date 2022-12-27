@@ -9,6 +9,6 @@ public interface ISendKudosView
 
     Task<IEnumerable<UserViewModel>> GetUsersAsync(string name);
 
-    bool Send(KudosViewModel kudos);
+    bool Send(KudosRequest kudos);
 
 }

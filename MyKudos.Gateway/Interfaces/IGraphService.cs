@@ -8,7 +8,7 @@ public interface IGraphService
     
     Task<string> GetUserPhoto(string userid);
     
-    Task<GraphUserPhotos> GetUserPhotos(GraphUsers users);
+    Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] users);
     
     Task<GraphUsers> GetUsers(string name);
 

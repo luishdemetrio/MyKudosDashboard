@@ -1,10 +1,6 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Grpc.Net.Client;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
-using MyKudos.Kudos.gRPC;
-using static MyKudos.Kudos.gRPC.KudosService;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -12,49 +8,59 @@ namespace MyKudos.Gateway.Controllers;
 [Route("[controller]")]
 public class KudosController : Controller
 {
-    private readonly string _kudosServiceUrl;
-
+    
     private readonly IGraphService _graphService;
+    private readonly IRecognitionService _recognitionService;
+    private readonly IKudosService _kudosService;
 
-    public KudosController(IConfiguration config, IGraphService graphService)
+    private List<Models.Recognition> _recognitions;
+
+    public KudosController(IGraphService graphService, IRecognitionService recognitionService, IKudosService kudosService)
     {
-        _kudosServiceUrl = config["kudosServiceUrl"];
+        
         _graphService = graphService;
+        _recognitionService = recognitionService;
+        _kudosService = kudosService;
+
+        _recognitions = _recognitionService.GetRecognitions().ToList();
+
     }
 
     [HttpGet(Name = "GetKudos")]
-    public async Task<IEnumerable<Models.Kudos>> Get()
+    public async Task<IEnumerable<Models.KudosResponse>> Get()
     {
-       // var kudos = new List<Models.Kudos>();
+       
+        var kudos = _kudosService.GetKudos();
 
-        var client = new KudosServiceClient(
-                            GrpcChannel.ForAddress(_kudosServiceUrl)
-                         );
+        var from= kudos.Select(u => u.From).Distinct().ToList();
 
-        var kudos = client.GetKudos(new Empty());
-
-        var from= kudos.Data.Select(u => u.FromPersonId).Distinct().ToList();
-
-        from.AddRange(kudos.Data.Select(u =>u.ToPersonId).Distinct());
-
+        from.AddRange(kudos.Select(u =>u.To).Distinct());
 
         List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
-        
 
-        var result = from kudo in kudos.Data
+
+        var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
+
+        var result = from kudo in kudos
                      join userTo in users
-                        on kudo.ToPersonId equals userTo.Id
+                        on kudo.To equals userTo.Id
                      join userFrom in users
-                        on kudo.FromPersonId equals userFrom.Id
-                    select new Models.Kudos(
-                        id : kudo.Id,
-                        SentBy: userFrom.DisplayName,
-                        SentTo: userTo.DisplayName,
-                        Title: kudo.TitleId,
-                        Message: kudo.Message,
-                        SendOn: DateTime.Now
-                    );
-
+                        on kudo.From equals userFrom.Id
+                     join photoTo in photos
+                        on kudo.To equals photoTo.id
+                     join photoFrom in photos
+                        on kudo.From equals photoFrom.id
+                     join rec in _recognitions
+                        on kudo.TitleId equals rec.Id
+                     
+                     select new Models.KudosResponse(
+                         Id: kudo.Id,
+                         From: new Person() { Id = kudo.From, Name = userFrom.DisplayName, Photo = photoFrom.photo },
+                         To: new Person() { Id = kudo.To, Name = userTo.DisplayName, Photo = photoTo.photo },
+                         Title: rec.Description,
+                         Message: kudo.Message,
+                         SendOn: kudo.SendOn
+                     ); 
 
 
                 return result;
@@ -62,8 +68,14 @@ public class KudosController : Controller
 
     }
 
-    private void GetEmployeeNames()
+    [HttpPost(Name = "SendKudos")]
+    public IActionResult Post([FromBody] Models.KudosRequest kudos)
     {
 
+        _kudosService.Send(kudos);
+
+        return Ok(kudos);
     }
+
+
 }

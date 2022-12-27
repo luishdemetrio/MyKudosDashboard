@@ -29,8 +29,8 @@ public class KudosGrpc : KudosServiceBase
             kudos.Data.Add(new KudosResponse()
             {
                  Id = item.Id.ToString(),
-                 FromPersonId = item.FromPersonId,
-                 ToPersonId = item.ToPersonId,
+                FromPersonId = item.FromPersonId,
+                ToPersonId = item.ToPersonId,
                  TitleId = item.TitleId,
                  Message = item.Message,
                  Date = item.Date.ToTimestamp()
@@ -40,4 +40,23 @@ public class KudosGrpc : KudosServiceBase
 
         return Task.FromResult(kudos);
     }
+
+    public override Task<SendKudosResponse> SendKudos(KudosRequest request, ServerCallContext context)
+    {
+       var result =  _kudosService.Send(new Domain.Models.KudosLog()
+        {
+            FromPersonId = request.FromPersonId,
+            ToPersonId = request.ToPersonId,
+            TitleId = request.TitleId,
+            Message = request.Message,
+            Date = request.SendOn.ToDateTime()
+        });
+
+        
+
+        return Task.FromResult(new SendKudosResponse() { Succeed = result });
+
+    }
+
+    
 }

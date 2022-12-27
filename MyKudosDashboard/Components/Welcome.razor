@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Hosting
 @using MyKudosDashboard.Interfaces;
+@using MyKudosDashboard.Models;
 
 @inject TeamsFx teamsfx
 @inject TeamsUserCredential teamsUserCredential
@@ -106,29 +107,37 @@ else
 
                             <FluentTabPanel>
 
+                                  <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll">
 
-                                    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll">
+                                @foreach (var item in kudos)
+                                { 
                                         
                                         <div class="profile" data-is-focusable="true">
 
                                             <div class="avatar">
-                                                <img src="profiles/nami.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
+                                                <img src=@($"data:image/png;base64,{item.To.Photo}") style="height:80px;width:80px;float:left;border-radius: 50%" />
                                             </div>
 
                                             <div class="info" >
 
                                                 <ul class="list-unstyled ">
                                                     <li>
-                                                        <h5>Nami Cat Burglar</h5>
+                                                        <h5>@item.To.Name</h5>
                                                     </li>
 
                                                     <li>
                                                         <div class="text-wrap" style="width: 16rem;">
-                                                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">LEADERSHIP</spam> kudos</spam>
+                                                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">@item.Title.ToUpper()</spam> kudos</spam>
                                                         </div>
                                                     </li>
-                                                    <li>
-                                                        <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Sogeking</spam></spam>
+                                                    <li >
+                                                        <div>
+                                                            <span style="margin-right:5px">Sent by</span>
+                                                            <img src=@($"data:image/png;base64,{item.From.Photo}")
+                                                                    style="height: 26px;width: 26px;border-radius: 50%" />
+                                                            <span style="margin-left:5px">@item.From.Name</span>
+                                                        </div>
+                                                        
                                                     </li>
                                                 </ul>
                                             </div>
@@ -136,7 +145,7 @@ else
                                             <div class="card-body" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
 
                                                 <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
-                                                                Thank you Nami for selecting and scheduling guest speakers to our Tell The Truth Tue...
+                                                                @item.Message
                                                 </div>
 
                                                 <div style="float:right">
@@ -168,109 +177,10 @@ else
 
                                             </div>
                                         </div>
+                                   
 
-                                            <div class="profile" data-is-focusable="true">
-                                                <div class="avatar">
-                                                    <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                                </div>
-
-                                                <div class="info" >
-
-                                                    <ul class="list-unstyled ">
-                                                        <li>
-                                                            <h5>Monkey D Luffy</h5>
-                                                        </li>
-
-                                                        <li>
-                                                            <div class="text-wrap" style="width: 16rem;">
-                                                                <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">GROWTH MINDSET</spam> kudos</spam>
-                                                            </div>
-                                                        </li>
-                                                        <li>
-                                                            <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Nico Robin</spam></spam>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                            <div class="card-body" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
-
-                                                <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
-                                                                Thank you for working with us on the Connected Use Case workshop brainstorming session...
-                                                            </div>
-
-                                                            <div style="float:right">
-
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.CodeText" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    Read more
-                                                                </FluentButton>
-
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    3
-                                                                </FluentButton>
-
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    1
-                                                                </FluentButton>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="profile"  >
-
-                                                        <div class="avatar">
-                                                            <img src="profiles/zoro.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                                        </div>
-
-                                                        <div class="info" >
-                                                            <ul class="list-unstyled ">
-                                                                <li>
-                                                                    <h5>Roronoa Zoro</h5>
-                                                                </li>
-
-                                                                <li>
-                                                                    <div class="text-wrap" style="width: 16rem;">
-                                                                        <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">THANK YOU</spam> kudos</spam>
-                                                                    </div>
-                                                                </li>
-                                                                <li>
-                                                                    <spam class="card-title pricing-card-title">Sent by <spam style="font-weight: bold">Monkey D Luffy</spam></spam>
-                                                                </li>
-                                                            </ul>
-
-                                                        </div>
-
-                                            <div class="card-body" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
-
-                                                            <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
-                                                                Thank you for doing an AMAZING job during the demo for the Straw Pirates today. It w...
-                                                            </div>
-
-                                                            <div style="float:right">
-
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.CodeText" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    Read more
-                                                                </FluentButton>
-
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    3
-                                                                </FluentButton>
-
-                                                                <FluentButton style="margin-left:20px;">
-                                                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                                                    1
-                                                                </FluentButton>
-                                                            </div>
-
-
-                                                        </div>
-                                                    </div>
-                                    </div>
+                                }
+                                </div>
                                    
                                 </FluentTabPanel>
                             <FluentTabPanel>
@@ -389,6 +299,8 @@ else
     private void OnOpenModalParameterButtonClick() => sendKudosIsHidden = false;
     private void OnCloseModalParameterButtonClick() => sendKudosIsHidden = true;
 
+    private IEnumerable<KudosResponse> kudos;
+
     private void OnDismiss()
     {
         sendKudosIsHidden = true;
@@ -406,7 +318,11 @@ else
             if (isInTeams)
             {
                 user = await teamsUserCredential.GetUserInfoAsync();
+
                 userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
+
+                kudos = WelcomeView.GetKudos();
+
             }
             else
             {

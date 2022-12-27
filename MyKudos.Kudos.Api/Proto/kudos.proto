@@ -7,7 +7,21 @@ import "google/protobuf/empty.proto";
 
 
 
-message KudosRequest{};
+
+message KudosRequest{
+	string FromPersonId = 1;
+	string ToPersonId = 2;
+	string TitleId = 3;
+	string Message = 4;
+	google.protobuf.Timestamp  SendOn = 5;
+	
+}
+
+message SendKudosResponse{
+	bool succeed = 1;
+	string error = 2;
+}
+
 
 message KudosResponse {
 	string Id = 1;
@@ -25,4 +39,6 @@ message PaginatedKudosResponse{
 service KudosService {
 
 rpc GetKudos (google.protobuf.Empty) returns (PaginatedKudosResponse);
+
+rpc SendKudos(KudosRequest) returns (SendKudosResponse);
 }

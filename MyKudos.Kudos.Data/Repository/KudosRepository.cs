@@ -15,10 +15,11 @@ public class KudosRepository: IKudosRepository
 		_context = context;
 	}
 
-    public void Add(KudosLog kudos)
+    public bool Add(KudosLog kudos)
     {
 		_context.Kudos.Add(kudos);
 		_context.SaveChanges();
+		return true;
     }
 
     public IEnumerable<KudosLog> GetKudos()

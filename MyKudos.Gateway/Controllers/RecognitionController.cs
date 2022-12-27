@@ -1,7 +1,5 @@
-using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc;
-using MyKudos.Recognition.gRPC;
-using static MyKudos.Recognition.gRPC.RecognitionService;
+using MyKudos.Gateway.Interfaces;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -11,35 +9,17 @@ namespace MyKudos.Gateway.Controllers;
 public class RecognitionController : ControllerBase
 {
 
+    private readonly IRecognitionService _recognitionService;
 
-    private readonly string _recognitionServiceUrl;
-
-    public RecognitionController(IConfiguration config)
+    public RecognitionController( IRecognitionService recognitionService)
     {
-        _recognitionServiceUrl = config["RecognitionServiceUrl"];
+        _recognitionService = recognitionService;   
     }
 
     [HttpGet(Name = "GetRecognitions")]
     public IEnumerable<Models.Recognition> Get()
     {
-        var results = new List<Models.Recognition>();
-
-        var channel = GrpcChannel.ForAddress(_recognitionServiceUrl);
-        var client = new RecognitionServiceClient(channel);
-
-        var items = client.GetRecognitions(new RecognitionRequest());
-
-        foreach (var item in items.Data)
-        {
-            results.Add(new Models.Recognition()
-            {
-                Emoji = item.Emoji,
-                Description = item.Description
-            });
-        }
-
-        return results;
-
+        return _recognitionService.GetRecognitions();
 
     }
 
