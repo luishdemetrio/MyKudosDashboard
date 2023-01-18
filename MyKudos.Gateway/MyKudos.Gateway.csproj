@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+  
     <Protobuf Include="..\MyKudos.Kudos.Api\Proto\kudos.proto" GrpcServices="Client">
       <Link>Protos\kudos.proto</Link>
     </Protobuf>

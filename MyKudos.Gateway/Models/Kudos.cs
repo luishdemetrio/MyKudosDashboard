@@ -13,9 +13,9 @@ public record Kudos(
 
 
 public record KudosRequest (
-    string From,
-    string To,
-    string TitleId,
+    Person From,
+    Person To,
+    Reward Title,
     string Message
     );
 
@@ -29,3 +29,13 @@ public record KudosResponse(
     DateTime SendOn
     );
 
+public record Reward(string Id, string Description);
+
+//public record KudosNotification(
+//    string? Id,
+//    Person From,
+//    Person To,
+//    string Title,
+//    string Message,
+//    DateTime SendOn
+//    );

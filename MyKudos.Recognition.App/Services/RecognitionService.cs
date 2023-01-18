@@ -16,6 +16,9 @@ public sealed class RecognitionService : IRecognitionService
 
     public IEnumerable<Domain.Models.Recognition> GetRecognitions()
     {
+
+
+
         return _recognitionRepository.GetRecognitions();
     }
 }

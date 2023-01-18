@@ -13,6 +13,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IGraphService, GraphService>();
 builder.Services.AddScoped<IRecognitionService, RecognitionService>();
 builder.Services.AddScoped<IKudosService, KudosService>();
+builder.Services.AddScoped<IAgentNotificationService, AgentNotificationService>();
+
 
 var app = builder.Build();
 

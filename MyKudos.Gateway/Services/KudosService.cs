@@ -1,10 +1,6 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
-using Microsoft.Graph;
-using Microsoft.Graph.Extensions;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
-using System;
 using static MyKudos.Kudos.gRPC.KudosService;
 
 namespace MyKudos.Gateway.Services;
@@ -16,9 +12,7 @@ public class KudosService : IKudosService
 
     public KudosService(IConfiguration config)
     {
-
         _kudosServiceUrl = config["kudosServiceUrl"];
-
     }
 
     public IEnumerable<Models.Kudos> GetKudos()
@@ -59,10 +53,10 @@ public class KudosService : IKudosService
 
         var r = client.SendKudos(new Kudos.gRPC.KudosRequest()
         {
-            FromPersonId = kudos.From,
-            ToPersonId = kudos.To,
+            FromPersonId = kudos.From.Id,
+            ToPersonId = kudos.To.Id,
             Message = kudos.Message,
-            TitleId = kudos.TitleId,
+            TitleId = kudos.Title.Id,
             SendOn = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc).ToTimestamp()
         }) ;
 

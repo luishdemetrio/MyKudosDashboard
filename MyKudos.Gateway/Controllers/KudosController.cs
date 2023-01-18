@@ -13,14 +13,18 @@ public class KudosController : Controller
     private readonly IRecognitionService _recognitionService;
     private readonly IKudosService _kudosService;
 
+    private readonly IAgentNotificationService _agentNotificationService;
+
     private List<Models.Recognition> _recognitions;
 
-    public KudosController(IGraphService graphService, IRecognitionService recognitionService, IKudosService kudosService)
+    public KudosController(IGraphService graphService, IRecognitionService recognitionService, IKudosService kudosService, IAgentNotificationService agentNotificationService)
     {
         
         _graphService = graphService;
         _recognitionService = recognitionService;
         _kudosService = kudosService;
+
+        _agentNotificationService = agentNotificationService;
 
         _recognitions = _recognitionService.GetRecognitions().ToList();
 
@@ -73,6 +77,8 @@ public class KudosController : Controller
     {
 
         _kudosService.Send(kudos);
+
+        _agentNotificationService.SendNotification(kudos);
 
         return Ok(kudos);
     }

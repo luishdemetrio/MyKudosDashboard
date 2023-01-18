@@ -24,12 +24,15 @@
         public string Photo { get; set; }
     }
 
-    public record KudosRequest(
-        string From,
-        string To,
-        string TitleId,
+    public record KudosRequest (
+        Person From,
+        Person To,
+        Reward Title,
         string Message
     );
+
+    public record Reward(string Id, string Description);
+
 
     public class KudosResponse
     {

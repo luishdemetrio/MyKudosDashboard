@@ -137,11 +137,14 @@
 
 @code {
 
-        [Parameter]
-        public bool ModalHidden { get; set; } = true;
+    [Parameter]
+    public bool ModalHidden { get; set; } = true;
 
-        [Parameter]
-        public UserInfo UserProfile { get; set; }
+    [Parameter]
+    public UserInfo UserProfile { get; set; }
+
+    [Parameter]
+    public string UserPhoto { get; set; }
 
     private IEnumerable<RecognitionViewModel> recognitions;
 
@@ -186,10 +189,26 @@
 
     private void SendKudosClick()
     {
+
+        var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
+
         KudosRequest kudos = new(
-                From : UserProfile.ObjectId,
-                To : SelectedEmployee.Id,
-                TitleId : recognitions.Where(r=> r.IsSelected).FirstOrDefault().Id,
+                From: new Person()
+                {
+                    Id = UserProfile.ObjectId,
+                    Name = UserProfile.DisplayName,
+                    Photo = UserPhoto
+                },
+                To: new Person()
+                {
+                    Id = SelectedEmployee.Id,
+                    Name = SelectedEmployee.Name,
+                    Photo = SelectedEmployee.Photo
+                },
+                Title : new Reward( 
+                    Id:  recognition.Id, 
+                    Description: recognition.Description 
+                ),
                 Message : KudosMessage 
             );
 

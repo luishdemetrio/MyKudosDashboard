@@ -12,10 +12,11 @@ public class KudosService : IKudosService
 
     private readonly IKudosRepository _kudosRepository;
 
+
     public KudosService(IEventBus bus, IKudosRepository kudosRepository)
     {
         _bus = bus;
-        _kudosRepository = kudosRepository;
+        _kudosRepository = kudosRepository;        
     }
 
     public IEnumerable<KudosLog> GetKudos()
@@ -24,7 +25,7 @@ public class KudosService : IKudosService
     }
 
     public bool Send(KudosLog kudos)
-    {
+    {   
         return _kudosRepository.Add(kudos);
     }
 }
