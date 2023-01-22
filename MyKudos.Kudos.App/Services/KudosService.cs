@@ -26,6 +26,8 @@ public class KudosService : IKudosService
 
     public bool Send(KudosLog kudos)
     {   
+        //TODO: need to change here to send a message instead of saving in the repository
+        
         return _kudosRepository.Add(kudos);
     }
 }

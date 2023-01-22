@@ -3,8 +3,6 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsFx.Conversation;
-using MyKudos.Agent.Interfaces;
-using MyKudos.Agent.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,7 +43,6 @@ builder.Services.AddSingleton(sp =>
 // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 builder.Services.AddTransient<IBot, TeamsBot>();
 
-builder.Services.AddScoped<IAgentNotification, AgentNotification>();
 
 var app = builder.Build();
 

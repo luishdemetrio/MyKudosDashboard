@@ -1,36 +1,103 @@
 {
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5",
   "type": "AdaptiveCard",
-  "version": "1.4",
   "body": [
     {
-      "type": "TextBlock",
-      "text": "${title}",
-      "size": "Large",
-      "weight": "Bolder",
-      "wrap": true
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "Image",
+              "style": "Person",
+              "url": "${To.Photo}",
+              "size": "Medium"
+            }
+          ],
+          "width": "auto"
+        },
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "${To.Name}",
+              "wrap": true,
+              "size": "Large"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "Received a **${Title.Description}** recognition.",
+              "isSubtle": true,
+              "wrap": true,
+              "size": "Medium"
+            },
+            {
+              "type": "ColumnSet",
+              "columns": [
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "spacing": "None",
+                      "text": "Sent by",
+                      "isSubtle": true,
+                      "wrap": true,
+                      "separator": true,
+                      "size": "Medium"
+                    }
+                  ],
+                  "verticalContentAlignment": "Center"
+                },
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "Image",
+                      "style": "Person",
+                      "url": "${From.Photo}",
+                      "size": "Small",
+                      "width": "36px",
+                      "height": "36px"
+                    }
+                  ]
+                },
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "spacing": "Small",
+                      "text": "${From.Name}",
+                      "isSubtle": true,
+                      "wrap": true,
+                      "size": "Medium"
+                    }
+                  ],
+                  "verticalContentAlignment": "Center"
+                }
+              ]
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
     },
     {
       "type": "TextBlock",
-      "text": "${appName}",
-      "isSubtle": true,
-      "color": "Accent",
-      "weight": "Bolder",
-      "size": "Small",
-      "spacing": "None"
-    },
-    {
-      "type": "TextBlock",
-      "text": "${description}",
-      "isSubtle": true,
-      "wrap": true
-    }
-  ],
-  "actions": [
-    {
-      "type": "Action.OpenUrl",
-      "title": "View Details",
-      "url": "${notificationUrl}"
+      "text": "${Message}",
+      "wrap": true,
+      "size": "Medium",
+      "fontType": "Default",
+      "isSubtle": true
     }
   ]
 }

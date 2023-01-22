@@ -28,7 +28,8 @@
         Person From,
         Person To,
         Reward Title,
-        string Message
+        string Message,
+        DateTime SendOn
     );
 
     public record Reward(string Id, string Description);

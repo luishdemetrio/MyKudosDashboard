@@ -56,6 +56,8 @@ public class GraphService : IGraphService
     }
 
 
+    //get user's manager
+    //https://graph.microsoft.com/beta/me?$expand=manager($select=id)&$select=id,displayName,manager.id
 
     public async Task<GraphUsers> GetUsers(string name)
     {

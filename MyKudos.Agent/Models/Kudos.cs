@@ -1,10 +1,17 @@
 ﻿namespace MyKudos.Agent.Models;
 
 public record Kudos(
-    string Id,
-    string From,
-    string To,
-    string Title,
+    Person From,
+    Person To,
+    Reward Title,
     string Message,
     DateTime SendOn
-    );
+);
+
+public record Reward(string Id, string Description);
+
+public record Person(
+     string Id ,
+     string Name ,
+     string Photo 
+);

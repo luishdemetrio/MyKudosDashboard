@@ -209,7 +209,8 @@
                     Id:  recognition.Id, 
                     Description: recognition.Description 
                 ),
-                Message : KudosMessage 
+                Message : KudosMessage ,
+                SendOn : DateTime.Now
             );
 
         if (SendKudosView.Send(kudos))

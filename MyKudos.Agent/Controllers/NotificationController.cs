@@ -3,7 +3,6 @@ using AdaptiveCards.Templating;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamsFx.Conversation;
 using Newtonsoft.Json;
-using MyKudos.Agent.Interfaces;
 
 namespace MyKudos.Agent.Controllers
 {
@@ -12,43 +11,91 @@ namespace MyKudos.Agent.Controllers
     public class NotificationController : ControllerBase
     {
         private readonly ConversationBot _conversation;
-        private IAgentNotification _agentNotification;
+        
+        private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "NotificationDefault.json");
 
-        //private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "NotificationDefault.json");
-
-        public NotificationController(ConversationBot conversation, IAgentNotification agentNotification)
+        public NotificationController(ConversationBot conversation)
         {
-            _conversation = conversation;
-            _agentNotification = agentNotification;
+            _conversation = conversation;            
         }
 
         [HttpPost]
         public async Task<ActionResult> PostAsync(CancellationToken cancellationToken = default)
         {
 
-            await _agentNotification.SendNotification(new Kudos(Id: "1", From: "", To: "", Title: "", Message: "", SendOn: DateTime.Now ));
+            int membersCount = 0;
+            string users = string.Empty;
 
-            //// Read adaptive card template
-            //var cardTemplate = await System.IO.File.ReadAllTextAsync(_adaptiveCardFilePath, cancellationToken);
+            var installations = await this._conversation.Notification.GetInstallationsAsync(cancellationToken);
 
-            //var installations = await this._conversation.Notification.GetInstallationsAsync(cancellationToken);
-            //foreach (var installation in installations)
-            //{
-            //    // Build and send adaptive card
-            //    var cardContent = new AdaptiveCardTemplate(cardTemplate).Expand
-            //    (
-            //        new NotificationDefaultModel
-            //        {
-            //            Title = "New Event Occurred!",
-            //            AppName = "Contoso App Notification",
-            //            Description = $"This is a sample http-triggered notification to {installation.Type}",
-            //            NotificationUrl = "https://www.adaptivecards.io/",
-            //        }
-            //    );
-            //    await installation.SendAdaptiveCard(JsonConvert.DeserializeObject(cardContent), cancellationToken);
-            //}
+            if (installations.Count() == 0)
+            {
+                return Ok($"There are no users with the bot installed");
+            }
 
-            return Ok();
+            using var content = new StreamContent(this.HttpContext.Request.Body);
+
+            var contentString = await content.ReadAsStringAsync();
+
+            Kudos kudos = null;
+
+            if (!string.IsNullOrEmpty(contentString))
+            {
+                kudos = System.Text.Json.JsonSerializer.Deserialize<Kudos>(contentString);
+
+                if (kudos == null)
+                {
+                    return Ok("The Kudos body is missing or is invalid");
+                }
+            }
+
+            // Read adaptive card template
+            var cardTemplate = await System.IO.File.ReadAllTextAsync(_adaptiveCardFilePath, cancellationToken);
+
+            foreach (var installation in installations)
+            {
+
+
+                // "Person" means this bot is installed as Personal app
+                if (installation.Type == NotificationTargetType.Person)
+                {
+                    var members = await installation.GetMembersAsync(cancellationToken);
+
+                    if (members == null)
+                    {
+                        return Ok("The bot has no members.");
+                    }
+
+                    membersCount += members.Count();
+
+
+                    // find the people (who received the reward and his/her boss)
+                    var sendTo = members.ToList().FindAll(m => 
+                                (m.Account.Id == kudos.To.Id) || (m.Account.Id == kudos.From.Id));
+
+
+                    for (int i = 0; i < members.Length; i++)
+                    {
+                        users = users + members[i].Account.UserPrincipalName + " - " + members[i].Account.Name + "; BotAppId:" + installation.BotAppId;
+                    }
+
+                    foreach (var to in sendTo)
+                    {
+
+                        // Build and send adaptive card
+                        var cardContent = new AdaptiveCardTemplate(cardTemplate).Expand(kudos);
+
+                        await to.SendAdaptiveCard(JsonConvert.DeserializeObject(cardContent), cancellationToken);
+
+                    }
+
+                }
+            }
+
+            return Ok($"Installations: {installations.Count()}\nMembers: {membersCount}\nUsers:{users}");
+
         }
+
+
     }
 }

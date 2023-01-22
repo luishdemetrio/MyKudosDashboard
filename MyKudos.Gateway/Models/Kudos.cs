@@ -16,7 +16,8 @@ public record KudosRequest (
     Person From,
     Person To,
     Reward Title,
-    string Message
+    string Message,
+    DateTime SendOn
     );
 
 
