@@ -32,8 +32,7 @@ public class KudosController : Controller
 
     [HttpGet(Name = "GetKudos")]
     public async Task<IEnumerable<Models.KudosResponse>> Get()
-    {
-       
+    {       
         var kudos = _kudosService.GetKudos();
 
         var from= kudos.Select(u => u.From).Distinct().ToList();
@@ -41,7 +40,6 @@ public class KudosController : Controller
         from.AddRange(kudos.Select(u =>u.To).Distinct());
 
         List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
-
 
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
 

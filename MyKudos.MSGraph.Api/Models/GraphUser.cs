@@ -1,4 +1,4 @@
-﻿namespace MyKudos.Gateway.Models;
+﻿namespace MyKudos.MSGraph.Api.Models;
 
 public class GraphUser
 {
@@ -9,5 +9,5 @@ public class GraphUser
 
 public class GraphUsers
 {
-    public List<GraphUser> value { get; set; } = new();
+    public GraphUser[] value { get; set; }
 }

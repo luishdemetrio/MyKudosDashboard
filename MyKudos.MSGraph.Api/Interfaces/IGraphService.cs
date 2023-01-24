@@ -1,6 +1,6 @@
-﻿using MyKudos.Gateway.Models;
+﻿using MyKudos.MSGraph.Api.Models;
 
-namespace MyKudos.Gateway.Interfaces;
+namespace MyKudos.MSGraph.Api.Interfaces;
 
 public interface IGraphService
 {
@@ -9,8 +9,8 @@ public interface IGraphService
     Task<string> GetUserPhoto(string userid);
     
     Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] users);
-
-    Task<GraphUsers> GetUsersAsync(string name);
+    
+    Task<GraphUsers> GetUsers(string name);
 
     Task<List<GraphUser>> GetUserInfoAsync(string[] users);
 }

@@ -174,11 +174,11 @@
 
     }
 
-    private async Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
+    private Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
     {
         var settings = Settings.LoadSettings();        
 
-        return await SendKudosView.GetUsersAsync(searchText);
+        return Task.FromResult(SendKudosView.GetUsers(searchText));
 
     }
 

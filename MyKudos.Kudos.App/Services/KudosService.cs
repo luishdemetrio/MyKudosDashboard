@@ -1,4 +1,5 @@
 ﻿
+using MyKudos.Kudos.Domain.Commands;
 using MyKudos.Domain.Core.Bus;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.Domain.Interfaces;
@@ -25,9 +26,23 @@ public class KudosService : IKudosService
     }
 
     public bool Send(KudosLog kudos)
-    {   
+    {
         //TODO: need to change here to send a message instead of saving in the repository
-        
+
+
+        //var createTransferCommand = new CreateSendKudosCommand
+        //    (
+        //       fromPersonId: kudos.FromPersonId,
+        //       toPersonId: kudos.ToPersonId,
+        //       titleId: kudos.TitleId,
+        //       message: kudos.Message,
+        //       date: kudos.Date
+        //    );
+
+        //_bus.SendCommand(createTransferCommand);
+
+        //return true;
+
         return _kudosRepository.Add(kudos);
     }
 }

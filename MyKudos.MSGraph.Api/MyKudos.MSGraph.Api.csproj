@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Protos\graph.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.3.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
     <PackageReference Include="Microsoft.Graph" Version="4.48.0" />
@@ -16,17 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-  
-    <Protobuf Include="..\MyKudos.Kudos.Api\Proto\kudos.proto" GrpcServices="Client">
-      <Link>Protos\kudos.proto</Link>
-    </Protobuf>
-  
-    <Protobuf Include="..\MyKudos.MSGraph.Api\Protos\graph.proto" GrpcServices="Client">
-      <Link>Protos\graph.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\MyKudos.Recognition.Api\Proto\recognition.proto" GrpcServices="Client">
-      <Link>Protos\recognition.proto</Link>
-    </Protobuf>
+    <Protobuf Include="Protos\graph.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>

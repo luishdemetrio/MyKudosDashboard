@@ -1,10 +1,10 @@
 ﻿
 
-namespace MyKudos.Recognition.Domain.Commands;
+namespace MyKudos.Kudos.Domain.Commands;
 
 public class CreateSendKudosCommand : SendKudosCommand
 {
-    public CreateSendKudosCommand(string? fromPersonId, string? toPersonId, string? titleId, string? message, DateTime? date)
+    public CreateSendKudosCommand(string fromPersonId, string toPersonId, string titleId, string message, DateTime date)
     {
         FromPersonId = fromPersonId;
         ToPersonId  = toPersonId;

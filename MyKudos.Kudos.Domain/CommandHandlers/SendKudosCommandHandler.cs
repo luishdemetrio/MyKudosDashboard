@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using MyKudos.Recognition.Domain.Commands;
-using MyKudos.Recognition.Domain.Events;
+using MyKudos.Kudos.Domain.Commands;
+using MyKudos.Kudos.Domain.Events;
 using MyKudos.Domain.Core.Bus;
 
-namespace MyKudos.Recognition.Domain.CommandHandlers;
+namespace MyKudos.Kudos.Domain.CommandHandlers;
 
 public class SendKudosCommandHandler : IRequestHandler<CreateSendKudosCommand, bool>
 {

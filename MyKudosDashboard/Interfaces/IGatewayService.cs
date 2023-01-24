@@ -9,4 +9,6 @@ public interface IGatewayService
     bool SendKudos(KudosRequest kudos);
 
     IEnumerable<KudosResponse> GetKudos();
+
+    IEnumerable<UserViewModel> GetUsers(string name);
 }

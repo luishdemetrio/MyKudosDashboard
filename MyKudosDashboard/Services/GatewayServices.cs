@@ -88,4 +88,26 @@ public class GatewayService : IGatewayService
         return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
         
     }
+
+    public IEnumerable<UserViewModel> GetUsers(string name)
+    {
+        List<UserViewModel> kudos = new();
+
+        var uri = $"{_gatewayServiceUrl}user/?name={name}";
+
+        var client = new RestClient(uri);
+
+        var request = new RestRequest();
+
+        request.Method = Method.Get;
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            kudos = JsonConvert.DeserializeObject<IEnumerable<UserViewModel>>(response.Content).ToList();
+        }
+
+        return kudos;
+    }
 }

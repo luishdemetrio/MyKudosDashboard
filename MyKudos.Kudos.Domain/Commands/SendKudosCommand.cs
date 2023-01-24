@@ -1,6 +1,6 @@
 ﻿using MyKudos.Domain.Core.Commands;
 
-namespace MyKudos.Recognition.Domain.Commands;
+namespace MyKudos.Kudos.Domain.Commands;
 
 public abstract class SendKudosCommand : Command
 {
@@ -12,5 +12,5 @@ public abstract class SendKudosCommand : Command
 
     public string? Message { get; protected set; }
 
-    public DateTime? Date { get; set; }
+    public DateTime Date { get; set; }
 }

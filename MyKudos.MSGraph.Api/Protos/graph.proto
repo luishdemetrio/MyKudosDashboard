@@ -1,0 +1,57 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "MyKudos.MSGraph.gRPC";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+
+
+message UserById{
+	string Id = 1;	
+}
+message ListUsersById{
+	repeated UserById Ids = 1;
+}
+
+message UserRequestByName{
+	string Name = 1;	
+}
+
+message ListUsersByName{
+	repeated UserResponseByName Users = 1;
+}
+
+message MSGraphUser
+{
+    string Id =1;
+    string DisplayName =2;
+    string UserPrincipalName =3;
+}
+
+message UserResponseByName{
+	MSGraphUser User=1;
+}
+
+
+
+message UserPhoto{
+	string id = 1;
+	string photo = 2;
+}
+
+message UserPhotosList{
+	repeated UserPhoto Users = 1;
+}
+
+
+message UsersPhotos{
+	repeated UserRequestByName Users = 1;
+}
+service MSGraphService {
+
+rpc GetUsers (UserRequestByName) returns (ListUsersByName);
+
+rpc GetUserPhotos(ListUsersById) returns (UserPhotosList);
+
+}

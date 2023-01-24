@@ -21,21 +21,23 @@ public class SendKudosView : ISendKudosView
 
     }
 
-    public async Task<IEnumerable<UserViewModel>> GetUsersAsync(string name)
+    public IEnumerable<UserViewModel> GetUsers(string name)
     {
 
-        var graphUsers = await _graphHelper.GetUsers(name);
+        return _dashboardService.GetUsers(name);
 
-        if (graphUsers.value.Count()  == 0)
-            return new List<UserViewModel>();
+        //var graphUsers = await _graphHelper.GetUsers(name);
 
-        var photos = await _graphHelper.GetUserPhotos(graphUsers);
+        //if (graphUsers.value.Count()  == 0)
+        //    return new List<UserViewModel>();
+
+        //var photos = await _graphHelper.GetUserPhotos(graphUsers);
                 
 
-        return (from graphUser in graphUsers.value
-                 join photo in photos.responses
-                     on graphUser.id equals photo.id
-                 select new UserViewModel(graphUser.id, graphUser.displayName, "data:image/png;base64," + photo.body));
+        //return (from graphUser in graphUsers.value
+        //         join photo in photos.responses
+        //             on graphUser.id equals photo.id
+        //         select new UserViewModel(graphUser.id, graphUser.displayName, "data:image/png;base64," + photo.body));
     }
 
     public bool Send(KudosRequest kudos)

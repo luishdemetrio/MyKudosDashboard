@@ -53,64 +53,64 @@ public class GraphService : IGraphService
 
 
 
-    public async Task<GraphUsersDTO> GetUsers(string name)
-    {
+    //public async Task<GraphUsersDTO> GetUsers(string name)
+    //{
 
-        GraphUsersDTO r = new();
+    //    GraphUsersDTO r = new();
 
-        var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
+    //    var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
 
-        var request = new RestRequest();
+    //    var request = new RestRequest();
 
-        request.Method = Method.Get;
-        request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+    //    request.Method = Method.Get;
+    //    request.AddHeader("ConsistencyLevel", "eventual");
+    //    request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
 
-        RestResponse response = client.Execute(request);
+    //    RestResponse response = client.Execute(request);
 
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            r = JsonConvert.DeserializeObject<GraphUsersDTO>(response.Content)!;
+    //    if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+    //    {
+    //        r = JsonConvert.DeserializeObject<GraphUsersDTO>(response.Content)!;
 
-        }
+    //    }
 
-        return r;
-    }
+    //    return r;
+    //}
 
-    public async Task<GraphUserPhotos> GetUserPhotos(GraphUsersDTO users)
-    {
+    //public async Task<GraphUserPhotos> GetUserPhotos(GraphUsersDTO users)
+    //{
 
-        GraphUserPhotos photos = new();
+    //    GraphUserPhotos photos = new();
 
-        var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
+    //    var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
 
-        var request = new RestRequest();
+    //    var request = new RestRequest();
 
-        request.Method = Method.Post;
-        request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+    //    request.Method = Method.Post;
+    //    request.AddHeader("ConsistencyLevel", "eventual");
+    //    request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
 
 
-        List<GraphBatchRequestDTO> batch = new();
+    //    List<GraphBatchRequestDTO> batch = new();
 
-        foreach (var item in users.value)
-        {
-            batch.Add(new GraphBatchRequestDTO(item.id, "GET", $"users/{item.id}/photos/48x48/$value"));
-        }
+    //    foreach (var item in users.value)
+    //    {
+    //        batch.Add(new GraphBatchRequestDTO(item.id, "GET", $"users/{item.id}/photos/48x48/$value"));
+    //    }
 
-        var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
-        request.AddParameter("application/json", body, ParameterType.RequestBody);
+    //    var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
+    //    request.AddParameter("application/json", body, ParameterType.RequestBody);
 
-        RestResponse response = client.Execute(request);
+    //    RestResponse response = client.Execute(request);
 
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
-        {
-            photos = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
+    //    if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+    //    {
+    //        photos = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
 
-        }
+    //    }
 
-        return photos;
-    }
+    //    return photos;
+    //}
 
     public async Task<string> GetUserPhoto(string userid)
     {

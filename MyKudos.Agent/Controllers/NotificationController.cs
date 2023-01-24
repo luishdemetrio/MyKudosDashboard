@@ -69,9 +69,9 @@ namespace MyKudos.Agent.Controllers
                     membersCount += members.Count();
 
 
-                    // find the people (who received the reward and his/her boss)
+                    // find the people (who received the reward, who sent it and his/her boss)
                     var sendTo = members.ToList().FindAll(m => 
-                                (m.Account.Id == kudos.To.Id) || (m.Account.Id == kudos.From.Id));
+                                (m.Account.AadObjectId == kudos.To.Id) || (m.Account.AadObjectId == kudos.From.Id));
 
 
                     for (int i = 0; i < members.Length; i++)
