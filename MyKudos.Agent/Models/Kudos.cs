@@ -5,7 +5,8 @@ public record Kudos(
     Person To,
     Reward Title,
     string Message,
-    DateTime SendOn
+    DateTime SendOn,
+    string? ManagerId
 );
 
 public record Reward(string Id, string Description);
@@ -15,3 +16,4 @@ public record Person(
      string Name ,
      string Photo 
 );
+

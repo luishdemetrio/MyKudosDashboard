@@ -13,5 +13,7 @@ public interface IGraphService
     Task<GraphUsers> GetUsersAsync(string name);
 
     Task<List<GraphUser>> GetUserInfoAsync(string[] users);
+
+    string GetUserManager(string userid);
 }
 

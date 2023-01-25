@@ -188,8 +188,14 @@ public class GraphService : IGraphService
         return result;
     }
 
+    public string GetUserManager(string userid)
+    {
+        var msclient = new MSGraphServiceClient(
+                           GrpcChannel.ForAddress(_graphServiceUrl)
+                        );
 
-    
+                var manager = msclient.GetUserManager(new UserById() { Id = userid });
 
-
+                return manager.Id;
+    }
 }

@@ -17,7 +17,7 @@ public class AgentNotificationService : IAgentNotificationService
         _agentServiceUrl = config["agentServiceUrl"];
     }
 
-    public bool SendNotification(KudosRequest kudos)
+    public bool SendNotification(KudosNotification kudos)
     {          
 
         var uri = $"{_agentServiceUrl}api/notification";
@@ -43,4 +43,5 @@ public class AgentNotificationService : IAgentNotificationService
     }
 
    
+
 }

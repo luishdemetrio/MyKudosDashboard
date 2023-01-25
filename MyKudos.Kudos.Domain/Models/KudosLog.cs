@@ -15,3 +15,34 @@ public class KudosLog
 
     public DateTime Date { get; set; }
 }
+
+
+public record KudosNotification(
+    Person From,
+    Person To,
+    Reward Title,
+    string Message,
+    DateTime SendOn,
+    string ManagerId
+    );
+
+
+public class Person
+{
+    public string Id { get; set; }
+
+    public string Name { get; set; }
+
+    public string Photo { get; set; }
+}
+
+public record Reward(string Id, string Description);
+
+
+public class GraphUser
+{
+    public string Id { get; set; }
+    public string DisplayName { get; set; }
+    public string UserPrincipalName { get; set; }
+
+}

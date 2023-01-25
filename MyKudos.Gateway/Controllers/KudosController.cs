@@ -76,7 +76,18 @@ public class KudosController : Controller
 
         _kudosService.Send(kudos);
 
-        _agentNotificationService.SendNotification(kudos);
+        string userManagerId = _graphService.GetUserManager(kudos.To.Id);
+
+
+        _agentNotificationService.SendNotification(
+            new KudosNotification(                
+                From : kudos.From,
+                To : kudos.To,                 
+                ManagerId : userManagerId,
+                Message : kudos.Message,
+                Title : kudos.Title,
+                SendOn : kudos.SendOn
+                ));
 
         return Ok(kudos);
     }

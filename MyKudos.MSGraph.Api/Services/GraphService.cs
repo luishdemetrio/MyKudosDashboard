@@ -55,16 +55,15 @@ public class GraphService : IGraphService
     }
 
 
-    //get user's manager
-    //https://graph.microsoft.com/beta/me?$expand=manager($select=id)&$select=id,displayName,manager.id
-
+   
     public async Task<GraphUsers> GetUsers(string name)
     {
 
         GraphUsers r = new();
 
         var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
-
+        
+        
         var request = new RestRequest();
 
         request.Method = Method.Get;
@@ -123,6 +122,27 @@ public class GraphService : IGraphService
 
         return photos;
     }
+
+    public async Task<string> GetUserManager(string userid)
+    {
+
+        string result = string.Empty;
+
+        var directoryObject = await _appClient.Users[userid].Manager
+                      .Request()
+                      .Header("ConsistencyLevel", "eventual")
+                      .Select("id")
+                      .GetAsync();
+
+        if (directoryObject != null)
+        {
+            result = directoryObject.Id;
+        }
+
+        return result;
+
+    }
+
 
     public async Task<string> GetUserPhoto(string userid)
     {

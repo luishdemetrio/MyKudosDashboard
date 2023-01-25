@@ -16,7 +16,7 @@ using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Recognition.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Commands;
 using MyKudos.Kudos.Domain.CommandHandlers;
-using MyKudos.Kudos.Domain.Services;
+//using MyKudos.Kudos.Domain.Services;
 
 namespace MyKudos.Infra.IoC;
 
@@ -38,7 +38,7 @@ public class DependencyContainer
         //Application services
         services.AddTransient<IRecognitionService, RecognitionService>();
         services.AddTransient<IKudosService, KudosService>();
-        services.AddTransient<IAgentNotificationService, AgentNotificationService>();
+  //      services.AddTransient<IAgentNotificationService, AgentNotificationService>();
 
         //Data
         services.AddTransient<RecognitionDbContext>(_ =>

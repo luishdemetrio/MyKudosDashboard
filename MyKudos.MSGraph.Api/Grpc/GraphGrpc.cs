@@ -58,6 +58,37 @@ public class GraphGrpc : MSGraphServiceBase
 
         return result;
 
+    }
+
+
+    public override async Task<UserById> GetUserManager(UserById request, ServerCallContext context)
+    {
+        UserById result = new UserById()
+        {
+            Id = await _graphService.GetUserManager(request.Id)
+        };
+   
+        return result;
 
     }
+
+    public override async Task<UserInfoList> GetUserInfo(ListUsersById request, ServerCallContext context)
+    {
+        UserInfoList result = new UserInfoList();
+
+        var users = await _graphService.GetUserInfoAsync(request.Ids.Select(u => u.Id).ToArray());
+
+        foreach (var user in users)
+        {
+            result.User.Add(new UserInfo()
+            {
+                Id = user.Id,
+                DisplayName = user.DisplayName,
+                UserPrincipalName = user.UserPrincipalName
+            });
+        }
+
+        return result;
+    }
+
 }

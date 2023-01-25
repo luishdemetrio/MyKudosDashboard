@@ -48,10 +48,25 @@ message UserPhotosList{
 message UsersPhotos{
 	repeated UserRequestByName Users = 1;
 }
+
+message UserInfo{
+	string Id =1;
+    string DisplayName = 2;
+    string UserPrincipalName = 3;
+}
+
+message UserInfoList{
+	repeated UserInfo User = 1;
+}
+
 service MSGraphService {
 
 rpc GetUsers (UserRequestByName) returns (ListUsersByName);
 
 rpc GetUserPhotos(ListUsersById) returns (UserPhotosList);
+
+rpc GetUserManager(UserById) returns (UserById);
+
+rpc GetUserInfo(ListUsersById) returns (UserInfoList);
 
 }

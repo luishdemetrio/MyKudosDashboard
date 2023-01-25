@@ -1,9 +1,9 @@
-﻿using MyKudos.Kudos.Domain.Models;
+﻿//using MyKudos.Kudos.Domain.Models;
 
-namespace MyKudos.Kudos.Domain.Interfaces;
+//namespace MyKudos.Kudos.Domain.Interfaces;
 
-public interface IAgentNotificationService
-{
+//public interface IAgentNotificationService
+//{
 
-    bool SendNotification(KudosLog kudos);
-}
+//    bool SendNotification(KudosLog kudos);
+//}

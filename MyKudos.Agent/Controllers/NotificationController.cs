@@ -71,7 +71,9 @@ namespace MyKudos.Agent.Controllers
 
                     // find the people (who received the reward, who sent it and his/her boss)
                     var sendTo = members.ToList().FindAll(m => 
-                                (m.Account.AadObjectId == kudos.To.Id) || (m.Account.AadObjectId == kudos.From.Id));
+                                (m.Account.AadObjectId == kudos.To.Id) || 
+                                (m.Account.AadObjectId == kudos.From.Id) ||
+                                (m.Account.AadObjectId == kudos.ManagerId));
 
 
                     for (int i = 0; i < members.Length; i++)

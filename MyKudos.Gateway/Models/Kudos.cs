@@ -20,6 +20,19 @@ public record KudosRequest (
     DateTime SendOn
     );
 
+public record KudosNotification 
+(
+    Person From,
+    Person To,
+    Reward Title,
+    string Message,
+    DateTime SendOn,
+    string ManagerId
+    
+);
+    
+    
+
 
 public record KudosResponse(
     string? Id,

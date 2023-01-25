@@ -5,5 +5,5 @@ namespace MyKudos.Gateway.Interfaces;
 public interface IAgentNotificationService
 {
 
-    bool SendNotification(KudosRequest kudos);
+    bool SendNotification(KudosNotification kudos);
 }

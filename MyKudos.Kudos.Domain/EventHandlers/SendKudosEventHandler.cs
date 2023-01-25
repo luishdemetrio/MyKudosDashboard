@@ -10,13 +10,13 @@ public class SendKudosEventHandler : IEventHandler<SendKudosCreatedEvent>
 
     private readonly IKudosRepository _kudosRepository;
 
-    private readonly IAgentNotificationService _agentNotificationService;
+    //private readonly IAgentNotificationService _agentNotificationService;
 
 
-    public SendKudosEventHandler(IKudosRepository kudosRepository, IAgentNotificationService agentNotificationService)
+    public SendKudosEventHandler(IKudosRepository kudosRepository) //, IAgentNotificationService agentNotificationService)
     {
         _kudosRepository = kudosRepository;
-        _agentNotificationService = agentNotificationService;
+        //_agentNotificationService = agentNotificationService;
     }
 
     public Task Handle(SendKudosCreatedEvent @event)
@@ -33,7 +33,7 @@ public class SendKudosEventHandler : IEventHandler<SendKudosCreatedEvent>
 
         _kudosRepository.Add(kudos);
 
-        _agentNotificationService.SendNotification(kudos);
+       // _agentNotificationService.SendNotification(kudos);
 
         return Task.CompletedTask;
     }
