@@ -45,4 +45,13 @@ public class KudosService : IKudosService
 
         return _kudosRepository.Add(kudos);
     }
+
+    public bool SendLike(string kudosId, string personId)
+    {
+        return _kudosRepository.SendLike(kudosId, personId);
+
+
+    }
+
+  
 }

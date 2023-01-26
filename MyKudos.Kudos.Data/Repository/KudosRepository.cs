@@ -26,4 +26,29 @@ public class KudosRepository: IKudosRepository
 	{
 		return _context.Kudos;
 	}
+
+    public bool SendLike(string kudosId, string personId)
+    {
+		var kudos = _context.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
+
+		if (kudos != null)
+		{
+			if (kudos.Likes == null)
+			{
+				kudos.Likes = new List<string>();
+                kudos.Likes.Add(personId);
+            }else if (kudos.Likes.Contains(personId))
+			{
+				kudos.Likes.Remove(personId);
+			}
+			else
+			{
+				kudos.Likes.Add(personId);
+			}
+
+			_context.SaveChanges();
+		}
+		return true;
+
+    }
 }

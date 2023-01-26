@@ -14,6 +14,8 @@ public class KudosLog
     public string? Message { get; set; }
 
     public DateTime Date { get; set; }
+
+    public List<string> Likes { get; set; } = new();
 }
 
 

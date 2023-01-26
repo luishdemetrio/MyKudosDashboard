@@ -1,5 +1,7 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using Google.Protobuf.Collections;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore.Storage;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.gRPC;
 using static MyKudos.Kudos.gRPC.KudosService;
@@ -26,15 +28,27 @@ public class KudosGrpc : KudosServiceBase
         foreach (var item in items)
         {
 
+            PaginatedPersonId likes = new();
+
+            if (item.Likes != null)
+            {
+                foreach (var like in item.Likes)
+                {
+                    likes.Id.Add(new PersonId() { Id = like });
+                }
+            }
+            
+
             kudos.Data.Add(new KudosResponse()
             {
-                 Id = item.Id.ToString(),
+                Id = item.Id.ToString(),
                 FromPersonId = item.FromPersonId,
                 ToPersonId = item.ToPersonId,
-                 TitleId = item.TitleId,
-                 Message = item.Message,
-                 Date = item.Date.ToTimestamp()
-            });
+                TitleId = item.TitleId,
+                Message = item.Message,
+                Date = item.Date.ToTimestamp(),
+                Likes = likes
+            }) ; 
 
         }
 
@@ -58,5 +72,14 @@ public class KudosGrpc : KudosServiceBase
 
     }
 
-    
+
+    public override Task<SendLikeResponse> SendLike(SendLikeRequest request, ServerCallContext context)
+    {
+        
+        var r = _kudosService.SendLike(request.KudosId, request.PersonId);
+
+        return Task.FromResult(new SendLikeResponse() { Succeed = r });
+
+    }
+
 }

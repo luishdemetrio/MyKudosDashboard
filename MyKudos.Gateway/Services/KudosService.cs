@@ -30,12 +30,13 @@ public class KudosService : IKudosService
         {
             result.Add(new Models.Kudos(
                 Id: item.Id,
-                From:  item.FromPersonId,
-                To:  item.ToPersonId,
+                From: item.FromPersonId,
+                To: item.ToPersonId,
                 TitleId: item.TitleId,
                 Message: item.Message,
-                SendOn: item.Date.ToDateTime()
-                ));
+                SendOn: item.Date.ToDateTime(),
+                Likes: item.Likes.Id.Select(x => x.Id)
+                )) ;
         }
 
 
@@ -63,5 +64,17 @@ public class KudosService : IKudosService
         return r.Succeed;
     }
 
+    public bool SendLike(string kudosId, string personId)
+    {
+        List<Models.Kudos> result = new();
 
+        var client = new KudosServiceClient(
+                            GrpcChannel.ForAddress(_kudosServiceUrl)
+                         );
+
+        var r = client.SendLike(new Kudos.gRPC.SendLikeRequest() { KudosId = kudosId, PersonId = personId });
+
+        return r.Succeed;
+
+    }
 }

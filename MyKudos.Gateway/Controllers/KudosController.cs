@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -39,37 +41,69 @@ public class KudosController : Controller
 
         from.AddRange(kudos.Select(u =>u.To).Distinct());
 
-        List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
+        List<string> likesId = new();
 
+        //user from likes
+        foreach (var k in kudos)
+        {
+            likesId.AddRange( k.Likes);
+
+        }
+
+        from.AddRange(likesId.Distinct());
+
+        List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
+                
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
 
-        var result = from kudo in kudos
-                     join userTo in users
-                        on kudo.To equals userTo.Id
-                     join userFrom in users
-                        on kudo.From equals userFrom.Id
-                     join photoTo in photos
-                        on kudo.To equals photoTo.id
-                     join photoFrom in photos
-                        on kudo.From equals photoFrom.id
-                     join rec in _recognitions
-                        on kudo.TitleId equals rec.Id
-                     
-                     select new Models.KudosResponse(
-                         Id: kudo.Id,
-                         From: new Person() { Id = kudo.From, Name = userFrom.DisplayName, Photo = photoFrom.photo },
-                         To: new Person() { Id = kudo.To, Name = userTo.DisplayName, Photo = photoTo.photo },
-                         Title: rec.Description,
-                         Message: kudo.Message,
-                         SendOn: kudo.SendOn
-                     ); 
+        
+        List<Person> likes = new();
 
+        foreach (var k in kudos)
+        {
 
-                return result;
+            likes.AddRange( from like in k.Likes
+                        join u in users
+                            on like equals u.Id
+                        join photo in photos
+                            on like equals photo.id
+                        select new Person()
+                        {
+                            Id = k.Id,
+                            Name = u.DisplayName,
+                            Photo = photo.photo
+                        });
+        }
+
+        var  result =  from kudo in kudos
+                        join userTo in users
+                            on kudo.To equals userTo.Id
+                        join userFrom in users
+                            on kudo.From equals userFrom.Id
+                        join photoTo in photos
+                            on kudo.To equals photoTo.id
+                        join photoFrom in photos
+                            on kudo.From equals photoFrom.id
+                        join rec in _recognitions
+                            on kudo.TitleId equals rec.Id                        
+
+                        select new Models.KudosResponse(
+                                Id: kudo.Id,
+                                From: new Person() { Id = kudo.From, Name = userFrom.DisplayName, Photo = photoFrom.photo },
+                                To: new Person() { Id = kudo.To, Name = userTo.DisplayName, Photo = photoTo.photo },
+                                Title: rec.Description,
+                                Message: kudo.Message,
+                                SendOn: kudo.SendOn,
+                                Likes: likes.Where( l => l.Id == kudo.Id )
+                            );
+        
+
+        return result;
 
 
     }
 
+    
     [HttpPost(Name = "SendKudos")]
     public IActionResult Post([FromBody] Models.KudosRequest kudos)
     {
@@ -91,6 +125,8 @@ public class KudosController : Controller
 
         return Ok(kudos);
     }
+
+    
 
 
 }

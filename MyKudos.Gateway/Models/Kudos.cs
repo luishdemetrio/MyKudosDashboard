@@ -7,7 +7,8 @@ public record Kudos(
     string To,
     string TitleId,
     string Message,
-    DateTime SendOn
+    DateTime SendOn,
+    IEnumerable<string> Likes
     );
 
 
@@ -40,7 +41,8 @@ public record KudosResponse(
     Person To,
     string Title,
     string Message,
-    DateTime SendOn
+    DateTime SendOn,
+    IEnumerable<Person> Likes
     );
 
 public record Reward(string Id, string Description);

@@ -79,7 +79,8 @@
                       "text": "${From.Name}",
                       "isSubtle": true,
                       "wrap": true,
-                      "size": "Medium"
+                      "size": "Medium",
+                      "weight": "Bolder"
                     }
                   ],
                   "verticalContentAlignment": "Center"
