@@ -3,6 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore.Storage;
 using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Kudos.gRPC;
 using static MyKudos.Kudos.gRPC.KudosService;
 

@@ -48,6 +48,8 @@
         public string? Message { get; set; }
 
         public DateTime SendOn { get; set; }
+        
+        public List<Person> Likes { get; set; }
     }
 
 }

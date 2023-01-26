@@ -79,7 +79,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSGraph", "MSGraph", "{3435
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{DCE38E39-4AB4-498C-B876-30C65DB397DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.MSGraph.Api", "MyKudos.MSGraph.Api\MyKudos.MSGraph.Api.csproj", "{0FDADB21-7970-4EF1-BAC3-FFA8BD9C9C4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.MSGraph.Api", "MyKudos.MSGraph.Api\MyKudos.MSGraph.Api.csproj", "{0FDADB21-7970-4EF1-BAC3-FFA8BD9C9C4D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{C4FAFEEB-25D6-4DA5-8A7D-912238923CF4}"
+	ProjectSection(SolutionItems) = preProject
+		armdeploy.json = armdeploy.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -55,9 +55,8 @@ public class KudosController : Controller
         List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
                 
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
-
         
-        List<Person> likes = new();
+        List<LikeDTO> likes = new();
 
         foreach (var k in kudos)
         {
@@ -67,12 +66,17 @@ public class KudosController : Controller
                             on like equals u.Id
                         join photo in photos
                             on like equals photo.id
-                        select new Person()
-                        {
-                            Id = k.Id,
-                            Name = u.DisplayName,
-                            Photo = photo.photo
-                        });
+                        select new LikeDTO(
+                        
+                            KudosId : k.Id,
+                            Person : new Person()
+                            {
+                                Id = like,
+                                Name = u.DisplayName,
+                                Photo = photo.photo
+                            }
+                            
+                        ));
         }
 
         var  result =  from kudo in kudos
@@ -94,7 +98,7 @@ public class KudosController : Controller
                                 Title: rec.Description,
                                 Message: kudo.Message,
                                 SendOn: kudo.SendOn,
-                                Likes: likes.Where( l => l.Id == kudo.Id )
+                                Likes: likes.Where( l => l.KudosId == kudo.Id ).Select( l => l.Person )
                             );
         
 

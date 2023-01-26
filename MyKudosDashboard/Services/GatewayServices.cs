@@ -1,7 +1,9 @@
-﻿using MyKudosDashboard.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using RestSharp;
+using System.Text.Json;
 
 namespace MyKudosDashboard.Services;
 
@@ -27,7 +29,7 @@ public class GatewayService : IGatewayService
         var request = new RestRequest();
 
         request.Method = Method.Get;
-      
+
         RestResponse response = client.Execute(request);
 
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -37,7 +39,7 @@ public class GatewayService : IGatewayService
         }
 
         return recognitions;
-                
+
     }
 
 
@@ -66,7 +68,7 @@ public class GatewayService : IGatewayService
 
     public bool SendKudos(KudosRequest kudos)
     {
-        
+
         var uri = $"{_gatewayServiceUrl}kudos";
 
         var client = new RestClient(uri);
@@ -86,7 +88,7 @@ public class GatewayService : IGatewayService
         RestResponse response = client.Execute(request);
 
         return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
-        
+
     }
 
     public IEnumerable<UserViewModel> GetUsers(string name)
@@ -110,4 +112,52 @@ public class GatewayService : IGatewayService
 
         return kudos;
     }
+
+    public Task<string> GetUserPhoto(string userid)
+    {
+        string userPhoto = string.Empty;
+
+        var uri = $"{_gatewayServiceUrl}photo/?userid={userid}";
+
+        var client = new RestClient(uri);
+
+        var request = new RestRequest();
+
+        request.Method = Method.Get;
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            userPhoto = response.Content;
+        }
+
+        return Task.FromResult(userPhoto.Replace("\"", ""));
+    }
+
+    public bool SendLike(Like like)
+    {
+        var uri = $"{_gatewayServiceUrl}likes";
+
+        var client = new RestClient(uri);
+
+        var request = new RestRequest();
+
+        request.Method = Method.Post;
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(like);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+
+        RestResponse response = client.Execute(request);
+
+        return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
+    }
+
+
+
 }

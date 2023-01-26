@@ -1,4 +1,6 @@
-﻿namespace MyKudos.Gateway.Interfaces
+﻿using MyKudos.Gateway.Models;
+
+namespace MyKudos.Gateway.Interfaces
 {
     public interface IKudosService
     {

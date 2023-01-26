@@ -1,6 +1,8 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.Client;
 using MyKudos.Gateway.Interfaces;
+using MyKudos.Gateway.Models;
+using MyKudos.Kudos.gRPC;
 using static MyKudos.Kudos.gRPC.KudosService;
 
 namespace MyKudos.Gateway.Services;
@@ -72,7 +74,11 @@ public class KudosService : IKudosService
                             GrpcChannel.ForAddress(_kudosServiceUrl)
                          );
 
-        var r = client.SendLike(new Kudos.gRPC.SendLikeRequest() { KudosId = kudosId, PersonId = personId });
+        var r = client.SendLike(new Kudos.gRPC.SendLikeRequest()
+        {
+            KudosId = kudosId,
+            PersonId = personId
+        });
 
         return r.Succeed;
 

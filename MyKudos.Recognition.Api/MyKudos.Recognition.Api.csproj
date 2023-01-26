@@ -12,8 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.50.0" />
-    <PackageReference Include="MediatR" Version="11.1.0" />
-    <PackageReference Include="MediatR.extensions.microsoft.dependencyinjection" Version="11.0.0" />
+    
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,9 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyKudos.Infra.IoC\MyKudos.Infra.IoC.csproj" />
+    <ProjectReference Include="..\MyKudos.Recognition.App\MyKudos.Recognition.App.csproj" />
+    <ProjectReference Include="..\MyKudos.Recognition.Data\MyKudos.Recognition.Data.csproj" />
   </ItemGroup>
 
+  
   <ItemGroup>
     <Protobuf Include="Proto\recognition.proto" GrpcServices="Server" />
   </ItemGroup>

@@ -5,12 +5,11 @@ namespace MyKudosDashboard.Views;
 
 public class WelcomeView : IWelcomeView
 {
-    private IGraphService _graphHelper;
+    
     private IGatewayService _gatewayService;
 
-    public WelcomeView(IGraphService graphHelper, IGatewayService gatewayService)
-    {
-        _graphHelper = graphHelper;
+    public WelcomeView(IGatewayService gatewayService)
+    {   
         _gatewayService = gatewayService;
     }
 
@@ -21,6 +20,7 @@ public class WelcomeView : IWelcomeView
 
     public async Task<string> GetUserPhoto(string userid)
     {
-        return await _graphHelper.GetUserPhoto(userid);
+
+        return await _gatewayService.GetUserPhoto(userid);
     }
 }

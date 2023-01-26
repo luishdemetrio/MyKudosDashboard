@@ -9,14 +9,14 @@ namespace MyKudos.Kudos.App.Services;
 
 public class KudosService : IKudosService
 {
-    private readonly IEventBus _bus;
+   // private readonly IEventBus _bus;
 
     private readonly IKudosRepository _kudosRepository;
 
 
-    public KudosService(IEventBus bus, IKudosRepository kudosRepository)
+    public KudosService(IKudosRepository kudosRepository)
     {
-        _bus = bus;
+    //    _bus = bus;
         _kudosRepository = kudosRepository;        
     }
 

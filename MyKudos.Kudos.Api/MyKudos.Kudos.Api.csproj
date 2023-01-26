@@ -12,13 +12,10 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
-    <PackageReference Include="MediatR" Version="11.1.0" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyKudos.Infra.IoC\MyKudos.Infra.IoC.csproj" />
     <ProjectReference Include="..\MyKudos.Kudos.App\MyKudos.Kudos.App.csproj" />
     <ProjectReference Include="..\MyKudos.Kudos.Data\MyKudos.Kudos.Data.csproj" />
   </ItemGroup>

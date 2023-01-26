@@ -1,11 +1,13 @@
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyKudos.Domain.Core.Bus;
-using MyKudos.Infra.IoC;
 using MyKudos.Kudos.Api.Grpc;
+using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.App.Services;
 using MyKudos.Kudos.Data.Context;
+using MyKudos.Kudos.Data.Repository;
 using MyKudos.Kudos.Domain.EventHandlers;
 using MyKudos.Kudos.Domain.Events;
+using MyKudos.Kudos.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +21,26 @@ builder.Services.AddSwaggerGen(c =>
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
 
-builder.Services.AddMediatR(typeof(Program));
+//builder.Services.AddMediatR(typeof(Program));
 
 builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
-DependencyContainer.RegisterServices(builder.Services);
+builder.Services.AddSingleton<IKudosService, KudosService>();
+builder.Services.AddSingleton<IKudosRepository, KudosRepository>();
 
+var config = builder.Configuration.GetSection("CosmosDb");
+
+builder.Services.AddTransient<KudosDbContext>(_ =>
+{
+    var options = new DbContextOptionsBuilder<KudosDbContext>()
+      .UseCosmos(
+              config["AccountEndPoint"],
+              config["AccountKey"],
+              config["DatabaseName"])
+      .Options;
+
+    return new KudosDbContext(options);
+});
 
 var app = builder.Build();
 
@@ -41,7 +57,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-ConfigureEventBus(app);
+//ConfigureEventBus(app);
 
 app.MapGrpcService<KudosGrpc>();
 

@@ -12,7 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IGraphService, GraphService>();
+builder.Services.AddSingleton<IGraphService, GraphService>();
 
 builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 

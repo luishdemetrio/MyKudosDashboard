@@ -1,8 +1,10 @@
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MyKudos.Recognition.Data.Context;
-using MyKudos.Infra.IoC;
 using MyKudos.Recognition.Api.Grpc;
+using MyKudos.Recognition.App.Interfaces;
+using MyKudos.Recognition.App.Services;
+using MyKudos.Recognition.Data.Repository;
+using MyKudos.Recognition.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +15,29 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMediatR(typeof(Program));
+//builder.Services.AddMediatR(typeof(Program));
 
 builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
-DependencyContainer.RegisterServices(builder.Services);
+//DependencyContainer.RegisterServices(builder.Services);
+
+builder.Services.AddSingleton<IRecognitionService, RecognitionService>();
+builder.Services.AddSingleton<IRecognitionRepository, RecognitionRepository>();
+
+
+var config = builder.Configuration.GetSection("CosmosDb");
+
+builder.Services.AddSingleton<RecognitionDbContext>(_ =>
+{
+    var options = new DbContextOptionsBuilder<RecognitionDbContext>()
+      .UseCosmos(
+              config["AccountEndPoint"],
+              config["AccountKey"],
+              config["DatabaseName"])
+      .Options;
+
+    return new RecognitionDbContext(options);
+});
 
 var app = builder.Build();
 

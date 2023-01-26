@@ -30,8 +30,7 @@ builder.Services.AddScoped<ContextMenuService>();
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
 builder.Services.AddScoped<IWelcomeView, WelcomeView>();
-
-builder.Services.AddScoped<IGraphService, GraphService>();
+builder.Services.AddScoped<IKudosListView, KudosListView>();
 
 //Services
 

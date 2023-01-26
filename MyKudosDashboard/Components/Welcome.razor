@@ -106,13 +106,13 @@ else
                             <FluentTab Text="Kudos from me" />
 
                             <FluentTabPanel >
-                                <KudosList kudos=@GetAllKudos() />                                   
-                                </FluentTabPanel>
-                            <FluentTabPanel>                                
-                                <KudosList kudos=@GetKudosToMe()/>
+                                <KudosList kudos=@GetAllKudos() User=@user UserPhoto=@userPhoto />
+                            </FluentTabPanel>
+                            <FluentTabPanel>
+                                <KudosList kudos=@GetKudosToMe() User=@user UserPhoto=@userPhoto />
                             </FluentTabPanel>
                             <FluentTabPanel >
-                                <KudosList kudos=@GetKudosFromMe() />
+                                <KudosList kudos=@GetKudosFromMe() User=@user UserPhoto=@userPhoto />
                             </FluentTabPanel>
                             
                     </FluentTabs>

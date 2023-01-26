@@ -11,4 +11,8 @@ public interface IGatewayService
     IEnumerable<KudosResponse> GetKudos();
 
     IEnumerable<UserViewModel> GetUsers(string name);
+
+    Task<string> GetUserPhoto(string userid);
+
+    bool SendLike(Like like);
 }
