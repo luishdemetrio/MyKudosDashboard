@@ -2,6 +2,7 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
+
 		"baseResourceName": {
 			"type": "string",
 			"minLength": 1,
@@ -9,80 +10,140 @@
 				"description": "The base name to use for the resources that will be provisioned."
 			}
 		},
-		"apis_MyKudosGateway_path": {
-			"type": "SecureString"
-		},
-		"sites_KudosGateway_name": {
-			"defaultValue": "KudosGateway",
+
+		"sites_Recognition_name": {
+			"defaultValue": "recognition",
 			"type": "String"
 		},
-		"service_KudosGatewayapi_name": {
-			"defaultValue": "KudosGatewayApi",
+
+
+		"databaseAccounts_mykudos_name": {
+			"defaultValue": "mykudos",
 			"type": "String"
+
 		},
-		"serverfarms_KudosGatewayPlan_name": {
-			"defaultValue": "KudosGatewayPlan",
-			"type": "String"
-		}
-	},
-	"variables": {},
-	"resources": [
-		{
-			"type": "Microsoft.ApiManagement/service",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[parameters('service_MyKudosGatewayapi_name')]",
-			"location": "East US",
-			"sku": {
-				"name": "Consumption",
-				"capacity": 0
-			},
-			"properties": {
-				"publisherEmail": "luffy@luisdemetrio.com",
-				"publisherName": "Straw Pirates",
-				"notificationSenderEmail": "apimgmt-noreply@mail.windowsazure.com",
-				"hostnameConfigurations": [
-					{
-						"type": "Proxy",
-						"hostName": "mykudosgatewayapi.azure-api.net",
-						"negotiateClientCertificate": false,
-						"defaultSslBinding": true,
-						"certificateSource": "BuiltIn"
-					}
-				],
-				"customProperties": {
-					"Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "False",
-					"Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "False",
-					"Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls10": "False",
-					"Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Tls11": "False",
-					"Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "False",
-					"Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "False"
-				},
-				"virtualNetworkType": "None",
-				"disableGateway": false,
-				"natGatewayState": "Disabled",
-				"apiVersionConstraint": {},
-				"publicNetworkAccess": "Enabled"
+
+		"hostingPlanSku": {
+			"type": "string",
+			"allowedValues": [
+				"Basic",
+				"Standard",
+				"Premium"
+			],
+			"defaultValue": "Standard",
+			"metadata": {
+				"description": "The pricing tier for the hosting plan."
 			}
 		},
+		"hostingPlanSize": {
+			"type": "string",
+			"allowedValues": [
+				"1",
+				"2",
+				"3"
+			],
+			"defaultValue": "2",
+			"metadata": {
+				"description": "The size of the hosting plan (small, medium, or large)."
+			}
+		},
+		"location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().location]",
+			"metadata": {
+				"description": "Location for all resources."
+			}
+		},
+
+		"DefaultCulture": {
+			"defaultValue": "en-US",
+			"allowedValues": [
+				"ar-SA",
+				"de-DE",
+				"en-US",
+				"es-ES",
+				"fr-FR",
+				"he-IL",
+				"ja-JP",
+				"ko-KR",
+				"pt-BR",
+				"ru-RU",
+				"zh-CN",
+				"zh-TW"
+			],
+			"minLength": 1,
+			"type": "String",
+			"metadata": {
+				"description": "Default culture."
+			}
+		},
+		"SupportedCultures": {
+			"defaultValue": "ar-SA,de-DE,en-US,es-ES,fr-FR,he-IL,ja-JP,ko-KR,pt-BR,ru-RU,zh-CN,zh-TW",
+			"minLength": 1,
+			"type": "String",
+			"metadata": {
+				"description": "Comma-delimited list of the supported cultures."
+			}
+		},
+
+		"gitRepoUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "The URL to the GitHub repository to deploy."
+			},
+			"defaultValue": "https://github.com/luishdemetrio/MyKudosDashboard.git"
+		},
+
+		"gitBranch": {
+			"type": "string",
+			"metadata": {
+				"description": "The branch of the GitHub repository to deploy."
+			},
+			"defaultValue": "master"
+		}
+	},
+
+	"variables": {
+
+		"hostingPlanName": "[parameters('baseResourceName')]",
+		"sharedSkus": [
+			"Free",
+			"Shared"
+		],
+
+		"isSharedPlan": "[contains(variables('sharedSkus'), parameters('hostingPlanSku'))]",
+		"skuFamily": "[if(equals(parameters('hostingPlanSku'), 'Shared'), 'D', take(parameters('hostingPlanSku'), 1))]",
+		"i18n:DefaultCulture": "[parameters('DefaultCulture')]",
+		"i18n:SupportedCultures": "[parameters('SupportedCultures')]",
+		"subscriptionTenantId": "[subscription().tenantId]",
+
+		"recognition_appservice": "[concat(parameters('baseResourceName'), parameters('sites_Recognition_name') )]",
+
+		"recognition_appserviceplan": "[concat(variables('recognition_appservice'), 'plan' )]"
+
+
+	},
+	"resources": [
+
 		{
 			"type": "Microsoft.Web/serverfarms",
 			"apiVersion": "2022-03-01",
-			"name": "[parameters('serverfarms_MyKudosGateway20230126151945Plan_name')]",
-			"location": "East US",
+			"name": "[variables('recognition_appserviceplan')]",
+			"location": "[parameters('location')]",
 			"sku": {
-				"name": "S1",
-				"tier": "Standard",
-				"size": "S1",
-				"family": "S",
+				"name": "[if(variables('isSharedPlan'), concat(variables('skuFamily'), '1'), concat(variables('skuFamily'), parameters('hostingPlanSize')))]",
+				"tier": "[parameters('hostingPlanSku')]",
+				"size": "[concat(variables('skuFamily'), parameters('hostingPlanSize'))]",
+				"family": "[variables('skuFamily')]",
 				"capacity": 1
 			},
-			"kind": "linux",
+			"kind": "app",
 			"properties": {
 				"perSiteScaling": false,
 				"elasticScaleEnabled": false,
 				"maximumElasticWorkerCount": 1,
 				"isSpot": false,
-				"reserved": true,
+				"reserved": false,
 				"isXenon": false,
 				"hyperV": false,
 				"targetWorkerCount": 0,
@@ -91,125 +152,49 @@
 			}
 		},
 		{
-			"type": "Microsoft.ApiManagement/service/apis",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "MyKudos.Gateway, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-				"apiRevision": "1",
-				"subscriptionRequired": true,
-				"serviceUrl": "https://kudosgatewaydev.azurewebsites.net",
-				"protocols": [
-					"https"
-				],
-				"authenticationSettings": {
-					"oAuth2AuthenticationSettings": [],
-					"openidAuthenticationSettings": []
-				},
-				"subscriptionKeyParameterNames": {
-					"header": "Ocp-Apim-Subscription-Key",
-					"query": "subscription-key"
-				},
-				"isCurrent": true,
-				"path": "[parameters('apis_MyKudosGateway_path')]"
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/policies",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/policy')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"value": "<!--\r\n    IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n  <inbound></inbound>\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound></outbound>\r\n</policies>",
-				"format": "xml"
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/subscriptions",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/master')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"scope": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name')), '/')]",
-				"displayName": "Built-in all-access subscription",
-				"state": "active",
-				"allowTracing": true
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/Kudos')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "Kudos"
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/Likes')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "Likes"
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/Photo')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "Photo"
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/Recognition')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "Recognition"
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/User')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "User"
-			}
-		},
-		{
 			"type": "Microsoft.Web/sites",
 			"apiVersion": "2022-03-01",
-			"name": "[parameters('sites_KudosGatewayDev_name')]",
-			"location": "East US",
+			"name": "[variables('recognition_appservice')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_MyKudosGateway20230126151945Plan_name'))]"
+				"[resourceId('Microsoft.Web/serverfarms', variables('recognition_appserviceplan'))]"
 			],
-			"tags": {
-				"hidden-related:/subscriptions/066535a0-eccc-4e9f-ab96-edef050aeb51/resourceGroups/rg-KudosDev/providers/Microsoft.Web/serverFarms/MyKudosGateway20230126151945Plan": "empty"
-			},
-			"kind": "app,linux",
+
+			"resources": [
+				{
+					"apiVersion": "2015-08-01",
+					"name": "appsettings",
+					"type": "config",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
+					],
+					"properties": {
+						"PROJECT": "MyKudos.Recognition.Api/MyKudos.Recognition.Api.csproj",
+						"SCM_COMMAND_IDLE_TIMEOUT": "120",
+						"CosmosDb__AccountEndPoint": "",
+						"CosmosDb__AccountKey": "",
+						"CosmosDb__DatabaseName": ""
+
+					}
+				},
+				{
+					"apiVersion": "2016-08-01",
+					"name": "web",
+					"type": "sourcecontrols",
+					"condition": "[not(empty(parameters('gitRepoUrl')))]",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]",
+						"[resourceId('Microsoft.Web/sites/config', variables('recognition_appservice'), 'appsettings')]"
+					],
+					"properties": {
+						"RepoUrl": "[parameters('gitRepoUrl')]",
+						"branch": "[parameters('gitBranch')]",
+						"IsManualIntegration": true
+					}
+				}
+			],
+
+			"kind": "app",
 			"identity": {
 				"type": "SystemAssigned"
 			},
@@ -217,18 +202,18 @@
 				"enabled": true,
 				"hostNameSslStates": [
 					{
-						"name": "kudosgatewaydev.azurewebsites.net",
+						"name": "[concat( variables('recognition_appservice'), '.azurewebsites.net' )]",
 						"sslState": "Disabled",
 						"hostType": "Standard"
 					},
 					{
-						"name": "kudosgatewaydev.scm.azurewebsites.net",
+						"name": "[concat( variables('recognition_appservice'), '.scm.azurewebsites.net' )]",
 						"sslState": "Disabled",
 						"hostType": "Repository"
 					}
 				],
-				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_MyKudosGateway20230126151945Plan_name'))]",
-				"reserved": true,
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('recognition_appserviceplan'))]",
+				"reserved": false,
 				"isXenon": false,
 				"hyperV": false,
 				"vnetRouteAllEnabled": false,
@@ -236,10 +221,9 @@
 				"vnetContentShareEnabled": false,
 				"siteConfig": {
 					"numberOfWorkers": 1,
-					"linuxFxVersion": "DOTNETCORE|6.0",
 					"acrUseManagedIdentityCreds": false,
 					"alwaysOn": false,
-					"http20Enabled": true,
+					"http20Enabled": false,
 					"functionAppScaleLimit": 0,
 					"minimumElasticInstanceCount": 0
 				},
@@ -260,14 +244,11 @@
 		{
 			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
 			"apiVersion": "2022-03-01",
-			"name": "[concat(parameters('sites_KudosGatewayDev_name'), '/ftp')]",
-			"location": "East US",
+			"name": "[concat(variables('recognition_appservice'), '/ftp')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_KudosGatewayDev_name'))]"
+				"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
 			],
-			"tags": {
-				"hidden-related:/subscriptions/066535a0-eccc-4e9f-ab96-edef050aeb51/resourceGroups/rg-KudosDev/providers/Microsoft.Web/serverFarms/MyKudosGateway20230126151945Plan": "empty"
-			},
 			"properties": {
 				"allow": true
 			}
@@ -275,14 +256,11 @@
 		{
 			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
 			"apiVersion": "2022-03-01",
-			"name": "[concat(parameters('sites_KudosGatewayDev_name'), '/scm')]",
-			"location": "East US",
+			"name": "[concat(variables('recognition_appservice'), '/scm')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_KudosGatewayDev_name'))]"
+				"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
 			],
-			"tags": {
-				"hidden-related:/subscriptions/066535a0-eccc-4e9f-ab96-edef050aeb51/resourceGroups/rg-KudosDev/providers/Microsoft.Web/serverFarms/MyKudosGateway20230126151945Plan": "empty"
-			},
 			"properties": {
 				"allow": true
 			}
@@ -290,14 +268,11 @@
 		{
 			"type": "Microsoft.Web/sites/config",
 			"apiVersion": "2022-03-01",
-			"name": "[concat(parameters('sites_KudosGatewayDev_name'), '/web')]",
-			"location": "East US",
+			"name": "[concat(variables('recognition_appservice'), '/web')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_KudosGatewayDev_name'))]"
+				"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
 			],
-			"tags": {
-				"hidden-related:/subscriptions/066535a0-eccc-4e9f-ab96-edef050aeb51/resourceGroups/rg-KudosDev/providers/Microsoft.Web/serverFarms/MyKudosGateway20230126151945Plan": "empty"
-			},
 			"properties": {
 				"numberOfWorkers": 1,
 				"defaultDocuments": [
@@ -311,8 +286,7 @@
 					"index.php",
 					"hostingstart.html"
 				],
-				"netFrameworkVersion": "v4.0",
-				"linuxFxVersion": "DOTNETCORE|6.0",
+				"netFrameworkVersion": "v6.0",
 				"requestTracingEnabled": false,
 				"remoteDebuggingEnabled": false,
 				"remoteDebuggingVersion": "VS2019",
@@ -325,7 +299,7 @@
 				"use32BitWorkerProcess": true,
 				"webSocketsEnabled": false,
 				"alwaysOn": false,
-				"appCommandLine": "dotnet MyKudos.Gateway.dll",
+				"appCommandLine": "dotnet MyKudos.Recognition.Api.dll",
 				"managedPipelineMode": "Integrated",
 				"virtualApplications": [
 					{
@@ -372,530 +346,240 @@
 				"azureStorageAccounts": {}
 			}
 		},
-		{
-			"type": "Microsoft.Web/sites/deployments",
-			"apiVersion": "2022-03-01",
-			"name": "[concat(parameters('sites_KudosGatewayDev_name'), '/40ba7668-36d3-4e61-9fea-afb6194938af')]",
-			"location": "East US",
-			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_KudosGatewayDev_name'))]"
-			],
-			"properties": {
-				"status": 4,
-				"author_email": "N/A",
-				"author": "N/A",
-				"deployer": "Push-Deployer",
-				"message": "Created via a push deployment",
-				"start_time": "2023-01-26T18:27:01.5501284Z",
-				"end_time": "2023-01-26T18:27:09.1572459Z",
-				"active": true
-			}
-		},
+
 		{
 			"type": "Microsoft.Web/sites/hostNameBindings",
 			"apiVersion": "2022-03-01",
-			"name": "[concat(parameters('sites_KudosGatewayDev_name'), '/', parameters('sites_KudosGatewayDev_name'), '.azurewebsites.net')]",
-			"location": "East US",
+			"name": "[concat(variables('recognition_appservice'), '/', variables('recognition_appservice'), '.azurewebsites.net')]",
+			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/sites', parameters('sites_KudosGatewayDev_name'))]"
+				"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
 			],
 			"properties": {
-				"siteName": "KudosGatewayDev",
+				"siteName": "variables('recognition_appservice')",
 				"hostNameType": "Verified"
 			}
 		},
+
 		{
-			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetKudos')]",
+			"type": "Microsoft.DocumentDB/databaseAccounts",
+			"apiVersion": "2022-08-15",
+			"name": "[parameters('databaseAccounts_mykudos_name')]",
+			"location": "West US",
+			"tags": {
+				"defaultExperience": "Core (SQL)",
+				"hidden-cosmos-mmspecial": ""
+			},
+			"kind": "GlobalDocumentDB",
+			"identity": {
+				"type": "None"
+			},
+			"properties": {
+				"publicNetworkAccess": "Enabled",
+				"enableAutomaticFailover": false,
+				"enableMultipleWriteLocations": false,
+				"isVirtualNetworkFilterEnabled": false,
+				"virtualNetworkRules": [],
+				"disableKeyBasedMetadataWriteAccess": false,
+				"enableFreeTier": false,
+				"enableAnalyticalStorage": false,
+				"analyticalStorageConfiguration": {
+					"schemaType": "WellDefined"
+				},
+				"databaseAccountOfferType": "Standard",
+				"defaultIdentity": "FirstPartyIdentity",
+				"networkAclBypass": "None",
+				"disableLocalAuth": false,
+				"enablePartitionMerge": false,
+				"consistencyPolicy": {
+					"defaultConsistencyLevel": "Session",
+					"maxIntervalInSeconds": 5,
+					"maxStalenessPrefix": 100
+				},
+				"locations": [
+					{
+						"locationName": "West US",
+						"provisioningState": "Succeeded",
+						"failoverPriority": 0,
+						"isZoneRedundant": false
+					}
+				],
+				"cors": [],
+				"capabilities": [
+					{
+						"name": "EnableServerless"
+					}
+				],
+				"ipRules": [],
+				"backupPolicy": {
+					"type": "Periodic",
+					"periodicModeProperties": {
+						"backupIntervalInMinutes": 240,
+						"backupRetentionIntervalInHours": 8,
+						"backupStorageRedundancy": "Geo"
+					}
+				},
+				"networkAclBypassResourceIds": [],
+				"capacity": {
+					"totalThroughputLimit": 4000
+				},
+				"keysMetadata": {}
+			}
+		},
+		{
+			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+			"apiVersion": "2022-08-15",
+			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/dashboard-db')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
 			],
 			"properties": {
-				"displayName": "GetKudos",
-				"method": "GET",
-				"urlTemplate": "/Kudos",
-				"templateParameters": [],
-				"responses": [
+				"resource": {
+					"id": "recognition-db"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+			"apiVersion": "2022-08-15",
+			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/kudos-db')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+			],
+			"properties": {
+				"resource": {
+					"id": "kudos-db"
+				}
+			}
+		},
+		{
+			"type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+			"apiVersion": "2022-08-15",
+			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/00000000-0000-0000-0000-000000000001')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+			],
+			"properties": {
+				"roleName": "Cosmos DB Built-in Data Reader",
+				"type": "BuiltInRole",
+				"assignableScopes": [
+					"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				],
+				"permissions": [
 					{
-						"statusCode": 200,
-						"description": "Success",
-						"representations": [
+						"dataActions": [
+							"Microsoft.DocumentDB/databaseAccounts/readMetadata",
+							"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/executeQuery",
+							"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/readChangeFeed",
+							"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read"
+						],
+						"notDataActions": []
+					}
+				]
+			}
+		},
+		{
+			"type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+			"apiVersion": "2022-08-15",
+			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/00000000-0000-0000-0000-000000000002')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+			],
+			"properties": {
+				"roleName": "Cosmos DB Built-in Data Contributor",
+				"type": "BuiltInRole",
+				"assignableScopes": [
+					"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				],
+				"permissions": [
+					{
+						"dataActions": [
+							"Microsoft.DocumentDB/databaseAccounts/readMetadata",
+							"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*",
+							"Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*"
+						],
+						"notDataActions": []
+					}
+				]
+			}
+		},
+		{
+			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+			"apiVersion": "2022-08-15",
+			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/kudos-db/KudosDbContext')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_mykudos_name'), 'kudos-db')]",
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+			],
+			"properties": {
+				"resource": {
+					"id": "KudosDbContext",
+					"indexingPolicy": {
+						"indexingMode": "consistent",
+						"automatic": true,
+						"includedPaths": [
 							{
-								"contentType": "text/plain",
-								"examples": {
-									"default": {}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "KudosResponseArray"
-							},
-							{
-								"contentType": "application/json",
-								"examples": {
-									"default": {
-										"value": [
-											{
-												"id": "string",
-												"from": {
-													"id": "string",
-													"name": "string",
-													"photo": "string"
-												},
-												"to": {
-													"id": "string",
-													"name": "string",
-													"photo": "string"
-												},
-												"title": "string",
-												"message": "string",
-												"sendOn": "string",
-												"likes": [
-													{
-														"id": "string",
-														"name": "string",
-														"photo": "string"
-													}
-												]
-											}
-										]
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "KudosResponseArray"
-							},
-							{
-								"contentType": "text/json",
-								"examples": {
-									"default": {
-										"value": [
-											{
-												"id": "string",
-												"from": {
-													"id": "string",
-													"name": "string",
-													"photo": "string"
-												},
-												"to": {
-													"id": "string",
-													"name": "string",
-													"photo": "string"
-												},
-												"title": "string",
-												"message": "string",
-												"sendOn": "string",
-												"likes": [
-													{
-														"id": "string",
-														"name": "string",
-														"photo": "string"
-													}
-												]
-											}
-										]
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "KudosResponseArray"
+								"path": "/*"
 							}
 						],
-						"headers": []
+						"excludedPaths": [
+							{
+								"path": "/\"_etag\"/?"
+							}
+						]
+					},
+					"partitionKey": {
+						"paths": [
+							"/__partitionKey"
+						],
+						"kind": "Hash",
+						"version": 2
+					},
+					"conflictResolutionPolicy": {
+						"mode": "LastWriterWins",
+						"conflictResolutionPath": "/_ts"
 					}
-				]
+				}
 			}
 		},
 		{
-			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetRecognitions')]",
+			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+			"apiVersion": "2022-08-15",
+			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/dashboard-db/RecognitionDbContext')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_mykudos_name'), 'dashboard-db')]",
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
 			],
 			"properties": {
-				"displayName": "GetRecognitions",
-				"method": "GET",
-				"urlTemplate": "/Recognition",
-				"templateParameters": [],
-				"responses": [
-					{
-						"statusCode": 200,
-						"description": "Success",
-						"representations": [
+				"resource": {
+					"id": "RecognitionDbContext",
+					"indexingPolicy": {
+						"indexingMode": "consistent",
+						"automatic": true,
+						"includedPaths": [
 							{
-								"contentType": "text/plain",
-								"examples": {
-									"default": {}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "RecognitionArray"
-							},
-							{
-								"contentType": "application/json",
-								"examples": {
-									"default": {
-										"value": [
-											{
-												"id": "string",
-												"emoji": "string",
-												"description": "string"
-											}
-										]
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "RecognitionArray"
-							},
-							{
-								"contentType": "text/json",
-								"examples": {
-									"default": {
-										"value": [
-											{
-												"id": "string",
-												"emoji": "string",
-												"description": "string"
-											}
-										]
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "RecognitionArray"
+								"path": "/*"
 							}
 						],
-						"headers": []
-					}
-				]
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetUser-name')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "GetUser/{name}",
-				"method": "GET",
-				"urlTemplate": "/User",
-				"templateParameters": [],
-				"request": {
-					"queryParameters": [
-						{
-							"name": "name",
-							"type": "string",
-							"values": []
-						}
-					],
-					"headers": [],
-					"representations": []
-				},
-				"responses": [
-					{
-						"statusCode": 200,
-						"description": "Success",
-						"representations": [
+						"excludedPaths": [
 							{
-								"contentType": "text/plain",
-								"examples": {
-									"default": {}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "PersonArray"
-							},
-							{
-								"contentType": "application/json",
-								"examples": {
-									"default": {
-										"value": [
-											{
-												"id": "string",
-												"name": "string",
-												"photo": "string"
-											}
-										]
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "PersonArray"
-							},
-							{
-								"contentType": "text/json",
-								"examples": {
-									"default": {
-										"value": [
-											{
-												"id": "string",
-												"name": "string",
-												"photo": "string"
-											}
-										]
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "PersonArray"
+								"path": "/\"_etag\"/?"
 							}
+						]
+					},
+					"partitionKey": {
+						"paths": [
+							"/__partitionKey"
 						],
-						"headers": []
+						"kind": "Hash",
+						"version": 2
+					},
+					"conflictResolutionPolicy": {
+						"mode": "LastWriterWins",
+						"conflictResolutionPath": "/_ts"
 					}
-				]
+				}
 			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetUserphoto-userid')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "GetUserphoto/{userid}",
-				"method": "GET",
-				"urlTemplate": "/Photo",
-				"templateParameters": [],
-				"request": {
-					"queryParameters": [
-						{
-							"name": "userid",
-							"type": "string",
-							"values": []
-						}
-					],
-					"headers": [],
-					"representations": []
-				},
-				"responses": [
-					{
-						"statusCode": 200,
-						"description": "Success",
-						"representations": [
-							{
-								"contentType": "text/plain",
-								"examples": {
-									"default": {}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "PhotoGet200TextPlainResponse"
-							},
-							{
-								"contentType": "application/json",
-								"examples": {
-									"default": {
-										"value": "string"
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "PhotoGet200ApplicationJsonResponse"
-							},
-							{
-								"contentType": "text/json",
-								"examples": {
-									"default": {
-										"value": "string"
-									}
-								},
-								"schemaId": "63d2c6226d300f27d4a1bb20",
-								"typeName": "PhotoGet200TextJsonResponse"
-							}
-						],
-						"headers": []
-					}
-				]
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/SendKudos')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "SendKudos",
-				"method": "POST",
-				"urlTemplate": "/Kudos",
-				"templateParameters": [],
-				"request": {
-					"queryParameters": [],
-					"headers": [],
-					"representations": [
-						{
-							"contentType": "application/json",
-							"examples": {
-								"default": {
-									"value": {}
-								}
-							},
-							"schemaId": "63d2c6226d300f27d4a1bb20",
-							"typeName": "KudosRequest"
-						},
-						{
-							"contentType": "text/json",
-							"examples": {
-								"default": {
-									"value": {}
-								}
-							},
-							"schemaId": "63d2c6226d300f27d4a1bb20",
-							"typeName": "KudosRequest"
-						},
-						{
-							"contentType": "application/*+json",
-							"examples": {
-								"default": {
-									"value": {}
-								}
-							},
-							"schemaId": "63d2c6226d300f27d4a1bb20",
-							"typeName": "KudosRequest"
-						}
-					]
-				},
-				"responses": [
-					{
-						"statusCode": 200,
-						"description": "Success",
-						"representations": [],
-						"headers": []
-					}
-				]
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/SendLike')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"displayName": "SendLike",
-				"method": "POST",
-				"urlTemplate": "/Likes",
-				"templateParameters": [],
-				"request": {
-					"queryParameters": [],
-					"headers": [],
-					"representations": [
-						{
-							"contentType": "application/json",
-							"examples": {
-								"default": {
-									"value": {}
-								}
-							},
-							"schemaId": "63d2c6226d300f27d4a1bb20",
-							"typeName": "Like"
-						},
-						{
-							"contentType": "text/json",
-							"examples": {
-								"default": {
-									"value": {}
-								}
-							},
-							"schemaId": "63d2c6226d300f27d4a1bb20",
-							"typeName": "Like"
-						},
-						{
-							"contentType": "application/*+json",
-							"examples": {
-								"default": {
-									"value": {}
-								}
-							},
-							"schemaId": "63d2c6226d300f27d4a1bb20",
-							"typeName": "Like"
-						}
-					]
-				},
-				"responses": [
-					{
-						"statusCode": 200,
-						"description": "Success",
-						"representations": [],
-						"headers": []
-					}
-				]
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/schemas",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/63d2c6226d300f27d4a1bb20')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			],
-			"properties": {
-				"contentType": "application/vnd.ms-azure-apim.swagger.definitions+json",
-				"document": {}
-			}
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetKudos/Kudos')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway', 'GetKudos')]",
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			]
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/SendKudos/Kudos')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway', 'SendKudos')]",
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			]
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/SendLike/Likes')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway', 'SendLike')]",
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			]
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetUserphoto-userid/Photo')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway', 'GetUserphoto-userid')]",
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			]
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetRecognitions/Recognition')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway', 'GetRecognitions')]",
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			]
-		},
-		{
-			"type": "Microsoft.ApiManagement/service/apis/operations/tags",
-			"apiVersion": "2022-04-01-preview",
-			"name": "[concat(parameters('service_MyKudosGatewayapi_name'), '/MyKudosGateway/GetUser-name/User')]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway', 'GetUser-name')]",
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('service_MyKudosGatewayapi_name'), 'MyKudosGateway')]",
-				"[resourceId('Microsoft.ApiManagement/service', parameters('service_MyKudosGatewayapi_name'))]"
-			]
 		}
 	]
-}
+	}

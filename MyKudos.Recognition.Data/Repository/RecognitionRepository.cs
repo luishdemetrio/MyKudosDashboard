@@ -3,7 +3,6 @@ using MyKudos.Recognition.Data.Context;
 using MyKudos.Recognition.Data.Data;
 using MyKudos.Recognition.Domain.Interfaces;
 
-
 namespace MyKudos.Recognition.Data.Repository;
 
 public sealed class RecognitionRepository : IRecognitionRepository
@@ -23,6 +22,16 @@ public sealed class RecognitionRepository : IRecognitionRepository
 
     }
 
-   
+    public async Task SeedDatabaseAsync()
+    {
+       
+        var _ = await _context.Database.EnsureDeletedAsync();
 
+        if (await _context.Database.EnsureCreatedAsync())
+        {
+            _context.Recognitions?.AddRange(Seed.Data);
+
+            await _context.SaveChangesAsync();
+        }
+    }
 }

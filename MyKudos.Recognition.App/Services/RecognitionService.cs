@@ -21,4 +21,9 @@ public sealed class RecognitionService : IRecognitionService
 
         return _recognitionRepository.GetRecognitions();
     }
+
+    public void SeedDatabase()
+    {
+        _recognitionRepository.SeedDatabaseAsync();
+    }
 }
