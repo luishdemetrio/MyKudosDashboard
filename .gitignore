@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/MyKudos.Recognition.Api/appsettings.Development.json
+/MyKudos.MSGraph.Api/appsettings.Development.json
+/MyKudos.Kudos.Api/appsettings.Development.json
+/MyKudos.Gateway/appsettings.Development.json
