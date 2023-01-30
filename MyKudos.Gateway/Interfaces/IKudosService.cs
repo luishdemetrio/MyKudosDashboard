@@ -8,6 +8,6 @@ namespace MyKudos.Gateway.Interfaces
 
         bool Send(Models.KudosRequest kudos);
 
-        bool SendLike(string kudosId, string personId);
+        bool SendLike(Like like);
     }
 }

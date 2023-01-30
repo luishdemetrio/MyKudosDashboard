@@ -24,7 +24,7 @@ public class LikesController : Controller
     public IActionResult SendLike([FromBody] Like like)
     {
 
-        var kudos = _kudosService.SendLike(like.KudosId, like.PersonId); 
+        var kudos = _kudosService.SendLike(like); 
 
         return Ok();
     }

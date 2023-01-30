@@ -27,7 +27,7 @@ public class UserController : Controller
 
         var users = new List<Person>();
 
-        var graphUsers = await _graphService.GetUsersAsync(name);
+        var graphUsers = await _graphService.GetUsers(name);
 
         if (graphUsers.value.Count() == 0)
             return new List<Person>();

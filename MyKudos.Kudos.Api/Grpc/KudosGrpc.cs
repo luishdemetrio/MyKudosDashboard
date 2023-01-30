@@ -64,7 +64,7 @@ public class KudosGrpc : KudosServiceBase
             ToPersonId = request.ToPersonId,
             TitleId = request.TitleId,
             Message = request.Message,
-            Date = request.SendOn.ToDateTime()
+           Date = request.SendOn.ToDateTime()
         });
 
         

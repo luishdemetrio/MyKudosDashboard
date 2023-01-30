@@ -7,12 +7,12 @@ using static MyKudos.Kudos.gRPC.KudosService;
 
 namespace MyKudos.Gateway.Services;
 
-public class KudosService : IKudosService
+public class KudosServiceGrpc : IKudosService
 {
 
     private readonly string _kudosServiceUrl;
 
-    public KudosService(IConfiguration config)
+    public KudosServiceGrpc(IConfiguration config)
     {
         _kudosServiceUrl = config["kudosServiceUrl"];
     }
@@ -30,15 +30,15 @@ public class KudosService : IKudosService
 
         foreach (var item in kudos.Data)
         {
-            result.Add(new Models.Kudos(
-                Id: item.Id,
-                From: item.FromPersonId,
-                To: item.ToPersonId,
-                TitleId: item.TitleId,
-                Message: item.Message,
-                SendOn: item.Date.ToDateTime(),
-                Likes: item.Likes.Id.Select(x => x.Id)
-                )) ;
+            result.Add(new Models.Kudos() {
+                Id = item.Id,
+                FromPersonId = item.FromPersonId,
+                ToPersonId = item.ToPersonId,
+                TitleId = item.TitleId,
+                Message = item.Message,
+                Date = item.Date.ToDateTime(),
+                Likes = item.Likes.Id.Select(x => x.Id).ToList()
+                }) ;
         }
 
 
@@ -66,7 +66,7 @@ public class KudosService : IKudosService
         return r.Succeed;
     }
 
-    public bool SendLike(string kudosId, string personId)
+    public bool SendLike(Like like)
     {
         List<Models.Kudos> result = new();
 
@@ -76,8 +76,8 @@ public class KudosService : IKudosService
 
         var r = client.SendLike(new Kudos.gRPC.SendLikeRequest()
         {
-            KudosId = kudosId,
-            PersonId = personId
+            KudosId = like.KudosId,
+            PersonId = like.PersonId
         });
 
         return r.Succeed;

@@ -10,10 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IGraphService, GraphService>();
-builder.Services.AddScoped<IRecognitionService, RecognitionService>();
-builder.Services.AddScoped<IKudosService, KudosService>();
-builder.Services.AddScoped<IAgentNotificationService, AgentNotificationService>();
+builder.Services.AddSingleton<IGraphService, GraphServiceRest>();
+builder.Services.AddSingleton<IRecognitionService, RecognitionServiceRest>();
+builder.Services.AddSingleton<IKudosService, KudosServiceRest>();
+builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
 
 builder.Services.AddSwaggerGen(c =>
 {

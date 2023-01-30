@@ -37,22 +37,23 @@ public class KudosController : Controller
     {       
         var kudos = _kudosService.GetKudos();
 
-        var from= kudos.Select(u => u.From).Distinct().ToList();
+        var from= kudos.Select(u => u.FromPersonId).Distinct().ToList();
 
-        from.AddRange(kudos.Select(u =>u.To).Distinct());
+        from.AddRange(kudos.Select(u =>u.ToPersonId).Distinct());
 
         List<string> likesId = new();
 
         //user from likes
         foreach (var k in kudos)
         {
-            likesId.AddRange( k.Likes);
+            if (k.Likes != null)
+                likesId.AddRange( k.Likes);
 
         }
 
         from.AddRange(likesId.Distinct());
 
-        List<GraphUser> users =  await _graphService.GetUserInfoAsync(from.Distinct().ToArray()).ConfigureAwait(true);
+        List<GraphUser> users =  await _graphService.GetUserInfo(from.Distinct().ToArray()).ConfigureAwait(true);
                 
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
         
@@ -60,8 +61,8 @@ public class KudosController : Controller
 
         foreach (var k in kudos)
         {
-
-            likes.AddRange( from like in k.Likes
+            if (k.Likes != null)
+                likes.AddRange( from like in k.Likes
                         join u in users
                             on like equals u.Id
                         join photo in photos
@@ -81,23 +82,23 @@ public class KudosController : Controller
 
         var  result =  from kudo in kudos
                         join userTo in users
-                            on kudo.To equals userTo.Id
+                            on kudo.ToPersonId equals userTo.Id
                         join userFrom in users
-                            on kudo.From equals userFrom.Id
+                            on kudo.FromPersonId equals userFrom.Id
                         join photoTo in photos
-                            on kudo.To equals photoTo.id
+                            on kudo.ToPersonId equals photoTo.id
                         join photoFrom in photos
-                            on kudo.From equals photoFrom.id
+                            on kudo.FromPersonId equals photoFrom.id
                         join rec in _recognitions
                             on kudo.TitleId equals rec.Id                        
 
                         select new Models.KudosResponse(
                                 Id: kudo.Id,
-                                From: new Person() { Id = kudo.From, Name = userFrom.DisplayName, Photo = photoFrom.photo },
-                                To: new Person() { Id = kudo.To, Name = userTo.DisplayName, Photo = photoTo.photo },
+                                From: new Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = photoFrom.photo },
+                                To: new Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = photoTo.photo },
                                 Title: rec.Description,
                                 Message: kudo.Message,
-                                SendOn: kudo.SendOn,
+                                SendOn: kudo.Date,
                                 Likes: likes.Where( l => l.KudosId == kudo.Id ).Select( l => l.Person )
                             );
         

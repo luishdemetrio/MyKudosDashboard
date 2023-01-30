@@ -129,10 +129,10 @@ public class GatewayService : IGatewayService
 
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            userPhoto = response.Content;
+            userPhoto = "data:image/png;base64," + response.Content.Replace("\"", "").Replace("\\", "");
         }
 
-        return Task.FromResult(userPhoto.Replace("\"", ""));
+        return Task.FromResult(userPhoto);
     }
 
     public bool SendLike(Like like)

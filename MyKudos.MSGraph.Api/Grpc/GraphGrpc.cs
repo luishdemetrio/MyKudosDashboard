@@ -76,7 +76,7 @@ public class GraphGrpc : MSGraphServiceBase
     {
         UserInfoList result = new UserInfoList();
 
-        var users = await _graphService.GetUserInfoAsync(request.Ids.Select(u => u.Id).ToArray());
+        var users = await _graphService.GetUserInfo(request.Ids.Select(u => u.Id).ToArray());
 
         foreach (var user in users)
         {

@@ -1,15 +1,15 @@
 ﻿namespace MyKudos.Gateway.Models;
 
 
-public record Kudos(
-    string Id,
-    string From,
-    string To,
-    string TitleId,
-    string Message,
-    DateTime SendOn,
-    IEnumerable<string> Likes
-    );
+public class Kudos {
+    public string Id { get; set; }
+    public string FromPersonId { get; set; }
+    public string ToPersonId { get; set; }
+    public string TitleId { get; set; }
+    public string Message { get; set; }
+    public DateTime Date { get; set; }
+    public List<string> Likes { get; set; } = new();
+    }
 
 
 
@@ -32,7 +32,7 @@ public record KudosNotification
     
 );
     
-    
+ 
 
 
 public record KudosResponse(

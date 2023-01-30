@@ -22,7 +22,7 @@ public class Settings
     public string? TenantId { get; set; }
 }
 
-public class GraphService : IGraphService
+public class GraphServiceGrpc : IGraphService
 {
 
     // App-ony auth token credential
@@ -35,7 +35,7 @@ public class GraphService : IGraphService
     private readonly string _graphServiceUrl;
 
     
-    public GraphService(IConfiguration configuration)
+    public GraphServiceGrpc(IConfiguration configuration)
     {
         var settings = configuration.GetRequiredSection("Settings").Get<Settings>();
 
@@ -70,7 +70,7 @@ public class GraphService : IGraphService
     //get user's manager
     //https://graph.microsoft.com/beta/me?$expand=manager($select=id)&$select=id,displayName,manager.id
 
-    public async Task<GraphUsers> GetUsersAsync(string name)
+    public async Task<GraphUsers> GetUsers(string name)
     {
         GraphUsers r = new();
 
@@ -139,7 +139,7 @@ public class GraphService : IGraphService
 
     }
 
-    public async Task<List<Models.GraphUser>> GetUserInfoAsync(string[] users)
+    public async Task<List<Models.GraphUser>> GetUserInfo(string[] users)
     {
 
         var result = new List<Models.GraphUser>();

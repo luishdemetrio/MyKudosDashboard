@@ -5,12 +5,12 @@ using static MyKudos.Recognition.gRPC.RecognitionService;
 
 namespace MyKudos.Gateway.Services;
 
-public class RecognitionService : IRecognitionService
+public class RecognitionServiceGrpc : IRecognitionService
 {
 
     private readonly string _recognitionServiceUrl;
 
-    public RecognitionService(IConfiguration config)
+    public RecognitionServiceGrpc(IConfiguration config)
     {
         _recognitionServiceUrl = config["RecognitionServiceUrl"];
     }

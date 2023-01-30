@@ -9,18 +9,22 @@
 			"metadata": {
 				"description": "The base name to use for the resources that will be provisioned."
 			}
+		},		
+
+		"MsGraphClientId": {
+			"type": "string",
+			"minLength": 36,
+			"maxLength": 36,
+			"metadata": {
+				"description": "The application (client) ID of the Microsoft Graph app, e.g., 123e4567-e89b-12d3-a456-426655440000."
+			}
 		},
-
-		"sites_Recognition_name": {
-			"defaultValue": "recognition",
-			"type": "String"
-		},
-
-
-		"databaseAccounts_mykudos_name": {
-			"defaultValue": "mykudos",
-			"type": "String"
-
+		"MsGraphClientSecret": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "The client secret of the Microsoft Graph app."
+			}
 		},
 
 		"hostingPlanSku": {
@@ -58,18 +62,9 @@
 		"DefaultCulture": {
 			"defaultValue": "en-US",
 			"allowedValues": [
-				"ar-SA",
-				"de-DE",
 				"en-US",
 				"es-ES",
-				"fr-FR",
-				"he-IL",
-				"ja-JP",
-				"ko-KR",
-				"pt-BR",
-				"ru-RU",
-				"zh-CN",
-				"zh-TW"
+				"pt-BR"			
 			],
 			"minLength": 1,
 			"type": "String",
@@ -78,7 +73,7 @@
 			}
 		},
 		"SupportedCultures": {
-			"defaultValue": "ar-SA,de-DE,en-US,es-ES,fr-FR,he-IL,ja-JP,ko-KR,pt-BR,ru-RU,zh-CN,zh-TW",
+			"defaultValue": "en-US,es-ES,pt-BR",
 			"minLength": 1,
 			"type": "String",
 			"metadata": {
@@ -117,9 +112,17 @@
 		"i18n:SupportedCultures": "[parameters('SupportedCultures')]",
 		"subscriptionTenantId": "[subscription().tenantId]",
 
-		"recognition_appservice": "[concat(parameters('baseResourceName'), parameters('sites_Recognition_name') )]",
+		"databaseAccountsKudosName": "[parameters('baseResourceName')]",
 
-		"recognition_appserviceplan": "[concat(variables('recognition_appservice'), 'plan' )]"
+		"recognition_appservice": "[concat(parameters('baseResourceName'), 'recognition' )]",
+
+		"appserviceplan": "[concat(parameters('baseResourceName'), 'plan' )]",
+
+		"msgraph_appservice": "[concat(parameters('baseResourceName'), 'msgraph' )]",
+
+		"kudos_appservice": "[concat(parameters('baseResourceName'), 'kudos' )]",
+
+		"gateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]"
 
 
 	},
@@ -128,7 +131,7 @@
 		{
 			"type": "Microsoft.Web/serverfarms",
 			"apiVersion": "2022-03-01",
-			"name": "[variables('recognition_appserviceplan')]",
+			"name": "[variables('appserviceplan')]",
 			"location": "[parameters('location')]",
 			"sku": {
 				"name": "[if(variables('isSharedPlan'), concat(variables('skuFamily'), '1'), concat(variables('skuFamily'), parameters('hostingPlanSize')))]",
@@ -157,7 +160,8 @@
 			"name": "[variables('recognition_appservice')]",
 			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/serverfarms', variables('recognition_appserviceplan'))]"
+				"[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
+
 			],
 
 			"resources": [
@@ -166,14 +170,15 @@
 					"name": "appsettings",
 					"type": "config",
 					"dependsOn": [
-						"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
+						"[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]",
+						"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 					],
 					"properties": {
 						"PROJECT": "MyKudos.Recognition.Api/MyKudos.Recognition.Api.csproj",
 						"SCM_COMMAND_IDLE_TIMEOUT": "120",
-						"CosmosDb__AccountEndPoint": "",
-						"CosmosDb__AccountKey": "",
-						"CosmosDb__DatabaseName": ""
+						"CosmosDb__AccountEndPoint": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))).documentEndpoint]",
+						"CosmosDb__AccountKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName')), '2022-08-15').primaryMasterKey]",
+						"CosmosDb__DatabaseName": "recognition-db"
 
 					}
 				},
@@ -212,7 +217,7 @@
 						"hostType": "Repository"
 					}
 				],
-				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('recognition_appserviceplan'))]",
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
 				"reserved": false,
 				"isXenon": false,
 				"hyperV": false,
@@ -364,8 +369,8 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts",
 			"apiVersion": "2022-08-15",
-			"name": "[parameters('databaseAccounts_mykudos_name')]",
-			"location": "West US",
+			"name": "[variables('databaseAccountsKudosName')]",
+			"location": "[parameters('location')]",
 			"tags": {
 				"defaultExperience": "Core (SQL)",
 				"hidden-cosmos-mmspecial": ""
@@ -429,9 +434,9 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
 			"apiVersion": "2022-08-15",
-			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/dashboard-db')]",
+			"name": "[concat(variables('databaseAccountsKudosName'), '/recognition-db')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 			],
 			"properties": {
 				"resource": {
@@ -442,9 +447,9 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
 			"apiVersion": "2022-08-15",
-			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/kudos-db')]",
+			"name": "[concat(variables('databaseAccountsKudosName'), '/kudos-db')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 			],
 			"properties": {
 				"resource": {
@@ -455,15 +460,15 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
 			"apiVersion": "2022-08-15",
-			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/00000000-0000-0000-0000-000000000001')]",
+			"name": "[concat(variables('databaseAccountsKudosName'), '/00000000-0000-0000-0000-000000000001')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 			],
 			"properties": {
 				"roleName": "Cosmos DB Built-in Data Reader",
 				"type": "BuiltInRole",
 				"assignableScopes": [
-					"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+					"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 				],
 				"permissions": [
 					{
@@ -481,15 +486,15 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
 			"apiVersion": "2022-08-15",
-			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/00000000-0000-0000-0000-000000000002')]",
+			"name": "[concat(variables('databaseAccountsKudosName'), '/00000000-0000-0000-0000-000000000002')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 			],
 			"properties": {
 				"roleName": "Cosmos DB Built-in Data Contributor",
 				"type": "BuiltInRole",
 				"assignableScopes": [
-					"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+					"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 				],
 				"permissions": [
 					{
@@ -506,10 +511,10 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
 			"apiVersion": "2022-08-15",
-			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/kudos-db/KudosDbContext')]",
+			"name": "[concat(variables('databaseAccountsKudosName'), '/kudos-db/KudosDbContext')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_mykudos_name'), 'kudos-db')]",
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('databaseAccountsKudosName'), 'kudos-db')]",
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 			],
 			"properties": {
 				"resource": {
@@ -545,10 +550,10 @@
 		{
 			"type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
 			"apiVersion": "2022-08-15",
-			"name": "[concat(parameters('databaseAccounts_mykudos_name'), '/dashboard-db/RecognitionDbContext')]",
+			"name": "[concat(variables('databaseAccountsKudosName'), '/recognition-db/RecognitionDbContext')]",
 			"dependsOn": [
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('databaseAccounts_mykudos_name'), 'dashboard-db')]",
-				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_mykudos_name'))]"
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('databaseAccountsKudosName'), 'recognition-db')]",
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
 			],
 			"properties": {
 				"resource": {
@@ -580,6 +585,655 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Web/sites",
+			"apiVersion": "2022-03-01",
+			"name": "[variables('msgraph_appservice')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
+
+			],
+			"resources": [
+				{
+					"apiVersion": "2015-08-01",
+					"name": "appsettings",
+					"type": "config",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+					],
+					"properties": {
+						"PROJECT": "MyKudos.MSGraph.Api/MyKudos.MSGraph.Api.csproj",
+						"SCM_COMMAND_IDLE_TIMEOUT": "120",
+						"settings__clientid": "[parameters('MsGraphClientId')]",
+						"settings__clientsecret": "[parameters('MsGraphClientSecret')]",
+						"settings__tenantid": "[subscription().tenantId]"
+
+					}
+				},
+				{
+					"apiVersion": "2016-08-01",
+					"name": "web",
+					"type": "sourcecontrols",
+					"condition": "[not(empty(parameters('gitRepoUrl')))]",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]",
+						"[resourceId('Microsoft.Web/sites/config', variables('msgraph_appservice'), 'appsettings')]"
+					],
+					"properties": {
+						"RepoUrl": "[parameters('gitRepoUrl')]",
+						"branch": "[parameters('gitBranch')]",
+						"IsManualIntegration": true
+					}
+				}
+			],
+
+
+			"kind": "app",
+			"identity": {
+				"type": "SystemAssigned"
+			},
+
+			"properties": {
+				"enabled": true,
+				"hostNameSslStates": [
+					{
+						"name": "[concat( variables('msgraph_appservice'), '.azurewebsites.net' )]",
+						"sslState": "Disabled",
+						"hostType": "Standard"
+					},
+					{
+						"name": "[concat( variables('msgraph_appservice'), '.scm.azurewebsites.net' )]",
+						"sslState": "Disabled",
+						"hostType": "Repository"
+					}
+				],
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+				"reserved": false,
+				"isXenon": false,
+				"hyperV": false,
+				"vnetRouteAllEnabled": false,
+				"vnetImagePullEnabled": false,
+				"vnetContentShareEnabled": false,
+				"siteConfig": {
+					"numberOfWorkers": 1,
+					"acrUseManagedIdentityCreds": false,
+					"alwaysOn": false,
+					"http20Enabled": false,
+					"functionAppScaleLimit": 0,
+					"minimumElasticInstanceCount": 0
+				},
+				"scmSiteAlsoStopped": false,
+				"clientAffinityEnabled": true,
+				"clientCertEnabled": false,
+				"clientCertMode": "Required",
+				"hostNamesDisabled": false,
+				"customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+				"containerSize": 0,
+				"dailyMemoryTimeQuota": 0,
+				"httpsOnly": true,
+				"redundancyMode": "None",
+				"storageAccountRequired": false,
+				"keyVaultReferenceIdentity": "SystemAssigned"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('msgraph_appservice'), '/ftp')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+			],
+			"properties": {
+				"allow": true
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('msgraph_appservice'), '/scm')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+			],
+			"properties": {
+				"allow": true
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/config",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('msgraph_appservice'), '/web')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+			],
+			"properties": {
+				"numberOfWorkers": 1,
+				"defaultDocuments": [
+					"Default.htm",
+					"Default.html",
+					"Default.asp",
+					"index.htm",
+					"index.html",
+					"iisstart.htm",
+					"default.aspx",
+					"index.php",
+					"hostingstart.html"
+				],
+				"netFrameworkVersion": "v6.0",
+				"phpVersion": "5.6",
+				"requestTracingEnabled": false,
+				"remoteDebuggingEnabled": false,
+				"httpLoggingEnabled": false,
+				"acrUseManagedIdentityCreds": false,
+				"logsDirectorySizeLimit": 35,
+				"detailedErrorLoggingEnabled": false,
+				"scmType": "None",
+				"use32BitWorkerProcess": true,
+				"webSocketsEnabled": false,
+				"alwaysOn": false,
+				"managedPipelineMode": "Integrated",
+				"virtualApplications": [
+					{
+						"virtualPath": "/",
+						"physicalPath": "site\\wwwroot",
+						"preloadEnabled": false
+					}
+				],
+				"loadBalancing": "LeastRequests",
+				"experiments": {
+					"rampUpRules": []
+				},
+				"autoHealEnabled": false,
+				"vnetRouteAllEnabled": false,
+				"vnetPrivatePortsCount": 0,
+				"localMySqlEnabled": false,
+				"managedServiceIdentityId": 11945,
+				"ipSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 2147483647,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 2147483647,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictionsUseMain": false,
+				"http20Enabled": false,
+				"minTlsVersion": "1.2",
+				"scmMinTlsVersion": "1.2",
+				"ftpsState": "FtpsOnly",
+				"preWarmedInstanceCount": 0,
+				"functionsRuntimeScaleMonitoringEnabled": false,
+				"minimumElasticInstanceCount": 0,
+				"azureStorageAccounts": {}
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/hostNameBindings",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('msgraph_appservice'), '/', variables('msgraph_appservice'), '.azurewebsites.net')]",
+			"location": "Central US",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+			],
+			"properties": {
+				"siteName": "variables('msgraph_appservice')",
+				"hostNameType": "Verified"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/siteextensions",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('msgraph_appservice'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+			]
+		},
+
+
+		{
+			"type": "Microsoft.Web/sites",
+			"apiVersion": "2022-03-01",
+			"name": "[variables('kudos_appservice')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
+
+			],
+			"resources": [
+				{
+					"apiVersion": "2015-08-01",
+					"name": "appsettings",
+					"type": "config",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
+						"[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
+					],
+					"properties": {
+						"PROJECT": "MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj",
+						"SCM_COMMAND_IDLE_TIMEOUT": "120",
+						"CosmosDb__AccountEndPoint": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))).documentEndpoint]",
+						"CosmosDb__AccountKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName')), '2022-08-15').primaryMasterKey]",
+						"CosmosDb__DatabaseName": "kudos-db"
+
+					}
+				},
+				{
+					"apiVersion": "2016-08-01",
+					"name": "web",
+					"type": "sourcecontrols",
+					"condition": "[not(empty(parameters('gitRepoUrl')))]",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
+						"[resourceId('Microsoft.Web/sites/config', variables('kudos_appservice'), 'appsettings')]"
+					],
+					"properties": {
+						"RepoUrl": "[parameters('gitRepoUrl')]",
+						"branch": "[parameters('gitBranch')]",
+						"IsManualIntegration": true
+					}
+				}
+			],
+
+			"kind": "app",
+			"identity": {
+				"type": "SystemAssigned"
+			},
+			"properties": {
+				"enabled": true,
+				"hostNameSslStates": [
+					{
+						"name": "[concat( variables('kudos_appservice'), '.azurewebsites.net' )]",
+						"sslState": "Disabled",
+						"hostType": "Standard"
+					},
+					{
+						"name": "[concat( variables('kudos_appservice'), '.scm.azurewebsites.net' )]",
+						"sslState": "Disabled",
+						"hostType": "Repository"
+					}
+				],
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+				"reserved": false,
+				"isXenon": false,
+				"hyperV": false,
+				"vnetRouteAllEnabled": false,
+				"vnetImagePullEnabled": false,
+				"vnetContentShareEnabled": false,
+				"siteConfig": {
+					"numberOfWorkers": 1,
+					"acrUseManagedIdentityCreds": false,
+					"alwaysOn": false,
+					"http20Enabled": false,
+					"functionAppScaleLimit": 0,
+					"minimumElasticInstanceCount": 0
+				},
+				"scmSiteAlsoStopped": false,
+				"clientAffinityEnabled": true,
+				"clientCertEnabled": false,
+				"clientCertMode": "Required",
+				"hostNamesDisabled": false,
+				"customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+				"containerSize": 0,
+				"dailyMemoryTimeQuota": 0,
+				"httpsOnly": true,
+				"redundancyMode": "None",
+				"storageAccountRequired": false,
+				"keyVaultReferenceIdentity": "SystemAssigned"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('kudos_appservice'), '/ftp')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+			],
+
+			"properties": {
+				"allow": true
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('kudos_appservice'), '/scm')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+			],
+
+			"properties": {
+				"allow": true
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/config",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('kudos_appservice'), '/web')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+			],
+
+			"properties": {
+				"numberOfWorkers": 1,
+				"defaultDocuments": [
+					"Default.htm",
+					"Default.html",
+					"Default.asp",
+					"index.htm",
+					"index.html",
+					"iisstart.htm",
+					"default.aspx",
+					"index.php",
+					"hostingstart.html"
+				],
+				"netFrameworkVersion": "v6.0",
+				"phpVersion": "5.6",
+				"requestTracingEnabled": false,
+				"remoteDebuggingEnabled": false,
+				"httpLoggingEnabled": false,
+				"acrUseManagedIdentityCreds": false,
+				"logsDirectorySizeLimit": 35,
+				"detailedErrorLoggingEnabled": false,
+				"publishingUsername": "$KudosApi",
+				"scmType": "None",
+				"use32BitWorkerProcess": true,
+				"webSocketsEnabled": false,
+				"alwaysOn": false,
+				"managedPipelineMode": "Integrated",
+				"virtualApplications": [
+					{
+						"virtualPath": "/",
+						"physicalPath": "site\\wwwroot",
+						"preloadEnabled": false
+					}
+				],
+				"loadBalancing": "LeastRequests",
+				"experiments": {
+					"rampUpRules": []
+				},
+				"autoHealEnabled": false,
+				"vnetRouteAllEnabled": false,
+				"vnetPrivatePortsCount": 0,
+				"localMySqlEnabled": false,
+				"managedServiceIdentityId": 11947,
+				"ipSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 2147483647,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 2147483647,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictionsUseMain": false,
+				"http20Enabled": false,
+				"minTlsVersion": "1.2",
+				"scmMinTlsVersion": "1.2",
+				"ftpsState": "FtpsOnly",
+				"preWarmedInstanceCount": 0,
+				"functionsRuntimeScaleMonitoringEnabled": false,
+				"minimumElasticInstanceCount": 0,
+				"azureStorageAccounts": {}
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/hostNameBindings",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('kudos_appservice'), '/', variables('kudos_appservice'), '.azurewebsites.net')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+			],
+			"properties": {
+				"siteName": "variables('kudos_appservice')",
+				"hostNameType": "Verified"
+			}
+		},
+
+		{
+			"type": "Microsoft.Web/sites",
+			"apiVersion": "2022-03-01",
+			"name": "[variables('gateway_appservice')]",
+			"location": "[parameters('location')]",
+
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
+
+			],
+			"resources": [
+				{
+					"apiVersion": "2015-08-01",
+					"name": "appsettings",
+					"type": "config",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+					],
+					"properties": {
+						"PROJECT": "MyKudos.Gateway/MyKudos.Gateway.csproj",
+						"SCM_COMMAND_IDLE_TIMEOUT": "120",
+						"RecognitionServiceUrl": "[concat( concat('https://', variables('recognition_appservice')), '.azurewebsites.net')]",
+						"KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net')]",
+						"graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net')]",
+						"agentServiceUrl": ""
+
+					}
+				},
+				{
+					"apiVersion": "2016-08-01",
+					"name": "web",
+					"type": "sourcecontrols",
+					"condition": "[not(empty(parameters('gitRepoUrl')))]",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]",
+						"[resourceId('Microsoft.Web/sites/config', variables('gateway_appservice'), 'appsettings')]"
+					],
+					"properties": {
+						"RepoUrl": "[parameters('gitRepoUrl')]",
+						"branch": "[parameters('gitBranch')]",
+						"IsManualIntegration": true
+					}
+				}
+			],
+			"kind": "app",
+			"identity": {
+				"type": "SystemAssigned"
+			},
+			"properties": {
+				"enabled": true,
+				"hostNameSslStates": [
+					{
+						"name": "[concat(variables('gateway_appservice'), '.azurewebsites.net')]",
+						"sslState": "Disabled",
+						"hostType": "Standard"
+					},
+					{
+						"name": "[concat(variables('gateway_appservice'), '.scm.azurewebsites.net')]",
+						"sslState": "Disabled",
+						"hostType": "Repository"
+					}
+				],
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+				"reserved": false,
+				"isXenon": false,
+				"hyperV": false,
+				"vnetRouteAllEnabled": false,
+				"vnetImagePullEnabled": false,
+				"vnetContentShareEnabled": false,
+				"siteConfig": {
+					"numberOfWorkers": 1,
+					"acrUseManagedIdentityCreds": false,
+					"alwaysOn": false,
+					"http20Enabled": false,
+					"functionAppScaleLimit": 0,
+					"minimumElasticInstanceCount": 0
+				},
+				"scmSiteAlsoStopped": false,
+				"clientAffinityEnabled": true,
+				"clientCertEnabled": false,
+				"clientCertMode": "Required",
+				"hostNamesDisabled": false,
+				"customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+				"containerSize": 0,
+				"dailyMemoryTimeQuota": 0,
+				"httpsOnly": true,
+				"redundancyMode": "None",
+				"storageAccountRequired": false,
+				"keyVaultReferenceIdentity": "SystemAssigned"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('gateway_appservice'), '/ftp')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+			],
+			"properties": {
+				"allow": true
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('gateway_appservice'), '/scm')]",
+			"location": "East US",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+			],
+			"properties": {
+				"allow": true
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/config",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('gateway_appservice'), '/web')]",
+			"location": "East US",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+			],
+			"properties": {
+				"numberOfWorkers": 1,
+				"defaultDocuments": [
+					"Default.htm",
+					"Default.html",
+					"Default.asp",
+					"index.htm",
+					"index.html",
+					"iisstart.htm",
+					"default.aspx",
+					"index.php",
+					"hostingstart.html"
+				],
+				"netFrameworkVersion": "v6.0",
+				"phpVersion": "5.6",
+				"requestTracingEnabled": false,
+				"remoteDebuggingEnabled": false,
+				"httpLoggingEnabled": false,
+				"acrUseManagedIdentityCreds": false,
+				"logsDirectorySizeLimit": 35,
+				"detailedErrorLoggingEnabled": false,
+				"publishingUsername": "variables('gateway_appservice')",
+				"scmType": "None",
+				"use32BitWorkerProcess": true,
+				"webSocketsEnabled": false,
+				"alwaysOn": false,
+				"managedPipelineMode": "Integrated",
+				"virtualApplications": [
+					{
+						"virtualPath": "/",
+						"physicalPath": "site\\wwwroot",
+						"preloadEnabled": false
+					}
+				],
+				"loadBalancing": "LeastRequests",
+				"experiments": {
+					"rampUpRules": []
+				},
+				"autoHealEnabled": false,
+				"vnetRouteAllEnabled": false,
+				"vnetPrivatePortsCount": 0,
+				"localMySqlEnabled": false,
+				"managedServiceIdentityId": 8757,
+				"ipSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 2147483647,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 2147483647,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictionsUseMain": false,
+				"http20Enabled": false,
+				"minTlsVersion": "1.2",
+				"scmMinTlsVersion": "1.2",
+				"ftpsState": "FtpsOnly",
+				"preWarmedInstanceCount": 0,
+				"functionsRuntimeScaleMonitoringEnabled": false,
+				"minimumElasticInstanceCount": 0,
+				"azureStorageAccounts": {}
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/hostNameBindings",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('gateway_appservice'), '/', variables('gateway_appservice'), '.azurewebsites.net')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+			],
+			"properties": {
+				"siteName": "zorokudosgateway",
+				"hostNameType": "Verified"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/siteextensions",
+			"apiVersion": "2022-03-01",
+			"name": "[concat(variables('gateway_appservice'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+			]
 		}
+
 	]
 	}

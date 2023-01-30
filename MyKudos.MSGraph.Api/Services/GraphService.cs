@@ -154,11 +154,11 @@ public class GraphService : IGraphService
         using MemoryStream ms = new MemoryStream();
         photo.CopyTo(ms);
 
-        return "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+        return Convert.ToBase64String(ms.ToArray());
 
     }
 
-    public async Task<List<GraphUser>> GetUserInfoAsync(string[] users)
+    public async Task<List<GraphUser>> GetUserInfo(string[] users)
     {
 
         var result = new List<GraphUser>();
