@@ -1,0 +1,39 @@
+{
+    "solution": {
+        "provisionSucceeded": true,
+        "teamsAppTenantId": "b690fbd8-801a-47ad-8280-c2c247538c82",
+        "subscriptionId": "066535a0-eccc-4e9f-ab96-edef050aeb51",
+        "subscriptionName": "CSR-CUSPOC-NMST-luisdem",
+        "tenantId": "b690fbd8-801a-47ad-8280-c2c247538c82",
+        "needCreateResourceGroup": false,
+        "resourceGroupName": "rg-robinkudos",
+        "location": "eastus",
+        "resourceNameSuffix": "4bfb54"
+    },
+    "fx-resource-appstudio": {
+        "tenantId": "b690fbd8-801a-47ad-8280-c2c247538c82",
+        "teamsAppId": "ec2c0fcc-c061-49a1-92dd-27147cca5c3b"
+    },
+    "fx-resource-aad-app-for-teams": {
+        "clientId": "20c1e755-563e-49b8-a597-2f05dd2c330f",
+        "clientSecret": "{{fx-resource-aad-app-for-teams.clientSecret}}",
+        "objectId": "1a1e6c18-a08f-4939-b57f-b67a701df177",
+        "oauth2PermissionScopeId": "a2209bdd-7e94-45a4-9595-3b2709c9981b",
+        "tenantId": "b690fbd8-801a-47ad-8280-c2c247538c82",
+        "oauthHost": "https://login.microsoftonline.com",
+        "oauthAuthority": "https://login.microsoftonline.com/b690fbd8-801a-47ad-8280-c2c247538c82",
+        "applicationIdUris": "api://mykudosdasdeveb2930webapp.azurewebsites.net/20c1e755-563e-49b8-a597-2f05dd2c330f",
+        "frontendEndpoint": "https://mykudosdasdeveb2930webapp.azurewebsites.net"
+    },
+    "fx-resource-frontend-hosting": {
+        "indexPath": "",
+        "domain": "mykudosdasdeveb2930webapp.azurewebsites.net",
+        "endpoint": "https://mykudosdasdeveb2930webapp.azurewebsites.net",
+        "webAppResourceId": "/subscriptions/066535a0-eccc-4e9f-ab96-edef050aeb51/resourceGroups/rg-robinkudos/providers/Microsoft.Web/sites/mykudosdasdeveb2930webapp"
+    },
+    "fx-resource-identity": {
+        "identityName": "mykudosdasdeveb2930",
+        "identityResourceId": "/subscriptions/066535a0-eccc-4e9f-ab96-edef050aeb51/resourceGroups/rg-robinkudos/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mykudosdasdeveb2930",
+        "identityClientId": "2451a1ab-0fe0-484d-9619-d4adfacc94a2"
+    }
+}

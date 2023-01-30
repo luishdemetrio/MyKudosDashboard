@@ -1,8 +1,4 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using Grpc.Net.Client;
-using Microsoft.Graph;
-using MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
 using Newtonsoft.Json;
 using RestSharp;
@@ -85,7 +81,7 @@ public class GraphServiceRest : IGraphService
 
         if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            userPhoto = response.Content;
+            userPhoto = JsonConvert.DeserializeObject<string>(response.Content);
 
         }
 
@@ -137,7 +133,7 @@ public class GraphServiceRest : IGraphService
 
         if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            manager = response.Content;
+            manager = JsonConvert.DeserializeObject<string>(response.Content);
 
         }
 
