@@ -3,7 +3,7 @@ using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
-using Radzen;
+//using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,10 +21,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddFluentUIComponents();
 
 //Radzen
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
+//builder.Services.AddScoped<DialogService>();
+//builder.Services.AddScoped<NotificationService>();
+//builder.Services.AddScoped<TooltipService>();
+//builder.Services.AddScoped<ContextMenuService>();
 
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();

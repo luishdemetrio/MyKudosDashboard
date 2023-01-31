@@ -25,9 +25,17 @@
 
     <None Include=".fx/**/*" />
 
+    <Compile Remove="Helper\**" />
+
+    <EmbeddedResource Remove="Helper\**" />
+
     <None Remove="build/**/*" />
 
+    <None Remove="Helper\**" />
+
     <Content Remove="build/**/*" />
+
+    <Content Remove="Helper\**" />
 
   </ItemGroup>
 
@@ -45,14 +53,14 @@
 
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
 
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
+    <!--<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    </PackageReference>-->
 
-    <PackageReference Include="Microsoft.Graph" Version="4.48.0" />
+    <!--<PackageReference Include="Microsoft.Graph" Version="4.48.0" />
 
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.10" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.10" />-->
 
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 
@@ -60,9 +68,11 @@
 
     <PackageReference Include="Microsoft.TeamsFx" Version="1.1.0" />
 
-    <PackageReference Include="Radzen.Blazor" Version="4.4.4" />
+    <!--<PackageReference Include="Radzen.Blazor" Version="4.4.4" />-->
 
     <PackageReference Include="RestSharp" Version="108.0.3" />
+
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
 
   </ItemGroup>
 
@@ -70,7 +80,6 @@
 
   <ItemGroup>
     <Folder Include=".fx\states\" />
-    <Folder Include="Helper\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\badges\" />
   </ItemGroup>
