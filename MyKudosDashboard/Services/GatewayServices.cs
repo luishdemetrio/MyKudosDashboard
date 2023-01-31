@@ -129,7 +129,7 @@ public class GatewayService : IGatewayService
 
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            userPhoto = "data:image/png;base64," + response.Content;//.Replace("\"", "").Replace("\\", "");
+            userPhoto = response.Content;//.Replace("\"", "").Replace("\\", "");
         }
 
         return Task.FromResult(userPhoto);

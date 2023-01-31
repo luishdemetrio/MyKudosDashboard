@@ -1426,7 +1426,8 @@
             "TeamsFx__Authentication__ClientId": "[parameters('dashboardAppClientId')]",
             "TeamsFx__Authentication__ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('teams_appservice')) , '.azurewebsites.net/auth-start.html')]",
-            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', subscription().tenantId)]"
+            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', subscription().tenantId)]",
+            "GatewayServiceUrl": "[concat( concat('https://', variables('gateway_appservice')) , '.azurewebsites.net/')]"
 
           }
         },

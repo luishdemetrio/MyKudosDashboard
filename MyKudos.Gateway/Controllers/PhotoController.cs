@@ -18,8 +18,8 @@ public class PhotoController : Controller
     [HttpGet(Name = "GetUserphoto/{userid}")]        
     public async Task<string> GetUserPhoto(string userid)
     {
-
-        return await _graphService.GetUserPhoto(userid);
+        
+        return $"data:image/png;base64,{await _graphService.GetUserPhoto(userid)}";
 
     }
 }
