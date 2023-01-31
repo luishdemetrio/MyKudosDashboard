@@ -206,7 +206,7 @@ else
 
     UserInfo user;
 
-    string errorMessage;
+  //  string errorMessage;
     bool isInTeams;
     bool isLoading = true;
 
@@ -262,10 +262,10 @@ else
                 kudos = WelcomeView.GetKudos();
 
             }
-            else
-            {
-                errorMessage = "Not running in Microsoft Teams.";
-            }
+            //else
+            //{
+            //    errorMessage = "Not running in Microsoft Teams.";
+            //}
 
             isLoading = false;
             StateHasChanged();

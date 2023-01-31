@@ -28,6 +28,22 @@
       }
     },
 
+    "notificationClientId": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "metadata": {
+        "description": "The application (client) ID of the Microsoft Teams Kudos Notification Bot app, e.g., 123e4567-e89b-12d3-a456-426655440000."
+      }
+    },
+    "notificationClientSecret": {
+      "type": "securestring",
+      "minLength": 1,
+      "metadata": {
+        "description": "The client secret of the Microsoft Teams Kudos Notification Bot app."
+      }
+    },
+
     "MsGraphClientId": {
       "type": "string",
       "minLength": 36,
@@ -43,6 +59,8 @@
         "description": "The client secret of the Microsoft Graph app."
       }
     },
+
+
 
     "hostingPlanSku": {
       "type": "string",
@@ -141,12 +159,13 @@
 
     "gateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
 
-
     "teams_appservice": "[concat(parameters('baseResourceName'), 'dashboard' )]",
 
     "userAssignedIdentities_teams_appservice": "[variables('teams_appservice')]",
 
-    "userAssignedIdentities_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', variables('userAssignedIdentities_teams_appservice') )]"
+    "userAssignedIdentities_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', variables('userAssignedIdentities_teams_appservice') )]",
+
+    "notification_bot": "[concat(parameters('baseResourceName'), 'notification' )]"
 
 
   },
@@ -632,7 +651,7 @@
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "settings__clientid": "[parameters('MsGraphClientId')]",
             "settings__clientsecret": "[parameters('MsGraphClientSecret')]",
-            "settings__tenantid": "[subscription().tenantId]"
+            "settings__tenantid": "[variables('subscriptionTenantId')]"
 
           }
         },
@@ -652,13 +671,10 @@
           }
         }
       ],
-
-
       "kind": "app",
       "identity": {
         "type": "SystemAssigned"
       },
-
       "properties": {
         "enabled": true,
         "hostNameSslStates": [
@@ -1391,7 +1407,7 @@
       "name": "[variables('teams_appservice')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('teams_appservice'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]"
       ],
 
@@ -1405,68 +1421,333 @@
           ],
           "properties": {
             "PROJECT": "MyKudosDashboard/MyKudosDashboard.csproj",
-            "SCM_COMMAND_IDLE_TIMEOUT": "120",
+            "SCM_COMMAND_IDLE_TIMEOUT": "240",
             "IDENTITY_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice') )).clientId]",
             "TeamsFx__Authentication__ClientId": "[parameters('dashboardAppClientId')]",
             "TeamsFx__Authentication__ClientSecret": "[parameters('dashboardAppClientSecret')]",
-            "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', [variables('teams_appservice')]) , '.azurewebsites.net/auth-start.html')]",
-            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', variables('subscriptionTenantId'))]"
+            "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('teams_appservice')) , '.azurewebsites.net/auth-start.html')]",
+            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', subscription().tenantId)]"
+
+          }
+        },
+        {
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "condition": "[not(empty(parameters('gitRepoUrl')))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('teams_appservice'), 'appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('gitRepoUrl')]",
+            "branch": "[parameters('gitBranch')]",
+            "IsManualIntegration": true
+          }
+        }
+      ],
+
+      "kind": "app",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[variables('userAssignedIdentities_externalid')]": {}
+        }
+      },
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat(variables('teams_appservice'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat(variables('teams_appservice'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
+          "numberOfWorkers": 1,
+          "acrUseManagedIdentityCreds": false,
+          "alwaysOn": false,
+          "http20Enabled": false,
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 0
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]"
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('notification_bot')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
+
+      ],
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('notification_bot'))]"
+          ],
+          "properties": {
+            "PROJECT": "MyKudos.Agent/MyKudos.Agent.csproj",
+            "SCM_COMMAND_IDLE_TIMEOUT": "120",
+
+            "TeamsFx__Authentication__ClientId": "[parameters('notificationClientId')]",
+            "TeamsFx__Authentication__ClientSecret": "[parameters('notificationClientSecret')]",
+            "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('notification_bot')) , '.azurewebsites.net/auth-start.html')]",
+            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', 'subscription().tenantId)]''"
 
           }
         }
       ],
 
-        "kind": "app",
-        "identity": {
-          "type": "UserAssigned",
-          "userAssignedIdentities": {
-            "[variables('userAssignedIdentities_externalid')]": {}
-          }
-        },
-        "properties": {
-          "enabled": true,
-          "hostNameSslStates": [
-            {
-              "name": "[concat(variables('teams_appservice'), '.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Standard"
-            },
-            {
-              "name": "[concat(variables('teams_appservice'), '.scm.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Repository"
-            }
-          ],
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('teams_appservice'))]",
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "vnetRouteAllEnabled": false,
-          "vnetImagePullEnabled": false,
-          "vnetContentShareEnabled": false,
-          "siteConfig": {
-            "numberOfWorkers": 1,
-            "acrUseManagedIdentityCreds": false,
-            "alwaysOn": false,
-            "http20Enabled": false,
-            "functionAppScaleLimit": 0,
-            "minimumElasticInstanceCount": 0
+      "kind": "app",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat(variables('notification_bot'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
           },
-          "scmSiteAlsoStopped": false,
-          "clientAffinityEnabled": true,
-          "clientCertEnabled": false,
-          "clientCertMode": "Required",
-          "hostNamesDisabled": false,
-          "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
-          "containerSize": 0,
-          "dailyMemoryTimeQuota": 0,
-          "httpsOnly": true,
-          "redundancyMode": "None",
-          "storageAccountRequired": false,
-          "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]"
-        }
-    }
+          {
+            "name": "[concat(variables('notification_bot'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan') )]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
+          "numberOfWorkers": 1,
+          "acrUseManagedIdentityCreds": false,
+          "alwaysOn": false,
+          "http20Enabled": false,
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 0
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "SystemAssigned"
+      }
+    },
 
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('notification_bot'), '/ftp')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notification_bot') )]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('notification_bot'), '/scm')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notification_bot') )]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('notification_bot'), '/web')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notification_bot') )]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
+        ],
+        "netFrameworkVersion": "v6.0",
+        "phpVersion": "5.6",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "acrUseManagedIdentityCreds": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "[variables('notification_bot')]",
+        "scmType": "None",
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": false,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "vnetRouteAllEnabled": false,
+        "vnetPrivatePortsCount": 0,
+        "localMySqlEnabled": false,
+        "managedServiceIdentityId": 350,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "scmMinTlsVersion": "1.2",
+        "ftpsState": "FtpsOnly",
+        "preWarmedInstanceCount": 0,
+        "functionsRuntimeScaleMonitoringEnabled": false,
+        "minimumElasticInstanceCount": 0,
+        "azureStorageAccounts": {}
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('notification_bot'), '/', variables('notification_bot'), '.azurewebsites.net')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notification_bot') )]"
+      ],
+      "properties": {
+        "siteName": "[variables('notification_bot')]",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/siteextensions",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('notification_bot'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('notification_bot') )]"
+      ]
+    },
+
+    {
+      "type": "Microsoft.BotService/botServices",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[variables('notification_bot')]",
+      "location": "global",
+      "sku": {
+        "name": "F0"
+      },
+      "kind": "azurebot",
+      "properties": {
+        "displayName": "[variables('notification_bot')]",
+        "iconUrl": "https://docs.botframework.com/static/devportal/client/images/bot-framework-default.png",
+        "endpoint": "[concat('https://', variables('notification_bot'), 'azurewebsites.net/api/messages')]",
+        "msaAppId": "[parameters('notificationClientId')]",
+        "luisAppIds": [],
+        "isStreamingSupported": false,
+        "schemaTransformationVersion": "1.3",
+        "tenantId": "[subscription().subscriptionId]",
+        "isCmekEnabled": false,
+        "disableLocalAuth": false
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[concat(variables('notification_bot'), '/MsTeamsChannel')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
+      ],
+      "properties": {
+        "properties": {
+          "enableCalling": false,
+          "isEnabled": true,
+          "deploymentEnvironment": "CommercialDeployment",
+          "acceptedTerms": false
+        },
+        "etag": "W/\"7bdfb872f95de0268023338b25a9a16111/18/2022 1:23:43 PM\"",
+        "channelName": "MsTeamsChannel",
+        "location": "global"
+      }
+    }
 
 
   ]

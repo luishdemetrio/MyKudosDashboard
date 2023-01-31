@@ -1,0 +1,48 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.14/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.14",
+  "version": "1.0.0",
+  "id": "ae64e05c-e357-428a-8d04-e4c3b650cc56",
+  "packageName": "com.microsoft.teams.extension",
+  "developer": {
+    "name": "Luis Demetrio",
+    "websiteUrl": "https://github.com/luishdemetrio/MyKudosDashboard",
+    "privacyUrl": "https://github.com/luishdemetrio/MyKudosDashboard",
+    "termsOfUseUrl": "https://github.com/luishdemetrio/MyKudosDashboard"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Kudos",
+    "full": "Allows employees to recognize and appreciate each other's efforts in the workplace."
+  },
+  "description": {
+    "short": "Kudos",
+    "full": "Allows employees to recognize and appreciate each other's efforts in the workplace."
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [
+    {
+      "botId": "<<botId>>",
+      "scopes": [
+        "personal",
+        "team",
+        "groupchat"
+      ],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "composeExtensions": [],
+  "configurableTabs": [],
+  "staticTabs": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "{{state.fx-resource-bot.domain}}"
+  ]
+}

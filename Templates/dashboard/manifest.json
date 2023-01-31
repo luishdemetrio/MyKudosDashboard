@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.13/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.13",
+  "version": "1.0.0",
+  "id": "ec2c0fcc-c061-49a1-92dd-27147cca5c3b",
+  "packageName": "com.microsoft.teams.extension",
+  "developer": {
+    "name": "Luis Demetrio",
+    "websiteUrl": "https://github.com/luishdemetrio/MyKudosDashboard",
+    "privacyUrl": "https://github.com/luishdemetrio/MyKudosDashboard",
+    "termsOfUseUrl": "https://github.com/luishdemetrio/MyKudosDashboard"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Kudos Dashboard",
+    "full": "Allows employees to recognize and appreciate each other's efforts in the workplace."
+  },
+  "description": {
+    "short": "Kudos Dashboard",
+    "full": "Allows employees to recognize and appreciate each other's efforts in the workplace."
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [],
+  "composeExtensions": [],
+  "configurableTabs": [
+    {
+      "configurationUrl": "<<kudosDashboardAppDomain>>/config",
+      "canUpdateConfiguration": true,
+      "scopes": [
+        "team",
+        "groupchat"
+      ]
+    }
+  ],
+  "staticTabs": [
+    {
+      "entityId": "index",
+      "name": "Personal Tab",
+      "contentUrl": "https://<<kudosDashboardAppDomain>>/tab",
+      "websiteUrl": "https://<<kudosDashboardAppDomain>>/tab",
+      "scopes": [
+        "personal"
+      ]
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "https://<<kudosDashboardAppDomain>>"
+  ],
+  "webApplicationInfo": {
+    "id": "<<kudosDashboardClientId>>",
+    "resource": "api://kudossandidashboard.azurewebsites.net/<<kudosDashboardClientId>>"
+  }
+}

@@ -1,5 +1,4 @@
 using Microsoft.Fast.Components.FluentUI;
-using Microsoft.Identity.Web;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;

@@ -39,7 +39,7 @@
             "build": true,
             "provision": true,
             "folder": "",
-            "artifactFolder": "bin\\Release\\net6.0\\win-x86\\publish",
+            "artifactFolder": "publish",
             "sso": true,
             "deploy": true
         },
