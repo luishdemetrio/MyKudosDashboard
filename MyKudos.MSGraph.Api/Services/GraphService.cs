@@ -54,8 +54,6 @@ public class GraphService : IGraphService
         return response.Token;
     }
 
-
-   
     public async Task<GraphUsers> GetUsers(string name)
     {
 
@@ -80,8 +78,6 @@ public class GraphService : IGraphService
 
         return r;
     }
-
-
 
     public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] usersId)
     {
@@ -146,16 +142,16 @@ public class GraphService : IGraphService
 
     public async Task<string> GetUserPhoto(string userid)
     {
-
+       
         System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
-            .Request()
-            .GetAsync();
+        .Request()
+        .GetAsync();
 
         using MemoryStream ms = new MemoryStream();
         photo.CopyTo(ms);
 
         return Convert.ToBase64String(ms.ToArray());
-
+       
     }
 
     public async Task<List<GraphUser>> GetUserInfo(string[] users)

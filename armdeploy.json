@@ -825,7 +825,7 @@
       "type": "Microsoft.Web/sites/hostNameBindings",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('msgraph_appservice'), '/', variables('msgraph_appservice'), '.azurewebsites.net')]",
-      "location": "Central US",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
       ],
@@ -1164,7 +1164,7 @@
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('gateway_appservice'), '/scm')]",
-      "location": "East US",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
       ],
@@ -1176,7 +1176,7 @@
       "type": "Microsoft.Web/sites/config",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('gateway_appservice'), '/web')]",
-      "location": "East US",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
       ],
