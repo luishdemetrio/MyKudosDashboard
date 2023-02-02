@@ -9,3 +9,4 @@ build
 .fx/configs/config.local.json
 .fx/states/state.local.json
 appsettings.Development.json
+.backup

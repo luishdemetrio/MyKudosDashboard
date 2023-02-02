@@ -34,27 +34,27 @@ namespace MyKudos.Kudos.Api.Controllers
             return _kudosService.GetKudos();
         }
 
-        [HttpPost(Name = "CheckAndSeedDatabaseAsync")]
-        public async Task CheckAndSeedDatabaseAsync()
-        {
-            var options = new DbContextOptionsBuilder<KudosDbContext>()
-                .UseCosmos(
-                        "https://mykudos.documents.azure.com:443/",
-                        "pPT5EVtJyAh0Lk4N7ywHk2ZgPTSepeH6YvbUYw2R6msjLeCQLHMs1KfhOE5xPdoHUQVR3vMFiXvmACDbOWmCqA==",
-                        databaseName: "kudos-db")
-                .Options;
+        //[HttpPost(Name = "CheckAndSeedDatabaseAsync")]
+        //public async Task CheckAndSeedDatabaseAsync()
+        //{
+        //    var options = new DbContextOptionsBuilder<KudosDbContext>()
+        //        .UseCosmos(
+        //                "https://mykudos.documents.azure.com:443/",
+        //                "pPT5EVtJyAh0Lk4N7ywHk2ZgPTSepeH6YvbUYw2R6msjLeCQLHMs1KfhOE5xPdoHUQVR3vMFiXvmACDbOWmCqA==",
+        //                databaseName: "kudos-db")
+        //        .Options;
 
-            using var context = new KudosDbContext(options);
+        //    using var context = new KudosDbContext(options);
 
-          //  var _ = await context.Database.EnsureDeletedAsync();
+        //  //  var _ = await context.Database.EnsureDeletedAsync();
 
-            if (await context.Database.EnsureCreatedAsync())
-            {
-                //context.Recognitions?.AddRange(Seed.Data);
+        //    if (await context.Database.EnsureCreatedAsync())
+        //    {
+        //        //context.Recognitions?.AddRange(Seed.Data);
 
-                //await context.SaveChangesAsync();
-            }
+        //        //await context.SaveChangesAsync();
+        //    }
 
-        }
+        //}
     }
 }

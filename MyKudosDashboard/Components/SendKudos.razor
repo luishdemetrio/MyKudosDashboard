@@ -27,7 +27,7 @@
 
 <FluentDialog   @ref=SendKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true" 
-                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;" @ondismiss=OnDismiss>
+                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;" >
 
 <div style="margin:10px;">
 
@@ -175,9 +175,7 @@
     }
 
     private Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
-    {
-        var settings = Settings.LoadSettings();        
-
+    {   
         return Task.FromResult(SendKudosView.GetUsers(searchText));
 
     }

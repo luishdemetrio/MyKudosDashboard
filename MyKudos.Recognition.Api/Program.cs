@@ -24,6 +24,11 @@ builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 builder.Services.AddSingleton<IRecognitionService, RecognitionService>();
 builder.Services.AddSingleton<IRecognitionRepository, RecognitionRepository>();
 
+//string connectionString = builder.Configuration.GetConnectionString("AppConfig");
+
+//// Load configuration from Azure App Configuration
+//builder.Configuration.AddAzureAppConfiguration(connectionString);
+
 
 var config = builder.Configuration.GetSection("CosmosDb");
 
