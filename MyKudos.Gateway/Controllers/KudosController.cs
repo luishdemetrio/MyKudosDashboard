@@ -53,7 +53,7 @@ public class KudosController : Controller
 
         from.AddRange(likesId.Distinct());
 
-        List<GraphUser> users =  await _graphService.GetUserInfo(from.Distinct().ToArray()).ConfigureAwait(true);
+        List<Models.GraphUser> users =  await _graphService.GetUserInfo(from.Distinct().ToArray()).ConfigureAwait(true);
                 
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
         

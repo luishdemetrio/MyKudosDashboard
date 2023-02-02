@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
   
     <Protobuf Include="..\MyKudos.Kudos.Api\Proto\kudos.proto" GrpcServices="Client">
       <Link>Protos\kudos.proto</Link>

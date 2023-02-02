@@ -66,7 +66,7 @@ public class KudosServiceGrpc : IKudosService
         return r.Succeed;
     }
 
-    public bool SendLike(Like like)
+    public bool SendLike(LikeGateway like)
     {
         List<Models.Kudos> result = new();
 

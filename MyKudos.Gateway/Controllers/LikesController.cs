@@ -21,7 +21,7 @@ public class LikesController : Controller
     }
 
     [HttpPost(Name = "SendLike")]
-    public IActionResult SendLike([FromBody] Like like)
+    public IActionResult SendLike([FromBody] LikeGateway like)
     {
 
         var kudos = _kudosService.SendLike(like); 

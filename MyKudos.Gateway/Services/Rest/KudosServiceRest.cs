@@ -1,6 +1,7 @@
 ﻿using Microsoft.Graph;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
+using MyKudos.Kudos.Domain.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -52,7 +53,17 @@ public class KudosServiceRest: IKudosService
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");
 
-        var body = JsonConvert.SerializeObject(kudos);
+
+        var restKudos = new KudosLog()
+        {
+            FromPersonId = kudos.From.Id,
+            ToPersonId = kudos.To.Id,
+            TitleId = kudos.Title.Id,   
+            Message = kudos.Message,
+            Date = kudos.SendOn
+        };
+
+        var body = JsonConvert.SerializeObject(restKudos);
 
         request.AddParameter("application/json", body, ParameterType.RequestBody);
 
@@ -61,7 +72,7 @@ public class KudosServiceRest: IKudosService
         return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
     }
 
-    public bool SendLike(Like like)
+    public bool SendLike(LikeGateway like)
     {
         var client = new RestClient($"{_kudosServiceUrl}like");
 
