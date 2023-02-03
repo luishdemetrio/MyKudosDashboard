@@ -10,13 +10,17 @@ namespace MyKudos.Agent.Controllers
     [ApiController]
     public class NotificationController : ControllerBase
     {
+
+        private IConfiguration _configuration;
+
         private readonly ConversationBot _conversation;
         
         private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "NotificationDefault.json");
 
-        public NotificationController(ConversationBot conversation)
+        public NotificationController(ConversationBot conversation, IConfiguration configuration)
         {
-            _conversation = conversation;            
+            _conversation = conversation;     
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -30,7 +34,8 @@ namespace MyKudos.Agent.Controllers
 
             if (installations.Count() == 0)
             {
-                return Ok($"There are no users with the bot installed");
+                
+                return Ok($"There are no users with the bot {_configuration.GetSection("BOT_ID")?.Value} installed");
             }
 
             using var content = new StreamContent(this.HttpContext.Request.Body);

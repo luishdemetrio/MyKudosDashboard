@@ -26,3 +26,5 @@ bld/
 
 # Notification local store
 .notification.localstore.json
+
+.backup

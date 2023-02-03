@@ -1081,7 +1081,7 @@
             "RecognitionServiceUrl": "[concat( concat('https://', variables('recognition_appservice')), '.azurewebsites.net/')]",
             "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
-            "agentServiceUrl": ""
+            "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]"
 
           }
         },
@@ -1520,11 +1520,24 @@
             "PROJECT": "MyKudos.Agent/MyKudos.Agent.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
 
-            "TeamsFx__Authentication__ClientId": "[parameters('notificationClientId')]",
-            "TeamsFx__Authentication__ClientSecret": "[parameters('notificationClientSecret')]",
-            "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('notification_bot')) , '.azurewebsites.net/auth-start.html')]",
-            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', 'subscription().tenantId)]''"
+            "BOT_ID": "[parameters('notificationClientId')]",
+            "BOT_PASSWORD": "[parameters('notificationClientSecret')]"
 
+          }
+        },
+        {
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "condition": "[not(empty(parameters('gitRepoUrl')))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('notification_bot'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('notification_bot'), 'appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('gitRepoUrl')]",
+            "branch": "[parameters('gitBranch')]",
+            "IsManualIntegration": true
           }
         }
       ],
@@ -1732,6 +1745,32 @@
     {
       "type": "Microsoft.BotService/botServices/channels",
       "apiVersion": "2022-06-15-preview",
+      "name": "[concat(variables('notification_bot'), '/DirectLineChannel')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
+      ],
+      "properties": {
+        "properties": {
+          "sites": [
+            {
+              "siteName": "Default Site",
+              "isEnabled": true,
+              "isV1Enabled": true,
+              "isV3Enabled": true,
+              "isSecureSiteEnabled": false,
+              "isBlockUserUploadEnabled": false
+            }
+          ]
+        },
+        "etag": "W/\"315f78c29ddb1a89a1226dd3175e95642/3/2023 5:28:15 PM\"",
+        "channelName": "DirectLineChannel",
+        "location": "global"
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2022-06-15-preview",
       "name": "[concat(variables('notification_bot'), '/MsTeamsChannel')]",
       "location": "global",
       "dependsOn": [
@@ -1746,6 +1785,30 @@
         },
         "etag": "W/\"7bdfb872f95de0268023338b25a9a16111/18/2022 1:23:43 PM\"",
         "channelName": "MsTeamsChannel",
+        "location": "global"
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[concat(variables('notification_bot'), '/WebChatChannel')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
+      ],
+      "properties": {
+        "properties": {
+          "sites": [
+            {
+              "siteName": "Default Site",
+              "isEnabled": true,
+              "isWebchatPreviewEnabled": true,
+              "isBlockUserUploadEnabled": false
+            }
+          ]
+        },
+        "etag": "W/\"498e29ece9f6bd46fdc6da875399dd002/3/2023 5:28:15 PM\"",
+        "channelName": "WebChatChannel",
         "location": "global"
       }
     }

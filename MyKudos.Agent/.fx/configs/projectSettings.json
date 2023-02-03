@@ -12,7 +12,8 @@
                 "notification"
             ],
             "build": true,
-            "folder": "."
+            "folder": ".",
+            "artifactFolder": "bin\\Release\\net6.0\\publish"
         },
         {
             "name": "bot-service",
