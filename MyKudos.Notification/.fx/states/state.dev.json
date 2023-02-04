@@ -1,0 +1,33 @@
+{
+    "solution": {
+        "provisionSucceeded": true,
+        "teamsAppTenantId": "935d1d6d-2c54-492a-996e-8366e1d992dd",
+        "subscriptionId": "00a967c0-b3df-4f05-84ff-9af9243061f1",
+        "subscriptionName": "ME-MngEnvMCAP728187-luisdem-1",
+        "tenantId": "935d1d6d-2c54-492a-996e-8366e1d992dd",
+        "needCreateResourceGroup": true,
+        "resourceGroupName": "MyKudosNotification-dev-rg",
+        "location": "centralus",
+        "resourceNameSuffix": "5b55c0"
+    },
+    "fx-resource-appstudio": {
+        "tenantId": "935d1d6d-2c54-492a-996e-8366e1d992dd",
+        "teamsAppId": "ec43921e-2f52-4854-833c-96285bd7e484"
+    },
+    "fx-resource-bot": {
+        "botId": "d4b8ef54-7f25-4dea-977b-dad777f392d4",
+        "botPassword": "{{fx-resource-bot.botPassword}}",
+        "objectId": "fbd67a99-a340-4549-9337-d530d80f1372",
+        "skuName": "B1",
+        "siteName": "mykudosnotf766fabot",
+        "domain": "mykudosnotf766fabot.azurewebsites.net",
+        "appServicePlanName": "mykudosnotf766fabot",
+        "resourceId": "/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/resourceGroups/MyKudosNotification-dev-rg/providers/Microsoft.Web/sites/mykudosnotf766fabot",
+        "siteEndpoint": "https://mykudosnotf766fabot.azurewebsites.net"
+    },
+    "fx-resource-identity": {
+        "identityName": "mykudosnotf766fa",
+        "identityResourceId": "/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/resourceGroups/MyKudosNotification-dev-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/mykudosnotf766fa",
+        "identityClientId": "b0c59d00-ab1b-4f7e-a079-b3c01a90c548"
+    }
+}
