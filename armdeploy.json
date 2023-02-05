@@ -1780,7 +1780,6 @@
             }
           ]
         },
-        "etag": "W/\"71a5c3c07a9a707f92777f84386084e92/4/2023 1:12:04 AM\"",
         "channelName": "DirectLineChannel",
         "location": "global"
       }
@@ -1801,7 +1800,6 @@
           "deploymentEnvironment": "CommercialDeployment",
           "acceptedTerms": false
         },
-        "etag": "W/\"7bdfb872f95de0268023338b25a9a1612/4/2023 1:12:04 AM\"",
         "channelName": "MsTeamsChannel",
         "location": "global"
       }
@@ -1826,7 +1824,6 @@
             }
           ]
         },
-        "etag": "W/\"6316e442d289cfa836ddb54563f58a7f2/4/2023 1:12:04 AM\"",
         "channelName": "WebChatChannel",
         "location": "global"
       }

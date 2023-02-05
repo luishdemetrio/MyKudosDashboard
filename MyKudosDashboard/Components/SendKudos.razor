@@ -214,7 +214,10 @@
         if (SendKudosView.Send(kudos))
         {
             Hide();
+            StateHasChanged();
         }
+
+        
     }
 
     public delegate void CloseModalParameterButtonClick();
