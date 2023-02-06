@@ -228,17 +228,17 @@ else
 
     private IEnumerable<KudosResponse> GetAllKudos()
     {
-        return _kudos;
+        return _kudos.OrderByDescending(k=> k.SendOn);
     }
 
     private IEnumerable<KudosResponse> GetKudosToMe()
     {
-        return _kudos.Where(k => k.To.Id == user.ObjectId);
+        return _kudos.Where(k => k.To.Id == user.ObjectId).OrderByDescending(k => k.SendOn); 
     }
 
     private IEnumerable<KudosResponse> GetKudosFromMe()
     {
-        return _kudos.Where(k => k.From.Id == user.ObjectId);
+        return _kudos.Where(k => k.From.Id == user.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -264,8 +264,8 @@ else
     }
 
     private void OpenSendKudosPanel()
-    {       
-
+    {
+    
         sendKudosPanel.Show((KudosRequest k) =>
       {
           sendKudosIsHidden = true;
@@ -280,7 +280,7 @@ else
               SendOn = DateTime.Now
           });
 
-          InvokeAsync(() => StateHasChanged());
+          StateHasChanged();
 
       });
     }

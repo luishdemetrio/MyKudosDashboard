@@ -24,7 +24,7 @@ public class SendKudosView : ISendKudosView
         return _dashboardService.GetUsers(name);              
     }
 
-    public bool Send(KudosRequest kudos)
+    public Guid Send(KudosRequest kudos)
     {
      
         return _dashboardService.SendKudos(kudos);

@@ -8,7 +8,7 @@ public interface IKudosRepository
 
     IEnumerable<KudosLog> GetKudos();
 
-    bool Add(KudosLog kudos);
+    Guid Add(KudosLog kudos);
 
     bool SendLike(string kudosId, string personId);
 }

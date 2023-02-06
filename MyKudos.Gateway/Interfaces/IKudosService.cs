@@ -6,7 +6,7 @@ namespace MyKudos.Gateway.Interfaces
     {
         IEnumerable<Models.Kudos> GetKudos();
 
-        bool Send(Models.KudosRequest kudos);
+        string Send(Models.KudosRequest kudos);
 
         bool SendLike(LikeGateway like);
     }

@@ -25,7 +25,7 @@ public class KudosService : IKudosService
         return _kudosRepository.GetKudos();
     }
 
-    public bool Send(KudosLog kudos)
+    public Guid Send(KudosLog kudos)
     {
         //TODO: need to change here to send a message instead of saving in the repository
 
@@ -43,7 +43,8 @@ public class KudosService : IKudosService
 
         //return true;
 
-        return _kudosRepository.Add(kudos);
+        return ( _kudosRepository.Add(kudos) );
+        
     }
 
     public bool SendLike(string kudosId, string personId)

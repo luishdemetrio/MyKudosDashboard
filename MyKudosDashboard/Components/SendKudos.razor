@@ -209,9 +209,25 @@
                 SendOn : DateTime.Now
             );
 
-        if (SendKudosView.Send(kudos))
-        {   
-            closeModalParameter?.Invoke(kudos);
+        Guid kudosId = SendKudosView.Send(kudos);
+
+        
+        if (kudosId != Guid.Empty)
+        {
+            var k = new KudosResponse()
+                {
+                    Id = kudosId.ToString(),
+                    From = kudos.From,
+                    To = kudos.To,
+                    Title = kudos.Title.Description,
+                    Message = kudos.Message,
+                    Likes = new(),
+                    SendOn = DateTime.Now
+                };
+
+            
+            closeModalParameter?.Invoke(k);
+
             ClearFields();
             Hide();
 
@@ -225,7 +241,7 @@
         
     }
 
-    public delegate void CloseModalParameterButtonClick(KudosRequest kudos);
+    public delegate void CloseModalParameterButtonClick(KudosResponse kudos);
 
     public CloseModalParameterButtonClick closeModalParameter;
 

@@ -9,6 +9,6 @@ public interface ISendKudosView
 
     IEnumerable<UserViewModel> GetUsers(string name);
 
-    bool Send(KudosRequest kudos);
+    Guid Send(KudosRequest kudos);
 
 }

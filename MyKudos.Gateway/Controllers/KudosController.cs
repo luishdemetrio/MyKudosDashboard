@@ -91,6 +91,7 @@ public class KudosController : Controller
                             on kudo.FromPersonId equals photoFrom.id
                         join rec in _recognitions
                             on kudo.TitleId equals rec.Id                        
+                        orderby kudo.Date descending
 
                         select new Models.KudosResponse(
                                 Id: kudo.Id,

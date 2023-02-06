@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyKudos.Domain.Core.Bus;
-using MyKudos.Kudos.Api.Grpc;
+//using MyKudos.Kudos.Api.Grpc;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.App.Services;
 using MyKudos.Kudos.Data.Context;
@@ -59,7 +59,7 @@ app.MapControllers();
 
 //ConfigureEventBus(app);
 
-app.MapGrpcService<KudosGrpc>();
+//app.MapGrpcService<KudosGrpc>();
 
 app.Run();
 

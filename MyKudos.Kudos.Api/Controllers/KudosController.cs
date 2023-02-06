@@ -20,12 +20,12 @@ namespace MyKudos.Kudos.Api.Controllers
 
 
         [HttpPost]
-        public IActionResult Post([FromBody] KudosLog kudos)
+        public Guid Post([FromBody] KudosLog kudos)
         {
 
-            _kudosService.Send(kudos);
+            Guid kudosId = _kudosService.Send(kudos);
 
-            return Ok(kudos);
+            return kudosId;
         }
 
         [HttpGet(Name = "GetKudos")]

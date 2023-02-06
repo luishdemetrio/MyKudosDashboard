@@ -41,8 +41,9 @@ public class KudosServiceRest: IKudosService
 
     }
 
-    public bool Send(Models.KudosRequest kudos)
+    public string Send(Models.KudosRequest kudos)
     {
+        var result = string.Empty;
 
         var client = new RestClient($"{_kudosServiceUrl}kudos");
 
@@ -69,7 +70,12 @@ public class KudosServiceRest: IKudosService
 
         RestResponse response = client.Execute(request);
 
-        return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<string>(response.Content);
+        }
+
+        return result;
     }
 
     public bool SendLike(LikeGateway like)
