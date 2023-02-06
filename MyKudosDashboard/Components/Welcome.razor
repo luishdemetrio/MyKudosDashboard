@@ -266,19 +266,11 @@ else
     private void OpenSendKudosPanel()
     {
     
-        sendKudosPanel.Show((KudosRequest k) =>
+        sendKudosPanel.Show((KudosResponse k) =>
       {
           sendKudosIsHidden = true;
 
-          _kudos.Add(new KudosResponse()
-          {
-              From = k.From,
-              To = k.To,
-              Title = k.Title.Description,
-              Message = k.Message,
-              Likes = new(),
-              SendOn = DateTime.Now
-          });
+          _kudos.Add(k);
 
           StateHasChanged();
 
