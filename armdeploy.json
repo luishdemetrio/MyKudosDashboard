@@ -836,15 +836,6 @@
         "hostNameType": "Verified"
       }
     },
-    {
-      "type": "Microsoft.Web/sites/siteextensions",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('msgraph_appservice'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
-      ]
-    },
 
 
     {
@@ -1501,32 +1492,6 @@
       }
     },
 
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('notification_bot'), 'serverfarms')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "B1",
-        "tier": "Basic",
-        "size": "B1",
-        "family": "B",
-        "capacity": 1
-      },
-      "kind": "app",
-      "properties": {
-        "perSiteScaling": false,
-        "elasticScaleEnabled": false,
-        "maximumElasticWorkerCount": 1,
-        "isSpot": false,
-        "reserved": false,
-        "isXenon": false,
-        "hyperV": false,
-        "targetWorkerCount": 0,
-        "targetWorkerSizeId": 0,
-        "zoneRedundant": false
-      }
-    },
 
     {
       "type": "Microsoft.Web/sites",
@@ -1534,7 +1499,7 @@
       "name": "[variables('notification_bot')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', concat(variables('notification_bot'), 'serverfarms') )]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan') ) ]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('notification_bot_userAssignedIdentities'))]"
 
       ],
@@ -1593,7 +1558,7 @@
             "hostType": "Repository"
           }
         ],
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', concat(variables('notification_bot'), 'serverfarms') )]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
         "reserved": false,
         "isXenon": false,
         "hyperV": false,
@@ -1719,114 +1684,12 @@
         "hostNameType": "Verified"
       }
     },
-    {
-      "type": "Microsoft.Web/sites/siteextensions",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('notification_bot'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('notification_bot') )]"
-      ]
-    },
-
-    {
-      "type": "Microsoft.BotService/botServices",
-      "apiVersion": "2022-06-15-preview",
-      "name": "[variables('notification_bot')]",
-      "location": "global",
-      "sku": {
-        "name": "F0"
-      },
-      "kind": "azurebot",
-      "properties": {
-        "displayName": "[variables('notification_bot')]",
-        "iconUrl": "https://docs.botframework.com/static/devportal/client/images/bot-framework-default.png",
-        "endpoint": "[concat('https://', variables('notification_bot'), '.azurewebsites.net/api/messages')]",
-        "msaAppId": [ "parameters('notificationClientId')" ],
-        "luisAppIds": [],
-        "isStreamingSupported": false,
-        "schemaTransformationVersion": "1.3",
-        "tenantId": "[subscription().subscriptionId]",
-        "isCmekEnabled": false,
-        "disableLocalAuth": false
-      }
-    },
 
     {
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
       "apiVersion": "2022-01-31-preview",
       "name": "[variables('notification_bot_userAssignedIdentities')]",
       "location": "[parameters('location')]"
-    },
-
-    {
-      "type": "Microsoft.BotService/botServices/channels",
-      "apiVersion": "2022-06-15-preview",
-      "name": "[concat(variables('notification_bot'), '/DirectLineChannel')]",
-      "location": "global",
-      "dependsOn": [
-        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
-      ],
-      "properties": {
-        "properties": {
-          "sites": [
-            {
-              "siteName": "Default Site",
-              "isEnabled": true,
-              "isV1Enabled": true,
-              "isV3Enabled": true,
-              "isSecureSiteEnabled": false,
-              "isBlockUserUploadEnabled": false
-            }
-          ]
-        },
-        "channelName": "DirectLineChannel",
-        "location": "global"
-      }
-    },
-
-    {
-      "type": "Microsoft.BotService/botServices/channels",
-      "apiVersion": "2022-06-15-preview",
-      "name": "[concat(variables('notification_bot'), '/MsTeamsChannel')]",
-      "location": "global",
-      "dependsOn": [
-        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
-      ],
-      "properties": {
-        "properties": {
-          "enableCalling": false,
-          "isEnabled": true,
-          "deploymentEnvironment": "CommercialDeployment",
-          "acceptedTerms": false
-        },
-        "channelName": "MsTeamsChannel",
-        "location": "global"
-      }
-    },
-
-    {
-      "type": "Microsoft.BotService/botServices/channels",
-      "apiVersion": "2022-06-15-preview",
-      "name": "[concat(variables('notification_bot'), '/WebChatChannel')]",
-      "location": "global",
-      "dependsOn": [
-        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
-      ],
-      "properties": {
-        "properties": {
-          "sites": [
-            {
-              "siteName": "Default Site",
-              "isEnabled": true,
-              "isWebchatPreviewEnabled": true,
-              "isBlockUserUploadEnabled": false
-            }
-          ]
-        },
-        "channelName": "WebChatChannel",
-        "location": "global"
-      }
     },
 
     {
@@ -1851,6 +1714,100 @@
       ],
       "properties": {
         "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[variables('notification_bot')]",
+      "location": "global",
+      "sku": {
+        "name": "F0"
+      },
+      "kind": "azurebot",
+      "properties": {
+        "displayName": "Kudos",
+        "iconUrl": "[concat('//bot-framework.azureedge.net/bot-icons-v1/', variables('notification_bot'), '_6745svQaBtj4HRRGBiaAwdcy1Y1G4dC6d6Qo3Gj3Qb2l5.png')]",
+        "endpoint": "[concat('https://', variables('notification_bot'), '.azurewebsites.net/api/messages')]",
+        "msaAppId": "[parameters('notificationClientId')]",
+        "msaAppType": "MultiTenant",
+        "luisAppIds": [],
+        "isStreamingSupported": false,
+        "schemaTransformationVersion": "1.3",
+        "tenantId": "[subscription().tenantId]",
+        "isCmekEnabled": false,
+        "disableLocalAuth": false
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[concat(variables('notification_bot'), '/DirectLineChannel')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
+      ],
+      "properties": {
+        "properties": {
+          "sites": [
+            {
+              "siteName": "Default Site",
+              "isEnabled": true,
+              "isV1Enabled": true,
+              "isV3Enabled": true,
+              "isSecureSiteEnabled": false,
+              "isBlockUserUploadEnabled": false
+            }
+          ]
+        },
+        "etag": "W/\"99b91f987c775688b74c38e33e9575cf2/6/2023 12:05:11 AM\"",
+        "channelName": "DirectLineChannel",
+        "location": "global"
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[concat(variables('notification_bot'), '/WebChatChannel')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
+      ],
+      "properties": {
+        "properties": {
+          "sites": [
+            {
+              "siteName": "Default Site",
+              "isEnabled": true,
+              "isWebchatPreviewEnabled": true,
+              "isBlockUserUploadEnabled": false
+            }
+          ]
+        },
+        "etag": "W/\"42f8850a3ebf1627fa1f1fa90fc2047c2/6/2023 12:05:11 AM\"",
+        "channelName": "WebChatChannel",
+        "location": "global"
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2022-06-15-preview",
+      "name": "[concat(variables('notification_bot'), '/MsTeamsChannel')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.BotService/botServices', variables('notification_bot'))]"
+      ],
+      "properties": {
+        "properties": {
+          "enableCalling": false,
+          "incomingCallRoute": "graphPma",
+          "isEnabled": true,
+          "deploymentEnvironment": "CommercialDeployment",
+          "acceptedTerms": true
+        },
+        "etag": "W/\"bfd284d1a8e61ecf5c27ef9d858944e02/6/2023 12:17:43 AM\"",
+        "channelName": "MsTeamsChannel",
+        "location": "global"
       }
     }
 
