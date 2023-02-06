@@ -74,7 +74,7 @@ public class KudosController : Controller
                             {
                                 Id = like,
                                 Name = u.DisplayName,
-                                Photo = photo.photo
+                                Photo = $"data:image/png;base64,{photo.photo}"
                             }
                             
                         ));
@@ -94,8 +94,8 @@ public class KudosController : Controller
 
                         select new Models.KudosResponse(
                                 Id: kudo.Id,
-                                From: new Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = photoFrom.photo },
-                                To: new Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = photoTo.photo },
+                                From: new Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
+                                To: new Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
                                 Title: rec.Description,
                                 Message: kudo.Message,
                                 SendOn: kudo.Date,

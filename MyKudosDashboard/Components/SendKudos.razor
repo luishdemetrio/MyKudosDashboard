@@ -43,7 +43,7 @@
                          <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
                                            Debounce="500" style="witdh:80px"
-                                           >
+                                           ref=@_typeahead>
                             <SelectedTemplate >
                                 <div>
                                     <img src=@context.Photo
@@ -146,6 +146,8 @@
     [Parameter]
     public string UserPhoto { get; set; }
 
+    private BlazoredTypeahead<string, string> _typeahead;
+
     private IEnumerable<RecognitionViewModel> recognitions;
 
     private UserViewModel SelectedEmployee { get; set; }
@@ -156,11 +158,7 @@
     {
         await base.OnInitializedAsync();
 
-        //var settings = Settings.LoadSettings();
-        //GraphHelper.InitializeGraphForAppOnlyAuth(settings);
-
         recognitions = SendKudosView.GetRecognitions();
-
     }
 
     private void RecognitionClick(RecognitionViewModel recognition)
@@ -212,30 +210,37 @@
             );
 
         if (SendKudosView.Send(kudos))
-        {
+        {   
+            closeModalParameter?.Invoke(kudos);
+            ClearFields();
             Hide();
-            StateHasChanged();
+
         }
 
+
+    }
+
+    private void ClearFields()
+    {
         
     }
 
-    public delegate void CloseModalParameterButtonClick();
+    public delegate void CloseModalParameterButtonClick(KudosRequest kudos);
 
     public CloseModalParameterButtonClick closeModalParameter;
 
     private FluentDialog SendKudosFluentDialog;
-
-    
+        
 
     public void Show(CloseModalParameterButtonClick closeModalParameterButtonClick)
     {
+
+        SendKudosFluentDialog!.Show();
 
         closeModalParameter = closeModalParameterButtonClick;
 
         ModalHidden = false;
 
-        SendKudosFluentDialog!.Show();
        // await InvokeAsync(() => StateHasChanged());
 
     }
@@ -244,6 +249,9 @@
     {
         ModalHidden = true;
         SendKudosFluentDialog!.Hide();
+         
+        
+            
     }
 
     private void OnDismiss()

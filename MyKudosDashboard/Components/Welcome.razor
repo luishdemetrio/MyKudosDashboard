@@ -206,7 +206,6 @@ else
 
     UserInfo user;
 
-  //  string errorMessage;
     bool isInTeams;
     bool isLoading = true;
 
@@ -218,7 +217,7 @@ else
     private void OnOpenModalParameterButtonClick() => sendKudosIsHidden = false;
     private void OnCloseModalParameterButtonClick() => sendKudosIsHidden = true;
 
-    private IEnumerable<KudosResponse> kudos;
+    private List<KudosResponse> _kudos;
 
     private void OnDismiss()
     {
@@ -229,20 +228,17 @@ else
 
     private IEnumerable<KudosResponse> GetAllKudos()
     {
-
-        return kudos;
+        return _kudos;
     }
 
     private IEnumerable<KudosResponse> GetKudosToMe()
     {
-
-        return kudos.Where(k => k.To.Id == user.ObjectId);
+        return _kudos.Where(k => k.To.Id == user.ObjectId);
     }
 
     private IEnumerable<KudosResponse> GetKudosFromMe()
     {
-
-        return kudos.Where(k => k.From.Id == user.ObjectId);
+        return _kudos.Where(k => k.From.Id == user.ObjectId);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -259,29 +255,33 @@ else
 
                 userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
 
-                kudos = WelcomeView.GetKudos();
-
+                _kudos = WelcomeView.GetKudos().ToList();
             }
-            //else
-            //{
-            //    errorMessage = "Not running in Microsoft Teams.";
-            //}
 
             isLoading = false;
             StateHasChanged();
-
-
         }
     }
-       
-    private void OpenSendKudosPanel()
-    {
-       
 
-      sendKudosPanel.Show( () =>
+    private void OpenSendKudosPanel()
+    {       
+
+        sendKudosPanel.Show((KudosRequest k) =>
       {
           sendKudosIsHidden = true;
-      
+
+          _kudos.Add(new KudosResponse()
+          {
+              From = k.From,
+              To = k.To,
+              Title = k.Title.Description,
+              Message = k.Message,
+              Likes = new(),
+              SendOn = DateTime.Now
+          });
+
+          InvokeAsync(() => StateHasChanged());
+
       });
     }
 }
