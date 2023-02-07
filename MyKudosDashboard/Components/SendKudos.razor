@@ -137,8 +137,7 @@
                         {
                         <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
                        
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                       
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>                       
                         📩 Send                               
                         </button>
                         }else
@@ -254,15 +253,13 @@
     {
         isLoading = block;
         btnSendKudosDisabled = block;
-        // StateHasChanged();
+        StateHasChanged();
     }
 
     private async void SendKudosClick()
     {
         string kudosId = string.Empty;
         KudosRequest kudos = null;
-
-        
 
         var t = Task.Run(() =>
         {
