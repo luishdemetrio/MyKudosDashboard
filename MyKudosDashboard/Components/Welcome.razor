@@ -42,10 +42,10 @@ else
         <div class="row align-items-start" style="clear: both;height:90vh;">
             
 
-            <div class="col-2" style="height:100%;min-width:300px">
+            <div class="col-1" style="height:100%;min-width:300px">
 
                 <!-- PROFILE -->
-                <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
+                <div class="card col-12 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
 
                         <div class="card-header py-3">
                             <h4 class="my-0 fw-normal">🚀 Profile</h4>
@@ -89,7 +89,7 @@ else
                     </div>
                 </div>
 
-            <div class="col-4 " style="height:100%">
+            <div class="col-5 " style="height:100%">
 
                 <div class="card mb-3 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
                     <div class="card-header py-3" >
@@ -192,7 +192,7 @@ else
                 </div>*@
 
             <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden UserProfile=@user UserPhoto=@userPhoto
-                       />
+                   sendKudosCallBack=@SendCallBack />
          
         </div>
 
@@ -217,7 +217,8 @@ else
     private void OnOpenModalParameterButtonClick() => sendKudosIsHidden = false;
     private void OnCloseModalParameterButtonClick() => sendKudosIsHidden = true;
 
-    private List<KudosResponse> _kudos;
+    private List<KudosResponse> _kudosList;
+
 
     private void OnDismiss()
     {
@@ -228,17 +229,17 @@ else
 
     private IEnumerable<KudosResponse> GetAllKudos()
     {
-        return _kudos.OrderByDescending(k=> k.SendOn);
+        return _kudosList.OrderByDescending(k => k.SendOn);
     }
 
     private IEnumerable<KudosResponse> GetKudosToMe()
     {
-        return _kudos.Where(k => k.To.Id == user.ObjectId).OrderByDescending(k => k.SendOn); 
+        return _kudosList.Where(k => k.To.Id == user.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
     private IEnumerable<KudosResponse> GetKudosFromMe()
     {
-        return _kudos.Where(k => k.From.Id == user.ObjectId).OrderByDescending(k => k.SendOn);
+        return _kudosList.Where(k => k.From.Id == user.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -255,29 +256,61 @@ else
 
                 userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
 
-                _kudos = WelcomeView.GetKudos().ToList();
+                _kudosList = WelcomeView.GetKudos().ToList();
+
             }
 
             isLoading = false;
             StateHasChanged();
         }
+
+
     }
 
+    private async  void SendCallBack(KudosResponse pKudos)
+    {
+        _kudosList = new();
+        _kudosList.Add(pKudos);
 
+        StateHasChanged();
+
+        await InvokeAsync(() =>
+        {
+            _kudosList = WelcomeView.GetKudos().ToList();
+            StateHasChanged();
+        });
+
+        //_kudosList = new();
+        //  _kudosList.Add(pKudos);
+
+        //List<KudosResponse> tempKudosList = new();
+
+
+
+        //foreach (var item in _kudosList)
+        //{
+
+        //    tempKudosList.Add(new KudosResponse()
+        //        {
+        //            Id = item.Id,
+        //            From = item.From,
+        //            To = item.To,
+        //            Message = item.Message,
+        //            Title = item.Title,
+        //            Likes = new(),
+        //            SendOn = item.SendOn
+        //        });
+        //}
+
+        //_kudosList = tempKudosList;
+        
+    }
     private void OpenSendKudosPanel()
     {
         sendKudosIsHidden = false;
 
-        sendKudosPanel.SendKudosModal(async (KudosResponse kudos) =>
-        {
-            await InvokeAsync(() =>
-            {
-                _kudos.Add(kudos);
-                StateHasChanged();
+        sendKudosPanel.SendKudosModal();
 
-            });
-
-        });
     }
 }
 

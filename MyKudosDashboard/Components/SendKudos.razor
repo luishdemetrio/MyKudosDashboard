@@ -119,7 +119,7 @@
                         
                         <div class="input-group">
                            
-                            <textarea  @ref=@txtMessage class="form-control" aria-label="With textarea" style="height:160px"
+                            <textarea class="form-control" aria-label="With textarea" style="height:160px"
                                       @onchange="KudosMessageChanged" value=@KudosMessage />
                                 
                             
@@ -135,14 +135,14 @@
 
                         @if (isLoading)
                         {
-                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
+                            <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
                        
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>                       
                         📩 Send                               
                         </button>
                         }else
                         {
-                            <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
+                            <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
                                 📩 Send
                             </button>
                         }
@@ -175,7 +175,6 @@
     [Parameter]
     public string UserPhoto { get; set; }
 
-
     private bool isLoading = false;
     private bool btnSendKudosDisabled = false;
 
@@ -185,14 +184,12 @@
 
     private string KudosMessage;
 
-    public delegate void SendKudosCallBack(KudosResponse kudos);
+    public delegate void SendKudosCallBack(KudosResponse pKudos);
 
-
-    public SendKudosCallBack sendKudosCallBack;
+    [Parameter]
+    public SendKudosCallBack sendKudosCallBack { get; set; }
 
     private FluentDialog SendKudosFluentDialog;
-
-    private ElementReference txtMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,30 +198,24 @@
         recognitions = SendKudosView.GetRecognitions();
     }
 
-
-
-    public async void SendKudosModal(SendKudosCallBack pSendKudosCallBack)
+    
+    public void SendKudosModal()
     {
 
-        sendKudosCallBack = pSendKudosCallBack;
-
+        //sendKudosCallBack = pSendKudosCallBack;
+        
         KudosMessage = string.Empty;
 
-        await InvokeAsync(() =>
-        {
-            SelectedEmployee = null;
+        //await InvokeAsync(() =>
+        //{
+        SelectedEmployee = null;
 
-            ModalHidden = false;
-            KudosMessage = string.Empty;
+        ModalHidden = false;
+        KudosMessage = string.Empty;
 
-            StateHasChanged();
-        });
-
-       
-       
+        InvokeAsync(StateHasChanged);
+        //});
     }
-
-
 
     private void RecognitionClick(RecognitionViewModel recognition)
     {
@@ -253,12 +244,13 @@
     {
         isLoading = block;
         btnSendKudosDisabled = block;
-        StateHasChanged();
+        
     }
 
-    private async void SendKudosClick()
+    private async void SendKudosClick( )
     {
         string kudosId = string.Empty;
+
         KudosRequest kudos = null;
 
         var t = Task.Run(() =>
@@ -271,8 +263,9 @@
 
                 return;
             }
-            
+
             BlockSendButton(true);
+            InvokeAsync(() => StateHasChanged());
 
             kudos = new(
                     From: new Person()
@@ -303,27 +296,24 @@
 
         if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
         {
-            //var k = new KudosResponse()
-            //    {
-            //        Id = kudosId.ToString(),
-            //        From = kudos.From,
-            //        To = kudos.To,
-            //        Title = kudos.Title.Description,
-            //        Message = kudos.Message,
-            //        Likes = new(),
-            //        SendOn = DateTime.Now
-            //    };
-
-            //sendKudosCallBack?.Invoke(k);
-
-            BlockSendButton(false);
-            ClearFields();
-            Hide();
+            var k = new KudosResponse()
+                {
+                    Id = kudosId.ToString(),
+                    From = kudos.From,
+                    To = kudos.To,
+                    Title = kudos.Title.Description,
+                    Message = kudos.Message,
+                    Likes = new(),
+                    SendOn = DateTime.Now
+                };
 
             StateHasChanged();
 
-            
+            sendKudosCallBack?.Invoke(k);
            
+            BlockSendButton(false);
+            ClearFields();
+            Hide();
 
         }
     }
