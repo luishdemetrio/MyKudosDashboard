@@ -2,6 +2,7 @@
 @using MyKudosDashboard.Models;
 
 @inject ISendKudosView SendKudosView;
+@inject IJSRuntime JSRuntime;
 
 <style>
 
@@ -27,7 +28,9 @@
 
 <FluentDialog   @ref=SendKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true" 
-                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;" >
+                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;"   
+                Hidden=@ModalHidden 
+>
 
 <div style="margin:10px;">
 
@@ -43,7 +46,8 @@
                          <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
                                            Debounce="500" style="witdh:80px"
-                                           ref=@_typeahead>
+                                           
+                                           >
                             <SelectedTemplate >
                                 <div>
                                     <img src=@context.Photo
@@ -71,7 +75,7 @@
                 <tr>
                     <td scope="row">
 
-                        <p style="margin-bottom: 5px;">Title</p>
+                        <p style="margin-bottom: 5px;">Category</p>
                         
                         <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient"  >
 
@@ -89,9 +93,6 @@
                                             <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:0px" @onclick=@(() => RecognitionClick(item))>@item.Description</span>
                                             </div>
                                         </div>
-                                    
-                                
-                                
                             }
 
 
@@ -108,7 +109,8 @@
                         
                         <div class="input-group">
                            
-                            <textarea class="form-control" aria-label="With textarea" style="height:160px" @onchange="KudosMessageChanged"  ></textarea>
+                            <textarea class="form-control" aria-label="With textarea" style="height:160px" @onchange="KudosMessageChanged" 
+                            required></textarea>
                         </div>
 
                     </td>
@@ -118,7 +120,17 @@
                 <tr>
                    
                     <td scope="row" >
-                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick>📩 Send</button>
+
+                        
+                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        }
+                        📩 Send                               
+                        </button>
+                        
+
                         <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=Hide>✖️ Cancel</button>
 
                     </td>
@@ -146,7 +158,9 @@
     [Parameter]
     public string UserPhoto { get; set; }
 
-    private BlazoredTypeahead<string, string> _typeahead;
+
+    private bool isLoading = false;
+    private bool btnSendKudosDisabled = false;
 
     private IEnumerable<RecognitionViewModel> recognitions;
 
@@ -154,12 +168,31 @@
 
     private string KudosMessage;
 
+    public delegate void SendKudosCallBack(KudosResponse kudos);
+
+
+    public SendKudosCallBack sendKudosCallBack;
+
+    private FluentDialog SendKudosFluentDialog;
+
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         recognitions = SendKudosView.GetRecognitions();
     }
+
+
+    public void SendKudosModal(SendKudosCallBack pSendKudosCallBack)
+    {
+        sendKudosCallBack = pSendKudosCallBack;
+
+        ModalHidden = false;
+        StateHasChanged();
+    }
+
+
 
     private void RecognitionClick(RecognitionViewModel recognition)
     {
@@ -183,57 +216,86 @@
         KudosMessage = args.Value.ToString();
     }
 
-    private void SendKudosClick()
+
+    private void BlockSendButton(bool block)
     {
+        isLoading = block;
+        btnSendKudosDisabled = block;
+        // StateHasChanged();
+    }
 
-        var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
-
-        KudosRequest kudos = new(
-                From: new Person()
-                {
-                    Id = UserProfile.ObjectId,
-                    Name = UserProfile.DisplayName,
-                    Photo = UserPhoto
-                },
-                To: new Person()
-                {
-                    Id = SelectedEmployee.Id,
-                    Name = SelectedEmployee.Name,
-                    Photo = SelectedEmployee.Photo
-                },
-                Title : new Reward( 
-                    Id:  recognition.Id, 
-                    Description: recognition.Description 
-                ),
-                Message : KudosMessage ,
-                SendOn : DateTime.Now
-            );
-
-        string kudosId = SendKudosView.Send(kudos);
+    private async void SendKudosClick()
+    {
+        string kudosId = string.Empty;
+        KudosRequest kudos = null;
 
         
-        if (string.IsNullOrEmpty(kudosId))
+
+        var t = Task.Run(() =>
         {
-            var k = new KudosResponse()
-                {
-                    Id = kudosId.ToString(),
-                    From = kudos.From,
-                    To = kudos.To,
-                    Title = kudos.Title.Description,
-                    Message = kudos.Message,
-                    Likes = new(),
-                    SendOn = DateTime.Now
-                };
+            var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
 
+            if (recognition == null || SelectedEmployee == null || string.IsNullOrEmpty(KudosMessage))
+            {
+                JSRuntime.InvokeVoidAsync("alert", "Please inform all fields!");
+
+                return;
+            }
             
-            closeModalParameter?.Invoke(k);
+            BlockSendButton(true);
 
+            kudos = new(
+                    From: new Person()
+                    {
+                        Id = UserProfile.ObjectId,
+                        Name = UserProfile.DisplayName,
+                        Photo = UserPhoto
+                    },
+                    To: new Person()
+                    {
+                        Id = SelectedEmployee.Id,
+                        Name = SelectedEmployee.Name,
+                        Photo = SelectedEmployee.Photo
+                    },
+                    Title : new Reward( 
+                        Id:  recognition.Id, 
+                        Description: recognition.Description 
+                    ),
+                    Message : KudosMessage ,
+                    SendOn : DateTime.Now
+                );
+
+            kudosId = SendKudosView.Send(kudos);
+
+        });
+
+        await t;
+
+        if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
+        {
+            //var k = new KudosResponse()
+            //    {
+            //        Id = kudosId.ToString(),
+            //        From = kudos.From,
+            //        To = kudos.To,
+            //        Title = kudos.Title.Description,
+            //        Message = kudos.Message,
+            //        Likes = new(),
+            //        SendOn = DateTime.Now
+            //    };
+
+            //sendKudosCallBack?.Invoke(k);
+
+            BlockSendButton(false);
             ClearFields();
             Hide();
 
+            StateHasChanged();
+
+            
+           
+
         }
-
-
     }
 
     private void ClearFields()
@@ -241,25 +303,7 @@
         
     }
 
-    public delegate void CloseModalParameterButtonClick(KudosResponse kudos);
-
-    public CloseModalParameterButtonClick closeModalParameter;
-
-    private FluentDialog SendKudosFluentDialog;
-        
-
-    public void Show(CloseModalParameterButtonClick closeModalParameterButtonClick)
-    {
-
-        SendKudosFluentDialog!.Show();
-
-        closeModalParameter = closeModalParameterButtonClick;
-
-        ModalHidden = false;
-
-       // await InvokeAsync(() => StateHasChanged());
-
-    }
+    
 
     public void Hide()
     {

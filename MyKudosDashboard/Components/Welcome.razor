@@ -39,7 +39,6 @@ else
     <div class="welcome page" style="padding-top:0px">
 
          
-
         <div class="row align-items-start" style="clear: both;height:90vh;">
             
 
@@ -192,7 +191,8 @@ else
                     </div>
                 </div>*@
 
-            <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden UserProfile=@user UserPhoto=@userPhoto />
+            <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden UserProfile=@user UserPhoto=@userPhoto
+                       />
          
         </div>
 
@@ -263,18 +263,21 @@ else
         }
     }
 
+
     private void OpenSendKudosPanel()
     {
-    
-        sendKudosPanel.Show((KudosResponse k) =>
-      {
-          sendKudosIsHidden = true;
+        sendKudosIsHidden = false;
 
-          _kudos.Add(k);
+        sendKudosPanel.SendKudosModal(async (KudosResponse kudos) =>
+        {
+            await InvokeAsync(() =>
+            {
+                _kudos.Add(kudos);
+                StateHasChanged();
 
-          StateHasChanged();
+            });
 
-      });
+        });
     }
 }
 
