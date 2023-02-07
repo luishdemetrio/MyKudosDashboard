@@ -209,10 +209,10 @@
                 SendOn : DateTime.Now
             );
 
-        Guid kudosId = SendKudosView.Send(kudos);
+        string kudosId = SendKudosView.Send(kudos);
 
         
-        if (kudosId != Guid.Empty)
+        if (string.IsNullOrEmpty(kudosId))
         {
             var k = new KudosResponse()
                 {

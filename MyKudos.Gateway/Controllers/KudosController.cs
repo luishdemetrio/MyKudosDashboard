@@ -111,10 +111,10 @@ public class KudosController : Controller
 
     
     [HttpPost(Name = "SendKudos")]
-    public IActionResult Post([FromBody] Models.KudosRequest kudos)
+    public string Post([FromBody] Models.KudosRequest kudos)
     {
 
-        _kudosService.Send(kudos);
+       string kudosId = _kudosService.Send(kudos);
 
         string userManagerId = _graphService.GetUserManager(kudos.To.Id);
 
@@ -129,7 +129,7 @@ public class KudosController : Controller
                 SendOn : kudos.SendOn
                 ));
 
-        return Ok(kudos);
+        return kudosId;
     }
 
     

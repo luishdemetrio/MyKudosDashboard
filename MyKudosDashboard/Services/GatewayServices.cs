@@ -66,9 +66,9 @@ public class GatewayService : IGatewayService
     }
 
 
-    public Guid SendKudos(KudosRequest kudos)
+    public string SendKudos(KudosRequest kudos)
     {
-        Guid kudosId = new();
+        string kudosId = string.Empty;
 
         var uri = $"{_gatewayServiceUrl}kudos";
 
@@ -90,7 +90,7 @@ public class GatewayService : IGatewayService
 
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            kudosId = JsonConvert.DeserializeObject<Guid>(response.Content);
+            kudosId = JsonConvert.DeserializeObject<string>(response.Content);
         }
         
         return kudosId;

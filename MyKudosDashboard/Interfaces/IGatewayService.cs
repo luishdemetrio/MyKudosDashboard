@@ -6,7 +6,7 @@ public interface IGatewayService
 {
     IEnumerable<RecognitionViewModel> GetRecognitions();
 
-    Guid SendKudos(KudosRequest kudos);
+    string SendKudos(KudosRequest kudos);
 
     IEnumerable<KudosResponse> GetKudos();
 
