@@ -45,10 +45,10 @@
                 </div>
 
                 <div style="float:right">
-                    <FluentButton style="margin-left:20px;">
+                   @* <FluentButton style="margin-left:20px;">
                         <FluentIcon Name="@FluentIcons.CodeText" Slot="start" Size="@IconSize.Size16" Filled=false />
                         Read more
-                    </FluentButton>
+                    </FluentButton>*@
                    
                     <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id))>
                         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" 
@@ -77,10 +77,10 @@
                     </FluentTooltip>
 
 
-                    <FluentButton style="margin-left:20px;">
+                  @*  <FluentButton style="margin-left:20px;">
                         <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
                         0
-                    </FluentButton>
+                    </FluentButton>*@
                 </div>
 
 
