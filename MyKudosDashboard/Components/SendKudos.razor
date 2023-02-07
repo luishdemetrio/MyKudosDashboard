@@ -24,6 +24,15 @@
         --scroll-fade-next: var(--fill-color);
         --scroll-fade-previous: var(--fill-color)
     }
+
+    .top-align {
+        --scroll-align: flex-start
+    }
+
+    .bottom-align {
+        --scroll-align: flex-end
+    }
+
 </style>
 
 <FluentDialog   @ref=SendKudosFluentDialog
@@ -88,9 +97,10 @@
 
 
                                 <div class="@(item.IsSelected ? "card border border-primary" : "card")" style="width:@(@size.Width + 40)px;height: 55px">
-                                            <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:medium">
-                                            <h3 style="float: left;">@item.Emoji</h3>
-                                            <span class="btn stretched-link" style="float: right;padding-top:5px;padding-left:0px" @onclick=@(() => RecognitionClick(item))>@item.Description</span>
+                                            <div    style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:medium">
+                                            <h3     style="float: left;">@item.Emoji</h3>
+                                            <span   class="btn stretched-link" style="float: right;padding-top:5px;padding-left:0px" 
+                                                    @onclick=@(() => RecognitionClick(item))>@item.Description</span>
                                             </div>
                                         </div>
                             }
@@ -109,8 +119,10 @@
                         
                         <div class="input-group">
                            
-                            <textarea class="form-control" aria-label="With textarea" style="height:160px" @onchange="KudosMessageChanged" 
-                            required></textarea>
+                            <textarea  @ref=@txtMessage class="form-control" aria-label="With textarea" style="height:160px"
+                                      @onchange="KudosMessageChanged" value=@KudosMessage />
+                                
+                            
                         </div>
 
                     </td>
@@ -121,15 +133,21 @@
                    
                     <td scope="row" >
 
-                        
-                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
                         @if (isLoading)
                         {
+                        <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
+                       
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        }
+                       
                         📩 Send                               
                         </button>
-                        
+                        }else
+                        {
+                            <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=SendKudosClick disabled=@btnSendKudosDisabled>
+                                📩 Send
+                            </button>
+                        }
+
 
                         <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=Hide>✖️ Cancel</button>
 
@@ -175,6 +193,7 @@
 
     private FluentDialog SendKudosFluentDialog;
 
+    private ElementReference txtMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -184,12 +203,26 @@
     }
 
 
-    public void SendKudosModal(SendKudosCallBack pSendKudosCallBack)
+
+    public async void SendKudosModal(SendKudosCallBack pSendKudosCallBack)
     {
+
         sendKudosCallBack = pSendKudosCallBack;
 
-        ModalHidden = false;
-        StateHasChanged();
+        KudosMessage = string.Empty;
+
+        await InvokeAsync(() =>
+        {
+            SelectedEmployee = null;
+
+            ModalHidden = false;
+            KudosMessage = string.Empty;
+
+            StateHasChanged();
+        });
+
+       
+       
     }
 
 
