@@ -27,9 +27,7 @@ public class KudosService : IKudosService
 
     public Guid Send(KudosLog kudos)
     {
-        //TODO: need to change here to send a message instead of saving in the repository
-
-
+       
         //var createTransferCommand = new CreateSendKudosCommand
         //    (
         //       fromPersonId: kudos.FromPersonId,
