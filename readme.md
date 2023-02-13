@@ -19,6 +19,8 @@ The App sends out notification cards to the employee who received the "Kudos" re
 
 ## Legal notice
 
+The images used in this repository are from the "One Piece" anime and are the property of the original copyright holder. These images are used for illustration purposes only and are not intended for commercial use. All rights to the images are reserved to the original copyright holder and usage of these images does not imply any affiliation or endorsement by the copyright holder. The creator of this repository claims no rights to the images and acknowledges the original copyright holder's exclusive rights to the images.
+
 This app template is provided under the [MIT License](https://github.com/OfficeDev/OfficeDev/microsoft-teams-stickers-app/blob/master/LICENSE) terms.  In addition to these terms, by using this app template you agree to the following:
 
 - You, not Microsoft, will license the use of your app to users or organization. 
