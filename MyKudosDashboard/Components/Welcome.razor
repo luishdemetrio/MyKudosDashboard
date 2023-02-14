@@ -18,6 +18,11 @@
         <FluentProgressRing />
     </div>
 }
+else if (!isInTeams ||! string.IsNullOrEmpty(errorMessage)){
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        @errorMessage
+    </div>
+}
 else
 {
 
@@ -208,6 +213,7 @@ else
 
     bool isInTeams;
     bool isLoading = true;
+    string errorMessage = string.Empty;
 
     private string userPhoto;
 
@@ -249,15 +255,35 @@ else
         if (firstRender)
         {
             isInTeams = await MicrosoftTeams.IsInTeams();
+            errorMessage = string.Empty;
 
             if (isInTeams)
             {
-                user = await teamsUserCredential.GetUserInfoAsync();
+                try
+                {
+                    user = await teamsUserCredential.GetUserInfoAsync();
+                }
+                catch
+                {
+                    errorMessage = "You don't have access!";
+                }
+               
 
-                userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
+                if (user == null)
+                {
+                    errorMessage = "You don't have access!";
+                }
+                else
+                {
+                    userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
 
-                _kudosList = WelcomeView.GetKudos().ToList();
+                    _kudosList = WelcomeView.GetKudos().ToList();
+                }                
 
+            }
+            else
+            {
+                errorMessage = "Not running in Microsoft Teams!";
             }
 
             isLoading = false;
