@@ -1,7 +1,6 @@
-﻿namespace MyKudos.Gateway.Interfaces
+﻿namespace MyKudos.Gateway.Interfaces;
+
+public interface IRecognitionService
 {
-    public interface IRecognitionService
-    {
-        IEnumerable<Models.Recognition> GetRecognitions();
-    }
+    Task<IEnumerable<Models.Recognition>> GetRecognitionsAsync();
 }

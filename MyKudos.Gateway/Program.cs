@@ -1,5 +1,6 @@
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Services;
+using MyKudos.Gateway.Services.Rest;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddSingleton<IGraphService, GraphServiceRest>();
 builder.Services.AddSingleton<IRecognitionService, RecognitionServiceRest>();
 builder.Services.AddSingleton<IKudosService, KudosServiceRest>();
 builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
+builder.Services.AddSingleton<IRestServiceToken, RestServiceToken>();
 
 builder.Services.AddSwaggerGen(c =>
 {

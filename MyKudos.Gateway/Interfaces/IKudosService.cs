@@ -4,10 +4,10 @@ namespace MyKudos.Gateway.Interfaces
 {
     public interface IKudosService
     {
-        IEnumerable<Models.Kudos> GetKudos();
+        Task<IEnumerable<Models.Kudos>> GetKudosAsync();
 
-        string Send(Models.KudosRequest kudos);
+        Task<string> SendAsync(Models.KudosRequest kudos);
 
-        bool SendLike(LikeGateway like);
+        Task<bool> SendLikeAsync(LikeGateway like);
     }
 }

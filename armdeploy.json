@@ -1074,7 +1074,11 @@
             "RecognitionServiceUrl": "[concat( concat('https://', variables('recognition_appservice')), '.azurewebsites.net/')]",
             "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
-            "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]"
+            "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
+            "ClientId": "[parameters('dashboardAppClientId')]",
+            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TenantId": "[subscription().tenantId]",
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net'), concat(parameters('dashboardAppClientId'), '/.default') )]"
 
           }
         },
@@ -1420,7 +1424,12 @@
             "TeamsFx__Authentication__ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('teams_appservice')) , '.azurewebsites.net/auth-start.html')]",
             "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', subscription().tenantId)]",
-            "GatewayServiceUrl": "[concat( concat('https://', variables('gateway_appservice')) , '.azurewebsites.net/')]"
+            "GatewayServiceUrl": "[concat( concat('https://', variables('gateway_appservice')) , '.azurewebsites.net/')]",
+            "ClientId": "[parameters('dashboardAppClientId')]",
+            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TenantId": "[subscription().tenantId]",
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net'), concat(parameters('dashboardAppClientId'), '/.default') )]"
+
 
           }
         },

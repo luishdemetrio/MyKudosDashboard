@@ -9,22 +9,28 @@ public class GraphServiceRest : IGraphService
 {
        
     private readonly string _graphServiceUrl;
-        
-    public GraphServiceRest(IConfiguration configuration)
+
+    private readonly IRestServiceToken _serviceToken;
+
+    public GraphServiceRest(IConfiguration configuration, IRestServiceToken serviceToken)
     {   
         _graphServiceUrl = configuration["graphServiceUrl"];
 
+        _serviceToken = serviceToken;
+
     }
 
-    public Task<GraphUsers> GetUsers(string name)
+    public async Task<GraphUsers> GetUsers(string name)
     {
         GraphUsers r = new();
 
         var client = new RestClient($"{_graphServiceUrl}user/?name={name}");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
@@ -34,20 +40,22 @@ public class GraphServiceRest : IGraphService
 
         }
 
-        return Task.FromResult(r);
+        return r;
     }
 
 
-    public Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] usersId)
+    public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] usersId)
     {
 
         List<GraphUserPhoto> photos = new(); 
 
         var client = new RestClient($"{_graphServiceUrl}photos");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");
@@ -64,18 +72,20 @@ public class GraphServiceRest : IGraphService
 
         }
 
-        return Task.FromResult(photos.AsEnumerable());
+        return photos.AsEnumerable();
     }
 
-    public Task<string> GetUserPhoto(string userid)
+    public async Task<string> GetUserPhoto(string userid)
     {
         string userPhoto = string.Empty;
 
         var client = new RestClient($"{_graphServiceUrl}photo/?userid={userid}");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
@@ -85,20 +95,22 @@ public class GraphServiceRest : IGraphService
 
         }
 
-        return Task.FromResult(userPhoto);
+        return userPhoto;
 
     }
 
-    public  Task<List<Models.GraphUser>> GetUserInfo(string[] users)
+    public async Task<List<Models.GraphUser>> GetUserInfo(string[] users)
     {
 
         var result = new List<Models.GraphUser>();
 
         var client = new RestClient($"{_graphServiceUrl}userinfo");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");
@@ -116,22 +128,24 @@ public class GraphServiceRest : IGraphService
 
         }
 
-        return Task.FromResult(result);
+        return result;
     }
 
-    public string GetUserManager(string userid)
+    public async Task<string> GetUserManagerAsync(string userid)
     {
         string manager = string.Empty;
 
         var client = new RestClient($"{_graphServiceUrl}manager/?userid={userid}");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (response.IsSuccessful)
         {
             manager = JsonConvert.DeserializeObject<string>(response.Content);
 

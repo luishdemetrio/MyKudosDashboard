@@ -5,7 +5,7 @@ namespace MyKudosDashboard.Interfaces;
 public interface ISendKudosView
 {
 
-    IEnumerable<RecognitionViewModel> GetRecognitions();
+    Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync();
 
     IEnumerable<UserViewModel> GetUsers(string name);
 

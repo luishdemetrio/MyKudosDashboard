@@ -4,7 +4,7 @@ namespace MyKudosDashboard.Interfaces;
 
 public interface IGatewayService
 {
-    IEnumerable<RecognitionViewModel> GetRecognitions();
+    Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync();
 
     string SendKudos(KudosRequest kudos);
 

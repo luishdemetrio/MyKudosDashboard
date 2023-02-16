@@ -24,7 +24,7 @@ public class LikesController : Controller
     public IActionResult SendLike([FromBody] LikeGateway like)
     {
 
-        var kudos = _kudosService.SendLike(like); 
+        var kudos = _kudosService.SendLikeAsync(like); 
 
         return Ok();
     }

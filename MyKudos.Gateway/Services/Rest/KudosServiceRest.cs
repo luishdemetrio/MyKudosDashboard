@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph;
-using MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
 using MyKudos.Kudos.Domain.Models;
 using Newtonsoft.Json;
@@ -11,22 +10,26 @@ public class KudosServiceRest: IKudosService
 {
 
     private readonly string _kudosServiceUrl;
+    private readonly IRestServiceToken _serviceToken;
 
-    public KudosServiceRest(IConfiguration config)
+    public KudosServiceRest(IConfiguration config, IRestServiceToken serviceToken)
     {
         _kudosServiceUrl = config["kudosServiceUrl"];
+        _serviceToken = serviceToken;
     }
 
-    public IEnumerable<Models.Kudos> GetKudos()
+    public async Task<IEnumerable<Models.Kudos>> GetKudosAsync()
     {
 
         List<Models.Kudos> result = new();
 
         var client = new RestClient($"{_kudosServiceUrl}kudos");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
@@ -41,15 +44,17 @@ public class KudosServiceRest: IKudosService
 
     }
 
-    public string Send(Models.KudosRequest kudos)
+    public async Task<string> SendAsync(Models.KudosRequest kudos)
     {
         var result = string.Empty;
 
         var client = new RestClient($"{_kudosServiceUrl}kudos");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
-        request.Method = Method.Post;
+        var request = new RestRequest();
+        request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");
@@ -78,13 +83,15 @@ public class KudosServiceRest: IKudosService
         return result;
     }
 
-    public bool SendLike(LikeGateway like)
+    public async Task<bool> SendLikeAsync(LikeGateway like)
     {
         var client = new RestClient($"{_kudosServiceUrl}like");
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");

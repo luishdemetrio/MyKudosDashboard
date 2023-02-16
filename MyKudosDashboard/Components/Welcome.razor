@@ -7,20 +7,18 @@
 @inject TeamsFx teamsfx
 @inject TeamsUserCredential teamsUserCredential
 @inject MicrosoftTeams MicrosoftTeams
-@inject IWebHostEnvironment HostEnvironment
-@inject IConfiguration Configuration
-@inject NavigationManager MyNavigationManager
+
 @inject IWelcomeView WelcomeView;
 
-@if (isLoading)
+@if (_isLoading)
 {
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
         <FluentProgressRing />
     </div>
 }
-else if (!isInTeams ||! string.IsNullOrEmpty(errorMessage)){
+else if (!_isInTeams ||! string.IsNullOrEmpty(_errorMessage)){
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-        @errorMessage
+        @_errorMessage
     </div>
 }
 else
@@ -38,8 +36,6 @@ else
         .div2 {
         }
     </style>
-
-
 
     <div class="welcome page" style="padding-top:0px">
 
@@ -60,11 +56,11 @@ else
 
                             <div class="profile" >
                                 <div class="avatar" style="float:none" >
-                                    <img src=@userPhoto style="height:80px;width:80px;border-radius: 50%;align-content:left" />                                
+                                    <img src=@_userPhoto style="height:80px;width:80px;border-radius: 50%;align-content:left" />                                
                                 </div>
 
                                 <div class="info" >
-                                    <h5>@user.DisplayName</h5>
+                                    <h5>@_user.DisplayName</h5>
                                    @* <h2  class="card-title pricing-card-title">
                                         500
                                         <small class="text-muted fw-light">XP</small>                                    
@@ -110,13 +106,13 @@ else
                             <FluentTab Text="Kudos from me" />
 
                             <FluentTabPanel >
-                                <KudosList kudos=@GetAllKudos() User=@user UserPhoto=@userPhoto />
+                                <KudosList kudos=@GetAllKudos() User=@_user UserPhoto=@_userPhoto />
                             </FluentTabPanel>
                             <FluentTabPanel>
-                                <KudosList kudos=@GetKudosToMe() User=@user UserPhoto=@userPhoto />
+                                <KudosList kudos=@GetKudosToMe() User=@_user UserPhoto=@_userPhoto />
                             </FluentTabPanel>
                             <FluentTabPanel >
-                                <KudosList kudos=@GetKudosFromMe() User=@user UserPhoto=@userPhoto />
+                                <KudosList kudos=@GetKudosFromMe() User=@_user UserPhoto=@_userPhoto />
                             </FluentTabPanel>
                             
                     </FluentTabs>
@@ -196,7 +192,7 @@ else
                     </div>
                 </div>*@
 
-            <SendKudos @ref=sendKudosPanel ModalHidden=@sendKudosIsHidden UserProfile=@user UserPhoto=@userPhoto
+            <SendKudos @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto
                    sendKudosCallBack=@SendCallBack />
          
         </div>
@@ -209,26 +205,26 @@ else
 
 @code {
 
-    UserInfo user;
+    UserInfo _user;
 
-    bool isInTeams;
-    bool isLoading = true;
-    string errorMessage = string.Empty;
+    bool _isInTeams;
+    bool _isLoading = true;
+    string _errorMessage = string.Empty;
 
-    private string userPhoto;
+    private string _userPhoto;
 
-    private SendKudos sendKudosPanel;
-    private bool sendKudosIsHidden = false;
+    private SendKudos _sendKudosPanel;
+    private bool _sendKudosIsHidden = false;
 
-    private void OnOpenModalParameterButtonClick() => sendKudosIsHidden = false;
-    private void OnCloseModalParameterButtonClick() => sendKudosIsHidden = true;
+    private void OnOpenModalParameterButtonClick() => _sendKudosIsHidden = false;
+    private void OnCloseModalParameterButtonClick() => _sendKudosIsHidden = true;
 
     private List<KudosResponse> _kudosList;
 
 
     private void OnDismiss()
     {
-        sendKudosIsHidden = true;
+        _sendKudosIsHidden = true;
 
     }
 
@@ -240,12 +236,12 @@ else
 
     private IEnumerable<KudosResponse> GetKudosToMe()
     {
-        return _kudosList.Where(k => k.To.Id == user.ObjectId).OrderByDescending(k => k.SendOn);
+        return _kudosList.Where(k => k.To.Id == _user.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
     private IEnumerable<KudosResponse> GetKudosFromMe()
     {
-        return _kudosList.Where(k => k.From.Id == user.ObjectId).OrderByDescending(k => k.SendOn);
+        return _kudosList.Where(k => k.From.Id == _user.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -254,42 +250,35 @@ else
 
         if (firstRender)
         {
-            isInTeams = await MicrosoftTeams.IsInTeams();
-            errorMessage = string.Empty;
+            _isInTeams = await MicrosoftTeams.IsInTeams();
+            _errorMessage = string.Empty;
 
-            if (isInTeams)
+            if (_isInTeams)
             {
                 try
                 {
-                    user = await teamsUserCredential.GetUserInfoAsync();
+                    _user = await teamsUserCredential.GetUserInfoAsync();
                 }
                 catch
                 {
-                    errorMessage = "You don't have access!";
-                }
-               
+                    _errorMessage = "You don't have access!";
+                }               
 
-                if (user == null)
-                {
-                    errorMessage = "You don't have access!";
-                }
-                else
-                {
-                    userPhoto = await WelcomeView.GetUserPhoto(user.ObjectId);
+                if (_user != null)
+                {                    
+                    _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
 
                     _kudosList = WelcomeView.GetKudos().ToList();
-                }                
-
+                }
             }
             else
             {
-                errorMessage = "Not running in Microsoft Teams!";
+                _errorMessage = "Not running in Microsoft Teams!";
             }
 
-            isLoading = false;
+            _isLoading = false;
             StateHasChanged();
         }
-
 
     }
 
@@ -333,9 +322,9 @@ else
     }
     private void OpenSendKudosPanel()
     {
-        sendKudosIsHidden = false;
+        _sendKudosIsHidden = false;
 
-        sendKudosPanel.SendKudosModal();
+        _sendKudosPanel.SendKudosModal();
 
     }
 }

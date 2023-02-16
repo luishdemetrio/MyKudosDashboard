@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MyKudosDashboard.Interfaces;
+﻿using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using RestSharp;
-using System.Text.Json;
+using Microsoft.Identity.Client;
 
 namespace MyKudosDashboard.Services;
 
@@ -12,12 +11,40 @@ public class GatewayService : IGatewayService
 
     private readonly string _gatewayServiceUrl;
 
+    private readonly string _clientId;
+    private readonly string _clientSecret;
+    private readonly string _tenantId;
+    private readonly string _exposedAPI;
+    private readonly IConfidentialClientApplication _confidentialClientApplication;
+
     public GatewayService(IConfiguration config)
     {
         _gatewayServiceUrl = config["GatewayServiceUrl"];
+
+        _clientId = config["ClientId"];
+        _clientSecret = config["ClientSecret"];
+        _tenantId = config["TenantId"];
+        _exposedAPI = config["ExposedApi"];
+
+        _confidentialClientApplication = ConfidentialClientApplicationBuilder.Create(_clientId)
+        .WithClientSecret(_clientSecret)
+        .WithAuthority(new Uri($"https://login.microsoftonline.com/{_tenantId}"))
+        .Build();
+
     }
 
-    public IEnumerable<RecognitionViewModel> GetRecognitions()
+
+    private async Task<string> GetAccessTokenAsync()
+    {
+        
+        var scopes = new string[] { _exposedAPI };
+
+        var result =  await _confidentialClientApplication.AcquireTokenForClient(scopes).ExecuteAsync();
+
+        return result.AccessToken;
+    }
+
+    public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
     {
 
         List<RecognitionViewModel> recognitions = new();
@@ -25,14 +52,17 @@ public class GatewayService : IGatewayService
         var uri = $"{_gatewayServiceUrl}recognition";
 
         var client = new RestClient(uri);
+                
+        var token = await GetAccessTokenAsync();
 
         var request = new RestRequest();
-
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
+
 
         RestResponse response = client.Execute(request);
 
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        if (response.IsSuccessful)
         {
             recognitions = JsonConvert.DeserializeObject<IEnumerable<RecognitionViewModel>>(response.Content).ToList();
 

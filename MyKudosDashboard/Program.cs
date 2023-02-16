@@ -1,4 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 using Microsoft.Fast.Components.FluentUI;
+using Microsoft.Identity.Client;
+using Microsoft.TeamsFx.Helper;
+using Microsoft.TeamsFx;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
@@ -8,6 +13,15 @@ using MyKudosDashboard.Views;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+//builder.Services.AddRazorPages(options =>
+//{
+//    options.Conventions.AuthorizeFolder("/tab");
+
+//});
+
+
+
+
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddTeamsFx(builder.Configuration.GetSection("TeamsFx"));
@@ -16,7 +30,6 @@ builder.Services.AddScoped<MicrosoftTeams>();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
-
 
 builder.Services.AddFluentUIComponents();
 
@@ -33,7 +46,7 @@ builder.Services.AddScoped<IKudosListView, KudosListView>();
 
 //Services
 
-builder.Services.AddScoped<IGatewayService, GatewayService>();
+builder.Services.AddSingleton<IGatewayService, GatewayService>();
 
 
 //// Add MS GRAPH services to the container.

@@ -14,9 +14,9 @@ public class SendKudosView : ISendKudosView
         _dashboardService = dashboardService;        
     }
 
-    public IEnumerable<RecognitionViewModel> GetRecognitions()
+    public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
     {
-        return _dashboardService.GetRecognitions();
+        return await _dashboardService.GetRecognitionsAsync();
     }
 
     public IEnumerable<UserViewModel> GetUsers(string name)

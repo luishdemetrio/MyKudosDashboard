@@ -1,6 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Grpc.Net.Client;
-using MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
 using Newtonsoft.Json;
 using RestSharp;
@@ -11,22 +9,26 @@ public class AgentNotificationService : IAgentNotificationService
 {
 
     private readonly string _agentServiceUrl;
+    private readonly IRestServiceToken _serviceToken;
 
-    public AgentNotificationService(IConfiguration config)
+    public AgentNotificationService(IConfiguration config, IRestServiceToken serviceToken)
     {
         _agentServiceUrl = config["agentServiceUrl"];
+        _serviceToken = serviceToken;
     }
 
-    public bool SendNotification(KudosNotification kudos)
+    public async Task<bool> SendNotificationAsync(KudosNotification kudos)
     {          
 
         var uri = $"{_agentServiceUrl}api/notification";
 
         var client = new RestClient(uri);
 
-        var request = new RestRequest();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
-        request.Method = RestSharp.Method.Post;
+        var request = new RestRequest();
+        request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");

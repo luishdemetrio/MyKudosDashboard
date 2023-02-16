@@ -17,7 +17,7 @@ public class KudosController : Controller
 
     private readonly IAgentNotificationService _agentNotificationService;
 
-    private List<Models.Recognition> _recognitions;
+    private IEnumerable<Models.Recognition> _recognitions;
 
     public KudosController(IGraphService graphService, IRecognitionService recognitionService, IKudosService kudosService, IAgentNotificationService agentNotificationService)
     {
@@ -28,14 +28,20 @@ public class KudosController : Controller
 
         _agentNotificationService = agentNotificationService;
 
-        _recognitions = _recognitionService.GetRecognitions().ToList();
+        _ = PopulateRecognitionsAsync();
 
     }
+
+    private async Task PopulateRecognitionsAsync()
+    {
+        _recognitions = await _recognitionService.GetRecognitionsAsync().ConfigureAwait(false);
+    }
+
 
     [HttpGet(Name = "GetKudos")]
     public async Task<IEnumerable<Models.KudosResponse>> Get()
     {       
-        var kudos = _kudosService.GetKudos();
+        var kudos = await _kudosService.GetKudosAsync().ConfigureAwait(false);
 
         var from= kudos.Select(u => u.FromPersonId).Distinct().ToList();
 
@@ -111,15 +117,15 @@ public class KudosController : Controller
 
     
     [HttpPost(Name = "SendKudos")]
-    public string Post([FromBody] Models.KudosRequest kudos)
+    public async Task<string> PostAsync([FromBody] Models.KudosRequest kudos)
     {
 
-       string kudosId = _kudosService.Send(kudos);
+       string kudosId = await _kudosService.SendAsync(kudos).ConfigureAwait(false);
 
-        string userManagerId = _graphService.GetUserManager(kudos.To.Id);
+        string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
 
-        _agentNotificationService.SendNotification(
+        await _agentNotificationService.SendNotificationAsync(
             new KudosNotification(                
                 From : kudos.From,
                 To : kudos.To,                 

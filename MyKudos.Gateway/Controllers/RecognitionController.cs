@@ -17,9 +17,9 @@ public class RecognitionController : ControllerBase
     }
 
     [HttpGet(Name = "GetRecognitions")]
-    public IEnumerable<Models.Recognition> Get()
+    public async Task<IEnumerable<Models.Recognition>> GetAsync()
     {
-        return _recognitionService.GetRecognitions();
+        return await _recognitionService.GetRecognitionsAsync();
 
     }
 
