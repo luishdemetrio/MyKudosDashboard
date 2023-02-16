@@ -200,12 +200,12 @@
         recognitions = await SendKudosView.GetRecognitionsAsync();
     }
 
-    
+
     public void SendKudosModal()
     {
 
         //sendKudosCallBack = pSendKudosCallBack;
-        
+
         KudosMessage = string.Empty;
 
         //await InvokeAsync(() =>
@@ -246,7 +246,7 @@
     {
         isLoading = block;
         btnSendKudosDisabled = block;
-        
+
     }
 
     private async void SendKudosClick( )
@@ -255,9 +255,9 @@
 
         KudosRequest kudos = null;
 
-        var t =  Task.Run(() =>
+        var t = Task.Run(() =>
         {
-            var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
+        var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
 
             if (recognition == null || SelectedEmployee == null || string.IsNullOrEmpty(KudosMessage))
             {
@@ -267,6 +267,7 @@
             }
 
             BlockSendButton(true);
+            
             InvokeAsync(() => StateHasChanged());
 
             kudos = new(
@@ -290,13 +291,16 @@
                     SendOn : DateTime.Now
                 );
 
-           
+            
+
+            
 
         });
 
         await t;
 
-        kudosId = await SendKudosView.Send(kudos).ConfigureAwait(false);
+        kudosId = await SendKudosView.Send(kudos);
+        
 
         if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
         {
