@@ -12,8 +12,8 @@ public class KudosListView : IKudosListView
         _gatewayService= gatewayService;
     }
 
-    public bool SendLike(Like like)
+    public async Task<bool> SendLikeAsync(Like like)
     {
-        return _gatewayService.SendLike(like);
+        return await _gatewayService.SendLike(like);
     }
 }

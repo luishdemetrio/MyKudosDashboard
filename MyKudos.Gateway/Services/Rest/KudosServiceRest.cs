@@ -53,7 +53,7 @@ public class KudosServiceRest: IKudosService
         var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
-        request.Method = Method.Get;
+        request.Method = Method.Post;
         request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");

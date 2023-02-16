@@ -132,14 +132,14 @@
 
         return filled;
     }
-    private void Like(string kudosId)
+    private async void Like(string kudosId)
     {
-        var success = KudosListView.SendLike(
+        var success = await KudosListView.SendLikeAsync(
             new Like(
                 KudosId: kudosId,
                 PersonId: User.ObjectId
             )
-        );
+        ).ConfigureAwait(false);
 
         if (success)
         {

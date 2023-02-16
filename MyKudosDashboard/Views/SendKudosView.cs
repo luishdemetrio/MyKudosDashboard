@@ -19,14 +19,14 @@ public class SendKudosView : ISendKudosView
         return await _dashboardService.GetRecognitionsAsync();
     }
 
-    public IEnumerable<UserViewModel> GetUsers(string name)
+    public async Task<IEnumerable<UserViewModel>> GetUsersAsync(string name)
     {
-        return _dashboardService.GetUsers(name);              
+        return await _dashboardService.GetUsers(name);              
     }
 
-    public string Send(KudosRequest kudos)
+    public async Task<string> Send(KudosRequest kudos)
     {
      
-        return _dashboardService.SendKudos(kudos);
+        return await _dashboardService.SendKudos(kudos);
     }
 }

@@ -13,9 +13,9 @@ public class WelcomeView : IWelcomeView
         _gatewayService = gatewayService;
     }
 
-    public IEnumerable<KudosResponse> GetKudos()
+    public async Task<IEnumerable<KudosResponse>> GetKudos()
     {
-        return _gatewayService.GetKudos();
+        return await _gatewayService.GetKudos();
     }
 
     public async Task<string> GetUserPhoto(string userid)

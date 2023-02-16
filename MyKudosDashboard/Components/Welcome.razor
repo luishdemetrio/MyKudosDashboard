@@ -268,7 +268,8 @@ else
                 {                    
                     _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
 
-                    _kudosList = WelcomeView.GetKudos().ToList();
+                    _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
+
                 }
             }
             else
@@ -289,11 +290,12 @@ else
 
         StateHasChanged();
 
-        await InvokeAsync(() =>
-        {
-            _kudosList = WelcomeView.GetKudos().ToList();
-            StateHasChanged();
-        });
+ //       await InvokeAsync(() =>
+        //{
+            _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
+           
+            await InvokeAsync(() => StateHasChanged());
+        //});
 
         //_kudosList = new();
         //  _kudosList.Add(pKudos);

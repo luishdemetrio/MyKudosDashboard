@@ -73,7 +73,7 @@ public class GatewayService : IGatewayService
     }
 
 
-    public IEnumerable<KudosResponse> GetKudos()
+    public async Task<IEnumerable<KudosResponse>> GetKudos()
     {
         List<KudosResponse> kudos = new();
 
@@ -81,9 +81,11 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var request = new RestRequest();
+        var token = await GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
@@ -96,7 +98,7 @@ public class GatewayService : IGatewayService
     }
 
 
-    public string SendKudos(KudosRequest kudos)
+    public async Task<string> SendKudos(KudosRequest kudos)
     {
         string kudosId = string.Empty;
 
@@ -104,9 +106,11 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var request = new RestRequest();
+        var token = await GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");
@@ -127,7 +131,7 @@ public class GatewayService : IGatewayService
 
     }
 
-    public IEnumerable<UserViewModel> GetUsers(string name)
+    public async Task<IEnumerable<UserViewModel>> GetUsers(string name)
     {
         List<UserViewModel> kudos = new();
 
@@ -135,9 +139,11 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var request = new RestRequest();
+        var token = await GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
@@ -149,7 +155,7 @@ public class GatewayService : IGatewayService
         return kudos;
     }
 
-    public Task<string> GetUserPhoto(string userid)
+    public async Task<string> GetUserPhoto(string userid)
     {
         string userPhoto = string.Empty;
 
@@ -157,9 +163,11 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var request = new RestRequest();
+        var token = await GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         RestResponse response = client.Execute(request);
 
@@ -168,18 +176,20 @@ public class GatewayService : IGatewayService
             userPhoto = JsonConvert.DeserializeObject<string>(response.Content);
         }
 
-        return Task.FromResult(userPhoto);
+        return userPhoto;
     }
 
-    public bool SendLike(Like like)
+    public async Task<bool> SendLike(Like like)
     {
         var uri = $"{_gatewayServiceUrl}likes";
 
         var client = new RestClient(uri);
 
-        var request = new RestRequest();
+        var token = await GetAccessTokenAsync();
 
+        var request = new RestRequest();
         request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");

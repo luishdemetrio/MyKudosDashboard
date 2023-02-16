@@ -6,13 +6,13 @@ public interface IGatewayService
 {
     Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync();
 
-    string SendKudos(KudosRequest kudos);
+    Task<string> SendKudos(KudosRequest kudos);
 
-    IEnumerable<KudosResponse> GetKudos();
+    Task<IEnumerable<KudosResponse>> GetKudos();
 
-    IEnumerable<UserViewModel> GetUsers(string name);
+    Task<IEnumerable<UserViewModel>> GetUsers(string name);
 
     Task<string> GetUserPhoto(string userid);
 
-    bool SendLike(Like like);
+    Task<bool> SendLike(Like like);
 }

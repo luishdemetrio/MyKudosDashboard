@@ -5,5 +5,5 @@ namespace MyKudosDashboard.Interfaces;
 public interface IKudosListView
 {
 
-    bool SendLike(Like like);
+    Task<bool> SendLikeAsync(Like like);
 }
