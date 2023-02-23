@@ -1139,7 +1139,9 @@
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
-            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net'), concat(parameters('dashboardAppClientId'), '/.default') )]"
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net'), concat(parameters('dashboardAppClientId'), '/.default') )]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebusname'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_TopicName": "kudosTopic"
 
           }
         },
