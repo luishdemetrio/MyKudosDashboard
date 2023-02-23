@@ -31,8 +31,7 @@ public record KudosNotification
     string ManagerId
     
 );
-    
- 
+
 
 
 public record KudosResponse(

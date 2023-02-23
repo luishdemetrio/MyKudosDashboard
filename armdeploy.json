@@ -167,11 +167,72 @@
 
     "notification_bot": "[concat(parameters('baseResourceName'), 'notification' )]",
 
-    "notification_bot_userAssignedIdentities": "[concat(variables('notification_bot'), '_userAssignedIdentities')]"
+    "notification_bot_userAssignedIdentities": "[concat(variables('notification_bot'), '_userAssignedIdentities')]",
+
+    "kudos_messaging": "[concat(parameters('baseResourceName'), 'messaging' )]",
+
+    "kudos_notificationreceiver": "[concat(parameters('baseResourceName'), 'notificationreceiver' )]",
+
+    "actionGroups_Application_Insights_Smart_Detection_name": "Application Insights Smart Detection",
+
+    "smartdetectoralertrules_failure_anomalies___kudosnotificationreceiver_name": "failure anomalies - kudosnotificationreceiver"
+
+    
+
+
 
 
   },
   "resources": [
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[variables('kudos_messaging')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "properties": {
+        "premiumMessagingPartitions": 0,
+        "minimumTlsVersion": "1.2",
+        "publicNetworkAccess": "Enabled",
+        "disableLocalAuth": false,
+        "zoneRedundant": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/authorizationrules",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('kudos_messaging'), '/RootManageSharedAccessKey')]",
+      "location": "[variables('kudos_messaging')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('kudos_messaging'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen",
+          "Manage",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('kudos_messaging'), '/default')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('kudos_messaging'))]"
+      ],
+      "properties": {
+        "publicNetworkAccess": "Enabled",
+        "defaultAction": "Allow",
+        "virtualNetworkRules": [],
+        "ipRules": []
+      }
+    },
 
     {
       "type": "Microsoft.Web/serverfarms",

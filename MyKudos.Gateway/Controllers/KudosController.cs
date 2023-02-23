@@ -15,18 +15,24 @@ public class KudosController : Controller
     private readonly IRecognitionService _recognitionService;
     private readonly IKudosService _kudosService;
 
-    private readonly IAgentNotificationService _agentNotificationService;
+    //private readonly IAgentNotificationService _agentNotificationService;
 
     private IEnumerable<Models.Recognition> _recognitions;
 
-    public KudosController(IGraphService graphService, IRecognitionService recognitionService, IKudosService kudosService, IAgentNotificationService agentNotificationService)
+    private IKudosQueue _kudosNotificationQueue;
+
+    
+    public KudosController(IGraphService graphService, IRecognitionService recognitionService, 
+                           IKudosService kudosService, IKudosQueue kudosQueue)
     {
         
         _graphService = graphService;
         _recognitionService = recognitionService;
         _kudosService = kudosService;
 
-        _agentNotificationService = agentNotificationService;
+        //_agentNotificationService = agentNotificationService;
+
+        _kudosNotificationQueue= kudosQueue;
 
         _ = PopulateRecognitionsAsync();
 
@@ -124,16 +130,15 @@ public class KudosController : Controller
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
-
-        await _agentNotificationService.SendNotificationAsync(
-            new KudosNotification(                
-                From : kudos.From,
-                To : kudos.To,                 
-                ManagerId : userManagerId,
-                Message : kudos.Message,
-                Title : kudos.Title,
-                SendOn : kudos.SendOn
+        await _kudosNotificationQueue.SendAsync(new KudosNotification(
+                From: kudos.From,
+                To: kudos.To,
+                ManagerId: userManagerId,
+                Message: kudos.Message,
+                Title: kudos.Title,
+                SendOn: kudos.SendOn
                 ));
+                
 
         return kudosId;
     }

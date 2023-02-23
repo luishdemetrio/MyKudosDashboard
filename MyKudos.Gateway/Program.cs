@@ -17,6 +17,8 @@ builder.Services.AddSingleton<IKudosService, KudosServiceRest>();
 builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
 builder.Services.AddSingleton<IRestServiceToken, RestServiceToken>();
 
+builder.Services.AddSingleton<IKudosQueue, KudosQueue>();
+
 builder.Services.AddSwaggerGen(c =>
 {
    

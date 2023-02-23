@@ -25,6 +25,7 @@ builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
 builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>());
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>());
 
+
 // Create the Conversation with notification feature enabled.
 builder.Services.AddSingleton(sp =>
 {
