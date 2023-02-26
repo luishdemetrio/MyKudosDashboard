@@ -4,5 +4,7 @@ namespace MyKudos.Gateway.Interfaces;
 
 public interface IKudosQueue
 {
-    Task SendAsync(KudosNotification kudos);
+    Task SendKudosAsync(KudosNotification kudos);
+
+    Task SendLikeAsync(LikeGateway like );
 }

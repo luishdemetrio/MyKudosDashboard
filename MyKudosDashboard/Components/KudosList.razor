@@ -59,7 +59,7 @@
                         Read more
                     </FluentButton>*@
                    
-                    <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id))>
+                    <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" 
                         Filled=@Filled(item)
                             />
@@ -132,12 +132,13 @@
 
         return filled;
     }
-    private async void Like(string kudosId)
+    private async void Like(string kudosId, string toPersonId)
     {
         var success = await KudosListView.SendLikeAsync(
             new Like(
                 KudosId: kudosId,
-                PersonId: User.ObjectId
+                FromPersonId: User.ObjectId,
+                ToPersonId: toPersonId
             )
         ).ConfigureAwait(false);
 

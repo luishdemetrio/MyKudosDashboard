@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
+    <ProjectReference Include="..\MyKudos.Kudos.Token\MyKudos.Kudos.Token.csproj" />
   </ItemGroup>
 
   <ItemGroup>

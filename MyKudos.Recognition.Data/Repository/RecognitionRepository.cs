@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MyKudos.Recognition.Data.Context;
+﻿using MyKudos.Recognition.Data.Context;
 using MyKudos.Recognition.Data.Data;
 using MyKudos.Recognition.Domain.Interfaces;
 

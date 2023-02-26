@@ -90,5 +90,11 @@
 
 
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyKudos.Kudos.Token\MyKudos.Kudos.Token.csproj" />
+  </ItemGroup>
+
+
+
 </Project>
 

@@ -8,6 +8,8 @@ using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
+using MyKudos.Kudos.Token.Interfaces;
+using MyKudos.Kudos.Token.Services;
 //using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,10 +45,21 @@ builder.Services.AddFluentUIComponents();
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
 builder.Services.AddScoped<IWelcomeView, WelcomeView>();
 builder.Services.AddScoped<IKudosListView, KudosListView>();
+builder.Services.AddScoped<IUserProfileScoreView, UserProfileScoreView>();  
 
 //Services
 
 builder.Services.AddSingleton<IGatewayService, GatewayService>();
+
+var config = builder.Configuration;
+
+builder.Services.AddSingleton<IRestServiceToken>(t =>
+                new RestServiceToken(
+                    clientId: config["ClientId"],
+                    clientSecret: config["ClientSecret"],
+                    tenantId: config["TenantId"],
+                    exposedAPI: config["ExposedApi"]
+                ));
 
 
 //// Add MS GRAPH services to the container.

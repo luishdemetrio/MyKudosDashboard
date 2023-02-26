@@ -2,7 +2,7 @@
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using RestSharp;
-using Microsoft.Identity.Client;
+using MyKudos.Kudos.Token.Interfaces;
 
 namespace MyKudosDashboard.Services;
 
@@ -10,39 +10,15 @@ public class GatewayService : IGatewayService
 {
 
     private readonly string _gatewayServiceUrl;
+    private readonly IRestServiceToken _serviceToken;
 
-    private readonly string _clientId;
-    private readonly string _clientSecret;
-    private readonly string _tenantId;
-    private readonly string _exposedAPI;
-    private readonly IConfidentialClientApplication _confidentialClientApplication;
-
-    public GatewayService(IConfiguration config)
+    public GatewayService(IConfiguration config, IRestServiceToken restServiceToken)
     {
         _gatewayServiceUrl = config["GatewayServiceUrl"];
-
-        _clientId = config["ClientId"];
-        _clientSecret = config["ClientSecret"];
-        _tenantId = config["TenantId"];
-        _exposedAPI = config["ExposedApi"];
-
-        _confidentialClientApplication = ConfidentialClientApplicationBuilder.Create(_clientId)
-        .WithClientSecret(_clientSecret)
-        .WithAuthority(new Uri($"https://login.microsoftonline.com/{_tenantId}"))
-        .Build();
-
-    }
-
-
-    private async Task<string> GetAccessTokenAsync()
-    {
+        _serviceToken = restServiceToken;
         
-        var scopes = new string[] { _exposedAPI };
-
-        var result =  await _confidentialClientApplication.AcquireTokenForClient(scopes).ExecuteAsync();
-
-        return result.AccessToken;
     }
+
 
     public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
     {
@@ -53,7 +29,7 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
                 
-        var token = await GetAccessTokenAsync();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Get;
@@ -81,7 +57,7 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var token = await GetAccessTokenAsync();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Get;
@@ -106,7 +82,7 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var token = await GetAccessTokenAsync();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Post;
@@ -139,11 +115,14 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var token = await GetAccessTokenAsync();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Get;
         request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
 
         RestResponse response = client.Execute(request);
 
@@ -163,11 +142,15 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var token = await GetAccessTokenAsync();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Get;
         request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
 
         RestResponse response = client.Execute(request);
 
@@ -185,7 +168,7 @@ public class GatewayService : IGatewayService
 
         var client = new RestClient(uri);
 
-        var token = await GetAccessTokenAsync();
+        var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Post;
@@ -204,6 +187,29 @@ public class GatewayService : IGatewayService
         return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
     }
 
+    public async Task<UserScore> GetUserScoreAsync(string pUserId)
+    {
+        UserScore result = new();
 
+        var client = new RestClient($"{_gatewayServiceUrl}gamification?userid={pUserId}");
 
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<UserScore>(response.Content)!;
+
+        }
+
+        return result;
+    }
 }

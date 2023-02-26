@@ -13,6 +13,7 @@ public class Startup : FunctionsStartup
     {
         builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
         builder.Services.AddSingleton<IRestServiceToken, RestServiceToken>();
+        
     }
 
 

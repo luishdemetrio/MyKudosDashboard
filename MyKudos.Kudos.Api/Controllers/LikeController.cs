@@ -20,7 +20,7 @@ public class LikeController : Controller
     public IActionResult Post(SendLike like)
     {
 
-        var r = _kudosService.SendLike(like.KudosId, like.PersonId);
+        var r = _kudosService.SendLike(like.KudosId, like.FromPersonId);
 
         return Ok(r);
     }

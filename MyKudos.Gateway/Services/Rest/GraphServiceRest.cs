@@ -1,5 +1,6 @@
 ﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
+using MyKudos.Kudos.Token.Interfaces;
 using Newtonsoft.Json;
 using RestSharp;
 

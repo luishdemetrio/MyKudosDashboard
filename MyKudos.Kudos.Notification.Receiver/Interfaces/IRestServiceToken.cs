@@ -2,7 +2,7 @@
 
 namespace MyKudos.Kudos.Notification.Receiver.Interfaces;
 
-    public interface IRestServiceToken
-    {
-        Task<string> GetAccessTokenAsync();
-    }
+public interface IRestServiceToken
+{
+    Task<string> GetAccessTokenAsync();
+}
