@@ -25,12 +25,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
-builder.Services.AddSingleton<IKudosService, KudosService>();
-builder.Services.AddSingleton<IKudosRepository, KudosRepository>();
+builder.Services.AddScoped<IKudosService, KudosService>();
+builder.Services.AddScoped<IKudosRepository, KudosRepository>();
 
 var config = builder.Configuration.GetSection("CosmosDb");
 
-builder.Services.AddTransient<KudosDbContext>(_ =>
+builder.Services.AddScoped<KudosDbContext>(_ =>
 {
     var options = new DbContextOptionsBuilder<KudosDbContext>()
       .UseCosmos(

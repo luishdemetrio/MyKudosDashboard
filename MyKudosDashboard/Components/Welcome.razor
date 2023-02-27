@@ -4,6 +4,8 @@
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
+@using Microsoft.Fast.Components.FluentUI
+
 @inject TeamsFx teamsfx
 @inject TeamsUserCredential teamsUserCredential
 @inject MicrosoftTeams MicrosoftTeams
@@ -48,37 +50,11 @@ else
                 <!-- PROFILE -->
                 <div class="card col-12 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
 
-                        <div class="card-header py-3">
-                            <h4 class="my-0 fw-normal">🚀 Profile</h4>
-                        </div>
+                    <div class="card-header py-3">
+                        <h4 class="my-0 fw-normal">🚀 Profile</h4>
+                    </div>
 
-                        <div class="card-body">
-
-                            <div class="profile" >
-                                <div class="avatar" style="float:none" >
-                                    <img src=@_userPhoto style="height:80px;width:80px;border-radius: 50%;align-content:left" />                                
-                                </div>
-
-                                <div class="info" >
-                                    <h5>@_user.DisplayName</h5>
-                                   @* <h2  class="card-title pricing-card-title">
-                                        500
-                                        <small class="text-muted fw-light">XP</small>                                    
-                                        </h2>    *@                            
-                                </div>   
-                                
-                               @* <div style="clear:both;">
-                                    <p>Achievements</p>
-
-                                    <img src="badges/badge01.png" style="height:80px;width:80px;" />
-                                    <img src="badges/badge02.png" style="height:80px;width:80px;"/>
-                                    <img src="badges/badge03.png" style="height:80px;width:80px;" />
-                                </div>*@
-
-                          
-                        </div>
-                        
-                        </div>
+                    <UserProfileScore User=@_user UserPhoto=@_userPhoto /> 
 
                     <FluentButton style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel()) >
                         <span>Send Kudos</span>
@@ -98,7 +74,7 @@ else
                        
                 </div>
 
-                        <div class="card-body " >
+                <div class="card-body " >
 
                     <FluentTabs>
                             <FluentTab Text="All"></FluentTab>
@@ -117,80 +93,24 @@ else
                             
                     </FluentTabs>
 
-                           
-
                 </div>
                                
                     
                 </div>
                 </div>
 
-          @*  <div class="col-2 " style="height:100%">
+            <div class="col-2 " style="height:100%">
 
                 <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
+
                         <div class="card-header py-3">
                             <h4 class="my-0 fw-normal">🥇 Top Contributors</h4>
                         </div>
-                        <div class="card-body w-auto" >
 
+                       <TopContributors />
 
-                            <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="min-width: 350px;height:75vh;overflow-y:scroll">
-
-                                  <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-                                    <div class="avatar">
-                                        <img src="profiles/zoro.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                    </div>
-                                    <div class="info" >
-                                        <h5>Roronoa Zoro</h5>
-                                        <h2 class="card-title pricing-card-title">650<small class="text-muted fw-light">XP</small></h2>
-                                    </div>
-                                </div>
-
-                                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-                                    <div class="avatar">
-                                        <img src="profiles/luffy.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                    </div>
-                                    <div class="info" >
-                                        <h5>Monkey D Luffy</h5>
-                                        <h2 class="card-title pricing-card-title">500<small class="text-muted fw-light">XP</small></h2>
-                                    </div>
-                                </div>
-
-                                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-                                    <div class="avatar">
-                                        <img src="profiles/nami.png" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                    </div>
-                                    <div class="info">
-                                        <h5>Nami Cat Burglar</h5>
-                                        <h2 class="card-title pricing-card-title">400<small class="text-muted fw-light">XP</small></h2>
-                                    </div>
-                                </div>
-
-                                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-                                    <div class="avatar">
-                                        <img src="profiles/sogeking.jpg" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                    </div>
-                                    <div class="info">
-                                        <h5>Sogeking</h5>
-                                        <h2 class="card-title pricing-card-title">100<small class="text-muted fw-light">XP</small></h2>
-                                    </div>
-                                </div>
-
-                                 <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-                                    <div class="avatar">
-                                        <img src="profiles/sandi.jpeg" style="height:80px;width:80px;float:left;border-radius: 50%" />
-                                    </div>
-                                    <div class="info">
-                                        <h5>Sandi</h5>
-                                        <h2 class="card-title pricing-card-title">50<small class="text-muted fw-light">XP</small></h2>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
                     </div>
-                </div>*@
+                </div>
 
             <SendKudos @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto
                    sendKudosCallBack=@SendCallBack />

@@ -1,0 +1,105 @@
+﻿
+@using MyKudosDashboard.Interfaces;
+@using MyKudosDashboard.Models;
+
+@inject IUserProfileScoreView UserProfileScoreView;
+
+
+<div class="card-body">
+
+    <div class="profile">
+        <div class="avatar" style="float:none;;align-content:center">
+            <img src=@UserPhoto style="height:80px;width:80px;border-radius: 50%" />
+        </div>
+
+        <div class="info">
+            <h5>@User.DisplayName</h5>
+
+            @if (_isLoaded)
+            {
+                <h2 class="card-title pricing-card-title">
+                    @_userScore.Score
+                    <small class="text-muted fw-light"> points</small>
+                </h2>
+
+           
+                <div style="margin-left:10px">
+
+                    <h4 class="card-title pricing-card-title">
+
+                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Color="Color.Neutral" />
+
+                        <small class="text-muted fw-light"> @_userScore.KudosSent</small>
+                        <small class="text-muted fw-light"> kudos sent</small>
+                    </h4>
+
+                    <h4 class="card-title pricing-card-title">
+
+                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Color="Color.Neutral" />
+
+                        <small class="text-muted fw-light"> @_userScore.KudosReceived</small>
+                        <small class="text-muted fw-light"> kudos received</small>
+                    </h4>
+
+                    <h4 class="card-title pricing-card-title">
+
+                        <FluentIcon Name="@FluentIcons.ThumbLike" Color="Color.Neutral" />
+
+                        <small class="text-muted fw-light"> @_userScore.LikesSent</small>
+                        <small class="text-muted fw-light"> likes sent</small>
+                    </h4>
+
+                    <h4 class="card-title pricing-card-title">
+
+                        <FluentIcon Name="@FluentIcons.Heart" Color="Color.Neutral" />
+
+                        <small class="text-muted fw-light"> @_userScore.LikesReceived</small>
+                        <small class="text-muted fw-light"> likes received</small>
+                    </h4>
+
+                </div>
+            }
+            
+        </div>
+
+
+        @* <div style="clear:both;">
+        <p>Achievements</p>
+
+        <img src="badges/badge01.png" style="height:80px;width:80px;" />
+        <img src="badges/badge02.png" style="height:80px;width:80px;"/>
+        <img src="badges/badge03.png" style="height:80px;width:80px;" />
+        </div>*@
+
+
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public string UserPhoto { get; set; }
+
+
+    [Parameter]
+    public UserInfo User { get; set; }
+
+    private UserScore _userScore;
+
+    private bool _isLoaded = false;
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+            UserProfileScoreView.GetUserScore(User.ObjectId).ContinueWith(t =>
+            {
+                _userScore = t.Result;
+                _isLoaded = true;
+                InvokeAsync(StateHasChanged);
+            });
+    }
+
+}

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "MyKudos.Gamification.Receiver": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7128",
+      "launchBrowser": false
+    }
+  }
+}

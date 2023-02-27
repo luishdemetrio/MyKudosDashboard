@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
+    
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

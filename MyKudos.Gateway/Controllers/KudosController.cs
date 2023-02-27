@@ -19,7 +19,7 @@ public class KudosController : Controller
 
     private IEnumerable<Models.Recognition> _recognitions;
 
-    private IKudosQueue _kudosNotificationQueue;
+    private IKudosQueue _kudosQueue;
 
     
     public KudosController(IGraphService graphService, IRecognitionService recognitionService, 
@@ -32,7 +32,7 @@ public class KudosController : Controller
 
         //_agentNotificationService = agentNotificationService;
 
-        _kudosNotificationQueue= kudosQueue;
+        _kudosQueue= kudosQueue;
 
         _ = PopulateRecognitionsAsync();
 
@@ -130,7 +130,7 @@ public class KudosController : Controller
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
-        await _kudosNotificationQueue.SendAsync(new KudosNotification(
+        await _kudosQueue.SendKudosAsync(new KudosNotification(
                 From: kudos.From,
                 To: kudos.To,
                 ManagerId: userManagerId,
