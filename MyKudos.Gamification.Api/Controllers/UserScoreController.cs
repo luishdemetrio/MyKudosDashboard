@@ -24,6 +24,7 @@ public class UserScoreController : ControllerBase
 
     }
 
+
     [HttpPost(Name = "SetUserScore")]
     public bool SetUserScore([FromBody] UserScore userScore)
     {

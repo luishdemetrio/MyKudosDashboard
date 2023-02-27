@@ -7,4 +7,6 @@ public interface IUserScoreRepository
     UserScore GetUserScore(string pUserId);
 
     bool SetUserScore(UserScore userScore);
+
+    IEnumerable<UserScore> GetTopUserScores(int top);
 }

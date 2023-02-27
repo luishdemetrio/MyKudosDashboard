@@ -13,7 +13,6 @@ public class UserScoreRepository : IUserScoreRepository
     public UserScoreRepository(UserScoreDbContext scoreContext)
     {
         _context = scoreContext;
-
         
     }
 
@@ -46,5 +45,11 @@ public class UserScoreRepository : IUserScoreRepository
         }
 
         return _context.SaveChanges() > 0;
+    }
+
+    public IEnumerable<UserScore> GetTopUserScores(int top) 
+    {
+    
+        return _context.UserScores.Where(s=> s.Score > 0).OrderByDescending(s=> s.Score).Take(top);
     }
 }

@@ -17,4 +17,6 @@ public interface IGatewayService
     Task<bool> SendLike(Like like);
 
     Task<UserScore> GetUserScoreAsync(string pUserId);
+
+    Task<IEnumerable<TopContributors>> GetTopContributors();
 }

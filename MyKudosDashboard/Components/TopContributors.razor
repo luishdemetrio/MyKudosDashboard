@@ -1,0 +1,51 @@
+﻿@using MyKudosDashboard.Interfaces;
+@using MyKudosDashboard.Models;
+
+@inject ITopContributorsView TopContributorsView;
+
+<div class="card-body w-auto">
+
+    
+    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="min-width: 350px;height:75vh;overflow-y:scroll">
+
+
+         @if (_isLoaded)
+         {
+
+            @foreach (var item in _topContributors)
+            {
+
+                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
+                    <div class="avatar">
+                        <img src=@item.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
+                    </div>
+                    <div class="info">
+                        <h5>@item.Name</h5>
+                        <h2 class="card-title pricing-card-title">@item.Score<small class="text-muted fw-light">XP</small></h2>
+                    </div>
+                </div>
+            }
+         }
+      
+
+    </div>
+
+</div>
+
+@code {
+    private IEnumerable<Models.TopContributors> _topContributors;
+    private bool _isLoaded = false;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        TopContributorsView.GetTopContributors().ContinueWith(t =>
+        {
+            _topContributors = t.Result ;
+            _isLoaded = true;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+}

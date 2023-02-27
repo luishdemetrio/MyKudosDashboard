@@ -19,6 +19,29 @@ public class GamificationService : IGamificationService
         _serviceToken = serviceToken;
     }
 
+    public async Task<IEnumerable<UserScore>> GetTopUserScoresAsync(int top)
+    {
+        List<UserScore> result = new();
+
+        var client = new RestClient($"{_gamificationServiceUrl}Contributors?top={top}");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<List<UserScore>>(response.Content)!;
+
+        }
+
+        return result;
+    }
+
     public async Task<UserScore> GetUserScoreAsync(string pUserId)
     {
         UserScore result = new();

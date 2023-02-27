@@ -9,4 +9,6 @@ public interface IUserScoreService
 
     bool SetUserScore(UserScore userScore);
 
+    IEnumerable<UserScore> GetTopUserScores(int top);
+
 }

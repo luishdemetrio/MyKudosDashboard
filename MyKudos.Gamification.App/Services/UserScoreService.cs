@@ -25,4 +25,9 @@ public class UserScoreService : IUserScoreService
     {
         return _userScoreRepository.SetUserScore(userScore);
     }
+
+    public IEnumerable<UserScore> GetTopUserScores(int top)
+    {
+        return _userScoreRepository.GetTopUserScores(top);
+    }
 }
