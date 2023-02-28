@@ -104,8 +104,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Token", "Token", "{CD929C8D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Token", "MyKudos.Kudos.Token\MyKudos.Kudos.Token.csproj", "{331695CC-B5A5-43B0-8F5D-A928F5EC4709}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2F2FF5AB-FAFE-492C-8C3B-EBD3C7BE70DF}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
