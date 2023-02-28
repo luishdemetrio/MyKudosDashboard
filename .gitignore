@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /MyKudos.MSGraph.Api/appsettings.Development.json
 /MyKudos.Kudos.Api/appsettings.Development.json
 /MyKudos.Gateway/appsettings.Development.json
+/MyKudos.Test.Console/appsettings.development.json
