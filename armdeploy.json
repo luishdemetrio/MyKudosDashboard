@@ -235,7 +235,7 @@
             "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
           ],
           "properties": {
-            "PROJECT": "MyKudos.Gamification.Receiver/MyKudos.Gamification.Receiver.csproj",
+            "PROJECT": "MyKudos.Gamification.KudosSent.Receiver/MyKudos.Gamification.Receiver.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "userScoreServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
@@ -505,7 +505,7 @@
       "name": "[variables('gamification_appservice')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('gamification_serviceplan'))]"
+        "[resourceId('Microsoft.Web/serverfarms',variables('appserviceplan'))]"
 
       ],
       "resources": [
@@ -624,9 +624,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('gamification_appservice'))]"
       ],
-      "tags": {
-        "hidden-related:/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/resourceGroups/rg-shsk/providers/Microsoft.Web/serverFarms/shskplan": "empty"
-      },
       "properties": {
         "numberOfWorkers": 1,
         "defaultDocuments": [
@@ -958,7 +955,7 @@
           "condition": "[not(empty(parameters('gitRepoUrl')))]",
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('notification_function'))]",
-            "[resourceId('Microsoft.Web/sites/config', variables('notification_serviceplan'), 'appsettings')]"
+            "[resourceId('Microsoft.Web/sites/config', variables('notification_function'), 'appsettings')]"
           ],
           "properties": {
             "RepoUrl": "[parameters('gitRepoUrl')]",
@@ -2129,7 +2126,7 @@
         "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
       ],
       "properties": {
-        "siteName": "zorokudosgateway",
+        "siteName": "[variables('gateway_appservice')]",
         "hostNameType": "Verified"
       }
     },
