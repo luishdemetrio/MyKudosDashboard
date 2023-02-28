@@ -195,7 +195,7 @@
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2022-03-01",
       "name": "[variables('gamification_serviceplan')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic",
@@ -242,7 +242,7 @@
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebusname'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
             "KudosServiceBus_TopicName": "kudosTopic"
           }
         },
@@ -253,7 +253,7 @@
           "condition": "[not(empty(parameters('gitRepoUrl')))]",
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]",
-            "[resourceId('Microsoft.Web/sites/config', variables('gamification_serviceplan'), 'appsettings')]"
+            "[resourceId('Microsoft.Web/sites/config', variables('gamification_function'), 'appsettings')]"
           ],
           "properties": {
             "RepoUrl": "[parameters('gitRepoUrl')]",
@@ -743,7 +743,7 @@
       "type": "Microsoft.ServiceBus/namespaces/authorizationrules",
       "apiVersion": "2022-10-01-preview",
       "name": "[concat(variables('kudos_messaging'), '/RootManageSharedAccessKey')]",
-      "location": "[variables('kudos_messaging')]",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('kudos_messaging'))]"
       ],
@@ -803,7 +803,7 @@
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2022-03-01",
       "name": "[variables('notification_serviceplan')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic",
@@ -925,7 +925,7 @@
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-03-01",
       "name": "[variables('notification_function')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('notification_serviceplan'))]"
 
@@ -942,7 +942,7 @@
           "properties": {
             "PROJECT": "MyKudos.Kudos.Notification.Receiver/MyKudos.Kudos.Notification.Receiver.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebusname'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
             "KudosServiceBus_TopicName": "kudosTopic",
             "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
@@ -957,8 +957,8 @@
           "type": "sourcecontrols",
           "condition": "[not(empty(parameters('gitRepoUrl')))]",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]",
-            "[resourceId('Microsoft.Web/sites/config', variables('recognition_appservice'), 'appsettings')]"
+            "[resourceId('Microsoft.Web/sites', variables('notification_function'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('notification_serviceplan'), 'appsettings')]"
           ],
           "properties": {
             "RepoUrl": "[parameters('gitRepoUrl')]",
@@ -1017,7 +1017,7 @@
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('notification_function'), '/ftp')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notification_function'))]"
       ],
@@ -1029,7 +1029,7 @@
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('notification_function'), '/scm')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notification_function'))]"
       ],
@@ -1042,7 +1042,7 @@
       "type": "Microsoft.Web/sites/config",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('notification_function'), '/web')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notification_function'))]"
       ],
@@ -1130,7 +1130,7 @@
       "type": "Microsoft.Web/sites/functions",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('notification_function'), '/', variables('notification_function'))]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notification_function'))]"
       ],
@@ -1149,7 +1149,7 @@
       "type": "Microsoft.Web/sites/hostNameBindings",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('notification_function'), '/', variables('notification_function'), '.azurewebsites.net')]",
-      "location": "parameters('location')",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('notification_function'))]"
       ],
@@ -1948,7 +1948,7 @@
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('servicebusname'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
             "KudosServiceBus_TopicName": "kudosTopic"
 
           }
