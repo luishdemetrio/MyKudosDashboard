@@ -1,4 +1,4 @@
-﻿//namespace MyKudos.Gateway.Interfaces;
+﻿//namespace MyKudosDashboard.Interfaces;
 
 //public interface IRestServiceToken
 //{

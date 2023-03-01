@@ -8,8 +8,7 @@ using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
-using MyKudos.Kudos.Token.Interfaces;
-using MyKudos.Kudos.Token.Services;
+
 //using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);

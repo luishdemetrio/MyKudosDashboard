@@ -1,7 +1,8 @@
-﻿//using Microsoft.Identity.Client;
-//using MyKudos.Gateway.Interfaces;
+﻿
+//using Microsoft.Identity.Client;
+//using MyKudosDashboard.Interfaces;
 
-//namespace MyKudos.Gateway.Services.Rest;
+//namespace MyKudosDashboard.Services;
 
 //public class RestServiceToken : IRestServiceToken
 //{

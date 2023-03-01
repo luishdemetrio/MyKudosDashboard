@@ -2,7 +2,7 @@
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using RestSharp;
-using MyKudos.Kudos.Token.Interfaces;
+
 using System.Collections;
 
 namespace MyKudosDashboard.Services;
