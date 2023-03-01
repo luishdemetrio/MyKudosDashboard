@@ -22,17 +22,7 @@ internal class Program
 
         services.AddSingleton(configuration);
 
-
-
-
-        services.AddSingleton<IRestServiceToken>(t =>
-                        new RestServiceToken(
-                            clientId: configuration["ClientId"],
-                            clientSecret: configuration["ClientSecret"],
-                            tenantId: configuration["TenantId"],
-                            exposedAPI: configuration["ExposedApi"]
-                        ));
-
+      
 
         // Add more services here
 

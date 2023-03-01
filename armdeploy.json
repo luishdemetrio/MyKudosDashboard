@@ -157,7 +157,7 @@
 
     "kudos_appservice": "[concat(parameters('baseResourceName'), 'kudos' )]",
 
-    "gateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
+    "gateway_appservicegateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
 
     "gamification_appservice": "[concat(parameters('baseResourceName'), 'gamification' )]",
 
@@ -357,8 +357,8 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "$shskGamificationReceiver",
-        "scmType": "None",
+        "publishingUsername": "[variables('gamification_function')]",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -494,7 +494,7 @@
         "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
       ],
       "properties": {
-        "siteName": "shskGamificationReceiver",
+        "siteName": "[concat(variables('gamification_function'), 'GamificationReceiver')]",
         "hostNameType": "Verified"
       }
     },
@@ -597,9 +597,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('gamification_appservice'))]"
       ],
-      "tags": {
-        "hidden-related:/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/resourceGroups/rg-shsk/providers/Microsoft.Web/serverFarms/shskplan": "empty"
-      },
       "properties": {
         "allow": true
       }
@@ -646,8 +643,8 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "$shskgamification",
-        "scmType": "None",
+        "publishingUsername": "[variables('gamification_appservice')]",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -706,7 +703,7 @@
         "[resourceId('Microsoft.Web/sites', variables('gamification_appservice'))]"
       ],
       "properties": {
-        "siteName": "shskgamification",
+        "siteName": "[concat(variables('gamification_appservice'), 'gamification')]",
         "hostNameType": "Verified"
       }
     },
@@ -1064,7 +1061,7 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "$kudosnotificationreceiver",
+        "publishingUsername": "[variables('notification_function')]",
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
@@ -1210,8 +1207,8 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "$KudosGatewayDev",
-        "scmType": "None",
+        "publishingUsername": "[variables('recognition_appservice')]",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -1639,7 +1636,7 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "scmType": "None",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -1851,8 +1848,8 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "$KudosApi",
-        "scmType": "None",
+        "publishingUsername": "[variables('kudos_appservice')]",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -2066,8 +2063,8 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "variables('gateway_appservice')",
-        "scmType": "None",
+        "publishingUsername": "[variables('gateway_appservice')]",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -2201,8 +2198,8 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "variables('userAssignedIdentities_teams_appservice')",
-        "scmType": "None",
+        "publishingUsername": "[variables('userAssignedIdentities_teams_appservice')]",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": false,
@@ -2497,7 +2494,7 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('notification_bot')]",
-        "scmType": "None",
+        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,

@@ -75,6 +75,10 @@ public class GraphService : IGraphService
             r = JsonConvert.DeserializeObject<GraphUsers>(response.Content)!;
 
         }
+        else
+        {
+            throw new Exception(response.Content);
+        }
 
         return r;
     }
