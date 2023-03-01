@@ -1269,7 +1269,7 @@
         "[resourceId('Microsoft.Web/sites', variables('recognition_appservice'))]"
       ],
       "properties": {
-        "siteName": "variables('recognition_appservice')",
+        "siteName": "[variables('recognition_appservice')]",
         "hostNameType": "Verified"
       }
     },
@@ -1695,7 +1695,7 @@
         "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
       ],
       "properties": {
-        "siteName": "variables('msgraph_appservice')",
+        "siteName": "[variables('msgraph_appservice')]",
         "hostNameType": "Verified"
       }
     },
@@ -1908,7 +1908,7 @@
         "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
       ],
       "properties": {
-        "siteName": "variables('kudos_appservice')",
+        "siteName": "[variables('kudos_appservice')]",
         "hostNameType": "Verified"
       }
     },
@@ -2258,7 +2258,7 @@
         "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
       ],
       "properties": {
-        "siteName": "variables('teams_appservice')",
+        "siteName": "[variables('teams_appservice')]",
         "hostNameType": "Verified"
       }
     },
