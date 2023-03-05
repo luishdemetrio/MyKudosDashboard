@@ -243,7 +243,14 @@
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "kudosTopic"
+            "KudosServiceBus_TopicName": "kudosTopic",
+            "KudosReceiveScore": "50",
+            "KudosSendScore": "30",
+            "LikeSendScore": "5",
+            "LikeReceivedScore": "5",
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+            "FUNCTIONS_EXTENSION_VERSION":  "~4"
+
           }
         },
         {
@@ -1938,12 +1945,17 @@
             "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
             "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
+            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "kudosTopic"
+            "KudosServiceBus_TopicName": "kudosTopic",
+            "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
+            "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
+            "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
+            "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived"
 
           }
         },

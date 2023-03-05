@@ -257,7 +257,7 @@
 
         var t = Task.Run(() =>
         {
-        var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
+            var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
 
             if (recognition == null || SelectedEmployee == null || string.IsNullOrEmpty(KudosMessage))
             {
@@ -267,7 +267,7 @@
             }
 
             BlockSendButton(true);
-            
+
             InvokeAsync(() => StateHasChanged());
 
             kudos = new(
@@ -291,16 +291,16 @@
                     SendOn : DateTime.Now
                 );
 
-            
 
-            
+
+
 
         });
 
         await t;
 
         kudosId = await SendKudosView.Send(kudos);
-        
+
 
         if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
         {
@@ -315,13 +315,19 @@
                     SendOn = DateTime.Now
                 };
 
-            StateHasChanged();
+         
 
-            sendKudosCallBack?.Invoke(k);
-           
-            BlockSendButton(false);
-            ClearFields();
-            Hide();
+           sendKudosCallBack?.Invoke(k);
+
+           await InvokeAsync(() =>
+            {
+                BlockSendButton(false);
+                ClearFields();
+                Hide();
+                 StateHasChanged();
+            });
+
+            
 
         }
     }

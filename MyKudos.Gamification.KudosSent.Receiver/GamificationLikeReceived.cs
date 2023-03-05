@@ -18,7 +18,7 @@ public class GamificationLikeReceived
     {
         _logger = log;
         _userScoreService = userScoreService;
-        _likeReceiveScore = configuration["LikeSendScore"];
+        _likeReceiveScore = configuration["LikeReceivedScore"];
     }
 
 
