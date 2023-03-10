@@ -42,7 +42,10 @@ public class KudosQueue : IKudosQueue
 
         await SendTopic(kudos.To.Id, serviceBusAdminClient, _gamificationKudosReceivedTopicName, "notification") ;
 
-        
+
+        await SendTopic(kudos, serviceBusAdminClient, "kudosdashboard", "notification");
+
+
 
     }
 

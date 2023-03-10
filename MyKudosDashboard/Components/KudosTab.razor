@@ -1,0 +1,100 @@
+﻿@using MyKudosDashboard.Interfaces;
+@using MyKudosDashboard.Models;
+
+@inject IKudosTabView KudosTabView;
+
+<div class="card-body ">
+
+
+
+    <FluentTabs>
+        <FluentTab Text="All"></FluentTab>
+        <FluentTab Text="Kudos to me" />
+        <FluentTab Text="Kudos from me" />
+
+        @if (_kudosList != null)
+        {
+            <FluentTabPanel>
+                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto />
+            </FluentTabPanel>
+            <FluentTabPanel>
+                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto />
+            </FluentTabPanel>
+            <FluentTabPanel>
+                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto />
+            </FluentTabPanel>
+        }
+
+    </FluentTabs>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public IEnumerable<KudosResponse> kudos { get; set; }
+
+    [Parameter]
+    public string UserPhoto { get; set; }
+
+    [Parameter]
+    public UserInfo User { get; set; }
+
+    private List<KudosResponse> _kudosList;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (User != null)
+        {
+            LoadKudos();
+
+        }
+
+    }
+
+    private void LoadKudos()
+    {
+        KudosTabView.GetKudos().ContinueWith(t =>
+           {
+               _kudosList = t.Result.ToList();
+
+               InvokeAsync(StateHasChanged);
+           });
+    }
+
+    private IEnumerable<KudosResponse> GetAllKudos()
+    {
+        return _kudosList.OrderByDescending(k => k.SendOn);
+    }
+
+    private IEnumerable<KudosResponse> GetKudosToMe()
+    {
+        return _kudosList.Where(k => k.To.Id == User.ObjectId).OrderByDescending(k => k.SendOn);
+    }
+
+    private IEnumerable<KudosResponse> GetKudosFromMe()
+    {
+        return _kudosList.Where(k => k.From.Id == User.ObjectId).OrderByDescending(k => k.SendOn);
+    }
+
+
+    public void SendCallBack(KudosResponse pKudos)
+    {
+        _kudosList = new();
+        _kudosList.Add(pKudos);
+
+        //StateHasChanged();
+
+        // _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
+
+        //await InvokeAsync(() =>
+        //{
+        //    StateHasChanged();
+        //});
+
+        LoadKudos();
+
+    }
+}
