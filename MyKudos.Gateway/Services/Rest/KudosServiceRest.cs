@@ -98,10 +98,12 @@ public class KudosServiceRest: IKudosService
         request.AddHeader("Content-Type", "application/json");
 
         var body = JsonConvert.SerializeObject(like);
-        
+
         request.AddParameter("application/json", body, ParameterType.RequestBody);
 
         RestResponse response = client.Execute(request);
+
+        
 
         return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
 

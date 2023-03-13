@@ -61,7 +61,7 @@
                    
                     <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" 
-                        Filled=@Filled(item)
+                                    Filled=@Filled(item)
                             />
                         @item.Likes.Count()
                     </FluentButton>
@@ -111,6 +111,8 @@
     [Parameter]
     public UserInfo User { get; set; }
 
+    
+
     protected override void OnAfterRender(bool firstRender)
     {
 
@@ -118,6 +120,9 @@
 
         KudosListView.LikeCallback = UpdateLikeCallback;
         KudosListView.KudosCallback = UpdateKudosCallback;
+
+        
+
 
         //if (firstRender)
         //{
@@ -139,15 +144,21 @@
 
         return filled;
     }
+
     private async void Like(string kudosId, string toPersonId)
     {
-        var success = await KudosListView.SendLikeAsync(
-            new Like(
-                KudosId: kudosId,
-                FromPersonId: User.ObjectId,
-                ToPersonId: toPersonId
-            )
-        ).ConfigureAwait(false);
+
+
+        _ = KudosListView.SendLikeAsync(
+                new Like(
+                    KudosId: kudosId,
+                    FromPersonId: User.ObjectId,
+                    ToPersonId: toPersonId
+                )
+            );
+
+
+        UpdateLikes(kudosId, User.ObjectId);
 
         //if (success)
         //{
@@ -158,8 +169,13 @@
 
     }
 
+
     private void UpdateLikeCallback(Like like)
     {
+        // The person who sent already has the like updated
+        if (like.FromPersonId == User.ObjectId)
+            return;
+
         UpdateLikes(like.KudosId, like.FromPersonId);
     }
 
@@ -170,6 +186,7 @@
         if (kudo != null)
         {
             var like = kudo.Likes.Where(k => k.Id == personId).FirstOrDefault();
+
 
             if ((like is null) || (!kudo.Likes.Contains(like)))
             {
@@ -196,7 +213,7 @@
         if (k == null)
         {
             kudos.Append(pKudos);
-            InvokeAsync(StateHasChanged);
+          //  InvokeAsync(StateHasChanged);
         }
         
     }
