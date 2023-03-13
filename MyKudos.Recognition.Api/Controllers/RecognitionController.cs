@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Azure;
 using MyKudos.Recognition.App.Interfaces;
 
 namespace MyKudos.Recognition.Api.Controllers;
@@ -25,7 +26,7 @@ public class RecognitionController : ControllerBase
     [HttpPost(Name = "CheckAndSeedDatabaseAsync")]
     public async Task CheckAndSeedDatabaseAsync()
     {
-        _recognitionService.SeedDatabase();
+        await _recognitionService.SeedDatabaseAsync();
 
     }
 }

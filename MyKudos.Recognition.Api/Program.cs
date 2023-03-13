@@ -32,17 +32,25 @@ builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
 
 var config = builder.Configuration.GetSection("CosmosDb");
 
-builder.Services.AddScoped<RecognitionDbContext>(_ =>
+builder.Services.AddDbContext<RecognitionDbContext>(options =>
 {
-    var options = new DbContextOptionsBuilder<RecognitionDbContext>()
-      .UseCosmos(
+    options.UseCosmos(
               config["AccountEndPoint"],
               config["AccountKey"],
-              config["DatabaseName"])
-      .Options;
-
-    return new RecognitionDbContext(options);
+              config["DatabaseName"]);
 });
+
+//builder.Services.AddScoped<RecognitionDbContext>(_ =>
+//{
+//    var options = new DbContextOptionsBuilder<RecognitionDbContext>()
+//      .UseCosmos(
+//              config["AccountEndPoint"],
+//              config["AccountKey"],
+//              config["DatabaseName"])
+//      .Options;
+
+//    return new RecognitionDbContext(options);
+//});
 
 var app = builder.Build();
 

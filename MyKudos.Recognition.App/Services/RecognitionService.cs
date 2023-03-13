@@ -1,7 +1,6 @@
 ﻿using MyKudos.Recognition.App.Interfaces;
 using MyKudos.Recognition.Domain.Interfaces;
 
-
 namespace MyKudos.Recognition.App.Services;
 
 public sealed class RecognitionService : IRecognitionService
@@ -22,8 +21,8 @@ public sealed class RecognitionService : IRecognitionService
         return _recognitionRepository.GetRecognitions();
     }
 
-    public void SeedDatabase()
+    public async Task SeedDatabaseAsync()
     {
-        _recognitionRepository.SeedDatabaseAsync();
+        await _recognitionRepository.SeedDatabaseAsync().ConfigureAwait(false);
     }
 }

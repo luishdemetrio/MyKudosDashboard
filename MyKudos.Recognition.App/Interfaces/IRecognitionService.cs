@@ -6,5 +6,5 @@ public interface IRecognitionService
 {
     IEnumerable<Domain.Models.Recognition> GetRecognitions();
 
-    void SeedDatabase();
+    Task SeedDatabaseAsync();
 }
