@@ -157,7 +157,7 @@
 
     "kudos_appservice": "[concat(parameters('baseResourceName'), 'kudos' )]",
 
-    "gateway_appservicegateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
+    "gateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
 
     "gamification_appservice": "[concat(parameters('baseResourceName'), 'gamification' )]",
 
