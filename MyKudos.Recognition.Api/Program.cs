@@ -21,8 +21,8 @@ builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 //DependencyContainer.RegisterServices(builder.Services);
 
-builder.Services.AddSingleton<IRecognitionService, RecognitionService>();
-builder.Services.AddSingleton<IRecognitionRepository, RecognitionRepository>();
+builder.Services.AddScoped<IRecognitionService, RecognitionService>();
+builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
 
 //string connectionString = builder.Configuration.GetConnectionString("AppConfig");
 
@@ -32,7 +32,7 @@ builder.Services.AddSingleton<IRecognitionRepository, RecognitionRepository>();
 
 var config = builder.Configuration.GetSection("CosmosDb");
 
-builder.Services.AddSingleton<RecognitionDbContext>(_ =>
+builder.Services.AddScoped<RecognitionDbContext>(_ =>
 {
     var options = new DbContextOptionsBuilder<RecognitionDbContext>()
       .UseCosmos(

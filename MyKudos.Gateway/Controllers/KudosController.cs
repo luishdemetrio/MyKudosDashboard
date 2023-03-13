@@ -126,11 +126,11 @@ public class KudosController : Controller
     public async Task<string> PostAsync([FromBody] Models.KudosRequest kudos)
     {
 
-       string kudosId = await _kudosService.SendAsync(kudos).ConfigureAwait(false);
+        string kudosId = await _kudosService.SendAsync(kudos).ConfigureAwait(false);
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
-        await _kudosQueue.SendKudosAsync(new KudosNotification(
+        _ = _kudosQueue.SendKudosAsync(new KudosNotification(
                 From: kudos.From,
                 To: kudos.To,
                 ManagerId: userManagerId,

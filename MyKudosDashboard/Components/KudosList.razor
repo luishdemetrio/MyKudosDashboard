@@ -61,7 +61,7 @@
                    
                     <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" 
-                        Filled=@Filled(item)
+                                    Filled=@Filled(item)
                             />
                         @item.Likes.Count()
                     </FluentButton>
@@ -110,16 +110,28 @@
 
     [Parameter]
     public UserInfo User { get; set; }
-        
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender)
-        {
-            StateHasChanged();
-        }
+    
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+
+        base.OnAfterRender(firstRender);
+
+        KudosListView.LikeCallback = UpdateLikeCallback;
+        KudosListView.KudosCallback = UpdateKudosCallback;
+
+        
+
+
+        //if (firstRender)
+        //{
+        //    StateHasChanged();
+        //}
+
+        //StateHasChanged();
     }
+
 
     private bool Filled(KudosResponse item)
     {
@@ -132,46 +144,83 @@
 
         return filled;
     }
+
     private async void Like(string kudosId, string toPersonId)
     {
-        var success = await KudosListView.SendLikeAsync(
-            new Like(
-                KudosId: kudosId,
-                FromPersonId: User.ObjectId,
-                ToPersonId: toPersonId
-            )
-        ).ConfigureAwait(false);
 
-        if (success)
+        UpdateLikes(kudosId, User.ObjectId);
+
+        await KudosListView.SendLikeAsync(
+                new Like(
+                    KudosId: kudosId,
+                    FromPersonId: User.ObjectId,
+                    ToPersonId: toPersonId
+                )
+            );
+            
+      
+        
+
+        //if (success)
+        //{
+        //    UpdateLikes(kudosId, User.ObjectId);
+
+        //    StateHasChanged();
+        //}
+
+    }
+
+
+    private void UpdateLikeCallback(Like like)
+    {
+        // The person who sent already has the like updated
+        if (like.FromPersonId == User.ObjectId)
+            return;
+
+        UpdateLikes(like.KudosId, like.FromPersonId);
+    }
+
+    private void UpdateLikes(string kudosId, string personId)
+    {
+        var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
+
+        if (kudo != null)
         {
-            var kudo = kudos.Where(k=> k.Id == kudosId).FirstOrDefault();
+            var like = kudo.Likes.Where(k => k.Id == personId).FirstOrDefault();
 
-            if (kudo != null)
+
+            if ((like is null) || (!kudo.Likes.Contains(like)))
             {
-                var like = kudo.Likes.Where(k => k.Id == User.ObjectId).FirstOrDefault();
 
-                if ( (like is null) || (!kudo.Likes.Contains(like)))
-                {
-
-                    kudo.Likes.Add(new Person()
-                        {
-                            Id = User.ObjectId,
-                            Name = User.DisplayName,
-                            Photo = UserPhoto
-                        });
-                }
-                else
-                {
-                    kudo.Likes.Remove(like);
-                }
+                kudo.Likes.Add(new Person()
+                    {
+                        Id = personId,
+                        Name = User.DisplayName,
+                        Photo = UserPhoto
+                    });
             }
+            else
+            {
+                kudo.Likes.Remove(like);
+            }
+        }
+    }
 
-           
 
-            StateHasChanged();
+    private void UpdateKudosCallback(KudosResponse pKudos)
+    {
+        var k = kudos.Select(k => k.Id == pKudos.Id);
+
+        if (k == null)
+        {
+            kudos.Append(pKudos);
+          //  InvokeAsync(StateHasChanged);
         }
         
     }
+
+
+   
 
     
 

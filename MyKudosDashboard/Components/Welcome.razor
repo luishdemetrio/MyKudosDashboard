@@ -70,47 +70,26 @@ else
 
                 <div class="card mb-3 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
                     <div class="card-header py-3" >
-                    <h4 class="my-0 fw-normal" >👏 Kudos</h4>
-                       
-                </div>
+                        <h4 class="my-0 fw-normal" >👏 Kudos</h4>                       
+                    </div>
 
-                <div class="card-body " >
-
-                    <FluentTabs>
-                            <FluentTab Text="All"></FluentTab>
-                            <FluentTab Text="Kudos to me" />
-                            <FluentTab Text="Kudos from me" />
-
-                            <FluentTabPanel >
-                                <KudosList kudos=@GetAllKudos() User=@_user UserPhoto=@_userPhoto />
-                            </FluentTabPanel>
-                            <FluentTabPanel>
-                                <KudosList kudos=@GetKudosToMe() User=@_user UserPhoto=@_userPhoto />
-                            </FluentTabPanel>
-                            <FluentTabPanel >
-                                <KudosList kudos=@GetKudosFromMe() User=@_user UserPhoto=@_userPhoto />
-                            </FluentTabPanel>
-                            
-                    </FluentTabs>
-
-                </div>
-                               
+                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto />
                     
                 </div>
-                </div>
+            </div>
 
             <div class="col-2 " style="height:100%">
 
                 <div class="card mb-4 rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:100%">
 
-                        <div class="card-header py-3">
-                            <h4 class="my-0 fw-normal">🥇 Top Contributors</h4>
-                        </div>
-
-                       <TopContributors />
-
+                    <div class="card-header py-3">
+                        <h4 class="my-0 fw-normal">🥇 Top Contributors</h4>
                     </div>
+
+                    <TopContributors />
+
                 </div>
+            </div>
 
             <SendKudos @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto
                    sendKudosCallBack=@SendCallBack />
@@ -139,29 +118,12 @@ else
     private void OnOpenModalParameterButtonClick() => _sendKudosIsHidden = false;
     private void OnCloseModalParameterButtonClick() => _sendKudosIsHidden = true;
 
-    private List<KudosResponse> _kudosList;
-
+    private KudosTab _kudosTab;
 
     private void OnDismiss()
     {
         _sendKudosIsHidden = true;
 
-    }
-
-
-    private IEnumerable<KudosResponse> GetAllKudos()
-    {
-        return _kudosList.OrderByDescending(k => k.SendOn);
-    }
-
-    private IEnumerable<KudosResponse> GetKudosToMe()
-    {
-        return _kudosList.Where(k => k.To.Id == _user.ObjectId).OrderByDescending(k => k.SendOn);
-    }
-
-    private IEnumerable<KudosResponse> GetKudosFromMe()
-    {
-        return _kudosList.Where(k => k.From.Id == _user.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -188,8 +150,6 @@ else
                 {                    
                     _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
 
-                    _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
-
                 }
             }
             else
@@ -203,51 +163,17 @@ else
 
     }
 
-    private async  void SendCallBack(KudosResponse pKudos)
-    {
-        _kudosList = new();
-        _kudosList.Add(pKudos);
-
-        StateHasChanged();
-
-         _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
-
-        await InvokeAsync(() =>
-        {  
-            StateHasChanged();
-        });
-
-        //_kudosList = new();
-        //  _kudosList.Add(pKudos);
-
-        //List<KudosResponse> tempKudosList = new();
-
-
-
-        //foreach (var item in _kudosList)
-        //{
-
-        //    tempKudosList.Add(new KudosResponse()
-        //        {
-        //            Id = item.Id,
-        //            From = item.From,
-        //            To = item.To,
-        //            Message = item.Message,
-        //            Title = item.Title,
-        //            Likes = new(),
-        //            SendOn = item.SendOn
-        //        });
-        //}
-
-        //_kudosList = tempKudosList;
-        
-    }
     private void OpenSendKudosPanel()
     {
         _sendKudosIsHidden = false;
 
         _sendKudosPanel.SendKudosModal();
 
+    }
+
+    private void SendCallBack(KudosResponse pKudos)
+    {
+        _kudosTab.SendCallBack(pKudos);
     }
 }
 

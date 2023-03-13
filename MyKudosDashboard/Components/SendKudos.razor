@@ -249,7 +249,7 @@
 
     }
 
-    private async void SendKudosClick( )
+    private async void SendKudosClick()
     {
         string kudosId = string.Empty;
 
@@ -272,23 +272,23 @@
 
             kudos = new(
                     From: new Person()
-                    {
-                        Id = UserProfile.ObjectId,
-                        Name = UserProfile.DisplayName,
-                        Photo = UserPhoto
-                    },
+                        {
+                            Id = UserProfile.ObjectId,
+                            Name = UserProfile.DisplayName,
+                            Photo = UserPhoto
+                        },
                     To: new Person()
-                    {
-                        Id = SelectedEmployee.Id,
-                        Name = SelectedEmployee.Name,
-                        Photo = SelectedEmployee.Photo
-                    },
-                    Title : new Reward( 
-                        Id:  recognition.Id, 
-                        Description: recognition.Description 
+                        {
+                            Id = SelectedEmployee.Id,
+                            Name = SelectedEmployee.Name,
+                            Photo = SelectedEmployee.Photo
+                        },
+                    Title: new Reward(
+                        Id: recognition.Id,
+                        Description: recognition.Description
                     ),
-                    Message : KudosMessage ,
-                    SendOn : DateTime.Now
+                    Message: KudosMessage,
+                    SendOn: DateTime.Now
                 );
 
 
@@ -304,32 +304,32 @@
 
         if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
         {
-            var k = new KudosResponse()
-                {
-                    Id = kudosId.ToString(),
-                    From = kudos.From,
-                    To = kudos.To,
-                    Title = kudos.Title.Description,
-                    Message = kudos.Message,
-                    Likes = new(),
-                    SendOn = DateTime.Now
-                };
+            //var k = new KudosResponse()
+            //    {
+            //        Id = kudosId.ToString(),
+            //        From = kudos.From,
+            //        To = kudos.To,
+            //        Title = kudos.Title.Description,
+            //        Message = kudos.Message,
+            //        Likes = new(),
+            //        SendOn = DateTime.Now
+            //    };
 
-         
 
-           sendKudosCallBack?.Invoke(k);
 
-           await InvokeAsync(() =>
-            {
-                BlockSendButton(false);
-                ClearFields();
-                Hide();
+           // sendKudosCallBack?.Invoke(k);
+
+            await InvokeAsync(() =>
+             {
+                 BlockSendButton(false);
+                 ClearFields();
+                 Hide();
                  StateHasChanged();
-            });
+             });
 
-            
 
-        }
+            }
+        
     }
 
     private void ClearFields()

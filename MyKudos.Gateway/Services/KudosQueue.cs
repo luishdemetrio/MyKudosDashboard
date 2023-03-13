@@ -42,7 +42,10 @@ public class KudosQueue : IKudosQueue
 
         await SendTopic(kudos.To.Id, serviceBusAdminClient, _gamificationKudosReceivedTopicName, "notification") ;
 
-        
+
+        await SendTopic(kudos, serviceBusAdminClient, "kudosdashboard", "notification");
+
+
 
     }
 
@@ -88,5 +91,7 @@ public class KudosQueue : IKudosQueue
         await SendTopic(like.FromPersonId, serviceBusAdminClient, _gamificationLikeSentTopicName, "notification");
 
         await SendTopic(like.ToPersonId, serviceBusAdminClient, _gamificationLikeReceivedTopicName, "notification");
+
+        await SendTopic(like, serviceBusAdminClient, "dashboard", "notification");
     }
 }
