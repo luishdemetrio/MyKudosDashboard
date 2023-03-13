@@ -148,17 +148,18 @@
     private async void Like(string kudosId, string toPersonId)
     {
 
+        UpdateLikes(kudosId, User.ObjectId);
 
-        _ = KudosListView.SendLikeAsync(
+        await KudosListView.SendLikeAsync(
                 new Like(
                     KudosId: kudosId,
                     FromPersonId: User.ObjectId,
                     ToPersonId: toPersonId
                 )
             );
-
-
-        UpdateLikes(kudosId, User.ObjectId);
+            
+      
+        
 
         //if (success)
         //{
