@@ -83,14 +83,14 @@ public class KudosQueue : IKudosQueue
         await sender.CloseAsync();
     }
 
-    public async Task SendLikeAsync(LikeGateway like )
+    public async Task SendLikeAsync(LikeGateway like, int sign )
     {
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         
-        await SendTopic(like.FromPersonId, serviceBusAdminClient, _gamificationLikeSentTopicName, "notification");
+        await SendTopic($"{like.FromPersonId},{sign}", serviceBusAdminClient, _gamificationLikeSentTopicName, "notification");
 
-        await SendTopic(like.ToPersonId, serviceBusAdminClient, _gamificationLikeReceivedTopicName, "notification");
+        await SendTopic($"{like.ToPersonId},{sign}", serviceBusAdminClient, _gamificationLikeReceivedTopicName, "notification");
 
         await SendTopic(like, serviceBusAdminClient, "dashboard", "notification");
     }

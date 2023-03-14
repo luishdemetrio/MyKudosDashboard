@@ -1,13 +1,12 @@
 ﻿using MyKudos.Gateway.Models;
 
-namespace MyKudos.Gateway.Interfaces
+namespace MyKudos.Gateway.Interfaces;
+
+public interface IKudosService
 {
-    public interface IKudosService
-    {
-        Task<IEnumerable<Models.Kudos>> GetKudosAsync();
+    Task<IEnumerable<Models.Kudos>> GetKudosAsync();
 
-        Task<string> SendAsync(Models.KudosRequest kudos);
+    Task<string> SendAsync(Models.KudosRequest kudos);
 
-        Task<bool> SendLikeAsync(LikeGateway like);
-    }
+    Task<int> SendLikeAsync(LikeGateway like);
 }

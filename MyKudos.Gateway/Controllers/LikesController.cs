@@ -22,13 +22,13 @@ public class LikesController : Controller
     }
 
     [HttpPost(Name = "SendLike")]
-    public IActionResult SendLike([FromBody] LikeGateway like)
+    public async Task<IActionResult> SendLikeAsync([FromBody] LikeGateway like)
     {
 
-        var kudos = _kudosService.SendLikeAsync(like);
+        var sign = await _kudosService.SendLikeAsync(like).ConfigureAwait(false);
 
 
-         _kudosQueue.SendLikeAsync(like);
+         await _kudosQueue.SendLikeAsync(like, sign);
 
         return Ok();
     }

@@ -84,8 +84,10 @@ public class KudosServiceRest: IKudosService
         return result;
     }
 
-    public async Task<bool> SendLikeAsync(LikeGateway like)
+    public async Task<int> SendLikeAsync(LikeGateway like)
     {
+        int result = 0;
+
         var client = new RestClient($"{_kudosServiceUrl}like");
 
         var token = await _serviceToken.GetAccessTokenAsync();
@@ -105,7 +107,11 @@ public class KudosServiceRest: IKudosService
 
         
 
-        return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<int>(response.Content);
+        }
 
+        return result;
     }
 }

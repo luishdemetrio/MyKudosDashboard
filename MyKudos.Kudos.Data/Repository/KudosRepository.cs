@@ -28,8 +28,13 @@ public class KudosRepository: IKudosRepository
 		return _context.Kudos;
 	}
 
-    public bool SendLike(string kudosId, string personId)
+	//return -1 means that the user unliked
+	//return 1 means that the user liked
+    public int SendLike(string kudosId, string personId)
     {
+
+		int sign = 0;
+
 		var kudos = _context.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
 
 		if (kudos != null)
@@ -38,18 +43,22 @@ public class KudosRepository: IKudosRepository
 			{
 				kudos.Likes = new List<string>();
                 kudos.Likes.Add(personId);
+				sign = 1;
             }else if (kudos.Likes.Contains(personId))
 			{
 				kudos.Likes.Remove(personId);
+				sign = -1;
 			}
 			else
 			{
 				kudos.Likes.Add(personId);
+				sign = 1;
 			}
 
 			_context.SaveChanges();
 		}
-		return true;
+
+		return sign;
 
     }
 }

@@ -6,5 +6,5 @@ public interface IKudosQueue
 {
     Task SendKudosAsync(KudosNotification kudos);
 
-    Task SendLikeAsync(LikeGateway like );
+    Task SendLikeAsync(LikeGateway like, int sign );
 }

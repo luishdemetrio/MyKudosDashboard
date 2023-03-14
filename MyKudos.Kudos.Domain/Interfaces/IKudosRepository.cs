@@ -10,5 +10,5 @@ public interface IKudosRepository
 
     Guid Add(KudosLog kudos);
 
-    bool SendLike(string kudosId, string personId);
+    int SendLike(string kudosId, string personId);
 }

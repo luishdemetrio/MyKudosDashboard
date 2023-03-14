@@ -27,14 +27,25 @@ public class GamificationLikeReceived
     {
         try
         {
-            await _userScoreService.SetUserScoreAsync(
-                new UserScore()
-                {
-                    UserId = mySbMsg.Replace("\"", ""),
-                    LikesReceived = 1,
-                    Score = int.Parse(_likeReceiveScore)
-                });
+            var result = mySbMsg.Split(",");
+            string userId;
+            int sign;
 
+            if (result.Length == 2)
+            {
+                userId = result[0].Replace("\"", "");
+                sign = int.Parse(result[1]);
+
+                await _userScoreService.SetUserScoreAsync(
+                        new UserScore()
+                        {
+                            UserId = userId,
+                            LikesReceived = 1 * sign,
+                            Score = int.Parse(_likeReceiveScore) * sign
+                        }
+                    );
+
+            }
             _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }
         catch (Exception ex)

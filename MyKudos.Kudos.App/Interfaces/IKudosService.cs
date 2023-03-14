@@ -9,5 +9,5 @@ public interface IKudosService
 
     public IEnumerable<KudosLog> GetKudos();
 
-    public bool SendLike(string kudosId, string personId);
+    public int SendLike(string kudosId, string personId);
 }
