@@ -35,7 +35,7 @@ public class GamificationLikeSent
             if (result.Length == 2)
             {
                 userId = result[0].Replace("\"", "");
-                sign = int.Parse(result[1]);
+                sign = int.Parse(result[1].Replace("\"", ""));
 
 
                 await _userScoreService.SetUserScoreAsync(
