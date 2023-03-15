@@ -294,7 +294,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 200,
           "minimumElasticInstanceCount": 0
@@ -368,7 +368,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -577,7 +577,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
           "minimumElasticInstanceCount": 0
@@ -654,7 +654,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -994,7 +994,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 200,
           "minimumElasticInstanceCount": 0
@@ -1072,7 +1072,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -1218,7 +1218,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "appCommandLine": "dotnet MyKudos.Recognition.Api.dll",
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
@@ -1571,7 +1571,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
           "minimumElasticInstanceCount": 0
@@ -1646,7 +1646,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -1780,7 +1780,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
           "minimumElasticInstanceCount": 0
@@ -1859,7 +1859,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -2003,7 +2003,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
           "minimumElasticInstanceCount": 0
@@ -2079,7 +2079,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -2214,7 +2214,7 @@
         "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": false,
+        "alwaysOn": true,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -2358,7 +2358,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
           "minimumElasticInstanceCount": 0
@@ -2454,7 +2454,7 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
+          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 0,
           "minimumElasticInstanceCount": 0
