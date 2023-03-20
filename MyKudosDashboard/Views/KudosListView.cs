@@ -20,13 +20,11 @@ public class KudosListView : IKudosListView
     public IKudosListView.UpdateKudosCallBack KudosCallback { get; set; }
 
 
-    public KudosListView(IGatewayService gatewayService)
+    public KudosListView(IGatewayService gatewayService, IConfiguration configuration)
     {
         _gatewayService = gatewayService;
 
-        var connectionString = "Endpoint=sb://virtualkudosmessaging.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=ygd5/DAwj+Rx3Lr5SGjjqZsq1dkUj/6pV+ASbErqEa8=";
-
-        _serviceBusClient = new ServiceBusClient(connectionString);
+        _serviceBusClient = new ServiceBusClient(configuration["KudosServiceBus_ConnectionString"]);
 
         ServiceBusLikeMessageProcessor();
 
