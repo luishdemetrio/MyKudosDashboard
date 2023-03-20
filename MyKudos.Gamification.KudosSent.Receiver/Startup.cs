@@ -17,6 +17,8 @@ public class Startup : FunctionsStartup
         builder.Services.AddSingleton<IUserScoreService, UserScoreService>();
 
         builder.Services.AddSingleton<IRestServiceToken, RestServiceToken>();
+
+        builder.Services.AddSingleton<IScoreQueue, ScoreQueue>();
     }
 
    
