@@ -3,6 +3,8 @@ using AdaptiveCards.Templating;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamsFx.Conversation;
 using Newtonsoft.Json;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Builder;
 
 namespace MyKudos.Notification.Controllers
 {
@@ -16,15 +18,26 @@ namespace MyKudos.Notification.Controllers
 
         private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "NotificationDefault.json");
 
-        public NotificationController(ConversationBot conversation, IConfiguration configuration)
+        private readonly IBotFrameworkHttpAdapter _botAdapter;
+        private readonly IBot _botNotification;
+
+        public NotificationController(ConversationBot conversation, IConfiguration configuration,
+                                      IBot botNotification, IBotFrameworkHttpAdapter adapter)
         {
             _conversation = conversation;
             _configuration = configuration;
+
+            _botAdapter = adapter;
+            _botNotification = botNotification;
+
         }
 
         [HttpPost]
         public async Task<ActionResult> PostAsync(CancellationToken cancellationToken = default)
         {
+            await _botAdapter.ProcessAsync(Request, Response, _botNotification);
+
+    
             int membersCount = 0;
             string users = string.Empty;
 
@@ -99,5 +112,7 @@ namespace MyKudos.Notification.Controllers
 
             return Ok($"Installations: {installations.Count()}\nMembers: {membersCount}\nUsers:{users}");
         }
+
+
     }
 }

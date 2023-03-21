@@ -3,6 +3,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.TeamsFx.Conversation;
+using MyKudos.Notification.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,10 @@ builder.Services.AddSingleton<CloudAdapter, AdapterWithErrorHandler>();
 builder.Services.AddSingleton<IBotFrameworkHttpAdapter>(sp => sp.GetService<CloudAdapter>());
 builder.Services.AddSingleton<BotAdapter>(sp => sp.GetService<CloudAdapter>());
 
+
+// Create the Bot Adapter with error handling enabled.
+builder.Services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+builder.Services.AddScoped<IBot, KudosNotificationBot>();
 
 // Create the Conversation with notification feature enabled.
 builder.Services.AddSingleton(sp =>
