@@ -54,7 +54,7 @@ else
                         <h4 class="my-0 fw-normal">🚀 Profile</h4>
                     </div>
 
-                    <UserProfileScore User=@_user UserPhoto=@_userPhoto /> 
+                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto /> 
 
                     <FluentButton style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel()) >
                         <span>Send Kudos</span>
@@ -112,6 +112,8 @@ else
 
     private string _userPhoto;
 
+    private UserProfileScore _userProfileScore;
+
     private SendKudos _sendKudosPanel;
     private bool _sendKudosIsHidden = false;
 
@@ -149,6 +151,10 @@ else
                 if (_user != null)
                 {                    
                     _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
+                    
+                    WelcomeView.RegisterForUserScoreUpdate(_user.ObjectId);
+
+                    WelcomeView.ScoreCallback = UpdateScoreCallback;
 
                 }
             }
@@ -160,6 +166,12 @@ else
             _isLoading = false;
             StateHasChanged();
         }
+
+    }
+
+    private void UpdateScoreCallback(UserScore userScore)
+    {
+        _userProfileScore.UpdateScore(userScore);
 
     }
 

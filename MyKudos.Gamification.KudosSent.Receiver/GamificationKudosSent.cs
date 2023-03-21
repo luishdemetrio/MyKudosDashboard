@@ -14,11 +14,16 @@ public class GamificationKudosSent
     private readonly IUserScoreService _userScoreService;
     private string _kudosSendScore;
 
-    public GamificationKudosSent(ILogger<GamificationKudosSent> log, IConfiguration configuration, IUserScoreService userScoreService)
+    private readonly IScoreQueue _scoreQueue;
+
+
+    public GamificationKudosSent(ILogger<GamificationKudosSent> log, IConfiguration configuration, IUserScoreService userScoreService,
+                                 IScoreQueue scoreQueue)
     {
          _logger = log;
         _userScoreService = userScoreService;
         _kudosSendScore =  configuration["KudosSendScore"];
+        _scoreQueue = scoreQueue;
     }
 
     [FunctionName("gamificationkudossent")]
@@ -27,13 +32,24 @@ public class GamificationKudosSent
 
         try
         {
+            var userId = mySbMsg.Replace("\"", "");
+
             await _userScoreService.SetUserScoreAsync(
                 new UserScore()
                 {
-                    UserId = mySbMsg.Replace("\"", ""),
+                    UserId = userId,
                     KudosSent = 1,
                     Score = int.Parse(_kudosSendScore)
                 });
+
+
+            var score = await _userScoreService.GetUserScoreAsync(userId);
+            if (score != null)
+            {
+
+                await _scoreQueue.NotifyProfileScoreUpdated(score);
+            }
+
 
             _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }

@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyKudos.Gamification.Domain.Models;
@@ -14,28 +13,45 @@ namespace MyKudos.Gamification.Receiver
         private readonly ILogger<GamificationKudosReceived> _logger;
 
         private readonly IUserScoreService _userScoreService;
+
+        private readonly IScoreQueue _scoreQueue;
+
         private string _kudosReceiveScore;
 
-        public GamificationKudosReceived(ILogger<GamificationKudosReceived> log, IConfiguration configuration, IUserScoreService userScoreService)
+        public GamificationKudosReceived(ILogger<GamificationKudosReceived> log, IConfiguration configuration, IUserScoreService userScoreService,
+                                         IScoreQueue scoreQueue)
         {
             _logger = log;
             _userScoreService = userScoreService;
             _kudosReceiveScore = configuration["KudosReceiveScore"];
+            _scoreQueue = scoreQueue;
         }
 
 
         [FunctionName("gamificationKudosReceived")]
         public async Task Run([ServiceBusTrigger("gamificationkudosreceived", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
         {
+            
             try
             {
+                var userId = mySbMsg.Replace("\"", "");
+
                 await _userScoreService.SetUserScoreAsync(
                     new UserScore()
                     {
-                        UserId = mySbMsg.Replace("\"", ""),
+                        UserId = userId,
                         KudosReceived = 1,
                         Score = int.Parse(_kudosReceiveScore)
                     });
+
+
+                var score = await _userScoreService.GetUserScoreAsync(userId);
+
+                if (score != null) {
+
+                    await _scoreQueue.NotifyProfileScoreUpdated(score);
+                }
+
 
                 _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
             }
