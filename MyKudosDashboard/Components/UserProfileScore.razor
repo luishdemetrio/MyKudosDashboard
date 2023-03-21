@@ -94,12 +94,19 @@
     {
         base.OnInitialized();
 
-            UserProfileScoreView.GetUserScore(User.ObjectId).ContinueWith(t =>
-            {
-                _userScore = t.Result;
-                _isLoaded = true;
-                InvokeAsync(StateHasChanged);
-            });
+        UserProfileScoreView.GetUserScore(User.ObjectId).ContinueWith(t =>
+        {
+            _userScore = t.Result;
+            _isLoaded = true;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public void UpdateScore(UserScore userScore)
+    {
+        _userScore = userScore;
+        InvokeAsync(StateHasChanged);
+
     }
 
 }

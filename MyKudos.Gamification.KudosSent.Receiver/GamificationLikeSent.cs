@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
+using MyKudos.Gamification.Receiver.Services;
 
 
 namespace MyKudos.Gamification.Receiver;
@@ -15,11 +16,15 @@ public class GamificationLikeSent
     private readonly IUserScoreService _userScoreService;
     private string _likeSendScore;
 
-    public GamificationLikeSent(ILogger<GamificationKudosSent> log, IConfiguration configuration, IUserScoreService userScoreService)
+    private readonly IScoreQueue _scoreQueue;
+
+    public GamificationLikeSent(ILogger<GamificationKudosSent> log, IConfiguration configuration,
+                                IUserScoreService userScoreService, IScoreQueue scoreQueue)
     {
         _logger = log;
         _userScoreService = userScoreService;
         _likeSendScore = configuration["LikeSendScore"];
+        _scoreQueue = scoreQueue;
     }
 
     [FunctionName("GamificationLikeSent")]
@@ -46,7 +51,15 @@ public class GamificationLikeSent
                         Score = int.Parse(_likeSendScore) * sign
                     });
 
-                
+                var score = await _userScoreService.GetUserScoreAsync(userId);
+
+                if (score != null)
+                {
+
+                    await _scoreQueue.NotifyProfileScoreUpdated(score);
+                }
+
+
             }
             _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }
