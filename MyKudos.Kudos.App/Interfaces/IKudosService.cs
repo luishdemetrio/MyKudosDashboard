@@ -10,4 +10,8 @@ public interface IKudosService
     public IEnumerable<KudosLog> GetKudos();
 
     public int SendLike(string kudosId, string personId);
+
+    string SendComments(Comments comment);
+
+    IEnumerable<Comments> GetComments(string kudosId);
 }

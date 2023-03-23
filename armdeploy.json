@@ -1731,7 +1731,8 @@
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "CosmosDb__AccountEndPoint": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))).documentEndpoint]",
             "CosmosDb__AccountKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName')), '2022-08-15').primaryMasterKey]",
-            "CosmosDb__DatabaseName": "kudos-db"
+            "CosmosDb__DatabaseName": "kudos-db",
+            "CosmosDb__CommentsDatabaseName": "comments-db"
 
           }
         },

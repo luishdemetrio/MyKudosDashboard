@@ -73,7 +73,7 @@ else
                         <h4 class="my-0 fw-normal" >👏 Kudos</h4>                       
                     </div>
 
-                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto />
+                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack />
                     
                 </div>
             </div>
@@ -96,6 +96,8 @@ else
          
         </div>
 
+
+        <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_user UserPhoto=@_userPhoto />
 
 </div>
 
@@ -121,6 +123,9 @@ else
     private void OnCloseModalParameterButtonClick() => _sendKudosIsHidden = true;
 
     private KudosTab _kudosTab;
+
+    private CommentsKudos _replyKudos;
+
 
     private void OnDismiss()
     {
@@ -187,5 +192,12 @@ else
     {
         _kudosTab.SendCallBack(pKudos);
     }
+
+    private void ReplyCallBack(KudosResponse pKudos)
+    {
+        _replyKudos.ShowModal(pKudos);
+    }
+
+    
 }
 

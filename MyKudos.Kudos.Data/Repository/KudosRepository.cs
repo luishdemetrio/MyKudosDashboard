@@ -5,46 +5,50 @@ using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Data.Repository;
 
-public class KudosRepository: IKudosRepository
+public class KudosRepository : IKudosRepository
 {
 
-    private KudosDbContext _context;
+	private KudosDbContext _kudosDbContext;
 
-	public KudosRepository(KudosDbContext context)
+
+
+	public KudosRepository(KudosDbContext kudosDbContext)
 	{
-		_context = context;
+		_kudosDbContext = kudosDbContext;
+		
 	}
 
-    public Guid Add(KudosLog kudos)
-    {
-		_context.Kudos.Add(kudos);
-		_context.SaveChanges();
+	public Guid Add(KudosLog kudos)
+	{
+		_kudosDbContext.Kudos.Add(kudos);
+		_kudosDbContext.SaveChanges();
 
 		return kudos.Id;
-    }
+	}
 
-    public IEnumerable<KudosLog> GetKudos()
+	public IEnumerable<KudosLog> GetKudos()
 	{
-		return _context.Kudos;
+		return _kudosDbContext.Kudos;
 	}
 
 	//return -1 means that the user unliked
 	//return 1 means that the user liked
-    public int SendLike(string kudosId, string personId)
-    {
+	public int SendLike(string kudosId, string personId)
+	{
 
 		int sign = 0;
 
-		var kudos = _context.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
+		var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
 
 		if (kudos != null)
 		{
 			if (kudos.Likes == null)
 			{
 				kudos.Likes = new List<string>();
-                kudos.Likes.Add(personId);
+				kudos.Likes.Add(personId);
 				sign = 1;
-            }else if (kudos.Likes.Contains(personId))
+			}
+			else if (kudos.Likes.Contains(personId))
 			{
 				kudos.Likes.Remove(personId);
 				sign = -1;
@@ -55,10 +59,28 @@ public class KudosRepository: IKudosRepository
 				sign = 1;
 			}
 
-			_context.SaveChanges();
+			_kudosDbContext.SaveChanges();
 		}
 
 		return sign;
 
-    }
+	}
+
+	public bool SendComments(string kudosId, string commentId)
+	{
+
+		var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
+
+		if (kudos == null)
+			return false;
+
+		if (kudos.Comments == null)
+			kudos.Comments = new List<string>();
+
+		kudos.Comments.Add(commentId);
+
+        return _kudosDbContext.SaveChanges() >0;
+
+	}
+
 }

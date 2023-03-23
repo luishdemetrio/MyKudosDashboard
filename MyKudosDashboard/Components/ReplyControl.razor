@@ -1,0 +1,125 @@
+﻿@using MyKudosDashboard.Models;
+
+
+<div style="display: flex;">
+
+    <div style="width:50px;margin-top:5px;;padding-top: 15px">
+        <img src=@Comment.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
+    </div>
+
+    <div style="width:520px;">
+        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly="true" Value=@Comment.Message>@Comment.FromPerson.Name</FluentTextArea>
+    </div>
+
+</div>
+
+<div style="float:left;margin-left:37px">
+
+    <FluentButton id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" @onclick=@(()=>LikeComment(Comment.Id, Comment.FromPerson.Id))>
+        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
+                    Filled=@FilledLikeComments(@Comment) />
+        @Comment.Likes.Count()
+    </FluentButton>
+
+    <FluentTooltip Anchor=@($"reply_{Comment.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+
+        @if (Comment.Likes.Count() > 0)
+        {
+            <ul class="list-unstyled ">
+                @foreach (var like in Comment.Likes)
+                {
+                    <li>
+                        <div>
+                            <img src=@like.Photo
+                                 style="height: 26px;width: 26px;border-radius: 50%;" />
+                            <span style="margin-left:5px">@like.Name</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </FluentTooltip>
+
+    <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>ReplyMessageClick())>
+        <FluentIcon Name="@FluentIcons.CommentArrowRight" Slot="start" Size="@IconSize.Size16" Filled=false />
+        Reply
+    </FluentButton>
+
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string UserPhoto { get; set; }
+
+    [Parameter]
+    public CommentsResponse Comment { get; set; }
+
+    [Parameter]
+    public UserInfo User { get; set; }
+
+
+    private bool FilledLikeKudos(KudosResponse item)
+    {
+        bool filled = false;
+
+        @if (User != null)
+        {
+            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+        }
+
+        return filled;
+    }
+
+    private bool FilledLikeComments(CommentsResponse item)
+    {
+        bool filled = false;
+
+        @if (User != null)
+        {
+            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+        }
+
+        return filled;
+    }
+
+    private async void LikeComment(string commentId, string toPersonId)
+    {
+
+        UpdateLikes(commentId, User.ObjectId);
+
+    }
+
+    private void UpdateLikes(string commentId, string personId)
+    {
+
+        if (Comment.Id == commentId)
+        {
+            var like = Comment.Likes.Where(k => k.Id == personId).FirstOrDefault();
+
+
+            if ((like is null) || (!Comment.Likes.Contains(like)))
+            {
+
+                Comment.Likes.Add(new Person()
+                    {
+                        Id = personId,
+                        Name = User.DisplayName,
+                        Photo = UserPhoto
+                    });
+            }
+            else
+            {
+                Comment.Likes.Remove(like);
+            }
+        }
+    }
+
+    private void ReplyMessageClick()
+    {
+     
+    }
+
+}

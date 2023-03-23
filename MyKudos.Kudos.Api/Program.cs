@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MyKudos.Domain.Core.Bus;
 //using MyKudos.Kudos.Api.Grpc;
 using MyKudos.Kudos.App.Interfaces;
@@ -27,6 +28,7 @@ builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 builder.Services.AddScoped<IKudosService, KudosService>();
 builder.Services.AddScoped<IKudosRepository, KudosRepository>();
+builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 
 var config = builder.Configuration.GetSection("CosmosDb");
 
@@ -42,7 +44,28 @@ builder.Services.AddScoped<KudosDbContext>(_ =>
     return new KudosDbContext(options);
 });
 
+
+builder.Services.AddScoped<CommentsDbContext>(_ =>
+{
+    var options = new DbContextOptionsBuilder<CommentsDbContext>()
+      .UseCosmos(
+              config["AccountEndPoint"],
+              config["AccountKey"],
+              config["CommentsDatabaseName"])
+      .Options;
+
+    using var commentsContext = new CommentsDbContext(options);
+    commentsContext.Database.EnsureCreated();
+
+    return new CommentsDbContext(options);
+});
 var app = builder.Build();
+
+
+
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -64,10 +87,10 @@ app.MapControllers();
 app.Run();
 
 
-void ConfigureEventBus(IApplicationBuilder app)
-{
-    var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+//void ConfigureEventBus(IApplicationBuilder app)
+//{
+//    var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
 
-    eventBus.Subscribe<SendKudosCreatedEvent, SendKudosEventHandler>();
-}
+//    eventBus.Subscribe<SendKudosCreatedEvent, SendKudosEventHandler>();
+//}
 

@@ -16,8 +16,21 @@ public class KudosLog
     public DateTime Date { get; set; }
 
     public List<string> Likes { get; set; } = new();
+
+    public List<string> Comments { get; set; } = new();
 }
 
+
+public class Comments
+{
+    public Guid Id { get; set; } = Guid.NewGuid();  
+    public string KudosId { get; set; }
+    public string FromPersonId { get; set; }
+    public string Message { get; set; }
+    public DateTime Date { get; set; }
+    public List<string> Likes { get; set; } = new();
+
+}
 
 public record KudosNotification(
     Person From,

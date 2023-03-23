@@ -19,4 +19,8 @@ public interface IGatewayService
     Task<UserScore> GetUserScoreAsync(string pUserId);
 
     Task<IEnumerable<TopContributors>> GetTopContributors();
+
+    Task<string> SendCommentsAsync(CommentsRequest comment);
+
+    Task<IEnumerable<CommentsResponse>> GetComments(string kudosId);
 }

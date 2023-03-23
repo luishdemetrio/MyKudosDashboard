@@ -8,20 +8,20 @@
 
 
     <FluentTabs>
-        <FluentTab Text="All"></FluentTab>
+        <FluentTab Text="All"/>
         <FluentTab Text="Kudos to me" />
         <FluentTab Text="Kudos from me" />
 
         @if (_kudosList != null)
         {
             <FluentTabPanel>
-                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto />
+                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
             <FluentTabPanel>
-                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto />
+                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
             <FluentTabPanel>
-                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto />
+                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
         }
 
@@ -42,6 +42,13 @@
 
     private List<KudosResponse> _kudosList;
 
+    public delegate void ReplyKudosCallBack(KudosResponse pKudos);
+
+    [Parameter]
+    public ReplyKudosCallBack ReplyCallBack { get; set; }
+
+
+
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
@@ -52,6 +59,11 @@
 
         }
 
+    }
+
+    private void ReplyKudos(KudosResponse kudos)
+    {
+        ReplyCallBack?.Invoke(kudos);
     }
 
     private void LoadKudos()

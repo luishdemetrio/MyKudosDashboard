@@ -9,7 +9,8 @@ public class Kudos {
     public string Message { get; set; }
     public DateTime Date { get; set; }
     public List<string> Likes { get; set; } = new();
-    }
+    public List<string> Comments { get; set; } = new();
+}
 
 
 
@@ -34,15 +35,20 @@ public record KudosNotification
 
 
 
-public record KudosResponse(
-    string? Id,
-    Person From,
-    Person To,
-    string Title,
-    string Message,
-    DateTime SendOn,
-    IEnumerable<Person> Likes
-    );
+public class KudosResponse
+{
+    public string? Id { get; set; }
+    public Person From { get; set; }
+    public Person To { get; set; }
+    public string Title { get; set; }
+    public string Message { get; set; }
+    public DateTime SendOn { get; set; }
+    public IEnumerable<Person> Likes { get; set; }
+    public List<string> Comments { get; set; } = new();
+
+
+
+    }
 
 public record Reward(string Id, string Description);
 
