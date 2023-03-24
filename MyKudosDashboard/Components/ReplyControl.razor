@@ -1,19 +1,91 @@
 ﻿@using MyKudosDashboard.Models;
+@using Microsoft.Fast.Components.FluentUI
 
 
-<div style="display: flex;">
+<style>
+/* Style The Dropdown Button */
+.dropbtn {
+  margin-top: 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
 
-    <div style="width:50px;margin-top:5px;;padding-top: 15px">
+/* The container Div - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 16px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 5px 10px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+  
+}
+</style>
+
+<div style="display: flex;padding-bottom: 0px">
+
+    <div style="width:50px;margin-top:5px;padding-top: 15px">
         <img src=@Comment.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
     </div>
 
-    <div style="width:520px;">
-        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly="true" Value=@Comment.Message>@Comment.FromPerson.Name</FluentTextArea>
+    <div style="width:460px;display: flex;">
+        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly="true" Value=@Comment.Message Spellcheck="true"> @Comment.FromPerson.Name</FluentTextArea>
+
+
+        <div class="dropdown" style="margin-top: 5px;">
+            <button class="dropbtn">...</button>
+            <div class="dropdown-content">
+                <a href="#" @onclick=EditReplyOnClick>
+                    <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
+                                Filled=true />
+                    
+                </a>
+                <a href="#" @onclick=DeleteReplyOnClick>
+                    <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
+                                Filled=true />
+                    
+                </a>
+                
+            </div>
+        </div>
+
+      
+
+       
+
+
     </div>
 
 </div>
 
-<div style="float:left;margin-left:37px">
+<div style="float:left;margin-left:37px;padding-top: 0px">
 
     <FluentButton id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" @onclick=@(()=>LikeComment(Comment.Id, Comment.FromPerson.Id))>
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
@@ -60,7 +132,7 @@
     [Parameter]
     public UserInfo User { get; set; }
 
-
+   
     private bool FilledLikeKudos(KudosResponse item)
     {
         bool filled = false;
@@ -119,7 +191,16 @@
 
     private void ReplyMessageClick()
     {
-     
+
     }
 
+    private void EditReplyOnClick()
+    {
+        
+    }
+
+    private void DeleteReplyOnClick()
+    {
+
+    }
 }

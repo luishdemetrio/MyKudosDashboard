@@ -136,32 +136,40 @@
 
                     </tr>
 
-                    <tr>
+                    @if (_comments.Count() > 0)
+                    {
 
-                        <td scope="row">
+                        <tr>
 
-
-                            <div style="display: flex;">
-                                
-                                <ul class="list-unstyled ">
-                                    
-                                    @foreach (var comment in _comments)
-                                    {
-                                        
-                                        <li>
-
-                                            <ReplyControl Comment=@comment User=User UserPhoto=UserPhoto/>
-                                           
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
+                            <td scope="row">
 
 
-                        </td>
+                                <div style="display: flex;">
 
-                    </tr>
+                                    <ul class="list-unstyled ">
 
+                                        @foreach (var comment in _comments)
+                                        {
+
+                                            <li>
+
+                                                <ReplyControl Comment=@comment User=User UserPhoto=UserPhoto/>
+
+                                                @*<div style="float:left;margin-left:37px">
+
+                                                <ReplyControl Comment=@comment User=User UserPhoto=UserPhoto />
+
+                                            </div>*@
+
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
 
                      <tr>
 
@@ -209,8 +217,10 @@
 
     public void ShowModal(KudosResponse kudos)
     {
+
         _item = kudos;
 
+    
         ModalHidden = false;
 
         CommentsView.GetComments(_item.Id).ContinueWith(t =>
