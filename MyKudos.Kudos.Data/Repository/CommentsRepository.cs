@@ -1,11 +1,7 @@
 ﻿using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -65,5 +61,30 @@ public class CommentsRepository : ICommentsRepository
 
         return sign;
 
+    }
+
+
+    public bool Update(Comments comments)
+    {
+        var comment = _context.Comments.FirstOrDefault(c => c.Id == comments.Id);
+
+        if (comment != null)
+        {
+            comment.Message = comments.Message;
+        }
+
+        return _context.SaveChanges() >0;
+    }
+
+    public bool Delete(Guid commentId) {
+
+        var comment = _context.Comments.FirstOrDefault(c => c.Id == commentId);
+
+        if (comment != null)
+        {
+            _context.Comments.Remove(comment);
+        }
+
+        return _context.SaveChanges() > 0;
     }
 }

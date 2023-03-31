@@ -3,6 +3,7 @@ using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
+
 namespace MyKudos.Kudos.App.Services;
 
 public sealed class KudosService : IKudosService
@@ -50,5 +51,23 @@ public sealed class KudosService : IKudosService
     public IEnumerable<Comments> GetComments(string kudosId)
     {
         return _commentsRepository.GetComments(kudosId);
+    }
+
+    public bool UpdateComments(Comments comments)
+    {
+        return _commentsRepository.Update(comments);
+    }
+
+    public bool DeleteComments(string kudosId, Guid commentId)
+    {
+        
+
+        if (_commentsRepository.Delete(commentId))
+        {
+            _kudosRepository.DeleteComments(kudosId, commentId);
+            return true;
+        }
+
+        return false;
     }
 }

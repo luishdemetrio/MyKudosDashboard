@@ -29,4 +29,19 @@ public class CommentsController : Controller
     {
         return _kudosService.GetComments(kudosId);
     }
+
+
+
+    [HttpPut(Name = "Update")]
+    public bool Put(Comments comments)
+    {
+        return _kudosService.UpdateComments(comments);
+    }
+
+    [HttpDelete(Name = "Delete")]
+    public bool Delete(string kudosId, string commentId)
+    {
+        return _kudosService.DeleteComments(kudosId, Guid.Parse(commentId));
+    }
 }
+

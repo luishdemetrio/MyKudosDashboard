@@ -21,4 +21,9 @@ public interface ICommentsView
     Task<string> SendComments(CommentsRequest comment);
 
     Task<IEnumerable<CommentsResponse>> GetComments(string kudosId);
+
+
+    Task<bool> UpdateComments(CommentsResponse comment);
+
+    Task<bool> DeleteComments(string kudosId, string commentId);
 }

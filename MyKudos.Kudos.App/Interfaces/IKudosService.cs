@@ -14,4 +14,8 @@ public interface IKudosService
     string SendComments(Comments comment);
 
     IEnumerable<Comments> GetComments(string kudosId);
+
+    bool UpdateComments(Comments comments);
+
+    bool DeleteComments(string kudosId, Guid commentId);
 }

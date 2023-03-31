@@ -56,7 +56,10 @@
     </div>
 
     <div style="width:460px;display: flex;">
-        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly="true" Value=@Comment.Message Spellcheck="true"> @Comment.FromPerson.Name</FluentTextArea>
+
+        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly=@_isReplyCommendReadOnly
+                        Value=@Comment.Message Spellcheck="true"
+                        onchange=@PostValueChanged> @Comment.FromPerson.Name</FluentTextArea>
 
 
         <div class="dropdown" style="margin-top: 5px;">
@@ -76,18 +79,14 @@
             </div>
         </div>
 
-      
-
-       
-
-
     </div>
 
 </div>
 
 <div style="float:left;margin-left:37px;padding-top: 0px">
 
-    <FluentButton id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" @onclick=@(()=>LikeComment(Comment.Id, Comment.FromPerson.Id))>
+    <FluentButton   id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
+                    @onclick=@(()=>LikeComment(Comment.Id, Comment.FromPerson.Id))>
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                     Filled=@FilledLikeComments(@Comment) />
         @Comment.Likes.Count()
@@ -112,11 +111,23 @@
         }
     </FluentTooltip>
 
-    <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>ReplyMessageClick())>
+@*    <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>ReplyMessageClick())>
         <FluentIcon Name="@FluentIcons.CommentArrowRight" Slot="start" Size="@IconSize.Size16" Filled=false />
         Reply
-    </FluentButton>
+    </FluentButton>*@
 
+    @if(_isReplyCommendReadOnly == false)
+    {
+        <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditMessageClick())>
+            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=false />
+            Save Changes
+        </FluentButton>
+
+        <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditMessageClick())>
+            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=false />
+            Cancel
+        </FluentButton>
+    }
 
 </div>
 
@@ -132,7 +143,22 @@
     [Parameter]
     public UserInfo User { get; set; }
 
-   
+    public delegate void DeleteCommentCallBack(string kudosId, string commentId);
+
+    [Parameter]
+    public DeleteCommentCallBack deleteCommentCallBack { get; set; }
+
+    public delegate void UpdateCommentCallBack(CommentsResponse comments);
+
+    [Parameter]
+    public UpdateCommentCallBack updateCommentCallBack { get; set; }
+
+    private bool _isReplyCommendReadOnly=true;
+
+    private string _originalMessage;
+    private string _updatedComment;
+
+
     private bool FilledLikeKudos(KudosResponse item)
     {
         bool filled = false;
@@ -157,9 +183,8 @@
         return filled;
     }
 
-    private async void LikeComment(string commentId, string toPersonId)
+    private void LikeComment(string commentId, string toPersonId)
     {
-
         UpdateLikes(commentId, User.ObjectId);
 
     }
@@ -194,13 +219,39 @@
 
     }
 
+
     private void EditReplyOnClick()
     {
-        
+
+        _isReplyCommendReadOnly = false;
+
+        _originalMessage = Comment.Message;
+
     }
 
     private void DeleteReplyOnClick()
     {
+        deleteCommentCallBack?.Invoke(Comment.KudosId, Comment.Id);
+    }
 
+    private void CancelEditMessageClick()
+    {
+        _isReplyCommendReadOnly = true;
+        Comment.Message = _originalMessage;
+
+    }
+
+    private void SaveEditMessageClick()
+    {
+        _isReplyCommendReadOnly = true;
+
+        Comment.Message = _updatedComment;
+
+        updateCommentCallBack?.Invoke(Comment);
+    }
+
+    private void PostValueChanged(ChangeEventArgs args)
+    {
+        _updatedComment = args.Value.ToString();
     }
 }

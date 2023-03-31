@@ -83,4 +83,20 @@ public class KudosRepository : IKudosRepository
 
 	}
 
+    public bool DeleteComments(string kudosId, Guid commentId)
+    {
+        var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
+
+        if (kudos == null)
+            return false;
+
+
+        if ( (kudos.Comments != null) && (kudos.Comments.Contains(commentId.ToString()) ) )
+		{
+			kudos.Comments.Remove(commentId.ToString());
+			return _kudosDbContext.SaveChanges() > 0;
+		}
+
+		return false;
+    }
 }

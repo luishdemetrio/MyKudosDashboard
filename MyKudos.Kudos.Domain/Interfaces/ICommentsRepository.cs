@@ -13,4 +13,10 @@ public  interface ICommentsRepository
 
     IEnumerable<Comments> GetComments(string kudosId);
 
+    bool Update(Comments comments);
+    
+    bool Delete(Guid commentId);
+
+
+
 }

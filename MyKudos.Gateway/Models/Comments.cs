@@ -2,6 +2,7 @@
 
 public class CommentsRequest
 {
+    public string? Id { get; set; }
     public string KudosId { get; set; }
     public string FromPersonId { get; set; }
     public string Message { get; set; }

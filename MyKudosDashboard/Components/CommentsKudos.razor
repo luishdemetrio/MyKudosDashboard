@@ -124,7 +124,8 @@
                                 </div>
 
                                 <div style="width:520px;">
-                                    <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize="TextAreaResize.Vertical" onchange=@PostValueChanged   />
+                                    <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize="TextAreaResize.Vertical" onchange=@PostValueChanged 
+                                                    Value=@_replyMessage/>
                                 </div>
                             </div>
 
@@ -153,7 +154,9 @@
 
                                             <li>
 
-                                                <ReplyControl Comment=@comment User=User UserPhoto=UserPhoto/>
+                                                <ReplyControl   Comment=@comment User=User UserPhoto=UserPhoto 
+                                                                deleteCommentCallBack=@DeleteComment 
+                                                                updateCommentCallBack=@UpdateComment/>
 
                                                 @*<div style="float:left;margin-left:37px">
 
@@ -175,7 +178,7 @@
 
                         <td scope="row">
 
-                            <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>CloseClick() )>✖️ Cancel</button>
+                            <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>CloseClick() )>✖️ Close</button>
                         </td>
 
                     </tr>
@@ -371,6 +374,10 @@
 
                                 Date = DateTime.Now
                             });
+
+                         _replyMessage = string.Empty;
+
+                         InvokeAsync(StateHasChanged);
                      });
 
 
@@ -380,5 +387,26 @@
     {
         _showReply = !_showReply;
     }
+
+    public void DeleteComment(string kudosId, string commentId)
+    {
+        CommentsView.DeleteComments(kudosId, commentId).ContinueWith(t =>
+        {
+            var comment = _comments.First(c => c.Id == commentId);
+
+            if (_comments.Contains(comment))
+                _comments.Remove(comment);
+
+            InvokeAsync(StateHasChanged);
+
+            
+        });
+    }
+
+    public void UpdateComment(CommentsResponse comments)
+    {
+        CommentsView.UpdateComments(comments);
+    }
+
 
 }

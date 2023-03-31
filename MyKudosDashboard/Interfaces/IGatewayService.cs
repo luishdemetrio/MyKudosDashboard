@@ -23,4 +23,9 @@ public interface IGatewayService
     Task<string> SendCommentsAsync(CommentsRequest comment);
 
     Task<IEnumerable<CommentsResponse>> GetComments(string kudosId);
+
+    Task<bool> UpdateComments(CommentsRequest comments);
+
+    Task<bool> DeleteComments(string kudosId, string commentId);
+
 }

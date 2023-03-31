@@ -31,4 +31,21 @@ public class CommentsView : ICommentsView
     {
         return _dashboardService.SendLike(like);
     }
+
+    public Task<bool> UpdateComments(CommentsResponse comment)
+    {
+        return _dashboardService.UpdateComments(new CommentsRequest()
+        {
+            Id = comment.Id,
+            Date = comment.Date,
+            Message = comment.Message,
+            KudosId = comment.KudosId,
+            FromPersonId = comment.FromPerson.Id
+        });
+    }
+
+    public  Task<bool> DeleteComments(string kudosId, string commentId)
+    {
+        return _dashboardService.DeleteComments(kudosId, commentId);
+    }
 }

@@ -15,6 +15,8 @@ public interface IKudosService
 
     Task<IEnumerable<Comments>> GetComments(string kudosId);
 
-    
+    Task<bool> UpdateComments(Comments comments);
+
+    Task<bool> DeleteComments(string kudosId, string commentId);
 
 }

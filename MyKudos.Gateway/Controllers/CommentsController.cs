@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Graph;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
 using MyKudos.Kudos.Domain.Models;
+
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -117,5 +117,28 @@ public class CommentsController : Controller
 
         return result;
 
+    }
+
+
+    [HttpPut(Name ="Update")]
+    public Task<bool> Put ([FromBody]CommentsRequest comments)
+    {
+
+        return _kudosService.UpdateComments(new Comments()
+        {
+            Id = Guid.Parse(comments.Id),
+            KudosId = comments.KudosId,
+            Message = comments.Message,
+            FromPersonId = comments.FromPersonId,
+            Date = comments.Date
+        });
+
+        
+    }
+
+    [HttpDelete(Name = "Delete")]
+    public Task<bool> Delete(string kudosId, string commentId)
+    {
+        return _kudosService.DeleteComments(kudosId, commentId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
@@ -15,11 +16,14 @@ public class WelcomeView : IWelcomeView
 
     private IGatewayService _gatewayService;
 
+    private string _serviceBusConnectionString;
     public WelcomeView(IGatewayService gatewayService, IConfiguration configuration)
     {
         _gatewayService = gatewayService;
 
-        _serviceBusClient = new ServiceBusClient(configuration["KudosServiceBus_ConnectionString"]);
+        _serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
+
+        _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
 
     }
 
@@ -31,6 +35,7 @@ public class WelcomeView : IWelcomeView
         return await _gatewayService.GetUserPhoto(userId);
     }
 
+
     public void RegisterForUserScoreUpdate(string userId)
     {
         
@@ -40,8 +45,34 @@ public class WelcomeView : IWelcomeView
 
     }
 
+    private async Task CreateATopicIfItDoesntExistAsync(string topicName, string subscriptionName)
+    {
+        //create a topic if it doesnt exist
+        var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
+
+        if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
+        {
+            await serviceBusAdminClient.CreateTopicAsync(topicName);
+        }
+
+        //create a temp subscription for the user
+
+        if (!await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
+        {
+            var options = new CreateSubscriptionOptions(topicName, subscriptionName)
+            {
+                AutoDeleteOnIdle = TimeSpan.FromHours(1)
+            };
+
+            await serviceBusAdminClient.CreateSubscriptionAsync(options);
+        }
+    }
+
     private async void ServiceBusScoreProcessor(string userId)
     {
+
+        await CreateATopicIfItDoesntExistAsync("dashboardscoreupdated", userId);
+
         _serviceBusScoreProcessor = _serviceBusClient.CreateProcessor("dashboardscoreupdated", userId);
 
         _serviceBusScoreProcessor.ProcessMessageAsync += _serviceBusScoreProcessor_ProcessMessageAsync;

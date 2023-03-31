@@ -13,4 +13,6 @@ public interface IKudosRepository
     int SendLike(string kudosId, string personId);
 
     bool SendComments(string kudosId, string commentId);
+
+    bool DeleteComments(string kudosId, Guid commentId);
 }
