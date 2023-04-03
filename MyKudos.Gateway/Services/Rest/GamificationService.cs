@@ -35,7 +35,7 @@ public class GamificationService : IGamificationService
 
         if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            result = JsonConvert.DeserializeObject<List<UserScore>>(response.Content)!;
+            result = JsonConvert.DeserializeObject<List<UserScore>>(response.Content);
 
         }
 
@@ -58,7 +58,7 @@ public class GamificationService : IGamificationService
 
         if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            result = JsonConvert.DeserializeObject<UserScore>(response.Content)!;
+            result = JsonConvert.DeserializeObject<UserScore>(response.Content);
 
         }
 

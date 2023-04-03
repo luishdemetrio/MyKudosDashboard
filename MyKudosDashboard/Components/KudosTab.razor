@@ -53,7 +53,7 @@
     {
         base.OnAfterRender(firstRender);
 
-        if (User != null)
+        if (User != null && firstRender)
         {
             LoadKudos();
 

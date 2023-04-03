@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Azure;
 using MyKudos.Recognition.App.Interfaces;
 
 namespace MyKudos.Recognition.Api.Controllers;

@@ -248,8 +248,10 @@
             "KudosSendScore": "30",
             "LikeSendScore": "5",
             "LikeReceivedScore": "5",
+            "MessageReceivedScore": "5",
+            "MessageSentScore": "10",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-            "FUNCTIONS_EXTENSION_VERSION":  "~4"
+            "FUNCTIONS_EXTENSION_VERSION": "~4"
 
           }
         },
@@ -1956,7 +1958,12 @@
             "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
             "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
             "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
-            "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived"
+            "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived",
+            "KudosServiceBus_GamificationMessageSentTopicName": "GamificationMessageSent",
+            "KudosServiceBus_GamificationMessageReceivedTopicName": "GamificationMessageReceived",
+            "KudosServiceBus_GamificationMessageDeletedFromTopicName": "GamificationMessageDeletedFrom",
+            "KudosServiceBus_GamificationMessageDeletedToTopicName": "GamificationMessageDeletedTo"
+
 
           }
         },

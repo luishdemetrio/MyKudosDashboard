@@ -7,4 +7,8 @@ public interface IKudosQueue
     Task SendKudosAsync(KudosNotification kudos);
 
     Task SendLikeAsync(LikeGateway like, int sign );
+
+    Task MessageSent(CommentsRequest comments);
+
+    Task MessageDeleted(CommentsRequest comments);
 }

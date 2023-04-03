@@ -3,7 +3,6 @@ using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
 using MyKudos.Kudos.Domain.Models;
 
-
 namespace MyKudos.Gateway.Controllers;
 
 [ApiController]
@@ -31,7 +30,9 @@ public class CommentsController : Controller
     public Task<string> Post(CommentsRequest comments)
     {
 
-        var commentId = _kudosService.SendCommentsAsync(new Comments()
+        _ = _kudosQueue.MessageSent(comments);
+
+        return _kudosService.SendCommentsAsync(new Comments()
         {
             KudosId = comments.KudosId,
             Message = comments.Message,
@@ -39,7 +40,6 @@ public class CommentsController : Controller
             Date = comments.Date
         });
 
-        return commentId;
     }
 
     [HttpGet(Name = "GetComments")]
@@ -139,6 +139,11 @@ public class CommentsController : Controller
     [HttpDelete(Name = "Delete")]
     public Task<bool> Delete(string kudosId, string commentId)
     {
-        return _kudosService.DeleteComments(kudosId, commentId);
+        var result = _kudosService.DeleteComments(kudosId, commentId);
+
+        //await _kudosQueue.DeleteMessage(comments);
+
+        return result;
+                
     }
 }

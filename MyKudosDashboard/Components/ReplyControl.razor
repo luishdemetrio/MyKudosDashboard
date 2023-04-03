@@ -62,22 +62,28 @@
                         onchange=@PostValueChanged> @Comment.FromPerson.Name</FluentTextArea>
 
 
-        <div class="dropdown" style="margin-top: 5px;">
-            <button class="dropbtn">...</button>
-            <div class="dropdown-content">
-                <a href="#" @onclick=EditReplyOnClick>
-                    <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
-                                Filled=true />
+        @if (CanEditOrDeleteComment())
+        {
+            
+        
+            <div class="dropdown" style="margin-top: 5px;">
+                <button class="dropbtn">...</button>
+                <div class="dropdown-content">
+                    <a href="#" @onclick=EditReplyOnClick>
+                        <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
+                                    Filled=true />
                     
-                </a>
-                <a href="#" @onclick=DeleteReplyOnClick>
-                    <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
-                                Filled=true />
+                    </a>
+                    <a href="#" @onclick=DeleteReplyOnClick>
+                        <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
+                                    Filled=true />
                     
-                </a>
+                    </a>
                 
+                </div>
             </div>
-        </div>
+
+        }
 
     </div>
 
@@ -157,7 +163,7 @@
 
     private string _originalMessage;
     private string _updatedComment;
-
+    
 
     private bool FilledLikeKudos(KudosResponse item)
     {
@@ -169,6 +175,11 @@
         }
 
         return filled;
+    }
+
+    private bool CanEditOrDeleteComment()
+    {
+        return (Comment.FromPerson.Id == User.ObjectId);
     }
 
     private bool FilledLikeComments(CommentsResponse item)

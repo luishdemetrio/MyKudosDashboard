@@ -193,11 +193,15 @@
 
     private FluentDialog SendKudosFluentDialog;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnInitializedAsync();
+        await base.OnAfterRenderAsync(firstRender);
 
-        recognitions = await SendKudosView.GetRecognitionsAsync();
+        if (firstRender && recognitions == null)
+        {
+            
+            recognitions = await SendKudosView.GetRecognitionsAsync();
+        }
     }
 
 
@@ -304,21 +308,7 @@
 
         if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
         {
-            //var k = new KudosResponse()
-            //    {
-            //        Id = kudosId.ToString(),
-            //        From = kudos.From,
-            //        To = kudos.To,
-            //        Title = kudos.Title.Description,
-            //        Message = kudos.Message,
-            //        Likes = new(),
-            //        SendOn = DateTime.Now
-            //    };
-
-
-
-           // sendKudosCallBack?.Invoke(k);
-
+           
             await InvokeAsync(() =>
              {
                  BlockSendButton(false);

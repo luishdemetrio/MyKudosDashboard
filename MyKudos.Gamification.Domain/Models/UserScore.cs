@@ -10,4 +10,6 @@ public class UserScore
     public int KudosReceived { get; set; }
     public int LikesSent { get; set; }
     public int LikesReceived { get; set; }
+    public int MessagesReceived { get; set; }
+    public int MessagesSent { get; set; }
 }

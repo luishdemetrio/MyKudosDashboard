@@ -1,27 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.Fast.Components.FluentUI;
-using Microsoft.Identity.Client;
-using Microsoft.TeamsFx.Helper;
-using Microsoft.TeamsFx;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
 
-//using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-//builder.Services.AddRazorPages(options =>
-//{
-//    options.Conventions.AuthorizeFolder("/tab");
-
-//});
-
-
-
 
 builder.Services.AddServerSideBlazor();
 
@@ -34,11 +20,6 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddFluentUIComponents();
 
-//Radzen
-//builder.Services.AddScoped<DialogService>();
-//builder.Services.AddScoped<NotificationService>();
-//builder.Services.AddScoped<TooltipService>();
-//builder.Services.AddScoped<ContextMenuService>();
 
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
@@ -63,18 +44,6 @@ builder.Services.AddSingleton<IRestServiceToken>(t =>
                     exposedAPI: config["ExposedApi"]
                 ));
 
-
-//// Add MS GRAPH services to the container.
-//builder.Services
-//    // Use Web API authentication (default JWT bearer token scheme)
-//    .AddMicrosoftIdentityWebApiAuthentication(builder.Configuration)
-//    // Enable token acquisition via on-behalf-of flow
-//    .EnableTokenAcquisitionToCallDownstreamApi()
-//    // Add authenticated Graph client via dependency injection
-//    .AddMicrosoftGraph(builder.Configuration.GetSection("Graph"))
-//    // Use in-memory token cache
-//    // See https://github.com/AzureAD/microsoft-identity-web/wiki/token-cache-serialization
-//    .AddInMemoryTokenCaches();
 
 var app = builder.Build();
 
