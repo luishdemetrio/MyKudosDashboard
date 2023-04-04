@@ -389,14 +389,14 @@
         _showReply = !_showReply;
     }
 
-    public void DeleteComment(string kudosId, string commentId)
+    public void DeleteComment(CommentsResponse pComments)
     {
-        CommentsView.DeleteComments(kudosId, commentId).ContinueWith(t =>
+        CommentsView.DeleteComments(pComments, _item.To.Id).ContinueWith(t =>
         {
-            var comment = _comments.First(c => c.Id == commentId);
+            var comments = _comments.First(c => c.Id == pComments.Id.ToString());
 
-            if (_comments.Contains(comment))
-                _comments.Remove(comment);
+            if (_comments.Contains(comments))
+                _comments.Remove(comments);
 
             InvokeAsync(StateHasChanged);
 
@@ -406,7 +406,7 @@
 
     public void UpdateComment(CommentsResponse comments)
     {
-        CommentsView.UpdateComments(comments);
+        CommentsView.UpdateComments(comments, _item.To.Id);
     }
 
 

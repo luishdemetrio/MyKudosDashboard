@@ -137,11 +137,11 @@ public class CommentsController : Controller
     }
 
     [HttpDelete(Name = "Delete")]
-    public Task<bool> Delete(string kudosId, string commentId)
+    public Task<bool> Delete([FromBody] CommentsRequest comments)
     {
-        var result = _kudosService.DeleteComments(kudosId, commentId);
+        var result = _kudosService.DeleteComments(comments.KudosId, comments.Id.ToString());
 
-        //await _kudosQueue.DeleteMessage(comments);
+        _ = _kudosQueue.MessageDeleted(comments);
 
         return result;
                 

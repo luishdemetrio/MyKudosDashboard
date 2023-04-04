@@ -32,7 +32,7 @@ public class CommentsView : ICommentsView
         return _dashboardService.SendLike(like);
     }
 
-    public Task<bool> UpdateComments(CommentsResponse comment)
+    public Task<bool> UpdateComments(CommentsResponse comment, string toPersonId)
     {
         return _dashboardService.UpdateComments(new CommentsRequest()
         {
@@ -40,12 +40,21 @@ public class CommentsView : ICommentsView
             Date = comment.Date,
             Message = comment.Message,
             KudosId = comment.KudosId,
-            FromPersonId = comment.FromPerson.Id
+            FromPersonId = comment.FromPerson.Id,
+            ToPersonId = toPersonId
         });
     }
 
-    public  Task<bool> DeleteComments(string kudosId, string commentId)
+    public  Task<bool> DeleteComments(CommentsResponse comment, string toPersonId)
     {
-        return _dashboardService.DeleteComments(kudosId, commentId);
+        return _dashboardService.DeleteComments(new CommentsRequest()
+        {
+            Id = comment.Id,
+            Date = comment.Date,
+            Message = comment.Message,
+            KudosId = comment.KudosId,
+            FromPersonId = comment.FromPerson.Id,
+            ToPersonId = toPersonId
+        });
     }
 }

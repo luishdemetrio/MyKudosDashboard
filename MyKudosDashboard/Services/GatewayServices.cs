@@ -327,17 +327,24 @@ public class GatewayService : IGatewayService
         return result;
     }
 
-    public async Task<bool> DeleteComments(string kudosId, string commentId)
+    public async Task<bool> DeleteComments(CommentsRequest comments)
     {
         bool result = false;
 
-        var client = new RestClient($"{_gatewayServiceUrl}Comments?kudosId={kudosId}&commentId={commentId}");
+        var client = new RestClient($"{_gatewayServiceUrl}Comments");
 
         var token = await _serviceToken.GetAccessTokenAsync();
 
         var request = new RestRequest();
         request.Method = Method.Delete;
         request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(comments);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
 
         RestResponse response = client.Execute(request);
 

@@ -26,6 +26,6 @@ public interface IGatewayService
 
     Task<bool> UpdateComments(CommentsRequest comments);
 
-    Task<bool> DeleteComments(string kudosId, string commentId);
+    Task<bool> DeleteComments(CommentsRequest comments);
 
 }

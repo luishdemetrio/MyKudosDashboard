@@ -149,7 +149,7 @@
     [Parameter]
     public UserInfo User { get; set; }
 
-    public delegate void DeleteCommentCallBack(string kudosId, string commentId);
+    public delegate void DeleteCommentCallBack(CommentsResponse comments);
 
     [Parameter]
     public DeleteCommentCallBack deleteCommentCallBack { get; set; }
@@ -242,7 +242,7 @@
 
     private void DeleteReplyOnClick()
     {
-        deleteCommentCallBack?.Invoke(Comment.KudosId, Comment.Id);
+        deleteCommentCallBack?.Invoke(Comment);
     }
 
     private void CancelEditMessageClick()

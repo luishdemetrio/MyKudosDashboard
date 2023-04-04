@@ -20,7 +20,9 @@ public class KudosQueue : IKudosQueue
 
     private static string _gamificationMessageSentTopicName = string.Empty;
     private static string _gamificationMessageReceivedTopicName = string.Empty;
-    private static string _gamificationMessageDeletedTopicName = string.Empty;
+
+    private static string _gamificationMessageDeletedFromTopicName = string.Empty;
+    private static string _gamificationMessageDeletedToTopicName = string.Empty;
 
     public KudosQueue(IConfiguration configuration)
     {
@@ -35,7 +37,9 @@ public class KudosQueue : IKudosQueue
 
         _gamificationMessageSentTopicName = configuration["KudosServiceBus_GamificationMessageSentTopicName"];
         _gamificationMessageReceivedTopicName = configuration["KudosServiceBus_GamificationMessageReceivedTopicName"];
-        _gamificationMessageDeletedTopicName = configuration["KudosServiceBus_GamificationMessageDeletedTopicName"];
+        
+        _gamificationMessageDeletedFromTopicName = configuration["KudosServiceBus_GamificationMessageDeletedFromTopicName"];
+        _gamificationMessageDeletedToTopicName = configuration["KudosServiceBus_GamificationMessageDeletedToTopicName"];
     }
 
     public async Task SendKudosAsync(KudosNotification kudos)
@@ -127,7 +131,7 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic(comments.FromPersonId, serviceBusAdminClient, _gamificationMessageDeletedTopicName, "notification");
-        await SendTopic(comments.ToPersonId, serviceBusAdminClient, _gamificationMessageDeletedTopicName, "notification");
+        await SendTopic(comments.FromPersonId, serviceBusAdminClient, _gamificationMessageDeletedFromTopicName, "notification");
+        await SendTopic(comments.ToPersonId, serviceBusAdminClient, _gamificationMessageDeletedToTopicName, "notification");
     }
 }

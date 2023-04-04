@@ -17,7 +17,7 @@ public class UserScoreService : IUserScoreService
     public UserScoreService(IConfiguration config, IRestServiceToken serviceToken)
     {
         _serviceToken = serviceToken;
-        _userScoreServiceUrl = config["userScoreServiceUrl"];
+        _userScoreServiceUrl = "https://localhost:7202/";// config["userScoreServiceUrl"];
     }
 
     public async Task<UserScore> GetUserScoreAsync(string pUserId)
