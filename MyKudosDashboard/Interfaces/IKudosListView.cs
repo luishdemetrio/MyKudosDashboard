@@ -16,4 +16,6 @@ public interface IKudosListView
     public delegate void UpdateKudosCallBack(KudosResponse kudos);
 
     public UpdateKudosCallBack KudosCallback { get; set; }
+
+    public void RegisterForLiveUpdates(string userId);
 }

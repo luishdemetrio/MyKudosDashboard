@@ -15,13 +15,13 @@
         @if (_kudosList != null)
         {
             <FluentTabPanel>
-                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos KudosCallback=UpdateKudosCallback />
             </FluentTabPanel>
             <FluentTabPanel>
-                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos KudosCallback=UpdateKudosCallback />
             </FluentTabPanel>
             <FluentTabPanel>
-                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos KudosCallback=UpdateKudosCallback />
             </FluentTabPanel>
         }
 
@@ -47,16 +47,24 @@
     [Parameter]
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
+    private static int _numberOfCallBack;
 
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
 
         if (User != null && firstRender)
         {
             LoadKudos();
 
+        }
+        //else
+
+        if (_numberOfCallBack > 0)
+        {
+            Interlocked.Decrement(ref _numberOfCallBack);
+            StateHasChanged();
         }
 
     }
@@ -107,6 +115,23 @@
         //});
 
         LoadKudos();
+
+    }
+
+    private void UpdateKudosCallback(KudosResponse pKudos)
+    {
+        Interlocked.Increment(ref _numberOfCallBack);
+
+        var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
+
+        if (k == null)
+        {
+            _kudosList.Add(pKudos);
+            InvokeAsync(StateHasChanged);
+        }
+       
+      //  LoadKudos();
+       
 
     }
 }

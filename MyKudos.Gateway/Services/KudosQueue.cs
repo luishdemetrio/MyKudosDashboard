@@ -42,7 +42,7 @@ public class KudosQueue : IKudosQueue
         _gamificationMessageDeletedToTopicName = configuration["KudosServiceBus_GamificationMessageDeletedToTopicName"];
     }
 
-    public async Task SendKudosAsync(KudosNotification kudos)
+    public async Task SendKudosAsync(string kudosId, KudosNotification kudos)
     {
 
         //create an admin client to manage artifacts
@@ -50,23 +50,34 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //send notification via Bot
-        await SendTopic(kudos, serviceBusAdminClient, _notificationTopicName, "notification");
+        await SendTopic(kudos, serviceBusAdminClient, _notificationTopicName, "KudosNotification");
 
         //gamification
-        await SendTopic(kudos.From.Id, serviceBusAdminClient, _gamificationKudosSentTopicName, "notification");
-        await SendTopic(kudos.To.Id, serviceBusAdminClient, _gamificationKudosReceivedTopicName, "notification") ;
+        await SendTopic(kudos.From.Id, serviceBusAdminClient, _gamificationKudosSentTopicName, "FromPersonId");
+        await SendTopic(kudos.To.Id, serviceBusAdminClient, _gamificationKudosReceivedTopicName,  "ToPersonId") ;
 
         //notification to update the Teams Apps
-        await SendTopic(kudos, serviceBusAdminClient, "kudosdashboard", "notification");
+        await SendTopic(new KudosResponse
+                        {
+                            Id = kudosId,
+                            To = kudos.To,
+                            From = kudos.From,
+                            Message = kudos.Message,
+                            Title = kudos.Title.Description,
+                            SendOn = kudos.SendOn,
+                            Comments = new(),
+                            Likes = new List<Person>()
+                        }, 
+                        serviceBusAdminClient, "kudosdashboard", "KudosResponse");
 
 
 
     }
 
     private static async Task SendTopic(object queueMessage, ServiceBusAdministrationClient serviceBusAdminClient,
-                                        string topic, string subscriptionName)
+                                        string topic, string subject)
     {
-        
+
         //create a topic if it doesnt exist
 
         if (!await serviceBusAdminClient.TopicExistsAsync(topic))
@@ -74,21 +85,37 @@ public class KudosQueue : IKudosQueue
             await serviceBusAdminClient.CreateTopicAsync(topic);
         }
 
-        //create a temp subscription for the user
+  
+        var client = new ServiceBusClient(_connectionString);
 
-        if (!await serviceBusAdminClient.SubscriptionExistsAsync(topic, subscriptionName))
+        var sender = client.CreateSender(topic);
+
+        var message = new ServiceBusMessage(JsonConvert.SerializeObject(queueMessage))
         {
-            var options = new CreateSubscriptionOptions(topic, subscriptionName)
-            {
-                AutoDeleteOnIdle = TimeSpan.FromHours(1)
-            };
+            Subject = subject,
+            ContentType = "application/json"
+        };
 
-            await serviceBusAdminClient.CreateSubscriptionAsync(options);
+        await sender.SendMessageAsync(message);
+
+        await sender.CloseAsync();
+    }
+
+
+    private static async Task SendQueue(object queueMessage, ServiceBusAdministrationClient serviceBusAdminClient,
+                                        string queueName)
+    {
+
+        //create a topic if it doesnt exist
+
+        if (!await serviceBusAdminClient.QueueExistsAsync(queueName))
+        {
+            await serviceBusAdminClient.CreateQueueAsync(queueName);
         }
 
         var client = new ServiceBusClient(_connectionString);
 
-        var sender = client.CreateSender(topic);
+        var sender = client.CreateSender(queueName);
 
         var message = new ServiceBusMessage(JsonConvert.SerializeObject(queueMessage));
 
@@ -102,11 +129,11 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic($"{like.FromPersonId},{sign}", serviceBusAdminClient, _gamificationLikeSentTopicName, "notification");
-        await SendTopic($"{like.ToPersonId},{sign}", serviceBusAdminClient, _gamificationLikeReceivedTopicName, "notification");
+        await SendTopic($"{like.FromPersonId},{sign}", serviceBusAdminClient, _gamificationLikeSentTopicName, "FromPersonId");
+        await SendTopic($"{like.ToPersonId},{sign}", serviceBusAdminClient, _gamificationLikeReceivedTopicName, "ToPersonId");
 
         //notification to update the Teams Apps
-        await SendTopic(like, serviceBusAdminClient, "dashboard", "notification");
+        await SendTopic(like, serviceBusAdminClient, "dashboard", "LikeGateway");
     }
 
     public async Task MessageSent(CommentsRequest comments)
@@ -116,8 +143,8 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic(comments.FromPersonId, serviceBusAdminClient, _gamificationMessageSentTopicName, "notification");
-        await SendTopic(comments.ToPersonId, serviceBusAdminClient, _gamificationMessageReceivedTopicName, "notification");
+        await SendQueue(comments.FromPersonId, serviceBusAdminClient, "GamificationReplySent");
+        await SendQueue(comments.ToPersonId, serviceBusAdminClient, "GamificationReplyReceived");
 
 
 
@@ -131,7 +158,7 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic(comments.FromPersonId, serviceBusAdminClient, _gamificationMessageDeletedFromTopicName, "notification");
-        await SendTopic(comments.ToPersonId, serviceBusAdminClient, _gamificationMessageDeletedToTopicName, "notification");
+        await SendQueue(comments.FromPersonId, serviceBusAdminClient, _gamificationMessageDeletedFromTopicName);
+        await SendQueue(comments.ToPersonId, serviceBusAdminClient, _gamificationMessageDeletedToTopicName);
     }
 }

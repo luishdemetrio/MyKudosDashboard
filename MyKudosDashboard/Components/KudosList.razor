@@ -122,15 +122,23 @@
     [Parameter]
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
+    [Parameter]
+    public IKudosListView.UpdateKudosCallBack KudosCallback { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
 
         base.OnAfterRender(firstRender);
 
-        KudosListView.LikeCallback = UpdateLikeCallback;
-        KudosListView.KudosCallback = UpdateKudosCallback;
+        if (firstRender)
+        {
+            KudosListView.LikeCallback = UpdateLikeCallback;
+            KudosListView.KudosCallback = UpdateKudosCallback;
 
+            KudosListView.RegisterForLiveUpdates(User.ObjectId);
+        }
+        
+       
     }
 
 
@@ -166,7 +174,7 @@
     {
 
         ReplyCallBack?.Invoke(kudos);
-        
+
     }
 
     private void UpdateLikeCallback(Like like)
@@ -207,14 +215,16 @@
 
     private void UpdateKudosCallback(KudosResponse pKudos)
     {
-        var k = kudos.Select(k => k.Id == pKudos.Id);
+        //var k = kudos.FirstOrDefault(k => k.Id == pKudos.Id);
 
-        if (k == null)
-        {
-            kudos.Append(pKudos);
-          //  InvokeAsync(StateHasChanged);
-        }
-        
+        //if (k == null)
+        //{
+        //    kudos.Add(pKudos);
+        //    StateHasChanged();
+        //}
+
+        KudosCallback?.Invoke(pKudos);
+
     }
 
 

@@ -34,6 +34,8 @@ public class UserScoreRepository : IUserScoreRepository
             score.KudosReceived += userScore.KudosReceived;
             score.LikesSent += userScore.LikesSent;
             score.LikesReceived += userScore.LikesReceived;
+            score.MessagesReceived += userScore.MessagesReceived;
+            score.MessagesSent += userScore.MessagesSent;
             
           
         }

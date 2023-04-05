@@ -28,8 +28,8 @@ namespace MyKudos.Gamification.Receiver
         }
 
 
-        [FunctionName("gamificationKudosReceived")]
-        public async Task Run([ServiceBusTrigger("gamificationkudosreceived", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
+        [FunctionName("GamificationKudosReceived")]
+        public async Task Run([ServiceBusTrigger("GamificationKudosReceived", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
         {
             
             try
@@ -58,7 +58,7 @@ namespace MyKudos.Gamification.Receiver
             catch (Exception ex)
             {
                 _logger.LogError($"Error processing message: {ex.Message}");
-                throw;
+                
             }
 
         }

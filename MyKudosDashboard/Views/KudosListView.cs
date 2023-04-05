@@ -4,7 +4,6 @@ using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 
-
 namespace MyKudosDashboard.Views;
 
 public class KudosListView : IKudosListView
@@ -22,6 +21,7 @@ public class KudosListView : IKudosListView
 
     private string _serviceBusConnectionString;
 
+
     public KudosListView(IGatewayService gatewayService, IConfiguration configuration)
     {
         _gatewayService = gatewayService;
@@ -30,9 +30,6 @@ public class KudosListView : IKudosListView
 
         _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
 
-        ServiceBusLikeMessageProcessor();
-
-        ServiceBusKudosMessageProcessor();
     }
 
     public async Task<bool> SendLikeAsync(Like like)
@@ -64,14 +61,14 @@ public class KudosListView : IKudosListView
         }
     }
 
-    private async void ServiceBusLikeMessageProcessor()
+    private async void ServiceBusLikeMessageProcessor(string subscriptionName)
     {
 
 
-        await CreateATopicIfItDoesntExistAsync("dashboard", "notification");
+        await CreateATopicIfItDoesntExistAsync("dashboard", subscriptionName);
                 
 
-        _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("dashboard", "notification");
+        _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("dashboard", subscriptionName);
 
         _serviceBusLikeProcessor.ProcessMessageAsync += ServiceBusLikeProcessor_ProcessMessageAsync;
 
@@ -80,11 +77,12 @@ public class KudosListView : IKudosListView
         await _serviceBusLikeProcessor.StartProcessingAsync();
     }
 
-    private async void ServiceBusKudosMessageProcessor()
+    private async void ServiceBusKudosMessageProcessor(string subscriptionName)
     {
-        await CreateATopicIfItDoesntExistAsync("kudosdashboard", "notification");
 
-        _serviceBusKudosProcessor = _serviceBusClient.CreateProcessor("kudosdashboard", "notification");
+        await CreateATopicIfItDoesntExistAsync("kudosdashboard", subscriptionName);
+
+        _serviceBusKudosProcessor = _serviceBusClient.CreateProcessor("kudosdashboard", subscriptionName);
 
         _serviceBusKudosProcessor.ProcessMessageAsync += ServiceBusKudosProcessor_ProcessMessageAsync;
         _serviceBusKudosProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
@@ -101,7 +99,7 @@ public class KudosListView : IKudosListView
     private async Task ServiceBusLikeProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
     {
         //retrive the message body
-
+        
         var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
 
         if (like != null)
@@ -114,15 +112,21 @@ public class KudosListView : IKudosListView
 
     private async Task ServiceBusKudosProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
     { 
-        //retrive the message body
-
+        
         var kudos = JsonConvert.DeserializeObject<KudosResponse>(arg.Message.Body.ToString());
-
+        
         if (kudos != null)
         {
             KudosCallback?.Invoke(kudos);
         }
 
         await arg.CompleteMessageAsync(arg.Message);
+    }
+
+    public void RegisterForLiveUpdates(string userId)
+    {
+        ServiceBusLikeMessageProcessor(userId);
+
+        ServiceBusKudosMessageProcessor(userId);
     }
 }

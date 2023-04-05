@@ -72,5 +72,8 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
+app.UseCors(builder => builder.WithOrigins("https://localhost:44302")
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
 app.Run();
 

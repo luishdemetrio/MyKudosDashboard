@@ -31,6 +31,9 @@ public class GamificationService : IGamificationService
         request.Method = Method.Get;
         request.AddHeader("Authorization", "Bearer " + token);
 
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
         RestResponse response = client.Execute(request);
 
         if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -53,6 +56,9 @@ public class GamificationService : IGamificationService
         var request = new RestRequest();
         request.Method = Method.Get;
         request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
 
         RestResponse response = client.Execute(request);
 
