@@ -129,7 +129,7 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic($"{like.FromPersonId},{sign}", serviceBusAdminClient, _gamificationLikeSentTopicName, "FromPersonId");
+        await SendTopic($"{like.FromPerson.Id},{sign}", serviceBusAdminClient, _gamificationLikeSentTopicName, "FromPersonId");
         await SendTopic($"{like.ToPersonId},{sign}", serviceBusAdminClient, _gamificationLikeReceivedTopicName, "ToPersonId");
 
         //notification to update the Teams Apps

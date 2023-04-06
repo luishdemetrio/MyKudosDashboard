@@ -173,10 +173,10 @@
     private void UpdateLikeCallback(Like like)
     {
         // The person who sent already has the like updated
-        if (like.FromPersonId == User.ObjectId)
+        if (like.FromPerson.Id == User.ObjectId)
             return;
 
-        UpdateLikes(like.KudosId, like.FromPersonId);
+        UpdateLikes(like.KudosId, like.FromPerson.Id);
     }
 
     private void UpdateLikes(string kudosId, string personId)

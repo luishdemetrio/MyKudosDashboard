@@ -285,9 +285,14 @@
         UpdateLikes(kudosId, User.ObjectId);
 
         await CommentsView.SendLikeAsync(
-                    new Like(
+                      new Like(
                         KudosId: kudosId,
-                        FromPersonId: User.ObjectId,
+                        FromPerson: new Person
+                            {
+                                Id = User.ObjectId,
+                                Name = User.DisplayName,
+                                Photo = UserPhoto
+                            },
                         ToPersonId: toPersonId
                     )
                 );
@@ -305,10 +310,10 @@
     private void UpdateLikeCallback(Like like)
     {
         // The person who sent already has the like updated
-        if (like.FromPersonId == User.ObjectId)
+        if (like.FromPerson.Id == User.ObjectId)
             return;
 
-        UpdateLikes(like.KudosId, like.FromPersonId);
+        UpdateLikes(like.KudosId, like.FromPerson.Id);
     }
 
     private void UpdateLikes(string commentId, string personId)
