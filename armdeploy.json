@@ -275,7 +275,7 @@
             "hostType": "Repository"
           }
         ],
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('gamification_serviceplan'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
         "reserved": false,
         "isXenon": false,
         "hyperV": false,
