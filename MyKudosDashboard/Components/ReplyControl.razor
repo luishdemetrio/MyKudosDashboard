@@ -1,0 +1,268 @@
+﻿@using MyKudosDashboard.Models;
+@using Microsoft.Fast.Components.FluentUI
+
+
+<style>
+/* Style The Dropdown Button */
+.dropbtn {
+  margin-top: 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+/* The container Div - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 16px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 5px 10px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+  
+}
+</style>
+
+<div style="display: flex;padding-bottom: 0px">
+
+    <div style="width:50px;margin-top:5px;padding-top: 15px">
+        <img src=@Comment.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
+    </div>
+
+    <div style="width:460px;display: flex;">
+
+        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly=@_isReplyCommendReadOnly
+                        Value=@Comment.Message Spellcheck="true"
+                        onchange=@PostValueChanged> @Comment.FromPerson.Name</FluentTextArea>
+
+
+        @if (CanEditOrDeleteComment())
+        {
+            
+        
+            <div class="dropdown" style="margin-top: 5px;">
+                <button class="dropbtn">...</button>
+                <div class="dropdown-content">
+                    <a href="#" @onclick=EditReplyOnClick>
+                        <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
+                                    Filled=true />
+                    
+                    </a>
+                    <a href="#" @onclick=DeleteReplyOnClick>
+                        <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
+                                    Filled=true />
+                    
+                    </a>
+                
+                </div>
+            </div>
+
+        }
+
+    </div>
+
+</div>
+
+<div style="float:left;margin-left:37px;padding-top: 0px">
+
+    <FluentButton   id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
+                    @onclick=@(()=>LikeComment(Comment.Id, Comment.FromPerson.Id))>
+        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
+                    Filled=@FilledLikeComments(@Comment) />
+        @Comment.Likes.Count()
+    </FluentButton>
+
+    <FluentTooltip Anchor=@($"reply_{Comment.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+
+        @if (Comment.Likes.Count() > 0)
+        {
+            <ul class="list-unstyled ">
+                @foreach (var like in Comment.Likes)
+                {
+                    <li>
+                        <div>
+                            <img src=@like.Photo
+                                 style="height: 26px;width: 26px;border-radius: 50%;" />
+                            <span style="margin-left:5px">@like.Name</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </FluentTooltip>
+
+@*    <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>ReplyMessageClick())>
+        <FluentIcon Name="@FluentIcons.CommentArrowRight" Slot="start" Size="@IconSize.Size16" Filled=false />
+        Reply
+    </FluentButton>*@
+
+    @if(_isReplyCommendReadOnly == false)
+    {
+        <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditMessageClick())>
+            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=false />
+            Save Changes
+        </FluentButton>
+
+        <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditMessageClick())>
+            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=false />
+            Cancel
+        </FluentButton>
+    }
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string UserPhoto { get; set; }
+
+    [Parameter]
+    public CommentsResponse Comment { get; set; }
+
+    [Parameter]
+    public UserInfo User { get; set; }
+
+    public delegate void DeleteCommentCallBack(CommentsResponse comments);
+
+    [Parameter]
+    public DeleteCommentCallBack deleteCommentCallBack { get; set; }
+
+    public delegate void UpdateCommentCallBack(CommentsResponse comments);
+
+    [Parameter]
+    public UpdateCommentCallBack updateCommentCallBack { get; set; }
+
+    private bool _isReplyCommendReadOnly=true;
+
+    private string _originalMessage;
+    private string _updatedComment;
+    
+
+    private bool FilledLikeKudos(KudosResponse item)
+    {
+        bool filled = false;
+
+        @if (User != null)
+        {
+            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+        }
+
+        return filled;
+    }
+
+    private bool CanEditOrDeleteComment()
+    {
+        return (Comment.FromPerson.Id == User.ObjectId);
+    }
+
+    private bool FilledLikeComments(CommentsResponse item)
+    {
+        bool filled = false;
+
+        @if (User != null)
+        {
+            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+        }
+
+        return filled;
+    }
+
+    private void LikeComment(string commentId, string toPersonId)
+    {
+        UpdateLikes(commentId, User.ObjectId);
+
+    }
+
+    private void UpdateLikes(string commentId, string personId)
+    {
+
+        if (Comment.Id == commentId)
+        {
+            var like = Comment.Likes.Where(k => k.Id == personId).FirstOrDefault();
+
+
+            if ((like is null) || (!Comment.Likes.Contains(like)))
+            {
+
+                Comment.Likes.Add(new Person()
+                    {
+                        Id = personId,
+                        Name = User.DisplayName,
+                        Photo = UserPhoto
+                    });
+            }
+            else
+            {
+                Comment.Likes.Remove(like);
+            }
+        }
+    }
+
+    private void ReplyMessageClick()
+    {
+
+    }
+
+
+    private void EditReplyOnClick()
+    {
+
+        _isReplyCommendReadOnly = false;
+
+        _originalMessage = Comment.Message;
+
+    }
+
+    private void DeleteReplyOnClick()
+    {
+        deleteCommentCallBack?.Invoke(Comment);
+    }
+
+    private void CancelEditMessageClick()
+    {
+        _isReplyCommendReadOnly = true;
+        Comment.Message = _originalMessage;
+
+    }
+
+    private void SaveEditMessageClick()
+    {
+        _isReplyCommendReadOnly = true;
+
+        Comment.Message = _updatedComment;
+
+        updateCommentCallBack?.Invoke(Comment);
+    }
+
+    private void PostValueChanged(ChangeEventArgs args)
+    {
+        _updatedComment = args.Value.ToString();
+    }
+}

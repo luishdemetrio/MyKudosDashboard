@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Gamification.Domain\MyKudos.Gamification.Domain.csproj" />
     
+    
   </ItemGroup>
   
  

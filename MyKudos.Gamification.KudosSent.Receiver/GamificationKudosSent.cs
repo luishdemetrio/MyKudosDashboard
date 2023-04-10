@@ -26,8 +26,8 @@ public class GamificationKudosSent
         _scoreQueue = scoreQueue;
     }
 
-    [FunctionName("gamificationkudossent")]
-    public async Task RunAsync([ServiceBusTrigger("gamificationkudossent", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
+    [FunctionName("GamificationKudosSent")]
+    public async Task RunAsync([ServiceBusTrigger("GamificationKudosSent", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
     {
 
         try
@@ -56,7 +56,7 @@ public class GamificationKudosSent
         catch (Exception ex)
         {
             _logger.LogError($"Error processing message: {ex.Message}");
-            throw;
+            
         }
 
 

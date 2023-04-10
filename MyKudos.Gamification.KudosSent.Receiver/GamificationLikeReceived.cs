@@ -11,13 +11,13 @@ namespace MyKudos.Gamification.Receiver;
 
 public class GamificationLikeReceived
 {
-    private readonly ILogger<GamificationKudosSent> _logger;
+    private readonly ILogger<GamificationLikeReceived> _logger;
     private readonly IUserScoreService _userScoreService;
     private string _likeReceiveScore;
 
     private readonly IScoreQueue _scoreQueue;
 
-    public GamificationLikeReceived(ILogger<GamificationKudosSent> log, 
+    public GamificationLikeReceived(ILogger<GamificationLikeReceived> log, 
                                     IConfiguration configuration, IUserScoreService userScoreService, 
                                     IScoreQueue scoreQueue)
     {
@@ -65,7 +65,7 @@ public class GamificationLikeReceived
         catch (Exception ex)
         {
             _logger.LogError($"Error processing message: {ex.Message}");
-            throw;
+            
         }
     }
 }

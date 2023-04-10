@@ -3,8 +3,6 @@ using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
-using System.Collections;
-
 namespace MyKudosDashboard.Services;
 
 public class GatewayService : IGatewayService
@@ -63,6 +61,9 @@ public class GatewayService : IGatewayService
         var request = new RestRequest();
         request.Method = Method.Get;
         request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
 
         RestResponse response = client.Execute(request);
 
@@ -236,6 +237,123 @@ public class GatewayService : IGatewayService
         {
             result = JsonConvert.DeserializeObject<IEnumerable<TopContributors>>(response.Content).ToList();
 
+        }
+
+        return result;
+    }
+
+    public async Task<string> SendCommentsAsync(CommentsRequest comment)
+    {
+        string result = string.Empty;
+
+        var uri = $"{_gatewayServiceUrl}Comments";
+
+        var client = new RestClient(uri);
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(comment);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        comment.Id = "new";
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<string>(response.Content);
+
+        }
+
+        return result;
+    }
+
+    public async Task<IEnumerable<CommentsResponse>> GetComments(string kudosId)
+    {
+        List<CommentsResponse> result = new();
+
+        var client = new RestClient($"{_gatewayServiceUrl}Comments?kudosId={kudosId}");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Get;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<IEnumerable<CommentsResponse>>(response.Content).ToList();
+
+        }
+
+        return result;
+    }
+
+    public async Task<bool> UpdateComments(CommentsRequest comments)
+    {
+        bool result = false;
+
+        var client = new RestClient($"{_gatewayServiceUrl}Comments");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Put;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(comments);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<bool>(response.Content);
+        }
+
+        return result;
+    }
+
+    public async Task<bool> DeleteComments(CommentsRequest comments)
+    {
+        bool result = false;
+
+        var client = new RestClient($"{_gatewayServiceUrl}Comments");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Delete;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(comments);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<bool>(response.Content);
         }
 
         return result;

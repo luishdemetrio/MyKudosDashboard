@@ -8,20 +8,20 @@
 
 
     <FluentTabs>
-        <FluentTab Text="All"></FluentTab>
+        <FluentTab Text="All"/>
         <FluentTab Text="Kudos to me" />
         <FluentTab Text="Kudos from me" />
 
         @if (_kudosList != null)
         {
             <FluentTabPanel>
-                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto />
+                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos  />
             </FluentTabPanel>
             <FluentTabPanel>
-                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto />
+                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
             <FluentTabPanel>
-                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto />
+                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
         }
 
@@ -42,16 +42,31 @@
 
     private List<KudosResponse> _kudosList;
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
+    public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
-        if (User != null)
+    [Parameter]
+    public ReplyKudosCallBack ReplyCallBack { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (User != null && firstRender)
         {
+            KudosTabView.RegisterForLiveUpdates(User.ObjectId);
+            KudosTabView.LikeCallback = UpdateLikesCallBack;
+            KudosTabView.KudosCallback = UpdateKudosCallback;
+
             LoadKudos();
 
         }
+       
+    }
 
+    private void ReplyKudos(KudosResponse kudos)
+    {
+        ReplyCallBack?.Invoke(kudos);
     }
 
     private void LoadKudos()
@@ -80,21 +95,73 @@
     }
 
 
-    public void SendCallBack(KudosResponse pKudos)
+    //public void SendCallBack(KudosResponse pKudos)
+    //{
+    //    _kudosList = new();
+    //    _kudosList.Add(pKudos);
+
+    //    //StateHasChanged();
+
+    //    // _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
+
+    //    //await InvokeAsync(() =>
+    //    //{
+    //    //    StateHasChanged();
+    //    //});
+
+    //    LoadKudos();
+
+    //}
+
+    private void UpdateKudosCallback(KudosResponse pKudos)
     {
-        _kudosList = new();
-        _kudosList.Add(pKudos);
 
-        //StateHasChanged();
+        if (_kudosList == null)
+            return;
 
-        // _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
+        var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
 
-        //await InvokeAsync(() =>
-        //{
-        //    StateHasChanged();
-        //});
+        if (k == null)
+        {
+            _kudosList.Add(pKudos);
+            
+            InvokeAsync(StateHasChanged);
+        }
+    }
 
-        LoadKudos();
+    private void UpdateLikesCallBack(Like pLike)
+    {
 
+        // The person who sent already has the like updated
+        if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+                return;
+
+        
+        var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+
+        if (kudo != null)
+        {
+            var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
+
+
+            if ((like is null) || (!kudo.Likes.Contains(like)))
+            {
+
+                kudo.Likes.Add(new Person()
+                    {
+                        Id = pLike.FromPerson.Id,
+                        Name = pLike.FromPerson.Name ,
+                        Photo = pLike.FromPerson.Photo
+                    });
+            }
+            else
+            {
+                kudo.Likes.Remove(like);
+            }
+
+            //Interlocked.Increment(ref _numberOfCallBack);
+            //InvokeAsync(StateHasChanged);
+            InvokeAsync(StateHasChanged);
+        }
     }
 }

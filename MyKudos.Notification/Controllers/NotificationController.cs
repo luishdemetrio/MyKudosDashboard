@@ -28,6 +28,8 @@ namespace MyKudos.Notification.Controllers
             int membersCount = 0;
             string users = string.Empty;
 
+            
+
             var installations = await this._conversation.Notification.GetInstallationsAsync(cancellationToken);
 
             if (installations.Count() == 0)

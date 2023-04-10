@@ -19,4 +19,13 @@ public interface IGatewayService
     Task<UserScore> GetUserScoreAsync(string pUserId);
 
     Task<IEnumerable<TopContributors>> GetTopContributors();
+
+    Task<string> SendCommentsAsync(CommentsRequest comment);
+
+    Task<IEnumerable<CommentsResponse>> GetComments(string kudosId);
+
+    Task<bool> UpdateComments(CommentsRequest comments);
+
+    Task<bool> DeleteComments(CommentsRequest comments);
+
 }

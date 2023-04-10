@@ -33,7 +33,7 @@ public abstract class InteropModuleBase
     {
         if (_module == null)
         {
-            _ = await ImportPrerequisiteModuleAsync("https://unpkg.com/@microsoft/teams-js");
+            _ = await ImportPrerequisiteModuleAsync("https://res.cdn.office.net/teams-js/2.9.1/js/MicrosoftTeams.min.js");
             _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath).AsTask();
         }
 

@@ -50,6 +50,8 @@
         public DateTime SendOn { get; set; }
         
         public List<Person> Likes { get; set; }
+
+        public List<string> Comments { get; set; } = new();
     }
 
 }
