@@ -50,7 +50,7 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //send notification via Bot
-        await SendTopic(kudos, serviceBusAdminClient, _notificationTopicName, "KudosNotification");
+        await SendQueue(kudos, serviceBusAdminClient, _notificationTopicName);
 
         //gamification
         await SendTopic(kudos.From.Id, serviceBusAdminClient, _gamificationKudosSentTopicName, "FromPersonId");

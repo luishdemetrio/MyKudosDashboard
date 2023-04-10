@@ -1,25 +1,24 @@
-﻿using MyKudos.Notification.Models;
+﻿using MyKudos.CardNotification.Models;
 using AdaptiveCards.Templating;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.TeamsFx.Conversation;
 using Newtonsoft.Json;
 
-namespace MyKudos.Notification.Controllers
+namespace MyKudos.CardNotification.Controllers
 {
-    [Route("api/notification")]
+    [Route("api/cardnotification")]
     [ApiController]
     public class NotificationController : ControllerBase
     {
-        private IConfiguration _configuration;
-
         private readonly ConversationBot _conversation;
-
         private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "NotificationDefault.json");
+        private IConfiguration _configuration;
 
         public NotificationController(ConversationBot conversation, IConfiguration configuration)
         {
-            _conversation = conversation;
-            _configuration = configuration;
+
+            this._conversation = conversation;
+            this._configuration = configuration;
         }
 
         [HttpPost]
@@ -27,8 +26,6 @@ namespace MyKudos.Notification.Controllers
         {
             int membersCount = 0;
             string users = string.Empty;
-
-            
 
             var installations = await this._conversation.Notification.GetInstallationsAsync(cancellationToken);
 

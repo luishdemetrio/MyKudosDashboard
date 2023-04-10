@@ -12,6 +12,12 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
 
-    "ServiceBusConnection": "Endpoint=sb://shskmessaging.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8usyrrck2DujbpgsDe3LD7CGXtVMHgcx4+ASbNvMRww="
+    "ServiceBusConnection": "",
+    "agentServiceURL": "",
+    "ClientId": "",
+    "ClientSecret": "",
+    "TenantId": "",
+    "ExposedApi": ""
+
   }
 }
