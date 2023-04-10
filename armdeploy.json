@@ -81,7 +81,7 @@
         "2",
         "3"
       ],
-      "defaultValue": "2",
+      "defaultValue": "3",
       "metadata": {
         "description": "The size of the hosting plan (small, medium, or large)."
       }
@@ -185,6 +185,8 @@
 
     "gamification_function": "[concat(parameters('baseResourceName'), 'gamificationfunc' )]",
 
+    "gamification_api": "[concat(parameters('baseResourceName'), 'gamificationapi' )]",
+
     "notification_function": "[concat(parameters('baseResourceName'), 'notificationfunc' )]"
 
 
@@ -220,7 +222,7 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-03-01",
-      "name": "[variables('gamification_function')]",
+      "name": "[variables('gamification_api')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('gamification_serviceplan'))]"
@@ -232,26 +234,15 @@
           "name": "appsettings",
           "type": "config",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+            "[resourceId('Microsoft.Web/sites', variables('gamification_api'))]"
           ],
+
           "properties": {
-            "PROJECT": "MyKudos.Gamification.KudosSent.Receiver/MyKudos.Gamification.Receiver.csproj",
+            "PROJECT": "MyKudos.Gamification.Api/MyKudos.Gamification.Api.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
-            "userScoreServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
-            "ClientId": "[parameters('dashboardAppClientId')]",
-            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
-            "TenantId": "[subscription().tenantId]",
-            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "kudosTopic",
-            "KudosReceiveScore": "50",
-            "KudosSendScore": "30",
-            "LikeSendScore": "5",
-            "LikeReceivedScore": "5",
-            "MessageReceivedScore": "5",
-            "MessageSentScore": "10",
-            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-            "FUNCTIONS_EXTENSION_VERSION": "~4"
+            "CosmosDb__AccountEndPoint": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))).documentEndpoint]",
+            "CosmosDb__AccountKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName')), '2022-08-15').primaryMasterKey]",
+            "CosmosDb__DatabaseName": "userscore-db"
 
           }
         },
@@ -261,8 +252,8 @@
           "type": "sourcecontrols",
           "condition": "[not(empty(parameters('gitRepoUrl')))]",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]",
-            "[resourceId('Microsoft.Web/sites/config', variables('gamification_function'), 'appsettings')]"
+            "[resourceId('Microsoft.Web/sites', variables('gamification_api'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('gamification_api'), 'appsettings')]"
           ],
           "properties": {
             "RepoUrl": "[parameters('gitRepoUrl')]",
@@ -276,12 +267,12 @@
         "enabled": true,
         "hostNameSslStates": [
           {
-            "name": "[concat(variables('gamification_function'), '.azurewebsites.net')]",
+            "name": "[concat(variables('gamification_api'), '.azurewebsites.net')]",
             "sslState": "Disabled",
             "hostType": "Standard"
           },
           {
-            "name": "[concat(variables('gamification_function'), '.scm.azurewebsites.net')]",
+            "name": "[concat(variables('gamification_api'), '.scm.azurewebsites.net')]",
             "sslState": "Disabled",
             "hostType": "Repository"
           }
@@ -296,7 +287,6 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 200,
           "minimumElasticInstanceCount": 0
@@ -318,10 +308,10 @@
     {
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/ftp')]",
+      "name": "[concat(variables('gamification_api'), '/ftp')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+        "[resourceId('Microsoft.Web/sites', variables('gamification_api'))]"
       ],
       "properties": {
         "allow": true
@@ -330,10 +320,10 @@
     {
       "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
       "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/scm')]",
+      "name": "[concat(variables('gamification_api'), '/scm')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+        "[resourceId('Microsoft.Web/sites', variables('gamification_api'))]"
       ],
       "properties": {
         "allow": true
@@ -342,10 +332,10 @@
     {
       "type": "Microsoft.Web/sites/config",
       "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/web')]",
+      "name": "[concat(variables('gamification_api'), '/web')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+        "[resourceId('Microsoft.Web/sites', variables('gamification_api'))]"
       ],
       "properties": {
         "numberOfWorkers": 1,
@@ -366,8 +356,7 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "[variables('gamification_function')]",
-        "scmType": "ExternalGit",
+        "publishingUsername": "[variables('gamification_api')]",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -419,82 +408,6 @@
     },
 
     {
-      "type": "Microsoft.Web/sites/functions",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/gamificationKudosReceived')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-      ],
-      "properties": {
-        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationKudosReceived/')]",
-        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationKudosReceived/function.json')]",
-        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/gamificationKudosReceived.dat')]",
-        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/gamificationKudosReceived')]",
-        "config": {},
-        "language": "DotNetAssembly",
-        "isDisabled": false
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/functions",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/gamificationkudossent')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-      ],
-      "properties": {
-        "script_root_path_href": "[concat( concat('https://', variables('gamification_function') ), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationkudossent') ]",
-        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationkudossent/function.json')]",
-        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/gamificationkudossent.dat')]",
-        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/gamificationkudossent')]",
-        "config": {},
-        "language": "DotNetAssembly",
-        "isDisabled": false
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/functions",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/GamificationLikeReceived')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-      ],
-      "properties": {
-        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeReceived/')]",
-        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeReceived/function.json')]",
-        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/GamificationLikeReceived.dat')]",
-        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/GamificationLikeReceived')]",
-        "config": {},
-        "language": "DotNetAssembly",
-        "isDisabled": false
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/functions",
-      "apiVersion": "2022-03-01",
-      "name": "[concat(variables('gamification_function'), '/GamificationLikeSent')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-      ],
-      "properties": {
-        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeSent/')]",
-        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeSent/function.json')]",
-        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/GamificationLikeSent.dat')]",
-        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/GamificationLikeSent')]",
-        "config": {},
-        "language": "DotNetAssembly",
-        "isDisabled": false
-      }
-    },
-    {
       "type": "Microsoft.Web/sites/hostNameBindings",
       "apiVersion": "2022-03-01",
       "name": "[concat(variables('gamification_function'), '/', variables('gamification_function'), '.azurewebsites.net')]",
@@ -527,11 +440,23 @@
             "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))]"
           ],
           "properties": {
-            "PROJECT": "MyKudos.Gamification.Api/MyKudos.Gamification.Api.csproj",
+            "PROJECT": "MyKudos.Gamification.KudosSent.Receiver/MyKudos.Gamification.Receiver.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
-            "CosmosDb__AccountEndPoint": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))).documentEndpoint]",
-            "CosmosDb__AccountKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName')), '2022-08-15').primaryMasterKey]",
-            "CosmosDb__DatabaseName": "userscore-db"
+            "userScoreServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
+            "ClientId": "[parameters('dashboardAppClientId')]",
+            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TenantId": "[subscription().tenantId]",
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_TopicName": "kudosTopic",
+            "KudosReceiveScore": "50",
+            "KudosSendScore": "30",
+            "LikeSendScore": "5",
+            "LikeReceivedScore": "5",
+            "MessageReceivedScore": "5",
+            "MessageSentScore": "10",
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+            "FUNCTIONS_EXTENSION_VERSION": "~4"
 
           }
         },
@@ -653,7 +578,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('gamification_appservice')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -996,7 +920,6 @@
         "siteConfig": {
           "numberOfWorkers": 1,
           "acrUseManagedIdentityCreds": false,
-          "alwaysOn": true,
           "http20Enabled": false,
           "functionAppScaleLimit": 200,
           "minimumElasticInstanceCount": 0
@@ -1071,7 +994,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('notification_function')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -1217,7 +1139,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('recognition_appservice')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -1645,7 +1566,6 @@
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -1859,7 +1779,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('kudos_appservice')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -1948,7 +1867,7 @@
             "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
             "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
-            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
+            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_api')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
@@ -2084,7 +2003,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('gateway_appservice')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -2219,7 +2137,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('userAssignedIdentities_teams_appservice')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
@@ -2515,7 +2432,6 @@
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
         "publishingUsername": "[variables('notification_bot')]",
-        "scmType": "ExternalGit",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
         "alwaysOn": true,
