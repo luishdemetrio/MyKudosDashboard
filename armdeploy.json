@@ -223,7 +223,7 @@
       "name": "[variables('gamification_appservice')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('gamification_serviceplan'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
 
       ],
       "resources": [
