@@ -349,16 +349,18 @@
           "hostingstart.html"
         ],
         "netFrameworkVersion": "v6.0",
+        "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
+        "remoteDebuggingVersion": "VS2019",
         "httpLoggingEnabled": false,
         "acrUseManagedIdentityCreds": false,
         "logsDirectorySizeLimit": 35,
         "detailedErrorLoggingEnabled": false,
-        "publishingUsername": "[variables('gamification_api')]",
-        "use32BitWorkerProcess": false,
+        "publishingUsername": "[variables('gamification_appservice')]",
+        "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": true,
+        "alwaysOn": false,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -649,119 +651,119 @@
       }
     },
     {
-         "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('gamification_function'), '/gamificationKudosReceived')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationKudosReceived/')]",
-                "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-                "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationKudosReceived/function.json')]",
-                "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/gamificationKudosReceived.dat')]",
-                "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/gamificationKudosReceived')]",
-                "config": {},
-                "language": "DotNetAssembly",
-                "isDisabled": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('gamification_function'), '/gamificationkudossent')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationkudossent/')]",
-                "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-                "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationkudossent/function.json')]",
-                "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/gamificationkudossent.dat')]",
-                "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/gamificationkudossent')]",
-                "config": {},
-                "language": "DotNetAssembly",
-                "isDisabled": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('gamification_function'), '/GamificationLikeReceived')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeReceived/')]",
-                "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-                "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeReceived/function.json')]",
-                "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/GamificationLikeReceived.dat')]",
-                "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/GamificationLikeReceived",
-                "config": {},
-                "language": "DotNetAssembly",
-                "isDisabled": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('gamification_function'), '/GamificationLikeSent')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeSent/')]",
-                "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-                "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeSent/function.json"')],
-                "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/GamificationLikeSent.dat')]",
-                "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/GamificationLikeSent",
-                "config": {},
-                "language": "DotNetAssembly",
-                "isDisabled": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('gamification_function'), '/MessageReceived')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageReceived/')]",
-                "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-                "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageReceived/function.json"')],
-                "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/MessageReceived.dat')]",
-                "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/MessageReceived",
-                "config": {},
-                "language": "DotNetAssembly",
-                "isDisabled": false
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2022-09-01",
-            "name": "[concat(variables('gamification_function'), '/MessageSent')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
-            ],
-            "properties": {
-                "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageSent/')]",
-                "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
-                "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageSent/function.json"')],
-                "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/MessageSent.dat')]",
-                "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/MessageSent",
-                "config": {},
-                "language": "DotNetAssembly",
-                "isDisabled": false
-            }
-        },
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('gamification_function'), '/gamificationKudosReceived')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+      ],
+      "properties": {
+        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationKudosReceived/')]",
+        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
+        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationKudosReceived/function.json')]",
+        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/gamificationKudosReceived.dat')]",
+        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/gamificationKudosReceived')]",
+        "config": {},
+        "language": "DotNetAssembly",
+        "isDisabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('gamification_function'), '/gamificationkudossent')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+      ],
+      "properties": {
+        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationkudossent/')]",
+        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
+        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/gamificationkudossent/function.json')]",
+        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/gamificationkudossent.dat')]",
+        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/gamificationkudossent')]",
+        "config": {},
+        "language": "DotNetAssembly",
+        "isDisabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('gamification_function'), '/GamificationLikeReceived')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+      ],
+      "properties": {
+        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeReceived/')]",
+        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
+        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeReceived/function.json')]",
+        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/GamificationLikeReceived.dat')]",
+        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/GamificationLikeReceived')]",
+        "config": {},
+        "language": "DotNetAssembly",
+        "isDisabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('gamification_function'), '/GamificationLikeSent')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+      ],
+      "properties": {
+        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeSent/')]",
+        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
+        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/GamificationLikeSent/function.json')]",
+        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/GamificationLikeSent.dat')]",
+        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/GamificationLikeSent')]",
+        "config": {},
+        "language": "DotNetAssembly",
+        "isDisabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('gamification_function'), '/MessageReceived')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+      ],
+      "properties": {
+        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageReceived/')]",
+        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
+        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageReceived/function.json')]",
+        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/MessageReceived.dat')]",
+        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/MessageReceived')]",
+        "config": {},
+        "language": "DotNetAssembly",
+        "isDisabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('gamification_function'), '/MessageSent')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gamification_function'))]"
+      ],
+      "properties": {
+        "script_root_path_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageSent/')]",
+        "script_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Gamification.Receiver.dll')]",
+        "config_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/site/wwwroot/MessageSent/function.json')]",
+        "test_data_href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/vfs/data/Functions/sampledata/MessageSent.dat')]",
+        "href": "[concat( concat('https://', variables('gamification_function')), '.azurewebsites.net/admin/functions/MessageSent')]",
+        "config": {},
+        "language": "DotNetAssembly",
+        "isDisabled": false
+      }
+    },
     {
       "type": "Microsoft.ServiceBus/namespaces",
       "apiVersion": "2022-10-01-preview",
@@ -1109,7 +1111,7 @@
         "publishingUsername": "[variables('notification_function')]",
         "use32BitWorkerProcess": true,
         "webSocketsEnabled": false,
-        "alwaysOn": true,
+        "alwaysOn": false,
         "managedPipelineMode": "Integrated",
         "virtualApplications": [
           {
@@ -1863,7 +1865,7 @@
     },
     {
       "type": "Microsoft.Web/sites/config",
-      "apiVersion": "2022-03-01",
+      "apiVersion": "2022-09-01",
       "name": "[concat(variables('kudos_appservice'), '/web')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -1980,7 +1982,7 @@
             "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
             "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
-            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_api')), '.azurewebsites.net/')]",
+            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
