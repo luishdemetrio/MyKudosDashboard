@@ -990,7 +990,8 @@
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
-            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]"
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet"
           }
         },
         {
@@ -1175,11 +1176,11 @@
         "[resourceId('Microsoft.Web/sites', variables('notification_function'))]"
       ],
       "properties": {
-        "script_root_path_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/site/wwwroot/KudosNotificationReceiver/",
+        "script_root_path_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/site/wwwroot/SendNotificationCard/",
         "script_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/site/wwwroot/bin/MyKudos.Kudos.Notification.Receiver.dll",
-        "config_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/site/wwwroot/KudosNotificationReceiver/function.json",
-        "test_data_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/data/Functions/sampledata/KudosNotificationReceiver.dat",
-        "href": "https://kudosnotificationreceiver.azurewebsites.net/admin/functions/KudosNotificationReceiver",
+        "config_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/site/wwwroot/SendNotificationCard/function.json",
+        "test_data_href": "https://kudosnotificationreceiver.azurewebsites.net/admin/vfs/data/Functions/sampledata/SendNotificationCard.dat",
+        "href": "https://kudosnotificationreceiver.azurewebsites.net/admin/functions/SendNotificationCard",
         "config": {},
         "language": "DotNetAssembly",
         "isDisabled": false
@@ -1988,7 +1989,7 @@
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "kudosTopic",
+            "KudosServiceBus_TopicName": "notifyUserBotTopic",
             "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
             "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
             "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",

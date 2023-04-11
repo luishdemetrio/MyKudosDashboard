@@ -25,7 +25,11 @@ public class LikesController : Controller
     public async Task<IActionResult> SendLikeAsync([FromBody] LikeGateway like)
     {
 
-        var sign = await _kudosService.SendLikeAsync(like).ConfigureAwait(false);
+        var sign = await _kudosService.SendLikeAsync(new Kudos.Domain.Models.SendLike
+        (
+            KudosId : like.KudosId,
+            FromPersonId : like.FromPerson.Id
+        )).ConfigureAwait(false);
 
 
          await _kudosQueue.SendLikeAsync(like, sign);

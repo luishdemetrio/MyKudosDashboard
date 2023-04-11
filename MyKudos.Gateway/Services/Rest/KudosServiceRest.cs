@@ -1,5 +1,4 @@
 ﻿using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
 using MyKudos.Kudos.Domain.Models;
 using MyKudos.Kudos.Token.Interfaces;
 using Newtonsoft.Json;
@@ -171,7 +170,7 @@ public class KudosServiceRest: IKudosService
         return result;
     }
 
-    public async Task<int> SendLikeAsync(LikeGateway like)
+    public async Task<int> SendLikeAsync(SendLike like)
     {
         int result = 0;
 

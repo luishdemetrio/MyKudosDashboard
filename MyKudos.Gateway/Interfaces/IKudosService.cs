@@ -9,7 +9,7 @@ public interface IKudosService
 
     Task<string> SendAsync(Models.KudosRequest kudos);
 
-    Task<int> SendLikeAsync(LikeGateway like);
+    Task<int> SendLikeAsync(SendLike like);
 
     Task<string> SendCommentsAsync(Comments comment);
 

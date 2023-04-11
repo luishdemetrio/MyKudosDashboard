@@ -109,10 +109,10 @@ public class KudosController : Controller
                          From = new Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
                          To = new Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
                          Title= rec.Description,
-                                Message = kudo.Message,
-                                SendOn = kudo.Date,
-                                Likes= likes.Where(l => l.KudosId == kudo.Id).Select(l => l.Person),
-                                Comments =  (kudo.Comments is null) ? new List<string>() : kudo.Comments
+                        Message = kudo.Message,
+                        SendOn = kudo.Date,
+                        Likes= likes.Where(l => l.KudosId == kudo.Id).Select(l => l.Person),
+                        Comments =  (kudo.Comments is null) ? new List<string>() : kudo.Comments
                      };
         
 
