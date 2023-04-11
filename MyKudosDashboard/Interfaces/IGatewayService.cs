@@ -14,7 +14,8 @@ public interface IGatewayService
 
     Task<string> GetUserPhoto(string userid);
 
-    Task<bool> SendLike(Like like);
+    Task<bool> Like(Like like);
+    Task<bool> Unlike(Like like);
 
     Task<UserScore> GetUserScoreAsync(string pUserId);
 

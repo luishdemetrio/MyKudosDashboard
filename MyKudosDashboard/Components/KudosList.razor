@@ -138,21 +138,53 @@
     private async void Like(string kudosId, string toPersonId)
     {
 
-        UpdateLikes(kudosId, User.ObjectId);
+     
 
-        await KudosListView.SendLikeAsync(
+        var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
+
+
+        if (kudo != null)
+        {
+
+            if (kudo.Likes.Any(l => l.Id == User.ObjectId))
+            {
+                await KudosListView.SendUnlikeAsync(
                     new Like(
                         KudosId: kudosId,
                         FromPerson: new Person
-                        {
-                            Id = User.ObjectId,
-                            Name = User.DisplayName,
-                            Photo = UserPhoto
-                        },
+                            {
+                                Id = User.ObjectId,
+                                Name = User.DisplayName,
+                                Photo = UserPhoto
+                            },
                         ToPersonId: toPersonId
                     )
                 );
+            }
+            else
+            {
 
+
+                await KudosListView.SendLikeAsync(
+                       new Like(
+                           KudosId: kudosId,
+                           FromPerson: new Person
+                               {
+                                   Id = User.ObjectId,
+                                   Name = User.DisplayName,
+                                   Photo = UserPhoto
+                               },
+                           ToPersonId: toPersonId
+                       )
+                   );
+
+            }
+
+        }
+
+        UpdateLikes(kudosId, User.ObjectId);
+
+       
 
     }
 

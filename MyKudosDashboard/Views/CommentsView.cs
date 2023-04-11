@@ -29,7 +29,7 @@ public class CommentsView : ICommentsView
 
     public Task<bool> SendLikeAsync(Like like)
     {
-        return _dashboardService.SendLike(like);
+        return _dashboardService.Like(like);
     }
 
     public Task<bool> UpdateComments(CommentsResponse comment, string toPersonId)

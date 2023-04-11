@@ -1,5 +1,6 @@
 ﻿namespace MyKudos.Gateway.Models;
 
+
 public record LikeGateway(string KudosId, Person FromPerson, string ToPersonId);
 
 public record LikeDTO(string KudosId, Person Person);

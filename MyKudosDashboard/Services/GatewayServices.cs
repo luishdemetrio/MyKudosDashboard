@@ -164,7 +164,7 @@ public class GatewayService : IGatewayService
         return userPhoto;
     }
 
-    public async Task<bool> SendLike(Like like)
+    public async Task<bool> Like(Like like)
     {
         var uri = $"{_gatewayServiceUrl}likes";
 
@@ -174,6 +174,31 @@ public class GatewayService : IGatewayService
 
         var request = new RestRequest();
         request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(like);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+
+        RestResponse response = client.Execute(request);
+
+        return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
+    }
+
+    public async Task<bool> Unlike(Like like)
+    {
+        var uri = $"{_gatewayServiceUrl}likes";
+
+        var client = new RestClient(uri);
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Delete;
         request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");

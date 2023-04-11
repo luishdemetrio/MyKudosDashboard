@@ -9,7 +9,9 @@ public interface IKudosService
 
     Task<string> SendAsync(Models.KudosRequest kudos);
 
-    Task<int> SendLikeAsync(SendLike like);
+    Task<bool> LikeAsync(Kudos.Domain.Models.SendLike like);
+
+    Task<bool> UnlikeAsync(Kudos.Domain.Models.SendLike dislike);
 
     Task<string> SendCommentsAsync(Comments comment);
 

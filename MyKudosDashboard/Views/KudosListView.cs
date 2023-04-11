@@ -18,7 +18,12 @@ public class KudosListView : IKudosListView
 
     public async Task<bool> SendLikeAsync(Like like)
     {
-        return await _gatewayService.SendLike(like);
+        return await _gatewayService.Like(like);
+    }
+
+    public async Task<bool> SendUnlikeAsync(Like like)
+    {
+        return await _gatewayService.Unlike(like);
     }
 
 

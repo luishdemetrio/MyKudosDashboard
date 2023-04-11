@@ -10,7 +10,9 @@ public interface IKudosRepository
 
     Guid Add(KudosLog kudos);
 
-    int SendLike(string kudosId, string personId);
+    bool Like(string kudosId, string personId);
+
+    bool UndoLike(string kudosId, string personId);
 
     bool SendComments(string kudosId, string commentId);
 

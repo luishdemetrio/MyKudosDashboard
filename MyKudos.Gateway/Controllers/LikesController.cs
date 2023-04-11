@@ -22,18 +22,30 @@ public class LikesController : Controller
     }
 
     [HttpPost(Name = "SendLike")]
-    public async Task<IActionResult> SendLikeAsync([FromBody] LikeGateway like)
+    public  Task<bool> SendLikeAsync([FromBody] LikeGateway like)
     {
+        _ = _kudosQueue.SendLikeAsync(like);
 
-        var sign = await _kudosService.SendLikeAsync(new Kudos.Domain.Models.SendLike
+        return _kudosService.LikeAsync(new Kudos.Domain.Models.SendLike
         (
             KudosId : like.KudosId,
             FromPersonId : like.FromPerson.Id
-        )).ConfigureAwait(false);
+        ));
+
+    }
+
+    [HttpDelete(Name = "Unlike")]
+    public Task<bool> Delete([FromBody] LikeGateway unlike)
+    {
+        _ = _kudosQueue.SendDislikeAsync(unlike);
+
+        return _kudosService.UnlikeAsync(new Kudos.Domain.Models.SendLike
+        (
+            KudosId: unlike.KudosId,
+            FromPersonId: unlike.FromPerson.Id
+        ));
 
 
-         await _kudosQueue.SendLikeAsync(like, sign);
 
-        return Ok();
     }
 }

@@ -170,9 +170,9 @@ public class KudosServiceRest: IKudosService
         return result;
     }
 
-    public async Task<int> SendLikeAsync(SendLike like)
+    public async Task<bool> LikeAsync(SendLike like)
     {
-        int result = 0;
+        bool result = false;
 
         var client = new RestClient($"{_kudosServiceUrl}like");
 
@@ -195,7 +195,39 @@ public class KudosServiceRest: IKudosService
 
         if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            result = JsonConvert.DeserializeObject<int>(response.Content);
+            result = JsonConvert.DeserializeObject<bool>(response.Content);
+        }
+
+        return result;
+    }
+
+    public async Task<bool> UnlikeAsync(SendLike like)
+    {
+        bool result = false;
+
+        var client = new RestClient($"{_kudosServiceUrl}like");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        
+        request.Method = Method.Delete;
+
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(like);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<bool>(response.Content);
         }
 
         return result;

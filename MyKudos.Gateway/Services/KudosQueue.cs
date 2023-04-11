@@ -17,6 +17,9 @@ public class KudosQueue : IKudosQueue
     private static string _gamificationLikeSentTopicName = string.Empty;
     private static string _gamificationLikeReceivedTopicName = string.Empty;
 
+    private static string _gamificationDislikeSentTopicName = string.Empty;
+    private static string _gamificationDislikeReceivedTopicName = string.Empty;
+
 
     private static string _gamificationMessageSentTopicName = string.Empty;
     private static string _gamificationMessageReceivedTopicName = string.Empty;
@@ -34,6 +37,9 @@ public class KudosQueue : IKudosQueue
 
         _gamificationLikeSentTopicName = configuration["KudosServiceBus_GamificationLikeSentTopicName"];
         _gamificationLikeReceivedTopicName = configuration["KudosServiceBus_GamificationLikeReceivedTopicName"];
+
+        _gamificationDislikeSentTopicName = configuration["KudosServiceBus_GamificationDislikeSentTopicName"];
+        _gamificationDislikeReceivedTopicName = configuration["KudosServiceBus_GamificationDislikeReceivedTopicName"];
 
         _gamificationMessageSentTopicName = configuration["KudosServiceBus_GamificationMessageSentTopicName"];
         _gamificationMessageReceivedTopicName = configuration["KudosServiceBus_GamificationMessageReceivedTopicName"];
@@ -124,16 +130,28 @@ public class KudosQueue : IKudosQueue
         await sender.CloseAsync();
     }
 
-    public async Task SendLikeAsync(LikeGateway like, int sign )
+    public async Task SendLikeAsync(LikeGateway like )
     {
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic($"{like.FromPerson.Id},{sign}", serviceBusAdminClient, _gamificationLikeSentTopicName, "FromPersonId");
-        await SendTopic($"{like.ToPersonId},{sign}", serviceBusAdminClient, _gamificationLikeReceivedTopicName, "ToPersonId");
+        await SendTopic(like.FromPerson.Id, serviceBusAdminClient, _gamificationLikeSentTopicName, "FromPersonId");
+        await SendTopic(like.ToPersonId, serviceBusAdminClient, _gamificationLikeReceivedTopicName, "ToPersonId");
 
         //notification to update the Teams Apps
-        await SendTopic(like, serviceBusAdminClient, "dashboard", "LikeGateway");
+        await SendTopic(like, serviceBusAdminClient, "likedashboard", "LikeGateway");
+    }
+
+    public async Task SendDislikeAsync(LikeGateway like)
+    {
+        var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
+
+        //gamification
+        await SendTopic(like.FromPerson.Id, serviceBusAdminClient, _gamificationDislikeSentTopicName, "FromPersonId");
+        await SendTopic(like.ToPersonId, serviceBusAdminClient, _gamificationDislikeReceivedTopicName, "ToPersonId");
+
+        //notification to update the Teams Apps
+        await SendTopic(like, serviceBusAdminClient, "likedashboard", "LikeGateway");
     }
 
     public async Task MessageSent(CommentsRequest comments)

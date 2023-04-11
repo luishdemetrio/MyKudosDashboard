@@ -1994,6 +1994,8 @@
             "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
             "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
             "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived",
+            "KudosServiceBus_GamificationDislikeSentTopicName": "GamificationDislikeSent",
+            "KudosServiceBus_GamificationDislikeReceivedTopicName": "GamificationDislikeReceived",
             "KudosServiceBus_GamificationMessageSentTopicName": "GamificationMessageSent",
             "KudosServiceBus_GamificationMessageReceivedTopicName": "GamificationMessageReceived",
             "KudosServiceBus_GamificationMessageDeletedFromTopicName": "GamificationMessageDeletedFrom",

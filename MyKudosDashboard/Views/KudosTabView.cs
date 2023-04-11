@@ -41,6 +41,10 @@ public class KudosTabView : IKudosTabView
         //create a topic if it doesnt exist
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
 
+        if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
+        {
+            await serviceBusAdminClient.CreateTopicAsync(topicName);
+        }
 
         //create a temp subscription for the user
 
@@ -60,10 +64,10 @@ public class KudosTabView : IKudosTabView
     private void ServiceBusLikeMessageProcessor(string subscriptionName)
     {
 
-        CreateATopicIfItDoesntExistAsync("dashboard", subscriptionName).ContinueWith( t =>
+        CreateATopicIfItDoesntExistAsync("likedashboard", subscriptionName).ContinueWith( t =>
         {
             
-            _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("dashboard", subscriptionName);
+            _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("likedashboard", subscriptionName);
 
             _serviceBusLikeProcessor.ProcessMessageAsync += ServiceBusLikeProcessor_ProcessMessageAsync;
 

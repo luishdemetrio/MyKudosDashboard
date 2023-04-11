@@ -6,7 +6,9 @@ public interface IKudosQueue
 {
     Task SendKudosAsync(string kudosId, KudosNotification kudos);
 
-    Task SendLikeAsync(LikeGateway like, int sign );
+    Task SendLikeAsync(LikeGateway like);
+
+    Task SendDislikeAsync(LikeGateway like);
 
     Task MessageSent(CommentsRequest comments);
 

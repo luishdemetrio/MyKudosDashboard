@@ -28,9 +28,14 @@ public sealed class KudosService : IKudosService
         return (_kudosRepository.Add(kudos));
 
     }
-    public int SendLike(string kudosId, string personId)
+    public bool Like(string kudosId, string personId)
     {
-        return _kudosRepository.SendLike(kudosId, personId);
+        return _kudosRepository.Like(kudosId, personId);
+    }
+
+    public bool UndoLike(string kudosId, string personId)
+    {
+        return _kudosRepository.UndoLike(kudosId, personId);
     }
 
     public string SendComments(Comments comment)

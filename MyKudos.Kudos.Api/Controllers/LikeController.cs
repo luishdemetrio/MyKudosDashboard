@@ -16,12 +16,27 @@ public class LikeController : Controller
         _kudosService = kudosService;
     }
 
-    [HttpPost(Name ="SendLike")]
+    [HttpPost(Name ="Like")]
     public IActionResult Post(SendLike like)
     {
 
-        var r = _kudosService.SendLike(like.KudosId, like.FromPersonId);
+        var r = _kudosService.Like(like.KudosId, like.FromPersonId);
 
         return Ok(r);
     }
+
+    [HttpDelete(Name = "UndoLike")]
+    public IActionResult Delete([FromBody] SendLike like)
+    {
+        var r = _kudosService.UndoLike(like.KudosId, like.FromPersonId);
+
+        return Ok(r);
+
+
+
+    }
+
 }
+
+
+

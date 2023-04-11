@@ -31,42 +31,52 @@ public class KudosRepository : IKudosRepository
 		return _kudosDbContext.Kudos;
 	}
 
-	//return -1 means that the user unliked
-	//return 1 means that the user liked
-	public int SendLike(string kudosId, string personId)
-	{
 
-		int sign = 0;
+	public bool Like(string kudosId, string personId)
+	{
 
 		var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
 
-		if (kudos != null)
-		{
-			if (kudos.Likes == null)
-			{
-				kudos.Likes = new List<string>();
-				kudos.Likes.Add(personId);
-				sign = 1;
-			}
-			else if (kudos.Likes.Contains(personId))
-			{
-				kudos.Likes.Remove(personId);
-				sign = -1;
-			}
-			else
-			{
-				kudos.Likes.Add(personId);
-				sign = 1;
-			}
+		if (kudos == null)
+			return false;
 
-			_kudosDbContext.SaveChanges();
+
+		if (kudos.Likes == null)
+		{
+			kudos.Likes = new List<string>();
+			kudos.Likes.Add(personId);
+		}		
+		else if (!kudos.Likes.Contains(personId	))
+		{
+			kudos.Likes.Add(personId);
 		}
 
-		return sign;
+		return _kudosDbContext.SaveChanges() >0;
 
 	}
 
-	public bool SendComments(string kudosId, string commentId)
+
+    public bool UndoLike(string kudosId, string personId)
+    {
+
+        var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
+
+        if ((kudos == null) || (kudos.Likes == null))
+            return false;
+
+
+        if (kudos.Likes.Contains(personId))
+        {
+            kudos.Likes.Remove(personId);
+        }
+        
+
+        return _kudosDbContext.SaveChanges() > 0;
+
+    }
+
+
+    public bool SendComments(string kudosId, string commentId)
 	{
 
 		var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();
