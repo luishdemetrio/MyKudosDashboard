@@ -53,9 +53,11 @@ public class KudosTabView : IKudosTabView
         {
             var options = new CreateSubscriptionOptions(topicName, subscriptionName)
             {
-                AutoDeleteOnIdle = TimeSpan.FromDays(14),
-                LockDuration = TimeSpan.FromSeconds(60),
-                MaxDeliveryCount = 10
+                AutoDeleteOnIdle = TimeSpan.FromHours(1),
+                LockDuration = TimeSpan.FromMinutes(2),
+                MaxDeliveryCount = 10,
+                DefaultMessageTimeToLive = TimeSpan.FromMinutes(2)
+
             };
 
             await serviceBusAdminClient.CreateSubscriptionAsync(options);
@@ -134,6 +136,12 @@ public class KudosTabView : IKudosTabView
 
     public void RegisterForLiveUpdates(string userId)
     {
+
+        //if (userName.Length > 50)
+        //{
+        //    userName = userName.Substring(0, 50);
+        //}
+
         ServiceBusLikeMessageProcessor(userId);
 
         ServiceBusKudosMessageProcessor(userId);

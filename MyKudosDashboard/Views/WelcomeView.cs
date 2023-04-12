@@ -38,10 +38,17 @@ public class WelcomeView : IWelcomeView
 
     public void RegisterForUserScoreUpdate(string userId)
     {
-        
+        //its used later to control the score
         _userId = userId;
 
-        ServiceBusScoreProcessor(userId);
+        //if (userName.Length > 50)
+        //{
+        //    userName = userName.Substring(0, 50);
+        //}
+
+        //userName = userName.Replace(" ", "_");
+
+        ServiceBusScoreProcessor(_userId);
 
     }
 
@@ -93,7 +100,7 @@ public class WelcomeView : IWelcomeView
 
         var score = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-        if ((score != null) && score.UserId == _userId )
+        if ((score != null) && (score.UserId == _userId) )
         {
             ScoreCallback?.Invoke(score);
         }

@@ -32,6 +32,7 @@ public class LikeSent
     {
         try
         {
+            mySbMsg = mySbMsg.Replace("\"", "");
 
             await _userScoreService.SetUserScoreAsync(
                 new UserScore()

@@ -21,7 +21,7 @@ public class ScoreQueue : IScoreQueue
     }
 
     private static async Task SendTopic(object queueMessage, ServiceBusAdministrationClient serviceBusAdminClient,
-                                      string topic, string subscriptionName)
+                                      string topic)
     {
 
         //create a topic if it doesnt exist
@@ -31,23 +31,15 @@ public class ScoreQueue : IScoreQueue
             await serviceBusAdminClient.CreateTopicAsync(topic);
         }
 
-        //create a temp subscription for the user
-
-        if (!await serviceBusAdminClient.SubscriptionExistsAsync(topic, subscriptionName))
-        {
-            var options = new CreateSubscriptionOptions(topic, subscriptionName)
-            {
-                AutoDeleteOnIdle = TimeSpan.FromHours(1)
-            };
-
-            await serviceBusAdminClient.CreateSubscriptionAsync(options);
-        }
-
         var client = new ServiceBusClient(_connectionString);
 
         var sender = client.CreateSender(topic);
 
-        var message = new ServiceBusMessage(JsonConvert.SerializeObject(queueMessage));
+        var message = new ServiceBusMessage(JsonConvert.SerializeObject(queueMessage))
+        {
+            Subject = topic,
+            ContentType = "application/json"
+        };
 
         await sender.SendMessageAsync(message);
 
@@ -59,6 +51,6 @@ public class ScoreQueue : IScoreQueue
         
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
-        await SendTopic(score, serviceBusAdminClient, "dashboardscoreupdated", score.UserId);
+        await SendTopic(score, serviceBusAdminClient, "dashboardscoreupdated");
     }
 }

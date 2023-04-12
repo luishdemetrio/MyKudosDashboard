@@ -126,19 +126,22 @@ public class KudosController : Controller
     public async Task<string> PostAsync([FromBody] Models.KudosRequest kudos)
     {
 
-        string kudosId = await _kudosService.SendAsync(kudos).ConfigureAwait(false);
+       
+        string kudosId = await _kudosService.SendAsync(kudos);
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
-        await _kudosQueue.SendKudosAsync(kudosId, new KudosNotification(
-                From: kudos.From,
-                To: kudos.To,
-                ManagerId: userManagerId,
-                Message: kudos.Message,
-                Title: kudos.Title,
-                SendOn: kudos.SendOn
-                ));
-                
+
+        var queue = _kudosQueue.SendKudosAsync(kudosId, new KudosNotification(
+          From: kudos.From,
+          To: kudos.To,
+          ManagerId: userManagerId,
+          Message: kudos.Message,
+          Title: kudos.Title,
+          SendOn: kudos.SendOn
+          ));
+
+        Task.WaitAll(queue);
 
         return kudosId;
     }
