@@ -27,6 +27,9 @@ public class KudosQueue : IKudosQueue
     private static string _gamificationMessageDeletedFromTopicName = string.Empty;
     private static string _gamificationMessageDeletedToTopicName = string.Empty;
 
+
+    private ServiceBusClient _serviceBusClient;
+
     public KudosQueue(IConfiguration configuration)
     {
         _connectionString = configuration["KudosServiceBus_ConnectionString"];
@@ -46,6 +49,8 @@ public class KudosQueue : IKudosQueue
         
         _gamificationMessageDeletedFromTopicName = configuration["KudosServiceBus_GamificationMessageDeletedFromTopicName"];
         _gamificationMessageDeletedToTopicName = configuration["KudosServiceBus_GamificationMessageDeletedToTopicName"];
+
+        _serviceBusClient = new ServiceBusClient(_connectionString);
     }
 
     public async Task SendKudosAsync(string kudosId, KudosNotification kudos)
@@ -80,21 +85,21 @@ public class KudosQueue : IKudosQueue
 
     }
 
-    private static async Task SendTopic(object queueMessage, ServiceBusAdministrationClient serviceBusAdminClient,
+    private async Task SendTopic(object queueMessage, ServiceBusAdministrationClient serviceBusAdminClient,
                                         string topic, string subject)
     {
 
         //create a topic if it doesnt exist
 
-        if (!await serviceBusAdminClient.TopicExistsAsync(topic))
-        {
-            await serviceBusAdminClient.CreateTopicAsync(topic);
-        }
+        //if (!await serviceBusAdminClient.TopicExistsAsync(topic))
+        //{
+        //    await serviceBusAdminClient.CreateTopicAsync(topic);
+        //}
 
   
-        var client = new ServiceBusClient(_connectionString);
+       // var client = new ServiceBusClient(_connectionString);
 
-        var sender = client.CreateSender(topic);
+        var sender = _serviceBusClient.CreateSender(topic);
 
         var message = new ServiceBusMessage(JsonConvert.SerializeObject(queueMessage))
         {

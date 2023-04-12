@@ -54,7 +54,7 @@
 
         if (User != null && firstRender)
         {
-            KudosTabView.RegisterForLiveUpdates(User.ObjectId);
+            KudosTabView.RegisterForLiveUpdates(User.DisplayName.Replace(" ", "_"));
             KudosTabView.LikeCallback = UpdateLikesCallBack;
             KudosTabView.KudosCallback = UpdateKudosCallback;
 

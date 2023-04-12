@@ -38,13 +38,14 @@ public class KudosTabView : IKudosTabView
 
     private async Task CreateATopicIfItDoesntExistAsync(string topicName, string subscriptionName)
     {
-        //create a topic if it doesnt exist
+        
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
 
-        if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
-        {
-            await serviceBusAdminClient.CreateTopicAsync(topicName);
-        }
+        //create a topic if it doesnt exist
+        //if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
+        //{
+        //    await serviceBusAdminClient.CreateTopicAsync(topicName);
+        //}
 
         //create a temp subscription for the user
 
@@ -52,7 +53,9 @@ public class KudosTabView : IKudosTabView
         {
             var options = new CreateSubscriptionOptions(topicName, subscriptionName)
             {
-                AutoDeleteOnIdle = TimeSpan.FromHours(1)
+                AutoDeleteOnIdle = TimeSpan.FromDays(14),
+                LockDuration = TimeSpan.FromSeconds(60),
+                MaxDeliveryCount = 10
             };
 
             await serviceBusAdminClient.CreateSubscriptionAsync(options);

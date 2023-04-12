@@ -130,7 +130,7 @@ public class KudosController : Controller
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
-        _ = _kudosQueue.SendKudosAsync(kudosId, new KudosNotification(
+        await _kudosQueue.SendKudosAsync(kudosId, new KudosNotification(
                 From: kudos.From,
                 To: kudos.To,
                 ManagerId: userManagerId,
