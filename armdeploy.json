@@ -2442,7 +2442,7 @@
             "[resourceId('Microsoft.Web/sites', variables('notification_bot'))]"
           ],
           "properties": {
-            "PROJECT": "MyKudos.Notification/MyKudos.Notification.csproj",
+            "PROJECT": "MyKudos.CardNotification/MyKudos.CardNotification.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "BOT_ID": "[parameters('notificationClientId')]",
             "BOT_PASSWORD": "[parameters('notificationClientSecret')]",

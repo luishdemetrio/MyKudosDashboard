@@ -20,13 +20,17 @@ public class KudosTabView : IKudosTabView
 
     public IKudosTabView.UpdateKudosCallBack KudosCallback { get; set; }
 
-    public KudosTabView(IGatewayService gatewayService, IConfiguration configuration)
+    private readonly ILogger<KudosTabView> _logger;
+
+    public KudosTabView(IGatewayService gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger)
     {
         _gatewayService = gatewayService;
 
         _serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
 
         _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
+
+        _logger = logger;
     }
 
 
@@ -104,7 +108,7 @@ public class KudosTabView : IKudosTabView
 
     private async Task ServiceBusProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
     {
-
+        _logger.LogError($"Error processing message: {arg.Exception.Message}");
     }
 
     private async Task ServiceBusLikeProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)

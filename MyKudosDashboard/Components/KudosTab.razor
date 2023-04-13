@@ -114,7 +114,7 @@
 
     //}
 
-    private void UpdateKudosCallback(KudosResponse pKudos)
+    private async void UpdateKudosCallback(KudosResponse pKudos)
     {
 
         if (_kudosList == null)
@@ -126,11 +126,11 @@
         {
             _kudosList.Add(pKudos);
             
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged).ConfigureAwait(true);
         }
     }
 
-    private void UpdateLikesCallBack(Like pLike)
+    private async void UpdateLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
@@ -161,7 +161,7 @@
             }
 
             //Interlocked.Increment(ref _numberOfCallBack);
-            InvokeAsync(StateHasChanged);
+            await InvokeAsync(StateHasChanged).ConfigureAwait(true);
            
         }
     }
