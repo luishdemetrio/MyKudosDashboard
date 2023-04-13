@@ -147,7 +147,7 @@ public class KudosTabView : IKudosTabView
             UndoLikeCallback?.Invoke(like);
         }
 
-        await arg.CompleteMessageAsync(arg.Message);
+        await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
     }
 
     private async Task ServiceBusKudosProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
@@ -160,7 +160,7 @@ public class KudosTabView : IKudosTabView
             KudosCallback?.Invoke(kudos);
         }
 
-        await arg.CompleteMessageAsync(arg.Message);
+        await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
     }
 
     public void RegisterForLiveUpdates(string userId)

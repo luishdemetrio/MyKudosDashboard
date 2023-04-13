@@ -11,38 +11,46 @@ public static class Seed
             new Domain.Models.Recognition
             {
                 Emoji="🏆",
-                Description = "Awesome"
+                Title = "Awesome",
+                Description = "Recognizes outstanding performance or behavior that goes above and beyond expectations."
+
 
             },
             new Domain.Models.Recognition
             {
                 Emoji="✨",
-                Description = "Thank you"
+                Title = "Thank you",
+                Description = "Expresses gratitude for specific actions or efforts made by the employee that had a positive impact."
             },
             new Domain.Models.Recognition
             {
                 Emoji="🎉",
-                Description = "Congratulations"
+                Title = "Congratulations",
+                Description = "Celebrates significant accomplishments or milestones achieved by the employee."
             },
             new Domain.Models.Recognition
             {
                 Emoji="🏅",
-                Description = "Achiever"
+                Title = "Achiever",
+                Description = "Acknowledges employees who consistently achieve their goals and demonstrate a commitment to excellence."
             },
             new Domain.Models.Recognition
             {
                 Emoji="💡" ,
-                Description = "Problem Solver"
+                Title = "Problem Solver",
+                Description = "Recognizes employees who have demonstrated exceptional problem-solving skills and contributed to the success of a project or initiative."
             },
             new Domain.Models.Recognition
             {
                 Emoji="🦁" ,
-                Description = "Courage"
+                Title = "Courage",
+                Description = "Acknowledges employees who have shown courage, resilience, or perseverance in the face of challenges or adversity."
             },
             new Domain.Models.Recognition
             {
                 Emoji="🏀" ,
-                Description = "Team Player"
+                Title = "Team Player",
+                Description = "Recognizes employees who have demonstrated strong teamwork skills, contributed to a positive team dynamic, and supported their colleagues."
             }
         };
 }
