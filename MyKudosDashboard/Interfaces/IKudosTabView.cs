@@ -12,6 +12,7 @@ public interface IKudosTabView
     public delegate void UpdateLikesCallBack(Like like);
 
     public UpdateLikesCallBack LikeCallback { get; set; }
+    public UpdateLikesCallBack UndoLikeCallback { get; set; }
 
 
     public delegate void UpdateKudosCallBack(KudosResponse kudos);

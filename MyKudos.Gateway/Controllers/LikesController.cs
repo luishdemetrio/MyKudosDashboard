@@ -34,12 +34,12 @@ public class LikesController : Controller
 
     }
 
-    [HttpDelete(Name = "Unlike")]
+    [HttpDelete(Name = "Undolike")]
     public Task<bool> Delete([FromBody] LikeGateway unlike)
     {
         _ = _kudosQueue.SendDislikeAsync(unlike);
 
-        return _kudosService.UnlikeAsync(new Kudos.Domain.Models.SendLike
+        return _kudosService.UndoLikeAsync(new Kudos.Domain.Models.SendLike
         (
             KudosId: unlike.KudosId,
             FromPersonId: unlike.FromPerson.Id

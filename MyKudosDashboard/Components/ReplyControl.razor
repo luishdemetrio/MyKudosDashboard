@@ -1,6 +1,8 @@
-﻿@using MyKudosDashboard.Models;
+﻿@using MyKudosDashboard.Interfaces;
+@using MyKudosDashboard.Models;
 @using Microsoft.Fast.Components.FluentUI
 
+@inject IReplyView ReplyView
 
 <style>
 /* Style The Dropdown Button */
@@ -92,7 +94,7 @@
 <div style="float:left;margin-left:37px;padding-top: 0px">
 
     <FluentButton   id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
-                    @onclick=@(()=>LikeComment(Comment.Id, Comment.FromPerson.Id))>
+                    @onclick=@(()=>LikeComment(Comment))>
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                     Filled=@FilledLikeComments(@Comment) />
         @Comment.Likes.Count()
@@ -165,7 +167,7 @@
     private string _updatedComment;
     
 
-    private bool FilledLikeKudos(KudosResponse item)
+    private bool FilledLikeComment(KudosResponse item)
     {
         bool filled = false;
 
@@ -194,9 +196,39 @@
         return filled;
     }
 
-    private void LikeComment(string commentId, string toPersonId)
+    private async void LikeComment(CommentsResponse item)
     {
-        UpdateLikes(commentId, User.ObjectId);
+        
+        if (item.Likes.Any(l => l.Id == User.ObjectId))
+        {
+             await ReplyView.SendUndoLikeAsync(
+                     new LikeComment(
+                        KudosId: item.KudosId,
+                        FromPerson: new Person
+                            {
+                                Id = User.ObjectId,
+                                Name = User.DisplayName,
+                                Photo = $"data:image/png;base64,{UserPhoto}"
+                            }
+                    )
+                );            
+        }
+        else
+        {
+            await ReplyView.SendLikeAsync(
+                    new LikeComment(
+                      KudosId: item.KudosId,
+                      FromPerson: new Person
+                          {
+                              Id = User.ObjectId,
+                              Name = User.DisplayName,
+                              Photo = $"data:image/png;base64,{UserPhoto}"
+                          }
+                  )
+              );
+        }
+
+        UpdateLikes(item.Id, User.ObjectId);
 
     }
 
@@ -215,7 +247,7 @@
                     {
                         Id = personId,
                         Name = User.DisplayName,
-                        Photo = UserPhoto
+                        Photo = $"data:image/png;base64,{UserPhoto}"
                     });
             }
             else

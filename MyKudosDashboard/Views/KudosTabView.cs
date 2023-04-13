@@ -18,6 +18,8 @@ public class KudosTabView : IKudosTabView
 
     public IKudosTabView.UpdateLikesCallBack LikeCallback { get; set; }
 
+    public IKudosTabView.UpdateLikesCallBack UndoLikeCallback { get; set; }
+
     public IKudosTabView.UpdateKudosCallBack KudosCallback { get; set; }
 
     private readonly ILogger<KudosTabView> _logger;
@@ -40,16 +42,10 @@ public class KudosTabView : IKudosTabView
     }
 
 
-    private async Task CreateATopicIfItDoesntExistAsync(string topicName, string subscriptionName)
+    private async Task CreateASubscriberfItDoesntExistAsync(string topicName, string subscriptionName)
     {
         
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
-
-        //create a topic if it doesnt exist
-        //if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
-        //{
-        //    await serviceBusAdminClient.CreateTopicAsync(topicName);
-        //}
 
         //create a temp subscription for the user
 
@@ -57,7 +53,7 @@ public class KudosTabView : IKudosTabView
         {
             var options = new CreateSubscriptionOptions(topicName, subscriptionName)
             {
-                AutoDeleteOnIdle = TimeSpan.FromHours(1),
+                AutoDeleteOnIdle = TimeSpan.FromHours(12),
                 LockDuration = TimeSpan.FromMinutes(2),
                 MaxDeliveryCount = 10,
                 DefaultMessageTimeToLive = TimeSpan.FromMinutes(2)
@@ -73,7 +69,7 @@ public class KudosTabView : IKudosTabView
     private void ServiceBusLikeMessageProcessor(string subscriptionName)
     {
 
-        CreateATopicIfItDoesntExistAsync("likedashboard", subscriptionName).ContinueWith( t =>
+        CreateASubscriberfItDoesntExistAsync("likedashboard", subscriptionName).ContinueWith( t =>
         {
             
             _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("likedashboard", subscriptionName);
@@ -85,14 +81,29 @@ public class KudosTabView : IKudosTabView
             _serviceBusLikeProcessor.StartProcessingAsync();
             
         });
+    }
 
+    private void ServiceBusUndoLikeMessageProcessor(string subscriptionName)
+    {
 
+        CreateASubscriberfItDoesntExistAsync("undolikedashboard", subscriptionName).ContinueWith(t =>
+        {
+
+            _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("undolikedashboard", subscriptionName);
+
+            _serviceBusLikeProcessor.ProcessMessageAsync += ServiceBusUndoLikeProcessor_ProcessMessageAsync;
+
+            _serviceBusLikeProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
+
+            _serviceBusLikeProcessor.StartProcessingAsync();
+
+        });
     }
 
     private void ServiceBusKudosMessageProcessor(string subscriptionName)
     {
 
-        CreateATopicIfItDoesntExistAsync("kudosdashboard", subscriptionName).ContinueWith(t =>
+        CreateASubscriberfItDoesntExistAsync("kudosdashboard", subscriptionName).ContinueWith(t =>
         {
 
             _serviceBusKudosProcessor = _serviceBusClient.CreateProcessor("kudosdashboard", subscriptionName);
@@ -125,6 +136,20 @@ public class KudosTabView : IKudosTabView
         await arg.CompleteMessageAsync(arg.Message);
     }
 
+    private async Task ServiceBusUndoLikeProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
+    {
+        //retrive the message body
+
+        var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
+
+        if (like != null)
+        {
+            UndoLikeCallback?.Invoke(like);
+        }
+
+        await arg.CompleteMessageAsync(arg.Message);
+    }
+
     private async Task ServiceBusKudosProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
     {
 
@@ -141,13 +166,8 @@ public class KudosTabView : IKudosTabView
     public void RegisterForLiveUpdates(string userId)
     {
 
-        //if (userName.Length > 50)
-        //{
-        //    userName = userName.Substring(0, 50);
-        //}
-
         ServiceBusLikeMessageProcessor(userId);
-
+        ServiceBusUndoLikeMessageProcessor(userId);
         ServiceBusKudosMessageProcessor(userId);
     }
 }

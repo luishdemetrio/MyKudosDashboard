@@ -8,7 +8,7 @@ public interface IKudosListView
     Task<bool> SendLikeAsync(Like like);
 
 
-    Task<bool> SendUnlikeAsync(Like like);
+    Task<bool> SendUndoLikeAsync(Like like);
 
 
 

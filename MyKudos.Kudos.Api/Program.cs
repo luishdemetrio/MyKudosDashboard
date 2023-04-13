@@ -1,13 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using MyKudos.Domain.Core.Bus;
-//using MyKudos.Kudos.Api.Grpc;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.App.Services;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Data.Repository;
-using MyKudos.Kudos.Domain.EventHandlers;
-using MyKudos.Kudos.Domain.Events;
 using MyKudos.Kudos.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);

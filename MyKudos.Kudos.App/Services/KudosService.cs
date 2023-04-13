@@ -75,4 +75,14 @@ public sealed class KudosService : IKudosService
 
         return false;
     }
+
+    public bool LikeComment(string kudosId, string personId)
+    {
+        return _commentsRepository.Like(kudosId, personId);
+    }
+
+    public bool UndoLikeComment(string kudosId, string personId)
+    {
+        return _commentsRepository.UndoLike(kudosId, personId);
+    }
 }

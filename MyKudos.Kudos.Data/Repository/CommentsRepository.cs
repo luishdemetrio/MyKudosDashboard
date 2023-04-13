@@ -28,38 +28,43 @@ public class CommentsRepository : ICommentsRepository
         return _context.Comments.Where(c=> c.KudosId == kudosId);
     }
 
-    //return -1 means that the user unliked
-    //return 1 means that the user liked
-    public int SendLike(string commentsId, string personId)
+    public bool Like(string commentsId, string personId)
     {
 
-        int sign = 0;
+        var comments = _context.Comments.Where(k => k.KudosId == new Guid(commentsId)).FirstOrDefault();
 
-        var comments = _context.Comments.Where(k => k.Id == new Guid(commentsId)).First();
+        if (comments == null)
+            return false;
 
-        if (comments != null)
-        {
             if (comments.Likes == null)
             {
                 comments.Likes = new List<string>();
                 comments.Likes.Add(personId);
-                sign = 1;
             }
-            else if (comments.Likes.Contains(personId))
-            {
-                comments.Likes.Remove(personId);
-                sign = -1;
-            }
-            else
+            else if(!comments.Likes.Contains(personId))
             {
                 comments.Likes.Add(personId);
-                sign = 1;
+   
             }
 
-            _context.SaveChanges();
+        return _context.SaveChanges() > 0;
+
+    }
+
+    public bool UndoLike(string commentsId, string personId)
+    {
+
+        var comments = _context.Comments.Where(k => k.Id == new Guid(commentsId)).FirstOrDefault();
+
+        if ((comments == null) || (comments.Likes == null))
+            return false;
+
+        if (comments.Likes.Contains(personId))
+        {
+            comments.Likes.Remove(personId);
         }
 
-        return sign;
+        return _context.SaveChanges() > 0;
 
     }
 

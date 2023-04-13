@@ -17,8 +17,8 @@ public class KudosQueue : IKudosQueue
     private static string _gamificationLikeSentTopicName = string.Empty;
     private static string _gamificationLikeReceivedTopicName = string.Empty;
 
-    private static string _gamificationDislikeSentTopicName = string.Empty;
-    private static string _gamificationDislikeReceivedTopicName = string.Empty;
+    private static string _gamificationUndolikeSentTopicName = string.Empty;
+    private static string _gamificationUndolikeReceivedTopicName = string.Empty;
 
 
     private static string _gamificationMessageSentTopicName = string.Empty;
@@ -42,8 +42,8 @@ public class KudosQueue : IKudosQueue
         _gamificationLikeSentTopicName = configuration["KudosServiceBus_GamificationLikeSentTopicName"];
         _gamificationLikeReceivedTopicName = configuration["KudosServiceBus_GamificationLikeReceivedTopicName"];
 
-        _gamificationDislikeSentTopicName = configuration["KudosServiceBus_GamificationDislikeSentTopicName"];
-        _gamificationDislikeReceivedTopicName = configuration["KudosServiceBus_GamificationDislikeReceivedTopicName"];
+        _gamificationUndolikeSentTopicName = configuration["KudosServiceBus_GamificationUndolikeSentTopicName"];
+        _gamificationUndolikeReceivedTopicName = configuration["KudosServiceBus_GamificationUndolikeReceivedTopicName"];
 
         _gamificationMessageSentTopicName = configuration["KudosServiceBus_GamificationMessageSentTopicName"];
         _gamificationMessageReceivedTopicName = configuration["KudosServiceBus_GamificationMessageReceivedTopicName"];
@@ -53,54 +53,25 @@ public class KudosQueue : IKudosQueue
 
         _serviceBusClient = new ServiceBusClient(_connectionString);
 
-        _ = CreateTopicIfNotExistsAsync(_gamificationKudosSentTopicName);
-        _ = CreateTopicIfNotExistsAsync(_gamificationKudosReceivedTopicName);
+        CreateTopicIfNotExistsAsync(_gamificationKudosSentTopicName).ConfigureAwait(false);
+        CreateTopicIfNotExistsAsync(_gamificationKudosReceivedTopicName).ConfigureAwait(false); 
 
-        _ = CreateTopicIfNotExistsAsync(_gamificationLikeSentTopicName);
-        _ = CreateTopicIfNotExistsAsync(_gamificationLikeReceivedTopicName);
+        CreateTopicIfNotExistsAsync(_gamificationLikeSentTopicName).ConfigureAwait(false);
+        CreateTopicIfNotExistsAsync(_gamificationLikeReceivedTopicName).ConfigureAwait(false);
 
-        _ = CreateTopicIfNotExistsAsync(_gamificationDislikeSentTopicName);
-        _ = CreateTopicIfNotExistsAsync(_gamificationDislikeReceivedTopicName);
+        CreateTopicIfNotExistsAsync(_gamificationUndolikeSentTopicName).ConfigureAwait(false);
+        CreateTopicIfNotExistsAsync(_gamificationUndolikeReceivedTopicName).ConfigureAwait(false);
 
-        _ = CreateTopicIfNotExistsAsync(_gamificationMessageSentTopicName);
-        _ = CreateTopicIfNotExistsAsync(_gamificationMessageReceivedTopicName);
+        CreateTopicIfNotExistsAsync(_gamificationMessageSentTopicName).ConfigureAwait(false);
+        CreateTopicIfNotExistsAsync(_gamificationMessageReceivedTopicName).ConfigureAwait(false);
 
-        _ = CreateTopicIfNotExistsAsync(_gamificationMessageDeletedFromTopicName);
-        _ = CreateTopicIfNotExistsAsync(_gamificationMessageDeletedToTopicName);
+        CreateTopicIfNotExistsAsync(_gamificationMessageDeletedFromTopicName).ConfigureAwait(false);
+        CreateTopicIfNotExistsAsync(_gamificationMessageDeletedToTopicName).ConfigureAwait(false);
+
+
+        CreateTopicIfNotExistsAsync("likedashboard").ConfigureAwait(false);
+        CreateTopicIfNotExistsAsync("undolikedashboard").ConfigureAwait(false);
     }
-
-    public async Task SendKudosAsync(string kudosId, KudosNotification kudos)
-    {
-
-        //create an admin client to manage artifacts
-
-       // var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
-
-        //send notification via Bot
-        await SendQueue(kudos, _notificationTopicName);
-
-        //gamification
-        await SendTopic(kudos.From.Id,  _gamificationKudosSentTopicName, "FromPersonId");
-        await SendTopic(kudos.To.Id, _gamificationKudosReceivedTopicName,  "ToPersonId") ;
-
-        //notification to update the Teams Apps
-        await SendTopic(new KudosResponse
-                        {
-                            Id = kudosId,
-                            To = kudos.To,
-                            From = kudos.From,
-                            Message = kudos.Message,
-                            Title = kudos.Title.Description,
-                            SendOn = kudos.SendOn,
-                            Comments = new(),
-                            Likes = new List<Person>()
-                        }, 
-                        "kudosdashboard", "KudosResponse");
-
-
-
-    }
-
 
     private async Task CreateTopicIfNotExistsAsync(string topicName)
     {
@@ -112,18 +83,9 @@ public class KudosQueue : IKudosQueue
         }
     }
 
+
     private async Task SendTopic(object queueMessage, string topic, string subject)
     {
-
-        //create a topic if it doesnt exist
-
-        //if (!await serviceBusAdminClient.TopicExistsAsync(topic))
-        //{
-        //    await serviceBusAdminClient.CreateTopicAsync(topic);
-        //}
-
-  
-       // var client = new ServiceBusClient(_connectionString);
 
         var sender = _serviceBusClient.CreateSender(topic);
 
@@ -142,13 +104,7 @@ public class KudosQueue : IKudosQueue
     private static async Task SendQueue(object queueMessage,  string queueName)
     {
 
-        //create a topic if it doesnt exist
-
-        //if (!await serviceBusAdminClient.QueueExistsAsync(queueName))
-        //{
-        //    await serviceBusAdminClient.CreateQueueAsync(queueName);
-        //}
-
+     
         var client = new ServiceBusClient(_connectionString);
 
         var sender = client.CreateSender(queueName);
@@ -163,6 +119,35 @@ public class KudosQueue : IKudosQueue
 
         await sender.CloseAsync();
     }
+
+
+    public async Task SendKudosAsync(string kudosId, KudosNotification kudos)
+    {
+
+        //send notification via Bot
+        await SendQueue(kudos, _notificationTopicName);
+
+        //gamification
+        await SendTopic(kudos.From.Id, _gamificationKudosSentTopicName, "FromPersonId");
+        await SendTopic(kudos.To.Id, _gamificationKudosReceivedTopicName, "ToPersonId");
+
+        //notification to update the Teams Apps
+        await SendTopic(
+            new KudosResponse
+            {
+                Id = kudosId,
+                To = kudos.To,
+                From = kudos.From,
+                Message = kudos.Message,
+                Title = kudos.Title.Description,
+                SendOn = kudos.SendOn,
+                Comments = new(),
+                Likes = new List<Person>()
+            },
+            "kudosdashboard", "KudosResponse");
+    }
+
+
 
     public async Task SendLikeAsync(LikeGateway like )
     {
@@ -181,11 +166,11 @@ public class KudosQueue : IKudosQueue
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await SendTopic(like.FromPerson.Id, _gamificationDislikeSentTopicName, "FromPersonId");
-        await SendTopic(like.ToPersonId, _gamificationDislikeReceivedTopicName, "ToPersonId");
+        await SendTopic(like.FromPerson.Id, _gamificationUndolikeSentTopicName, "FromPersonId");
+        await SendTopic(like.ToPersonId, _gamificationUndolikeReceivedTopicName, "ToPersonId");
 
         //notification to update the Teams Apps
-        await SendTopic(like, "likedashboard", "LikeGateway");
+        await SendTopic(like, "undolikedashboard", "LikeGateway");
     }
 
     public async Task MessageSent(CommentsRequest comments)

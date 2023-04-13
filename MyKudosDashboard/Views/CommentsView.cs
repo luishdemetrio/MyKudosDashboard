@@ -32,6 +32,11 @@ public class CommentsView : ICommentsView
         return _dashboardService.Like(like);
     }
 
+    public async Task<bool> SendUndoLikeAsync(Like like)
+    {
+        return await _dashboardService.UndoLike(like);
+    }
+
     public Task<bool> UpdateComments(CommentsResponse comment, string toPersonId)
     {
         return _dashboardService.UpdateComments(new CommentsRequest()

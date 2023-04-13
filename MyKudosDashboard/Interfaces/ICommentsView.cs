@@ -6,6 +6,7 @@ public interface ICommentsView
 {
 
     Task<bool> SendLikeAsync(Like like);
+    Task<bool> SendUndoLikeAsync(Like like);
 
 
     public delegate void UpdateLikeCallBack(Like like);

@@ -12,6 +12,9 @@ public interface IKudosService
     public bool Like(string kudosId, string personId);
     public bool UndoLike(string kudosId, string personId);
 
+    public bool LikeComment(string kudosId, string personId);
+    public bool UndoLikeComment(string kudosId, string personId);
+
     string SendComments(Comments comment);
 
     IEnumerable<Comments> GetComments(string kudosId);

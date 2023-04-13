@@ -9,7 +9,9 @@ public  interface ICommentsRepository
 
     Guid Add(Comments comments);
 
-    int SendLike(string commentsId, string personId);
+    bool Like(string commentsId, string personId);
+
+    bool UndoLike(string commentsId, string personId);
 
     IEnumerable<Comments> GetComments(string kudosId);
 

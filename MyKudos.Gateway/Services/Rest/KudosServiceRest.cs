@@ -201,7 +201,7 @@ public class KudosServiceRest: IKudosService
         return result;
     }
 
-    public async Task<bool> UnlikeAsync(SendLike like)
+    public async Task<bool> UndoLikeAsync(SendLike like)
     {
         bool result = false;
 
@@ -259,6 +259,69 @@ public class KudosServiceRest: IKudosService
         {
             result = JsonConvert.DeserializeObject<bool>(response.Content)!;
 
+        }
+
+        return result;
+    }
+
+    public async Task<bool> LikeCommentAsync(SendLike like)
+    {
+        bool result = false;
+
+        var client = new RestClient($"{_kudosServiceUrl}likecomment");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+        request.Method = Method.Post;
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(like);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<bool>(response.Content);
+        }
+
+        return result;
+    }
+
+    public async Task<bool> UndoLikeCommentAsync(SendLike like)
+    {
+        bool result = false;
+
+        var client = new RestClient($"{_kudosServiceUrl}likecomment");
+
+        var token = await _serviceToken.GetAccessTokenAsync();
+
+        var request = new RestRequest();
+
+        request.Method = Method.Delete;
+
+        request.AddHeader("Authorization", "Bearer " + token);
+
+        request.AddHeader("Accept", "application/json");
+        request.AddHeader("Content-Type", "application/json");
+
+        var body = JsonConvert.SerializeObject(like);
+
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+
+        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            result = JsonConvert.DeserializeObject<bool>(response.Content);
         }
 
         return result;

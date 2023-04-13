@@ -29,6 +29,7 @@ builder.Services.AddScoped<IUserProfileScoreView, UserProfileScoreView>();
 builder.Services.AddScoped<ITopContributorsView, TopContributorsView>();
 builder.Services.AddScoped<IKudosTabView, KudosTabView>();
 builder.Services.AddScoped<ICommentsView, CommentsView>();
+builder.Services.AddScoped<IReplyView, ReplyView>();
 
 //Services
 

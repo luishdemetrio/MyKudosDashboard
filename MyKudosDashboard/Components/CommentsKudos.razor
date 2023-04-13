@@ -81,7 +81,7 @@
                                     @_item.Comments.Count()
                                 </FluentButton>
 
-                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item.Id, _item.To.Id))>
+                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
                                     <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                             Filled=@FilledLikeKudos(_item) />
                                     @_item.Likes.Count()
@@ -266,57 +266,56 @@
         return filled;
     }
 
-    private bool FilledLikeComments(CommentsResponse item)
-    {
-        bool filled = false;
 
-        @if (User != null)
+    private async void LikeKudos(KudosResponse kudos)
+    {
+
+        if (kudos.Likes.Any(l => l.Id == User.ObjectId))
         {
-            filled = item.Likes.Any(l => l.Id == User.ObjectId);
-        }
-
-        return filled;
-    }
-
-
-    private async void LikeKudos(string kudosId, string toPersonId)
-    {
-
-        UpdateLikes(kudosId, User.ObjectId);
-
-        await CommentsView.SendLikeAsync(
+             await CommentsView.SendUndoLikeAsync(
                       new Like(
-                        KudosId: kudosId,
+                        KudosId: kudos.Id,
                         FromPerson: new Person
                             {
                                 Id = User.ObjectId,
                                 Name = User.DisplayName,
-                                Photo = UserPhoto
+                                Photo = $"data:image/png;base64,{UserPhoto}"
                             },
-                        ToPersonId: toPersonId
+                        ToPersonId: kudos.To.Id
                     )
-                );
+                );            
+        }
+        else
+        {
+            await CommentsView.SendLikeAsync(
+                    new Like(
+                      KudosId: kudos.Id,
+                      FromPerson: new Person
+                          {
+                              Id = User.ObjectId,
+                              Name = User.DisplayName,
+                              Photo = $"data:image/png;base64,{UserPhoto}"
+                          },
+                      ToPersonId: kudos.To.Id
+                  )
+              );
+        }
+      
 
-
+        UpdateLikesKudos(kudos.Id, User.ObjectId);
     }
 
-    private async void LikeComment(string commentId, string toPersonId)
-    {
-
-        UpdateLikes(commentId, User.ObjectId);
-
-    }
-
+   
     private void UpdateLikeCallback(Like like)
     {
         // The person who sent already has the like updated
         if (like.FromPerson.Id == User.ObjectId)
             return;
 
-        UpdateLikes(like.KudosId, like.FromPerson.Id);
+        UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
     }
 
-    private void UpdateLikes(string commentId, string personId)
+    private void UpdateLikesKudos(string commentId, string personId)
     {        
 
         if (_item.Id == commentId)
@@ -331,7 +330,7 @@
                     {
                         Id = personId,
                         Name = User.DisplayName,
-                        Photo = UserPhoto
+                        Photo = $"data:image/png;base64,{UserPhoto}"
                     });
             }
             else

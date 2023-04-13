@@ -138,17 +138,14 @@
     private async void Like(string kudosId, string toPersonId)
     {
 
-     
-
         var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
-
 
         if (kudo != null)
         {
 
             if (kudo.Likes.Any(l => l.Id == User.ObjectId))
             {
-                await KudosListView.SendUnlikeAsync(
+                await KudosListView.SendUndoLikeAsync(
                     new Like(
                         KudosId: kudosId,
                         FromPerson: new Person

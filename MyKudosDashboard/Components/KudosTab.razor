@@ -57,11 +57,12 @@
             KudosTabView.RegisterForLiveUpdates(User.ObjectId);
 
             KudosTabView.LikeCallback = UpdateLikesCallBack;
+            KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
             KudosTabView.KudosCallback = UpdateKudosCallback;
 
             LoadKudos();
-
         }
+
        
     }
 
@@ -96,25 +97,8 @@
     }
 
 
-    //public void SendCallBack(KudosResponse pKudos)
-    //{
-    //    _kudosList = new();
-    //    _kudosList.Add(pKudos);
 
-    //    //StateHasChanged();
-
-    //    // _kudosList = (await WelcomeView.GetKudos().ConfigureAwait(false)).ToList();
-
-    //    //await InvokeAsync(() =>
-    //    //{
-    //    //    StateHasChanged();
-    //    //});
-
-    //    LoadKudos();
-
-    //}
-
-    private async void UpdateKudosCallback(KudosResponse pKudos)
+    private void UpdateKudosCallback(KudosResponse pKudos)
     {
 
         if (_kudosList == null)
@@ -126,11 +110,11 @@
         {
             _kudosList.Add(pKudos);
             
-            await InvokeAsync(StateHasChanged).ConfigureAwait(true);
+            InvokeAsync(StateHasChanged).ConfigureAwait(true);
         }
     }
 
-    private async void UpdateLikesCallBack(Like pLike)
+    private void UpdateLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
@@ -154,15 +138,36 @@
                         Name = pLike.FromPerson.Name ,
                         Photo = pLike.FromPerson.Photo
                     });
+          
             }
-            else
+
+            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+           
+        }
+    }
+
+    private void UpdateUndoLikesCallBack(Like pLike)
+    {
+
+        // The person who sent already has the like updated
+        if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+            return;
+
+
+        var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+
+        if (kudo != null)
+        {
+            var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
+
+
+            if ((like != null) || (kudo.Likes.Contains(like)))
             {
                 kudo.Likes.Remove(like);
             }
 
-            //Interlocked.Increment(ref _numberOfCallBack);
-            await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-           
+            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+
         }
     }
 }
