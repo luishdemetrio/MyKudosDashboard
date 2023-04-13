@@ -31,7 +31,7 @@ public class CommentsRepository : ICommentsRepository
     public bool Like(string commentsId, string personId)
     {
 
-        var comments = _context.Comments.Where(k => k.KudosId == new Guid(commentsId)).FirstOrDefault();
+        var comments = _context.Comments.Where(k => k.KudosId == commentsId).FirstOrDefault();
 
         if (comments == null)
             return false;
@@ -54,7 +54,7 @@ public class CommentsRepository : ICommentsRepository
     public bool UndoLike(string commentsId, string personId)
     {
 
-        var comments = _context.Comments.Where(k => k.Id == new Guid(commentsId)).FirstOrDefault();
+        var comments = _context.Comments.Where(k => k.KudosId == commentsId).FirstOrDefault();
 
         if ((comments == null) || (comments.Likes == null))
             return false;
