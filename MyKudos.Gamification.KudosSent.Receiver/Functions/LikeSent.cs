@@ -12,23 +12,21 @@ namespace MyKudos.Gamification.Receiver.Functions;
 
 public class LikeSent
 {
-    private readonly ILogger<LikeSent> _logger;
     private readonly IUserScoreService _userScoreService;
     private string _likeSendScore;
 
-    private readonly IScoreQueue _scoreQueue;
+    private readonly IScoreMessageSender _scoreQueue;
 
-    public LikeSent(ILogger<LikeSent> log, IConfiguration configuration,
-                                IUserScoreService userScoreService, IScoreQueue scoreQueue)
+    public LikeSent(IConfiguration configuration,
+                    IUserScoreService userScoreService, IScoreMessageSender scoreQueue)
     {
-        _logger = log;
         _userScoreService = userScoreService;
         _likeSendScore = configuration["LikeSendScore"];
         _scoreQueue = scoreQueue;
     }
 
     [FunctionName("GamificationLikeSent")]
-    public async Task Run([ServiceBusTrigger("GamificationLikeSent", "notification", Connection = "KudosServiceBus_ConnectionString")] string mySbMsg)
+    public async Task Run([ServiceBusTrigger("GamificationLikeSent", Connection = "KudosServiceBus_ConnectionString")] string mySbMsg, ILogger log)
     {
         try
         {
@@ -50,11 +48,11 @@ public class LikeSent
                 await _scoreQueue.NotifyProfileScoreUpdated(score);
             }
 
-            _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
+            log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error processing message: {ex.Message}");
+            log.LogError($"Error processing message: {ex.Message}");
 
         }
     }

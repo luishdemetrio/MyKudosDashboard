@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 
-namespace MyKudos.Gamification.Receiver
+namespace MyKudos.Gamification.Receiver.Functions
 {
     public class GamificationKudosReceived
     {
@@ -14,14 +14,13 @@ namespace MyKudos.Gamification.Receiver
 
         private readonly IUserScoreService _userScoreService;
 
-        private readonly IScoreQueue _scoreQueue;
+        private readonly IScoreMessageSender _scoreQueue;
 
         private string _kudosReceiveScore;
 
-        public GamificationKudosReceived(ILogger<GamificationKudosReceived> log, IConfiguration configuration, IUserScoreService userScoreService,
-                                         IScoreQueue scoreQueue)
+        public GamificationKudosReceived(IConfiguration configuration, IUserScoreService userScoreService,
+                                         IScoreMessageSender scoreQueue)
         {
-            _logger = log;
             _userScoreService = userScoreService;
             _kudosReceiveScore = configuration["KudosReceiveScore"];
             _scoreQueue = scoreQueue;
@@ -29,9 +28,9 @@ namespace MyKudos.Gamification.Receiver
 
 
         [FunctionName("GamificationKudosReceived")]
-        public async Task Run([ServiceBusTrigger("GamificationKudosReceived", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
+        public async Task Run([ServiceBusTrigger("GamificationKudosReceived", Connection = "KudosServiceBus_ConnectionString")] string mySbMsg, ILogger log)
         {
-            
+
             try
             {
                 var userId = mySbMsg.Replace("\"", "");
@@ -47,18 +46,19 @@ namespace MyKudos.Gamification.Receiver
 
                 var score = await _userScoreService.GetUserScoreAsync(userId);
 
-                if (score != null) {
+                if (score != null)
+                {
 
                     await _scoreQueue.NotifyProfileScoreUpdated(score);
                 }
 
 
-                _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
+                log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error processing message: {ex.Message}");
-                
+                log.LogError($"Error processing message: {ex.Message}");
+
             }
 
         }

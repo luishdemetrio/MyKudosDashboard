@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Recognition.Domain\MyKudos.Recognition.Domain.csproj" />
-    <ProjectReference Include="..\MyKudos.Domain.Core\MyKudos.Domain.Core.csproj" />
   </ItemGroup>
 
 </Project>

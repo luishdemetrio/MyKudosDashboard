@@ -1,8 +1,6 @@
-﻿using MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
-using MyKudos.Kudos.Token.Interfaces;
-using Newtonsoft.Json;
-using RestSharp;
 
 namespace MyKudos.Gateway.Services.Rest;
 
@@ -11,61 +9,52 @@ public class GamificationService : IGamificationService
  
 
     private readonly string _gamificationServiceUrl;
-    private readonly IRestServiceToken _serviceToken;
+    private IRestClientHelper _restClientHelper;
 
-    public GamificationService(IConfiguration config, IRestServiceToken serviceToken)
+    private readonly ILogger<GamificationService> _logger;
+
+    public GamificationService(IConfiguration config, ILogger<GamificationService> log, IRestClientHelper clientHelper)
     {
         _gamificationServiceUrl = config["gamificationServiceUrl"];
-        _serviceToken = serviceToken;
+        _logger = log;
+        _restClientHelper = clientHelper;
     }
 
     public async Task<IEnumerable<UserScore>> GetTopUserScoresAsync(int top)
     {
         List<UserScore> result = new();
 
-        var client = new RestClient($"{_gamificationServiceUrl}Contributors?top={top}");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            result = JsonConvert.DeserializeObject<List<UserScore>>(response.Content);
+            var contributors = await _restClientHelper.GetApiData<IEnumerable<UserScore>>($"{_gamificationServiceUrl}Contributors?top={top}");
+            result = contributors.ToList();
 
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetTopUserScoresAsync: {ex.Message}");
         }
 
         return result;
+
+        
     }
 
     public async Task<UserScore> GetUserScoreAsync(string pUserId)
     {
         UserScore result = new();
 
-        var client = new RestClient($"{_gamificationServiceUrl}UserScore?userid={pUserId}");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            result = JsonConvert.DeserializeObject<UserScore>(response.Content);
 
+            result = await _restClientHelper.GetApiData<UserScore>($"{_gamificationServiceUrl}UserScore?userid={pUserId}");
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetUserScoreAsync: {ex.Message}");
         }
 
         return result;

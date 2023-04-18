@@ -1,33 +1,36 @@
-﻿
-using Microsoft.AspNetCore.Components;
-using MyKudosDashboard.Interfaces;
+﻿using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Views;
 
 public class SendKudosView : ISendKudosView
 {
-    private IGatewayService _dashboardService;
+    private IKudosGateway _kudosGateway;
 
+    private IRecognitionGateway _recognitionGateway;
 
-    public SendKudosView(IGatewayService dashboardService)
+    private IUserGateway _userGateway;
+
+    public SendKudosView(IKudosGateway dashboardService, IRecognitionGateway recognitionGateway, IUserGateway userGateway)
     {
-        _dashboardService = dashboardService;        
+        _kudosGateway = dashboardService;
+        _recognitionGateway = recognitionGateway;
+        _userGateway = userGateway;
     }
 
     public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
     {
-        return await _dashboardService.GetRecognitionsAsync();
+        return await _recognitionGateway.GetRecognitionsAsync();
     }
 
     public async Task<IEnumerable<UserViewModel>> GetUsersAsync(string name)
     {
-        return await _dashboardService.GetUsers(name);              
+        return await _userGateway.GetUsers(name);              
     }
 
     public async Task<string> Send(KudosRequest kudos)
     {
      
-        return await _dashboardService.SendKudos(kudos);
+        return await _kudosGateway.SendKudos(kudos);
     }
 }

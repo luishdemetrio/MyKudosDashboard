@@ -10,29 +10,28 @@ namespace MyKudos.Gateway.Controllers;
 public class CommentsController : Controller
 {
 
-    private readonly IKudosService _kudosService;
+    private readonly ICommentsService _commentsService;
 
-    private IKudosQueue _kudosQueue;
+    private ICommentsMessageSender _commentsMessageSender;
 
     private readonly IGraphService _graphService;
 
-    public CommentsController(IKudosService kudosService, IKudosQueue kudosQueue,
+    public CommentsController(ICommentsService commentsService, ICommentsMessageSender commentsMessageSender,
                               IGraphService graphService)
     {
 
-        _kudosService = kudosService;
+        _commentsService = commentsService;
 
-        _kudosQueue = kudosQueue;
+        _commentsMessageSender = commentsMessageSender;
         _graphService = graphService;
     }
 
     [HttpPost(Name = "SendMessage")]
-    public Task<string> Post(CommentsRequest comments)
+    public async Task<string> Post(CommentsRequest comments)
     {
+        string commentId = string.Empty;
 
-        _ = _kudosQueue.MessageSent(comments);
-
-        return _kudosService.SendCommentsAsync(new Comments()
+        commentId =  await _commentsService.SendCommentsAsync(new Comments()
         {
             KudosId = comments.KudosId,
             Message = comments.Message,
@@ -40,6 +39,13 @@ public class CommentsController : Controller
             Date = comments.Date
         });
 
+        if (!string.IsNullOrEmpty(commentId))
+        {
+            comments.Id = commentId;
+            await _commentsMessageSender.MessageSent(comments);
+        }
+
+        return commentId;
     }
 
     [HttpGet(Name = "GetComments")]
@@ -48,7 +54,7 @@ public class CommentsController : Controller
 
         var result = new List<CommentsResponse>();
 
-        var comments =  await _kudosService.GetComments(kudosId);
+        var comments =  await _commentsService.GetComments(kudosId);
 
         if (comments != null)
         {
@@ -121,10 +127,12 @@ public class CommentsController : Controller
 
 
     [HttpPut(Name ="Update")]
-    public Task<bool> Put ([FromBody]CommentsRequest comments)
+    public async Task<bool> Put ([FromBody]CommentsRequest comments)
     {
 
-        return _kudosService.UpdateComments(new Comments()
+        bool succeed = false;
+
+        succeed = await  _commentsService.UpdateComments(new Comments()
         {
             Id = Guid.Parse(comments.Id),
             KudosId = comments.KudosId,
@@ -133,17 +141,28 @@ public class CommentsController : Controller
             Date = comments.Date
         });
 
-        
+        //if (succeed)
+        //{
+        //    await _commentsMessageSender.MessageUpdated(comments);
+        //}
+
+        return succeed;        
     }
 
     [HttpDelete(Name = "Delete")]
-    public Task<bool> Delete([FromBody] CommentsRequest comments)
+    public async Task<bool> Delete([FromBody] CommentsRequest comments)
     {
-        var result = _kudosService.DeleteComments(comments.KudosId, comments.Id.ToString());
+        bool succeed = false;
 
-        _ = _kudosQueue.MessageDeleted(comments);
+        succeed = await _commentsService.DeleteComments(comments.KudosId, comments.Id.ToString());
 
-        return result;
+        if (succeed)
+        {   
+            await _commentsMessageSender.MessageDeleted(comments);
+        }
+        
+
+        return succeed;
                 
     }
 }

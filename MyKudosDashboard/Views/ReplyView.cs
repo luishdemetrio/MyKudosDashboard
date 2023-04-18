@@ -6,22 +6,22 @@ namespace MyKudosDashboard.Views;
 public class ReplyView : IReplyView
 {
 
-    private IGatewayService _dashboardService;
+    private ICommentsGateway _commentsGateway;
 
-    public ReplyView(IGatewayService dashboardService)
+    public ReplyView(ICommentsGateway commentsGateway)
     {
 
-        _dashboardService = dashboardService;
+        _commentsGateway = commentsGateway;
 
     }
 
     public Task<bool> SendLikeAsync(LikeComment like)
     {
-        return _dashboardService.LikeComment(like);
+        return _commentsGateway.LikeComment(like);
     }
 
     public Task<bool> SendUndoLikeAsync(LikeComment like)
     {
-        return _dashboardService.UndoLikeComment(like);
+        return _commentsGateway.UndoLikeComment(like);
     }
 }

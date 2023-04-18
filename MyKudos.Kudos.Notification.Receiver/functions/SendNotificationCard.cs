@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using MyKudos.Kudos.Domain.Models;
 using MyKudos.Kudos.Notification.Receiver.Interfaces;

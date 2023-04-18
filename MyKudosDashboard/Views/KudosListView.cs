@@ -7,10 +7,10 @@ namespace MyKudosDashboard.Views;
 public class KudosListView : IKudosListView
 {
 
-    private readonly IGatewayService _gatewayService;
+    private readonly IKudosGateway _gatewayService;
 
 
-    public KudosListView(IGatewayService gatewayService)
+    public KudosListView(IKudosGateway gatewayService)
     {
         _gatewayService = gatewayService;
 

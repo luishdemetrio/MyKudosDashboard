@@ -31,7 +31,7 @@
             {
               "type": "TextBlock",
               "spacing": "Small",
-              "text": "Received a **${Title.Description}** recognition.",
+              "text": "Received a **${Title.Title}** recognition.",
               "isSubtle": true,
               "wrap": true,
               "size": "Medium"

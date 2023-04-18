@@ -1,7 +1,7 @@
 ﻿using Microsoft.Identity.Client;
-using MyKudosDashboard.Interfaces;
+using MyKudos.Communication.Helper.Interfaces;
 
-namespace MyKudosDashboard.Services;
+namespace MyKudos.Communication.Helper.Services;
 
 public class RestServiceToken : IRestServiceToken
 {

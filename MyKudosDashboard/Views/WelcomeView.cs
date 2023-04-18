@@ -14,17 +14,20 @@ public class WelcomeView : IWelcomeView
 
     private string _userId;
 
-    private IGatewayService _gatewayService;
+    private IKudosGateway _kudosGateway;
+
+    private IUserGateway _userGateway;
 
     private string _serviceBusConnectionString;
-    public WelcomeView(IGatewayService gatewayService, IConfiguration configuration)
+
+    public WelcomeView(IKudosGateway gatewayService, IConfiguration configuration, IUserGateway userGateway)
     {
-        _gatewayService = gatewayService;
+        _kudosGateway = gatewayService;
 
         _serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
 
         _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
-
+        _userGateway = userGateway;
     }
 
     public IWelcomeView.UpdateScoreCallBack ScoreCallback { get ; set ; }
@@ -32,7 +35,7 @@ public class WelcomeView : IWelcomeView
     public async Task<string> GetUserPhoto(string userId)
     {
 
-        return await _gatewayService.GetUserPhoto(userId);
+        return await _userGateway.GetUserPhoto(userId);
     }
 
 
@@ -40,13 +43,6 @@ public class WelcomeView : IWelcomeView
     {
         //its used later to control the score
         _userId = userId;
-
-        //if (userName.Length > 50)
-        //{
-        //    userName = userName.Substring(0, 50);
-        //}
-
-        //userName = userName.Replace(" ", "_");
 
         ServiceBusScoreProcessor(_userId);
 

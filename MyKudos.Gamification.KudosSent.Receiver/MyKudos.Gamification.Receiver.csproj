@@ -7,10 +7,12 @@
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="5.8.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.3" />
-    <PackageReference Include="RestSharp" Version="108.0.3" />
+    
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Gamification.Domain\MyKudos.Gamification.Domain.csproj" />
+    <ProjectReference Include="..\MyKudos.MessageSender\MyKudos.MessageSender.csproj" />
+    <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />
     
     
   </ItemGroup>

@@ -14,14 +14,14 @@ public class MessageReceived
 
     private readonly ILogger<MessageReceived> _logger;
     private readonly IUserScoreService _userScoreService;
-    private readonly IScoreQueue _scoreQueue;
+    private readonly IScoreMessageSender _scoreQueue;
 
     private string _messageReceivedScore;
 
     public MessageReceived(ILogger<MessageReceived> log,
                                        IConfiguration configuration,
                                        IUserScoreService userScoreService,
-                                       IScoreQueue scoreQueue)
+                                       IScoreMessageSender scoreQueue)
     {
         _logger = log;
         _userScoreService = userScoreService;
@@ -31,7 +31,7 @@ public class MessageReceived
 
 
     [FunctionName("MessageReceived")]
-    public async Task RunAsync([ServiceBusTrigger("GamificationReplyReceived", Connection = "KudosServiceBus_ConnectionString")]string myQueueItem, ILogger log)
+    public async Task RunAsync([ServiceBusTrigger("GamificationMessageReceived", Connection = "KudosServiceBus_ConnectionString")]string myQueueItem, ILogger log)
     {
         try
         {

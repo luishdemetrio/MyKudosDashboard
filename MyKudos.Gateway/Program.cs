@@ -1,8 +1,11 @@
+using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Interfaces;
+using MyKudos.Gateway.Queues;
 using MyKudos.Gateway.Services;
 using MyKudos.Gateway.Services.Rest;
-using MyKudos.Kudos.Token.Interfaces;
-using MyKudos.Kudos.Token.Services;
+using MyKudos.MessageSender.Interfaces;
+using MyKudos.Queue.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,26 +19,37 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IGraphService, GraphServiceRest>();
 builder.Services.AddSingleton<IRecognitionService, RecognitionServiceRest>();
 builder.Services.AddSingleton<IKudosService, KudosServiceRest>();
-builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
+//builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
 builder.Services.AddSingleton<IGamificationService, GamificationService>();
+builder.Services.AddSingleton<ICommentsService, CommentsServiceRest>();
+
+builder.Services.AddSingleton<ICommentsMessageSender, CommentsMessageSender>();
 
 var config = builder.Configuration;
 
-builder.Services.AddSingleton<IRestServiceToken>( t =>
-                new RestServiceToken(
+builder.Services.AddSingleton<IRestClientHelper>(t =>
+                new RestClientHelper(
+                   new RestServiceToken(
                     clientId: config["ClientId"],
                     clientSecret: config["ClientSecret"],
                     tenantId: config["TenantId"],
                     exposedAPI: config["ExposedApi"]
+                )
                 ));
 
-builder.Services.AddSingleton<IKudosQueue, KudosQueue>();
+builder.Services.AddSingleton<IKudosMessageSender, KudosMessageSender>();
 
 builder.Services.AddSwaggerGen(c =>
 {
    
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
+
+
+builder.Services.AddSingleton<IMessageSender>(t =>
+                new ServiceBusMessageSender(
+                    serviceBusConnectionString: config["KudosServiceBus_ConnectionString"]
+                ));
 
 var app = builder.Build();
 

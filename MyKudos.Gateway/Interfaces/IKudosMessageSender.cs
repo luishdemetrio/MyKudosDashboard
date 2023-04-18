@@ -2,15 +2,12 @@
 
 namespace MyKudos.Gateway.Interfaces;
 
-public interface IKudosQueue
+public interface IKudosMessageSender
 {
     Task SendKudosAsync(string kudosId, KudosNotification kudos);
 
     Task SendLikeAsync(LikeGateway like);
 
-    Task SendDislikeAsync(LikeGateway like);
+    Task SendUndoLikeAsync(LikeGateway like);
 
-    Task MessageSent(CommentsRequest comments);
-
-    Task MessageDeleted(CommentsRequest comments);
 }

@@ -10,11 +10,11 @@ namespace MyKudos.Gateway.Controllers;
 public class LikesCommentController : Controller
 {
 
-    private readonly IKudosService _kudosService;
+    private readonly ICommentsService _commentsService;
 
-    public LikesCommentController(IKudosService kudosService)
+    public LikesCommentController(ICommentsService commentsService)
     {
-        _kudosService = kudosService;
+        _commentsService = commentsService;
     }
 
     [HttpPost(Name = "SendLikeComment")]
@@ -22,7 +22,7 @@ public class LikesCommentController : Controller
     {
         
 
-        return _kudosService.LikeCommentAsync(new Kudos.Domain.Models.SendLike
+        return _commentsService.LikeCommentAsync(new Kudos.Domain.Models.SendLike
         (
             KudosId: like.KudosId,
             FromPersonId: like.FromPerson.Id
@@ -34,7 +34,7 @@ public class LikesCommentController : Controller
     public Task<bool> Delete([FromBody] LikeCommentGateway unlike)
     {   
 
-        return _kudosService.UndoLikeCommentAsync(new Kudos.Domain.Models.SendLike
+        return _commentsService.UndoLikeCommentAsync(new Kudos.Domain.Models.SendLike
         (
             KudosId: unlike.KudosId,
             FromPersonId: unlike.FromPerson.Id

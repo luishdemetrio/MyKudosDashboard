@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Interfaces;
 
-public interface IScoreQueue
+public interface IScoreMessageSender
 {
     Task NotifyProfileScoreUpdated(UserScore score);
 }

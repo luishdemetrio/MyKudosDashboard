@@ -10,17 +10,14 @@ namespace MyKudos.Gamification.Receiver.Functions;
 
 public class UndolikeReceived
 {
-    private readonly ILogger<UndolikeReceived> _logger;
     private readonly IUserScoreService _userScoreService;
     private string _likeReceiveScore;
 
-    private readonly IScoreQueue _scoreQueue;
+    private readonly IScoreMessageSender _scoreQueue;
 
-    public UndolikeReceived(ILogger<UndolikeReceived> log,
-                                    IConfiguration configuration, IUserScoreService userScoreService,
-                                    IScoreQueue scoreQueue)
+    public UndolikeReceived(IConfiguration configuration, IUserScoreService userScoreService,
+                            IScoreMessageSender scoreQueue)
     {
-        _logger = log;
         _userScoreService = userScoreService;
         _likeReceiveScore = configuration["LikeReceivedScore"];
         _scoreQueue = scoreQueue;
@@ -28,7 +25,7 @@ public class UndolikeReceived
 
 
     [FunctionName("GamificationUndolikeReceived")]
-    public async Task Run([ServiceBusTrigger("GamificationUndolikeReceived", "notification", Connection = "KudosServiceBus_ConnectionString")] string mySbMsg)
+    public async Task Run([ServiceBusTrigger("GamificationUndolikeReceived", Connection = "KudosServiceBus_ConnectionString")] string mySbMsg, ILogger log)
     {
         try
         {
@@ -52,11 +49,11 @@ public class UndolikeReceived
             }
 
 
-            _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
+            log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error processing message: {ex.Message}");
+            log.LogError($"Error processing message: {ex.Message}");
 
         }
     }

@@ -14,7 +14,7 @@ public class MessageSent
     private readonly ILogger<MessageSent> _logger;
 
     private readonly IUserScoreService _userScoreService;
-    private readonly IScoreQueue _scoreQueue;
+    private readonly IScoreMessageSender _scoreQueue;
 
     private string _messageSentScore;
 
@@ -22,7 +22,7 @@ public class MessageSent
     public MessageSent(ILogger<MessageSent> log,
                                    IConfiguration configuration,
                                    IUserScoreService userScoreService,
-                                   IScoreQueue scoreQueue)
+                                   IScoreMessageSender scoreQueue)
     {
         _logger = log;
         _userScoreService = userScoreService;
@@ -31,7 +31,7 @@ public class MessageSent
     }
 
     [FunctionName("MessageSent")]
-    public async Task RunAsync([ServiceBusTrigger("GamificationReplySent", Connection = "KudosServiceBus_ConnectionString")] string myQueueItem, ILogger log)
+    public async Task RunAsync([ServiceBusTrigger("GamificationMessageSent", Connection = "KudosServiceBus_ConnectionString")] string myQueueItem, ILogger log)
     {
         try
         {

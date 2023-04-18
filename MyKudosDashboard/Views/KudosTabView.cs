@@ -1,20 +1,21 @@
 ﻿using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
-using Azure.Messaging.ServiceBus.Administration;
 using Newtonsoft.Json;
-using Azure.Messaging.ServiceBus;
+using MyKudosDashboard.MessageSender;
 
 namespace MyKudosDashboard.Views;
 
 public class KudosTabView : IKudosTabView
 {
-    private IGatewayService _gatewayService;
+    private IKudosGateway _gatewayService;
 
-    private ServiceBusClient _serviceBusClient;
-    private ServiceBusProcessor _serviceBusLikeProcessor;
-    private ServiceBusProcessor _serviceBusKudosProcessor;
+    private static string _kudosSentDashboard = string.Empty;
 
-    private string _serviceBusConnectionString;
+    private static string _likeSentDashboard = string.Empty;
+    private static string _likeUndoDashboard = string.Empty;
+
+    private static string _commentSentDashboard = string.Empty;
+    private static string _commentDeletedDashboard = string.Empty;
 
     public IKudosTabView.UpdateLikesCallBack LikeCallback { get; set; }
 
@@ -22,17 +23,34 @@ public class KudosTabView : IKudosTabView
 
     public IKudosTabView.UpdateKudosCallBack KudosCallback { get; set; }
 
-    private readonly ILogger<KudosTabView> _logger;
+    public IKudosTabView.CommentsCallBack CommentsSentCallback { get; set; }
+    public IKudosTabView.CommentsCallBack CommentsUpdatedCallback { get; set; }
+    public IKudosTabView.CommentsCallBack CommentsDeletedCallback { get; set; }
 
-    public KudosTabView(IGatewayService gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger)
+    private ServiceBusSubscriberHelper _subscriberLikeSent;
+    private ServiceBusSubscriberHelper _subscriberUndoLike;
+    private ServiceBusSubscriberHelper _subscriberKudosSent;
+    private ServiceBusSubscriberHelper _subscriberCommentsSent;
+    private ServiceBusSubscriberHelper _subscriberCommentsDeleted;
+
+
+    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration)
     {
         _gatewayService = gatewayService;
 
-        _serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
+        _likeSentDashboard = configuration["KudosServiceBus_LikeSentDashboard"];
+        _likeUndoDashboard = configuration["KudosServiceBus_LikeUndoDashboard"];
 
-        _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
+        _kudosSentDashboard = configuration["KudosServiceBus_KudosSentDashboard"];
 
-        _logger = logger;
+        _commentSentDashboard = configuration["KudosServiceBus_MessageSentDashboard"];
+        _commentDeletedDashboard = configuration["KudosServiceBus_MessageDeletedDashboard"];
+
+        _subscriberLikeSent = new ServiceBusSubscriberHelper(configuration);
+        _subscriberUndoLike = new ServiceBusSubscriberHelper(configuration);
+        _subscriberKudosSent = new ServiceBusSubscriberHelper(configuration);
+        _subscriberCommentsDeleted = new ServiceBusSubscriberHelper(configuration);
+        _subscriberCommentsSent = new ServiceBusSubscriberHelper(configuration);
     }
 
 
@@ -42,132 +60,134 @@ public class KudosTabView : IKudosTabView
     }
 
 
-    private async Task CreateASubscriberfItDoesntExistAsync(string topicName, string subscriptionName)
+    private void SubscribeToLikeSent(string subscriptionName)
     {
-        
-        var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
-
-        //create a temp subscription for the user
-
-        if (!await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
+        var config = new ServiceBusProcessorConfig
         {
-            var options = new CreateSubscriptionOptions(topicName, subscriptionName)
+            DashboardName = _likeSentDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
             {
-                AutoDeleteOnIdle = TimeSpan.FromHours(12),
-                LockDuration = TimeSpan.FromMinutes(2),
-                MaxDeliveryCount = 10,
-                DefaultMessageTimeToLive = TimeSpan.FromMinutes(2)
+                //retrive the message body
+                var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
 
-            };
+                if (like != null)
+                {
+                    LikeCallback?.Invoke(like);
+                }
 
-            await serviceBusAdminClient.CreateSubscriptionAsync(options);
+                await arg.CompleteMessageAsync(arg.Message);
+            }
+        };
 
-        }
-
+        _subscriberLikeSent.ServiceBusProcessor(config);
     }
 
-    private void ServiceBusLikeMessageProcessor(string subscriptionName)
+    private void SubscribeUndoToLikeSent(string subscriptionName)
     {
-
-        CreateASubscriberfItDoesntExistAsync("likedashboard", subscriptionName).ContinueWith( t =>
+        var config = new ServiceBusProcessorConfig
         {
-            
-            _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("likedashboard", subscriptionName);
+            DashboardName = _likeUndoDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
+            {                
+                //retrive the message body
+                var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
 
-            _serviceBusLikeProcessor.ProcessMessageAsync += ServiceBusLikeProcessor_ProcessMessageAsync;
+                if (like != null)
+                {
+                    UndoLikeCallback?.Invoke(like);
+                }
 
-            _serviceBusLikeProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
+                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
+            }
+        };
 
-            _serviceBusLikeProcessor.StartProcessingAsync();
-            
-        });
+        _subscriberUndoLike.ServiceBusProcessor(config);
     }
 
-    private void ServiceBusUndoLikeMessageProcessor(string subscriptionName)
-    {
 
-        CreateASubscriberfItDoesntExistAsync("undolikedashboard", subscriptionName).ContinueWith(t =>
+    private void SubscribeKudosSent(string subscriptionName)
+    {
+        var config = new ServiceBusProcessorConfig
         {
+            DashboardName = _kudosSentDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
+            {
+                //retrive the message body
+                var kudos = JsonConvert.DeserializeObject<KudosResponse>(arg.Message.Body.ToString());
 
-            _serviceBusLikeProcessor = _serviceBusClient.CreateProcessor("undolikedashboard", subscriptionName);
+                if (kudos != null)
+                {
+                    KudosCallback?.Invoke(kudos);
+                }
 
-            _serviceBusLikeProcessor.ProcessMessageAsync += ServiceBusUndoLikeProcessor_ProcessMessageAsync;
+                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
+            }
+        };
 
-            _serviceBusLikeProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
-
-            _serviceBusLikeProcessor.StartProcessingAsync();
-
-        });
+        _subscriberKudosSent.ServiceBusProcessor(config);
     }
 
-    private void ServiceBusKudosMessageProcessor(string subscriptionName)
+    private void SubscribeCommentSent(string subscriptionName)
     {
-
-        CreateASubscriberfItDoesntExistAsync("kudosdashboard", subscriptionName).ContinueWith(t =>
+        var config = new ServiceBusProcessorConfig
         {
+            DashboardName = _commentSentDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
+            {
 
-            _serviceBusKudosProcessor = _serviceBusClient.CreateProcessor("kudosdashboard", subscriptionName);
+                //retrive the message body
+                var comments = JsonConvert.DeserializeObject<CommentsRequest>(arg.Message.Body.ToString());
 
-            _serviceBusKudosProcessor.ProcessMessageAsync += ServiceBusKudosProcessor_ProcessMessageAsync;
-            _serviceBusKudosProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
+                if (comments != null)
+                {
+                    CommentsSentCallback?.Invoke(comments);
+                }
 
-            _serviceBusKudosProcessor.StartProcessingAsync();
+                await arg.CompleteMessageAsync(arg.Message);
+            }
+        };
 
-        });
+        _subscriberCommentsSent.ServiceBusProcessor(config);
     }
 
-
-    private async Task ServiceBusProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
+    private void SubscribeCommentDeleted(string subscriptionName)
     {
-        _logger.LogError($"Error processing message: {arg.Exception.Message}");
-    }
-
-    private async Task ServiceBusLikeProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
-    {
-        //retrive the message body
-
-        var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
-
-        if (like != null)
+        var config = new ServiceBusProcessorConfig
         {
-            LikeCallback?.Invoke(like);
-        }
+            DashboardName = _commentDeletedDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
+            {
 
-        await arg.CompleteMessageAsync(arg.Message);
+                //retrive the message body
+                var comments = JsonConvert.DeserializeObject<CommentsRequest>(arg.Message.Body.ToString());
+
+                if (comments != null)
+                {
+                    CommentsDeletedCallback?.Invoke(comments);
+                }
+
+                await arg.CompleteMessageAsync(arg.Message);
+            }
+        };
+
+        _subscriberCommentsDeleted.ServiceBusProcessor(config);
     }
 
-    private async Task ServiceBusUndoLikeProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
-    {
-        //retrive the message body
-
-        var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
-
-        if (like != null)
-        {
-            UndoLikeCallback?.Invoke(like);
-        }
-
-        await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
-    }
-
-    private async Task ServiceBusKudosProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
-    {
-
-        var kudos = JsonConvert.DeserializeObject<KudosResponse>(arg.Message.Body.ToString());
-
-        if (kudos != null)
-        {
-            KudosCallback?.Invoke(kudos);
-        }
-
-        await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
-    }
+  
 
     public void RegisterForLiveUpdates(string userId)
     {
-
-        ServiceBusLikeMessageProcessor(userId);
-        ServiceBusUndoLikeMessageProcessor(userId);
-        ServiceBusKudosMessageProcessor(userId);
+        SubscribeKudosSent(userId);
+        SubscribeToLikeSent(userId);
+        SubscribeUndoToLikeSent(userId);    
+        SubscribeCommentSent(userId);
+        SubscribeCommentDeleted(userId);
+     
     }
+
 }

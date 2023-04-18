@@ -17,7 +17,7 @@ public class Kudos {
 public record KudosRequest (
     Person From,
     Person To,
-    Reward Title,
+    Reward Reward,
     string Message,
     DateTime SendOn
     );
@@ -26,7 +26,7 @@ public record KudosNotification
 (
     Person From,
     Person To,
-    Reward Title,
+    Reward Reward,
     string Message,
     DateTime SendOn,
     string ManagerId
@@ -50,7 +50,7 @@ public class KudosResponse
 
     }
 
-public record Reward(string Id, string Description);
+public record Reward(string Id, string Title);
 
 
 

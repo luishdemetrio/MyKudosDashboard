@@ -6,18 +6,18 @@ namespace MyKudosDashboard.Views;
 public class TopContributorsView : ITopContributorsView
 {
 
-    private IGatewayService _dashboardService;
+    private IGamificationGateway _gamificationGateway;
 
 
-    public TopContributorsView(IGatewayService dashboardService)
+    public TopContributorsView(IGamificationGateway gamificationGateway)
     {
-        _dashboardService = dashboardService;
+        _gamificationGateway = gamificationGateway;
     }
 
 
 
     public async Task<IEnumerable<TopContributors>> GetTopContributors()
     {
-        return await _dashboardService.GetTopContributors();
+        return await _gamificationGateway.GetTopContributors();
     }
 }

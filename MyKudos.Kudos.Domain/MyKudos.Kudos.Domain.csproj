@@ -6,10 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MyKudos.Domain.Core\MyKudos.Domain.Core.csproj" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.21.5" />

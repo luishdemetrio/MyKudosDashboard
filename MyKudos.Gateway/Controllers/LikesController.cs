@@ -11,9 +11,9 @@ public class LikesController : Controller
 
     private readonly IKudosService _kudosService;
 
-    private IKudosQueue _kudosQueue;
+    private IKudosMessageSender _kudosQueue;
 
-    public LikesController(IKudosService kudosService, IKudosQueue kudosQueue)
+    public LikesController(IKudosService kudosService, IKudosMessageSender kudosQueue)
     {
 
         _kudosService = kudosService;
@@ -37,7 +37,7 @@ public class LikesController : Controller
     [HttpDelete(Name = "Undolike")]
     public Task<bool> Delete([FromBody] LikeGateway unlike)
     {
-        _ = _kudosQueue.SendDislikeAsync(unlike);
+        _ = _kudosQueue.SendUndoLikeAsync(unlike);
 
         return _kudosService.UndoLikeAsync(new Kudos.Domain.Models.SendLike
         (

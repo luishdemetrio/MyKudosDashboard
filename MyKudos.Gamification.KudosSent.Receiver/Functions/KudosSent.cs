@@ -6,28 +6,26 @@ using Microsoft.Extensions.Logging;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 
-namespace MyKudos.Gamification.Receiver;
+namespace MyKudos.Gamification.Receiver.Functions;
 
 public class GamificationKudosSent
 {
-    private readonly ILogger<GamificationKudosSent> _logger;
     private readonly IUserScoreService _userScoreService;
     private string _kudosSendScore;
 
-    private readonly IScoreQueue _scoreQueue;
+    private readonly IScoreMessageSender _scoreQueue;
 
 
-    public GamificationKudosSent(ILogger<GamificationKudosSent> log, IConfiguration configuration, IUserScoreService userScoreService,
-                                 IScoreQueue scoreQueue)
+    public GamificationKudosSent(IConfiguration configuration, IUserScoreService userScoreService,
+                                 IScoreMessageSender scoreQueue)
     {
-         _logger = log;
         _userScoreService = userScoreService;
-        _kudosSendScore =  configuration["KudosSendScore"];
+        _kudosSendScore = configuration["KudosSendScore"];
         _scoreQueue = scoreQueue;
     }
 
     [FunctionName("GamificationKudosSent")]
-    public async Task RunAsync([ServiceBusTrigger("GamificationKudosSent", "notification", Connection = "KudosServiceBus_ConnectionString")]string mySbMsg)
+    public async Task RunAsync([ServiceBusTrigger("GamificationKudosSent",Connection = "KudosServiceBus_ConnectionString")] string mySbMsg, ILogger log)
     {
 
         try
@@ -51,15 +49,15 @@ public class GamificationKudosSent
             }
 
 
-            _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
+            log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error processing message: {ex.Message}");
-            
+            log.LogError($"Error processing message: {ex.Message}");
+
         }
 
 
-      
+
     }
 }

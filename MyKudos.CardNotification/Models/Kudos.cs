@@ -9,7 +9,7 @@ public record Kudos(
     string? ManagerId
 );
 
-public record Reward(string Id, string Description);
+public record Reward(string Id, string Title);
 
 public record Person(
      string Id,

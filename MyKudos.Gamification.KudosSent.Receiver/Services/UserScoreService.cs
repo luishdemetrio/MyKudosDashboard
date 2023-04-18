@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
-using Newtonsoft.Json;
 using RestSharp;
+using System;
 using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Services;
@@ -10,39 +12,32 @@ namespace MyKudos.Gamification.Receiver.Services;
 public class UserScoreService : IUserScoreService
 {
 
-
     private readonly string _userScoreServiceUrl;
-     private readonly IRestServiceToken _serviceToken;
 
-    public UserScoreService(IConfiguration config, IRestServiceToken serviceToken)
+    private IRestClientHelper _restClientHelper;
+
+    private readonly ILogger<UserScoreService> _logger;
+
+    public UserScoreService(IConfiguration config, ILogger<UserScoreService> log, IRestClientHelper clientHelper)
     {
-        _serviceToken = serviceToken;
+        
         _userScoreServiceUrl = config["userScoreServiceUrl"];
+        _logger = log;
+        _restClientHelper = clientHelper;
     }
 
     public async Task<UserScore> GetUserScoreAsync(string pUserId)
     {
         UserScore userScore = null;
 
-        var uri = $"{_userScoreServiceUrl}UserScore/?userId={pUserId}";
-
-        var client = new RestClient(uri);
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            userScore = JsonConvert.DeserializeObject<UserScore>(response.Content);
+            userScore = await _restClientHelper.GetApiData<UserScore>($"{_userScoreServiceUrl}UserScore/?userId={pUserId}");            
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetUserScoreAsync: {ex.Message}");
         }
 
         return userScore;
@@ -51,26 +46,19 @@ public class UserScoreService : IUserScoreService
 
     public async Task<bool> SetUserScoreAsync(UserScore userScore)
     {
-        var uri = $"{_userScoreServiceUrl}UserScore";
 
-        var client = new RestClient(uri);
+        bool result = false;
 
-        var token = await _serviceToken.GetAccessTokenAsync();
+        try
+        {
+            result = await _restClientHelper.SendApiData<UserScore, bool>($"{_userScoreServiceUrl}UserScore", Method.Post, userScore);
+        }
+        catch (Exception ex)
+        {
 
-        var request = new RestRequest();
-        request.Method = Method.Post;
-        request.AddHeader("Authorization", "Bearer " + token);
+            _logger.LogError($"Error processing SetUserScoreAsync: {ex.Message}");
+        }
 
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        var body = JsonConvert.SerializeObject(userScore);
-
-        request.AddParameter("application/json", body, ParameterType.RequestBody);
-
-
-        RestResponse response = client.Execute(request);
-
-        return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
+        return result;  
     }
 }

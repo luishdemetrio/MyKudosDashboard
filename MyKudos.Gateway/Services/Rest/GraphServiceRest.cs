@@ -1,8 +1,6 @@
-﻿using MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
-using MyKudos.Kudos.Token.Interfaces;
-using Newtonsoft.Json;
-using RestSharp;
 
 namespace MyKudos.Gateway.Services;
 
@@ -11,98 +9,73 @@ public class GraphServiceRest : IGraphService
        
     private readonly string _graphServiceUrl;
 
-    private readonly IRestServiceToken _serviceToken;
+    private IRestClientHelper _restClientHelper;
 
-    public GraphServiceRest(IConfiguration configuration, IRestServiceToken serviceToken)
+    private readonly ILogger<GraphServiceRest> _logger;
+
+    public GraphServiceRest(IConfiguration configuration, ILogger<GraphServiceRest> log, IRestClientHelper clientHelper)
     {   
         _graphServiceUrl = configuration["graphServiceUrl"];
-
-        _serviceToken = serviceToken;
+        _logger = log;
+        _restClientHelper = clientHelper;
 
     }
 
     public async Task<GraphUsers> GetUsers(string name)
     {
-        GraphUsers r = new();
+        GraphUsers result = new();
 
-        var client = new RestClient($"{_graphServiceUrl}user/?name={name}");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            r = JsonConvert.DeserializeObject<GraphUsers>(response.Content)!;
+            result = await _restClientHelper.GetApiData<GraphUsers>($"{_graphServiceUrl}user/?name={name}");
+            
+        }
+        catch (Exception ex)
+        {
 
+            _logger.LogError($"Error processing GetUsers: {ex.Message}");
         }
 
-        return r;
+        return result;
+
     }
 
 
     public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] usersId)
     {
+        List<GraphUserPhoto> result = new();
 
-        List<GraphUserPhoto> photos = new(); 
-
-        var client = new RestClient($"{_graphServiceUrl}photos");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        var body = JsonConvert.SerializeObject(usersId);
-
-        request.AddParameter("application/json", body, ParameterType.RequestBody);
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            photos = JsonConvert.DeserializeObject<List<GraphUserPhoto>>(response.Content)!;
+            var photos = await _restClientHelper.GetApiData<string[],IEnumerable<GraphUserPhoto>>($"{_graphServiceUrl}photos", usersId);
+            result = photos.ToList();
 
         }
+        catch (Exception ex)
+        {
 
-        return photos.AsEnumerable();
+            _logger.LogError($"Error processing GetUserPhotos: {ex.Message}");
+        }
+
+        return result;
     }
 
     public async Task<string> GetUserPhoto(string userid)
     {
-        string userPhoto = string.Empty;
+        string result = string.Empty;
 
-        var client = new RestClient($"{_graphServiceUrl}photo/?userid={userid}");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            userPhoto = JsonConvert.DeserializeObject<string>(response.Content);
+            result = await _restClientHelper.GetApiData<string>($"{_graphServiceUrl}photo/?userid={userid}");            
 
         }
+        catch (Exception ex)
+        {
 
-        return userPhoto;
+            _logger.LogError($"Error processing GetUserPhoto: {ex.Message}");
+        }
+
+        return result;
 
     }
 
@@ -111,56 +84,38 @@ public class GraphServiceRest : IGraphService
 
         var result = new List<Models.GraphUser>();
 
-        var client = new RestClient($"{_graphServiceUrl}userinfo");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        var body = JsonConvert.SerializeObject(users);
-
-        request.AddParameter("application/json", body, ParameterType.RequestBody);
-
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            result = JsonConvert.DeserializeObject<List<Models.GraphUser>>(response.Content)!;
+            result = await _restClientHelper.GetApiData<string[],List<Models.GraphUser>>($"{_graphServiceUrl}userinfo",users);
 
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetUserInfo: {ex.Message}");
         }
 
         return result;
+
+       
     }
 
     public async Task<string> GetUserManagerAsync(string userid)
     {
-        string manager = string.Empty;
+        string result = string.Empty;
 
-        var client = new RestClient($"{_graphServiceUrl}manager/?userid={userid}");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        RestResponse response = client.Execute(request);
-
-        if (response.IsSuccessful)
+        try
         {
-            manager = JsonConvert.DeserializeObject<string>(response.Content);
+            result = await _restClientHelper.GetApiData<string>($"{_graphServiceUrl}manager/?userid={userid}");
 
         }
+        catch (Exception ex)
+        {
 
-        return manager;
+            _logger.LogError($"Error processing GetUserManagerAsync: {ex.Message}");
+        }
+
+        return result;
+
     }
 }

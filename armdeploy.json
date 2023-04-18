@@ -171,8 +171,6 @@
 
     "notification_bot_userAssignedIdentities": "[concat(variables('notification_bot'), '_userAssignedIdentities')]",
 
-    "kudos_messaging": "[concat(parameters('baseResourceName'), 'messaging' )]",
-
     "kudos_notificationreceiver": "[concat(parameters('baseResourceName'), 'notificationreceiver' )]",
 
     "actionGroups_Application_Insights_Smart_Detection_name": "Application Insights Smart Detection",
@@ -185,7 +183,38 @@
 
     "gamification_function": "[concat(parameters('baseResourceName'), 'gamificationfunc' )]",
 
-    "notification_function": "[concat(parameters('baseResourceName'), 'notificationfunc' )]"
+    "notification_function": "[concat(parameters('baseResourceName'), 'notificationfunc' )]",
+
+
+    "KudosServiceBus_namespace": "[concat(parameters('baseResourceName'), 'messaging' )]",
+
+    "KudosServiceBus_TopicName": "notifyUserBotTopic",
+
+    "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
+    "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
+
+    "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
+    "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived",
+
+    "KudosServiceBus_GamificationUndolikeSentTopicName": "GamificationUndolikeSent",
+    "KudosServiceBus_GamificationUndolikeReceivedTopicName": "GamificationUndolikeReceived",
+
+    "KudosServiceBus_GamificationMessageSentTopicName": "GamificationMessageSent",
+    "KudosServiceBus_GamificationMessageReceivedTopicName": "GamificationMessageReceived",
+
+    "KudosServiceBus_GamificationMessageDeletedFromTopicName": "GamificationMessageDeletedFrom",
+    "KudosServiceBus_GamificationMessageDeletedToTopicName": "GamificationMessageDeletedTo",
+
+
+    "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
+    "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
+    "KudosServiceBus_MessageUpdatedDashboard": "MessageUpdatedDashboard",
+    
+
+    "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
+
+    "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
+    "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard"
 
 
   },
@@ -458,8 +487,8 @@
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "kudosTopic",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('KudosServiceBus_namespace'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+
             "KudosReceiveScore": "50",
             "KudosSendScore": "30",
             "LikeSendScore": "5",
@@ -467,7 +496,8 @@
             "MessageReceivedScore": "5",
             "MessageSentScore": "10",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-            "FUNCTIONS_EXTENSION_VERSION": "~4"
+            "FUNCTIONS_EXTENSION_VERSION": "~4",
+            "KudosServiceBus_ScoreUpdatedTopicName": "scoreUpdatedDashboard"
 
           }
         },
@@ -764,54 +794,6 @@
         "isDisabled": false
       }
     },
-    {
-      "type": "Microsoft.ServiceBus/namespaces",
-      "apiVersion": "2022-10-01-preview",
-      "name": "[variables('kudos_messaging')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "Standard",
-        "tier": "Standard"
-      },
-      "properties": {
-        "premiumMessagingPartitions": 0,
-        "minimumTlsVersion": "1.2",
-        "publicNetworkAccess": "Enabled",
-        "disableLocalAuth": false,
-        "zoneRedundant": false
-      }
-    },
-    {
-      "type": "Microsoft.ServiceBus/namespaces/authorizationrules",
-      "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('kudos_messaging'), '/RootManageSharedAccessKey')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.ServiceBus/namespaces', variables('kudos_messaging'))]"
-      ],
-      "properties": {
-        "rights": [
-          "Listen",
-          "Manage",
-          "Send"
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
-      "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('kudos_messaging'), '/default')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.ServiceBus/namespaces', variables('kudos_messaging'))]"
-      ],
-      "properties": {
-        "publicNetworkAccess": "Enabled",
-        "defaultAction": "Allow",
-        "virtualNetworkRules": [],
-        "ipRules": []
-      }
-    },
 
     {
       "type": "Microsoft.Web/serverfarms",
@@ -985,7 +967,6 @@
             "PROJECT": "MyKudos.Kudos.Notification.Receiver/MyKudos.Kudos.Notification.Receiver.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "kudosTopic",
             "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
@@ -1989,17 +1970,31 @@
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-            "KudosServiceBus_TopicName": "notifyUserBotTopic",
+
+            "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
+
             "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
             "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
+
             "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
             "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived",
+
             "KudosServiceBus_GamificationUndolikeSentTopicName": "GamificationUndolikeSent",
             "KudosServiceBus_GamificationUndolikeReceivedTopicName": "GamificationUndolikeReceived",
+
             "KudosServiceBus_GamificationMessageSentTopicName": "GamificationMessageSent",
             "KudosServiceBus_GamificationMessageReceivedTopicName": "GamificationMessageReceived",
+
             "KudosServiceBus_GamificationMessageDeletedFromTopicName": "GamificationMessageDeletedFrom",
-            "KudosServiceBus_GamificationMessageDeletedToTopicName": "GamificationMessageDeletedTo"
+            "KudosServiceBus_GamificationMessageDeletedToTopicName": "GamificationMessageDeletedTo",
+
+            "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
+            "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
+
+            "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
+
+            "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
+            "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard"
 
 
           }
@@ -2737,6 +2732,466 @@
         "etag": "W/\"bfd284d1a8e61ecf5c27ef9d858944e02/6/2023 12:17:43 AM\"",
         "channelName": "MsTeamsChannel",
         "location": "global"
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[variables('KudosServiceBus_namespace')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "properties": {
+        "premiumMessagingPartitions": 0,
+        "minimumTlsVersion": "1.2",
+        "publicNetworkAccess": "Enabled",
+        "disableLocalAuth": false,
+        "zoneRedundant": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/authorizationrules",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/RootManageSharedAccessKey')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen",
+          "Manage",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/default')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "publicNetworkAccess": "Enabled",
+        "defaultAction": "Allow",
+        "virtualNetworkRules": [],
+        "ipRules": []
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationKudosReceivedTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationKudosSentTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationLikeReceivedTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationLikeSentTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageReceivedTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P14D",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageSentTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P14D",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationUndolikeReceivedTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationUndolikeSentTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_AgentTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageDeletedFromTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageDeletedToTopicName')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "lockDuration": "PT1M",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+        "deadLetteringOnMessageExpiration": false,
+        "enableBatchedOperations": true,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "maxDeliveryCount": 10,
+        "status": "Active",
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_KudosSentDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_LikeSentDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_LikeUndoDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageDeletedDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageSentDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageUpdatedDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
       }
     }
 

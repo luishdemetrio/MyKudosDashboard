@@ -1,45 +1,47 @@
-﻿using MyKudosDashboard.Interfaces;
+﻿using Azure.Messaging.ServiceBus;
+using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Views;
 
 public class CommentsView : ICommentsView
 {
-    public ICommentsView.UpdateLikeCallBack LikeCallback { get ; set  ; }
-    public ICommentsView.UpdateCommentsCallBack CommentsCallback { get ; set ; }
 
+    
+    private ICommentsGateway _commentsGateway;
 
-    private IGatewayService _dashboardService;
+    private IKudosGateway _kudosGateway;
 
-
-    public CommentsView(IGatewayService dashboardService)
+    public CommentsView(ICommentsGateway commentsGateway, IKudosGateway kudosGateway)
     {
-        _dashboardService = dashboardService;
+        _commentsGateway = commentsGateway;
+        _kudosGateway = kudosGateway;
+
+    }
+
+    public Task<bool> LikeKudosAsync(Like like)
+    {
+        return _kudosGateway.Like(like);
+    }
+
+    public async Task<bool> UndoLikeKudosAsync(Like like)
+    {
+        return await _kudosGateway.UndoLike(like);
     }
 
     public Task<IEnumerable<CommentsResponse>> GetComments(string kudosId)
     {
-        return _dashboardService.GetComments(kudosId);
+        return _commentsGateway.GetComments(kudosId);
     }
 
     public Task<string> SendComments(CommentsRequest comment)
     {
-        return _dashboardService.SendCommentsAsync(comment); 
-    }
-
-    public Task<bool> SendLikeAsync(Like like)
-    {
-        return _dashboardService.Like(like);
-    }
-
-    public async Task<bool> SendUndoLikeAsync(Like like)
-    {
-        return await _dashboardService.UndoLike(like);
+        return _commentsGateway.SendCommentsAsync(comment); 
     }
 
     public Task<bool> UpdateComments(CommentsResponse comment, string toPersonId)
     {
-        return _dashboardService.UpdateComments(new CommentsRequest()
+        return _commentsGateway.UpdateComments(new CommentsRequest()
         {
             Id = comment.Id,
             Date = comment.Date,
@@ -52,7 +54,7 @@ public class CommentsView : ICommentsView
 
     public  Task<bool> DeleteComments(CommentsResponse comment, string toPersonId)
     {
-        return _dashboardService.DeleteComments(new CommentsRequest()
+        return _commentsGateway.DeleteComments(new CommentsRequest()
         {
             Id = comment.Id,
             Date = comment.Date,

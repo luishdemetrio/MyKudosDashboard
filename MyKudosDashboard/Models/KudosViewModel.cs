@@ -27,12 +27,12 @@
     public record KudosRequest (
         Person From,
         Person To,
-        Reward Title,
+        Reward Reward,
         string Message,
         DateTime SendOn
     );
 
-    public record Reward(string Id, string Description);
+    public record Reward(string Id, string Title);
 
 
     public class KudosResponse

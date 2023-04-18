@@ -1,4 +1,6 @@
 using Microsoft.Fast.Components.FluentUI;
+using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Communication.Helper.Services;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
@@ -33,16 +35,24 @@ builder.Services.AddScoped<IReplyView, ReplyView>();
 
 //Services
 
-builder.Services.AddSingleton<IGatewayService, GatewayService>();
+builder.Services.AddSingleton<ICommentsGateway, CommentsGateway>();
+builder.Services.AddSingleton<IGamificationGateway, GamificationGateway>();
+builder.Services.AddSingleton<IKudosGateway, GatewayService>();
+builder.Services.AddSingleton<IRecognitionGateway, RecognitionGateway>();
+builder.Services.AddSingleton<IUserGateway, UserGateway>();
+
+
 
 var config = builder.Configuration;
 
-builder.Services.AddSingleton<IRestServiceToken>(t =>
-                new RestServiceToken(
+builder.Services.AddSingleton<IRestClientHelper>(t =>
+                new RestClientHelper(
+                   new RestServiceToken(
                     clientId: config["ClientId"],
                     clientSecret: config["ClientSecret"],
                     tenantId: config["TenantId"],
                     exposedAPI: config["ExposedApi"]
+                )
                 ));
 
 

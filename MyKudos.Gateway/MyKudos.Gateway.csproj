@@ -7,18 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.12.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />
     <PackageReference Include="Azure.Identity" Version="1.3.0" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
     <PackageReference Include="Microsoft.Graph" Version="4.48.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="RestSharp" Version="108.0.3" />
+    <PackageReference Include="RestSharp" Version="110.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
-    <ProjectReference Include="..\MyKudos.Kudos.Token\MyKudos.Kudos.Token.csproj" />
+    
+    <ProjectReference Include="..\MyKudos.MessageSender\MyKudos.MessageSender.csproj" />
+    <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

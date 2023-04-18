@@ -33,6 +33,8 @@
         --scroll-align: flex-end
     }
 
+    
+
 </style>
 
 <FluentDialog   @ref=SendKudosFluentDialog
@@ -95,16 +97,22 @@
 
                                     using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1));
 
-                                    var size = graphics.MeasureString(@item.Description, new System.Drawing.Font("Segoe UI", 16, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
+                                    var size = graphics.MeasureString(@item.Title, new System.Drawing.Font("Segoe UI", 16, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));
 
 
-                                    <div class="@(item.IsSelected ? "card border border-primary" : "card")" style="width:@(@size.Width + 40)px;height: 55px">
-                                        <div    style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:medium">
+                                    <div class="@(item.IsSelected ? "card border border-primary " : "card ")"
+                                         style="width:@(@size.Width + 40)px;height: 55px" >
+
+                                        <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:medium" data-toggle="tooltip" data-placement="top" title=@item.Description>
                                             <h3     style="float: left;">@item.Emoji</h3>
                                             <span   class="btn stretched-link" style="float: right;padding-top:5px;padding-left:0px" 
                                                     @onclick=@(() => RecognitionClick(item))>@item.Title</span>
+
+                                            
                                         </div>
                                     </div>
+
+                                    
                                 }
 
 
@@ -199,7 +207,7 @@
 
         if (firstRender && recognitions == null)
         {
-            
+
             recognitions = await SendKudosView.GetRecognitionsAsync();
         }
     }
@@ -287,9 +295,9 @@
                             Name = SelectedEmployee.Name,
                             Photo = SelectedEmployee.Photo
                         },
-                    Title: new Reward(
+                    Reward: new Reward(
                         Id: recognition.Id,
-                        Description: recognition.Description
+                        Title: recognition.Title
                     ),
                     Message: KudosMessage,
                     SendOn: DateTime.Now
@@ -302,6 +310,9 @@
         });
 
         await t;
+
+        if (kudos == null)
+            return;
 
         kudosId = await SendKudosView.Send(kudos);
 

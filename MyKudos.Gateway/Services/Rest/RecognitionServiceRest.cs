@@ -1,7 +1,5 @@
-﻿using MyKudos.Gateway.Interfaces;
-using MyKudos.Kudos.Token.Interfaces;
-using Newtonsoft.Json;
-using RestSharp;
+﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Interfaces;
 
 namespace MyKudos.Gateway.Services;
 
@@ -9,40 +7,34 @@ public class RecognitionServiceRest : IRecognitionService
 {
 
     private readonly string _recognitionServiceUrl;
-    private readonly IRestServiceToken _serviceToken;
+    private IRestClientHelper _restClientHelper;
 
-    public RecognitionServiceRest(IConfiguration config, IRestServiceToken serviceToken)
+    private readonly ILogger<RecognitionServiceRest> _logger;
+
+    public RecognitionServiceRest(IConfiguration config, ILogger<RecognitionServiceRest> log, IRestClientHelper clientHelper)
     {
         _recognitionServiceUrl = config["RecognitionServiceUrl"];
 
-        _serviceToken= serviceToken;
-
+        _logger = log;
+        _restClientHelper = clientHelper;
     }
 
     public async Task<IEnumerable<Models.Recognition>> GetRecognitionsAsync()
     {
-        var results = new List<Models.Recognition>();
+        var result = new List<Models.Recognition>();
 
-        var client = new RestClient($"{_recognitionServiceUrl}recognition");
-
-        var token = await _serviceToken.GetAccessTokenAsync();
-
-        var request = new RestRequest();
-        request.Method = Method.Get;
-        request.AddHeader("Authorization", "Bearer " + token);
-
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
-
-        RestResponse response = client.Execute(request);
-
-        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        try
         {
-            results = JsonConvert.DeserializeObject<List<Models.Recognition>>(response.Content)!;
+            var recognitions = await _restClientHelper.GetApiData<IEnumerable<Models.Recognition>>($"{_recognitionServiceUrl}recognition");
+            result = recognitions.ToList();
+        }
+        catch (Exception ex)
+        {
 
+            _logger.LogError($"Error processing GetRecognitionsAsync: {ex.Message}");
         }
 
-        return results;
+        return result;
 
 
     }

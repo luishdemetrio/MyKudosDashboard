@@ -6,17 +6,17 @@ namespace MyKudosDashboard.Views;
 public class UserProfileScoreView : IUserProfileScoreView
 {
 
-    private IGatewayService _dashboardService;
+    private IGamificationGateway _gamificationGateway;
 
 
-    public UserProfileScoreView(IGatewayService dashboardService)
+    public UserProfileScoreView(IGamificationGateway gamificationGateway)
     {
-        _dashboardService = dashboardService;
+        _gamificationGateway = gamificationGateway;
     }
 
 
     public async Task<UserScore> GetUserScore(string userId)
     {
-        return await _dashboardService.GetUserScoreAsync(userId);
+        return await _gamificationGateway.GetUserScoreAsync(userId);
     }
 }

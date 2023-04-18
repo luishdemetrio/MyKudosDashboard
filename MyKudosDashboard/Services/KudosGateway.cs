@@ -1,0 +1,99 @@
+﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudosDashboard.Interfaces;
+using MyKudosDashboard.Models;
+using RestSharp;
+
+namespace MyKudosDashboard.Services;
+
+public class GatewayService : IKudosGateway
+{
+
+    private readonly string _gatewayServiceUrl;
+   
+    private IRestClientHelper _restClientHelper;
+
+    private readonly ILogger<GatewayService> _logger;
+
+    public GatewayService(IConfiguration config, IRestClientHelper restClientHelper, ILogger<GatewayService> log)
+    {
+        _gatewayServiceUrl = config["GatewayServiceUrl"];
+        _restClientHelper = restClientHelper;
+        _logger = log;
+        
+    }
+
+
+    public async Task<IEnumerable<KudosResponse>> GetKudos()
+    {
+
+        IEnumerable<KudosResponse> kudos = null;
+
+        try
+        {
+            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudos");
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return kudos;
+        
+    }
+
+
+    public async Task<string> SendKudos(KudosRequest kudos)
+    {
+        string kudosId = string.Empty;
+
+        try
+        {
+            kudosId = await _restClientHelper.SendApiData<KudosRequest, string>($"{_gatewayServiceUrl}kudos", Method.Post,  kudos);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing SendKudos: {ex.Message}");
+        }
+
+        return kudosId;
+
+    }
+
+    public async Task<bool> Like(Like like)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", Method.Post, like);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing Like: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> UndoLike(Like like)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", Method.Delete, like);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing UndoLike: {ex.Message}");
+        }
+
+        return result;
+
+    }
+    
+}

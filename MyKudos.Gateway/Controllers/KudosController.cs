@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Models;
+using MyKudos.Kudos.Domain.Models;
 using System.Security.Cryptography;
 
 namespace MyKudos.Gateway.Controllers;
@@ -18,11 +19,11 @@ public class KudosController : Controller
 
     private IEnumerable<Models.Recognition> _recognitions;
 
-    private IKudosQueue _kudosQueue;
+    private IKudosMessageSender _kudosQueue;
 
     
     public KudosController(IGraphService graphService, IRecognitionService recognitionService, 
-                           IKudosService kudosService, IKudosQueue kudosQueue)
+                           IKudosService kudosService, IKudosMessageSender kudosQueue)
     {
         
         _graphService = graphService;
@@ -81,7 +82,7 @@ public class KudosController : Controller
                                select new LikeDTO(
 
                                    KudosId: k.Id,
-                                   Person: new Person()
+                                   Person: new MyKudos.Gateway.Models.Person()
                                    {
                                        Id = like,
                                        Name = u.DisplayName,
@@ -106,9 +107,9 @@ public class KudosController : Controller
 
                      select new Models.KudosResponse() {
                          Id = kudo.Id,
-                         From = new Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
-                         To = new Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
-                         Title= rec.Description,
+                         From = new MyKudos.Gateway.Models.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
+                         To = new MyKudos.Gateway.Models.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
+                         Title= rec.Title,
                         Message = kudo.Message,
                         SendOn = kudo.Date,
                         Likes= likes.Where(l => l.KudosId == kudo.Id).Select(l => l.Person),
@@ -126,18 +127,26 @@ public class KudosController : Controller
     public async Task<string> PostAsync([FromBody] Models.KudosRequest kudos)
     {
 
-       
-        string kudosId = await _kudosService.SendAsync(kudos);
+        var restKudos = new KudosLog()
+        {
+            FromPersonId = kudos.From.Id,
+            ToPersonId = kudos.To.Id,
+            TitleId = kudos.Reward.Id,
+            Message = kudos.Message,
+            Date = kudos.SendOn
+        };
+
+        string kudosId = await _kudosService.SendAsync(restKudos);
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
 
-        var queue = _kudosQueue.SendKudosAsync(kudosId, new KudosNotification(
+        var queue = _kudosQueue.SendKudosAsync(kudosId, new MyKudos.Gateway.Models.KudosNotification(
           From: kudos.From,
           To: kudos.To,
           ManagerId: userManagerId,
           Message: kudos.Message,
-          Title: kudos.Title,
+          Reward: kudos.Reward,
           SendOn: kudos.SendOn
           ));
 
