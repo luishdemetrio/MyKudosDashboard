@@ -115,6 +115,9 @@
 
         _userScore = await UserProfileScoreView.GetUserScore(User.ObjectId);
 
+        if (_userScore == null)
+            _userScore = new();
+
         _isLoaded = true;
 
         await InvokeAsync(StateHasChanged);
