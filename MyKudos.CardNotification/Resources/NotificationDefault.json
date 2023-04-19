@@ -31,7 +31,7 @@
             {
               "type": "TextBlock",
               "spacing": "Small",
-              "text": "Received a **${Title.Title}** recognition.",
+              "text": "Received a **${Reward.Title}** recognition.",
               "isSubtle": true,
               "wrap": true,
               "size": "Medium"
@@ -99,6 +99,13 @@
       "size": "Medium",
       "fontType": "Default",
       "isSubtle": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "More Details",
+      "url": "https://teams.microsoft.com/l/app/41e97e70-97a3-42ba-9f49-786dce9733b8"
     }
   ]
 }

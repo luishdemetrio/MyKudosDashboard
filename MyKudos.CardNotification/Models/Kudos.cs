@@ -3,7 +3,7 @@ namespace MyKudos.CardNotification.Models;
 public record Kudos(
     Person From,
     Person To,
-    Reward Title,
+    Reward Reward,
     string Message,
     DateTime SendOn,
     string? ManagerId

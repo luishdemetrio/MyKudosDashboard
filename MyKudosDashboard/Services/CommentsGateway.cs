@@ -1,7 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
-using RestSharp;
 
 namespace MyKudosDashboard.Services;
 
@@ -28,7 +27,7 @@ public class CommentsGateway : ICommentsGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<LikeComment, bool>($"{_gatewayServiceUrl}likescomment", Method.Post, like);
+            result = await _restClientHelper.SendApiData<LikeComment, bool>($"{_gatewayServiceUrl}likescomment", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -47,7 +46,7 @@ public class CommentsGateway : ICommentsGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<LikeComment, bool>($"{_gatewayServiceUrl}likescomment", Method.Delete, like);
+            result = await _restClientHelper.SendApiData<LikeComment, bool>($"{_gatewayServiceUrl}likescomment", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {
@@ -65,7 +64,7 @@ public class CommentsGateway : ICommentsGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<CommentsRequest, string>($"{_gatewayServiceUrl}Comments", Method.Post, comment);
+            result = await _restClientHelper.SendApiData<CommentsRequest, string>($"{_gatewayServiceUrl}Comments", HttpMethod.Post, comment);
         }
         catch (Exception ex)
         {
@@ -104,7 +103,7 @@ public class CommentsGateway : ICommentsGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<CommentsRequest, bool>($"{_gatewayServiceUrl}Comments", Method.Put, comments);
+            result = await _restClientHelper.SendApiData<CommentsRequest, bool>($"{_gatewayServiceUrl}Comments", HttpMethod.Put, comments);
         }
         catch (Exception ex)
         {
@@ -121,7 +120,7 @@ public class CommentsGateway : ICommentsGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<CommentsRequest, bool>($"{_gatewayServiceUrl}Comments", Method.Delete, comments);
+            result = await _restClientHelper.SendApiData<CommentsRequest, bool>($"{_gatewayServiceUrl}Comments", HttpMethod.Delete, comments);
         }
         catch (Exception ex)
         {

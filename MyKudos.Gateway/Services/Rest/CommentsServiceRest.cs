@@ -28,8 +28,8 @@ public class CommentsServiceRest: ICommentsService
         
         try
         {
-            result = await _restClientHelper.SendApiData<string, bool>($"{_kudosServiceUrl}Comments?kudosId={kudosId}&commentId={commentId}", 
-                                                                       Method.Delete, body: null);
+            result = await _restClientHelper.SendApiData<string, bool>($"{_kudosServiceUrl}Comments?kudosId={kudosId}&commentId={commentId}",
+                                                                       HttpMethod.Delete, body: null);
         }
         catch (Exception ex)
         {
@@ -68,7 +68,7 @@ public class CommentsServiceRest: ICommentsService
 
         try
         {
-            result = await _restClientHelper.SendApiData<Comments, string>($"{_kudosServiceUrl}Comments", Method.Post, comment);
+            result = await _restClientHelper.SendApiData<Comments, string>($"{_kudosServiceUrl}Comments", HttpMethod.Post, comment);
         }
         catch (Exception ex)
         {
@@ -87,7 +87,7 @@ public class CommentsServiceRest: ICommentsService
 
         try
         {
-            result = await _restClientHelper.SendApiData<Comments, bool>($"{_kudosServiceUrl}Comments", Method.Put, comments);
+            result = await _restClientHelper.SendApiData<Comments, bool>($"{_kudosServiceUrl}Comments", HttpMethod.Put, comments);
         }
         catch (Exception ex)
         {
@@ -105,7 +105,7 @@ public class CommentsServiceRest: ICommentsService
 
         try
         {
-            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}likecomment", Method.Post, like);
+            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}likecomment", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -123,7 +123,7 @@ public class CommentsServiceRest: ICommentsService
 
         try
         {
-            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}likecomment", Method.Delete, like);
+            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}likecomment", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {

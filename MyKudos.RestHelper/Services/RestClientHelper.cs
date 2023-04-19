@@ -1,7 +1,8 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using Newtonsoft.Json;
-using RestSharp;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 
 namespace MyKudos.Communication.Helper.Services;
 
@@ -15,88 +16,175 @@ public class RestClientHelper : IRestClientHelper
         _serviceToken = restServiceToken;
     }
 
-    private async Task SetCommonHeadersAsync(RestRequest request)
+    //private async Task SetCommonHeadersAsync(RestRequest request)
+    //{
+    //    var token = await _serviceToken.GetAccessTokenAsync();
+
+    //    request.AddHeader("Authorization", "Bearer " + token);
+    //    request.AddHeader("Accept", "application/json");
+    //    request.AddHeader("Content-Type", "application/json");
+    //}
+
+    private async Task SetCommonHeaders(HttpRequestMessage request)
     {
         var token = await _serviceToken.GetAccessTokenAsync();
 
-        request.AddHeader("Authorization", "Bearer " + token);
-        request.AddHeader("Accept", "application/json");
-        request.AddHeader("Content-Type", "application/json");
+        request.Headers.Add("Authorization", "Bearer " + token);
+        request.Headers.Add("Accept", "application/json");
+        //request.Headers.Add("Content-Type", "application/json");
     }
 
     public async Task<TResponse> GetApiData<TResponse>(string endpoint)
     {
-        var client = new RestClient(endpoint);
 
-        var request = new RestRequest();
-        request.Method = Method.Get;
+      
+            using var httpClient = new HttpClient();
 
-        await SetCommonHeadersAsync(request);
+            using var request = new HttpRequestMessage(new HttpMethod("GET"), endpoint);
 
-        var response = await client.ExecuteAsync(request);
+            await SetCommonHeaders(request);
 
-        switch (response.StatusCode)
-        {
-            case HttpStatusCode.OK:
-                return JsonConvert.DeserializeObject<TResponse>(response.Content);
-            // handle other status codes here
-            default:
-                throw new Exception($"API Error: {response.StatusCode}");
-        }
+            using var response = await httpClient.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+    
+            return JsonConvert.DeserializeObject<TResponse>(responseContent);
+
+        //    return myResponse;
+
+       
+
+
+
+        //if (ex.StatusCode == HttpStatusCode.NotFound)
+        //{
+        //    Console.WriteLine("Resource not found");
+        //}
+        //else
+        //{
+        //    Console.WriteLine($"Request failed: {ex.StatusCode}");
+        //}
+
+        //if (ex.InnerException != null)
+        //{
+        //    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+        //}
+
+        //if (ex.Response != null)
+        //{
+        //    var errorContent = await ex.Response.Content.ReadAsStringAsync();
+        //    Console.WriteLine($"Error response content: {errorContent}");
+        //}
+
+        //throw;
     }
 
     public async Task<TResponse> GetApiData<TRequestBody, TResponse>( string endpoint, TRequestBody? body)
     {
-        var client = new RestClient(endpoint);
 
-        var request = new RestRequest();
-        request.Method = Method.Get;
 
-        await SetCommonHeadersAsync(request);
+       return await SendApiData<TRequestBody, TResponse>(endpoint, HttpMethod.Get, body);
 
-        if (body != null)
-        {
-            var requestBody = JsonConvert.SerializeObject(body);
-            request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
-        }
+        //using var httpClient = new HttpClient();
 
-        var response = await client.ExecuteAsync(request);
+        //using var request = new HttpRequestMessage(new HttpMethod("GET"), endpoint);
 
-        switch (response.StatusCode)
-        {
-            case HttpStatusCode.OK:
-                return JsonConvert.DeserializeObject<TResponse>(response.Content);
-            // handle other status codes here
-            default:
-                throw new Exception($"API Error: {response.StatusCode}");
-        }
+        //await SetCommonHeaders(request);
+
+        //if (body != null)
+        //{
+        //    var requestBody = JsonConvert.SerializeObject(body);
+        //    var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+
+        //    request.Content = content;
+        //}
+
+        //using var response = await httpClient.SendAsync(request);
+
+        //response.EnsureSuccessStatusCode();
+
+        //var responseContent = await response.Content.ReadAsStringAsync();
+
+        //return JsonConvert.DeserializeObject<TResponse>(responseContent );
+
+        //var client = new RestClient(endpoint);
+
+        //var request = new RestRequest();
+        //request.Method = Method.Get;
+
+        //await SetCommonHeadersAsync(request);
+
+        //if (body != null)
+        //{
+        //    var requestBody = JsonConvert.SerializeObject(body);
+        //    request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
+        //}
+
+        //var response = await client.ExecuteAsync(request);
+
+        //switch (response.StatusCode)
+        //{
+        //    case HttpStatusCode.OK:
+        //        return JsonConvert.DeserializeObject<TResponse>(response.Content);
+        //    // handle other status codes here
+        //    default:
+        //        throw new Exception($"API Error: {response.StatusCode}");
+        //}
     }
 
 
 
-    public async Task<TResponse> SendApiData<TRequestBody, TResponse>(string endpoint, Method httpMethod, TRequestBody body)
+    public async Task<TResponse> SendApiData<TRequestBody, TResponse>(string endpoint, HttpMethod httpMethod, TRequestBody body)
     {
-        var client = new RestClient(endpoint);
 
-        var request = new RestRequest();
-        request.Method = httpMethod;
+        using var httpClient = new HttpClient();
 
-        await SetCommonHeadersAsync(request);
+        using var request = new HttpRequestMessage(new HttpMethod(httpMethod.Method), endpoint);
 
-        var requestBody = JsonConvert.SerializeObject(body);
+        await SetCommonHeaders(request);
 
-        request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
-
-        var response = await client.ExecuteAsync(request);
-
-        switch (response.StatusCode)
+        if (body != null)
         {
-            case HttpStatusCode.OK:
-                return JsonConvert.DeserializeObject<TResponse>(response.Content);
-            // handle other status codes here
-            default:
-                throw new Exception($"API Error: {response.StatusCode}");
+            var requestBody = JsonConvert.SerializeObject(body);
+            var content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+
+
+            request.Content = content;
         }
+
+        using var response = await httpClient.SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+
+        return JsonConvert.DeserializeObject<TResponse>(responseContent);
+
+
+        //var client = new RestClient(endpoint);
+
+        //var request = new RestRequest();
+        //request.Method = httpMethod;
+
+        //await SetCommonHeadersAsync(request);
+
+        //var requestBody = JsonConvert.SerializeObject(body);
+
+        //request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
+
+        //var response = await client.ExecuteAsync(request);
+
+        //switch (response.StatusCode)
+        //{
+        //    case HttpStatusCode.OK:
+        //        return JsonConvert.DeserializeObject<TResponse>(response.Content);
+        //    // handle other status codes here
+        //    default:
+        //        throw new Exception($"API Error: {response.StatusCode}");
+        //}
     }
 
 

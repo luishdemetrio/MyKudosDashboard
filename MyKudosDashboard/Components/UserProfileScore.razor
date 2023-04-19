@@ -106,22 +106,29 @@
     private bool _isLoaded = false;
 
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         base.OnInitialized();
 
-        UserProfileScoreView.GetUserScore(User.ObjectId).ContinueWith(t =>
-        {
-            _userScore = t.Result;
-            _isLoaded = true;
-            InvokeAsync(StateHasChanged);
-        });
+        UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
+        UserProfileScoreView.UserScoreCallback = UpdateScore;
+
+        _userScore = await UserProfileScoreView.GetUserScore(User.ObjectId);
+
+        _isLoaded = true;
+
+        await InvokeAsync(StateHasChanged);
     }
 
-    public void UpdateScore(UserScore userScore)
+    public async void UpdateScore(UserScore userScore)
     {
-        _userScore = userScore;
-        InvokeAsync(StateHasChanged);
+        if(userScore.UserId == User.ObjectId)
+        {
+            _userScore = userScore;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
+        }
+        
 
     }
 

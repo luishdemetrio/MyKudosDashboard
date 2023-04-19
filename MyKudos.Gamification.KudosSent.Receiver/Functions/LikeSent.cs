@@ -44,8 +44,11 @@ public class LikeSent
 
             if (score != null)
             {
-
                 await _scoreQueue.NotifyProfileScoreUpdated(score);
+            }
+            else
+            {
+                log.LogError($"Error processing message: The returned scoreId is null for the message {mySbMsg}");
             }
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
@@ -53,7 +56,7 @@ public class LikeSent
         catch (Exception ex)
         {
             log.LogError($"Error processing message: {ex.Message}");
-            log.LogError($"Error processing message: {ex.ToString()}");
+            log.LogError($"Error processing message: {ex}");
 
         }
     }

@@ -497,7 +497,7 @@
             "MessageSentScore": "10",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "FUNCTIONS_EXTENSION_VERSION": "~4",
-            "KudosServiceBus_ScoreUpdatedTopicName": "scoreUpdatedDashboard"
+            "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard"
 
           }
         },
@@ -1970,7 +1970,7 @@
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-           
+
             "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
 
             "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
@@ -1995,7 +1995,9 @@
             "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
 
             "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
-            "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard"
+            "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
+
+            "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard"
 
 
           }
@@ -2354,7 +2356,9 @@
 
             "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
             "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
-            "KudosServiceBus_MessageUpdateddDashboard": "MessageUpdatedDashboard"
+            "KudosServiceBus_MessageUpdateddDashboard": "MessageUpdatedDashboard",
+
+            "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard"
 
 
           }
@@ -3186,6 +3190,29 @@
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
       "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageUpdatedDashboard')]')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_ScoreUpdatedDashboard')]')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"

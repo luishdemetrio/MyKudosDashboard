@@ -45,7 +45,7 @@ public class KudosServiceRest: IKudosService
 
         try
         {
-            result = await _restClientHelper.SendApiData<KudosLog, string>($"{_kudosServiceUrl}kudos", Method.Post, kudos);
+            result = await _restClientHelper.SendApiData<KudosLog, string>($"{_kudosServiceUrl}kudos", HttpMethod.Post, kudos);
         }
         catch (Exception ex)
         {
@@ -63,7 +63,7 @@ public class KudosServiceRest: IKudosService
 
         try
         {
-            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}like", Method.Post, like);
+            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}like", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -81,7 +81,7 @@ public class KudosServiceRest: IKudosService
 
         try
         {
-            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}like", Method.Delete, like);
+            result = await _restClientHelper.SendApiData<SendLike, bool>($"{_kudosServiceUrl}like", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {

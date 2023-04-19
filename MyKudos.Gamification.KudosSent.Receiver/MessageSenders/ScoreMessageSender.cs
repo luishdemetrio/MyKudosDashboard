@@ -25,7 +25,7 @@ internal class ScoreMessageSender : IScoreMessageSender
 
     private void ReadConfigurationSettings(IConfiguration configuration)
     {
-        _topicName = configuration["KudosServiceBus_ScoreUpdatedTopicName"];
+        _topicName = configuration["KudosServiceBus_ScoreUpdatedDashboard"];
        
     }
 

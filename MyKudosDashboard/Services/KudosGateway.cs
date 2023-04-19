@@ -1,7 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
-using RestSharp;
 
 namespace MyKudosDashboard.Services;
 
@@ -49,7 +48,7 @@ public class GatewayService : IKudosGateway
 
         try
         {
-            kudosId = await _restClientHelper.SendApiData<KudosRequest, string>($"{_gatewayServiceUrl}kudos", Method.Post,  kudos);
+            kudosId = await _restClientHelper.SendApiData<KudosRequest, string>($"{_gatewayServiceUrl}kudos",  HttpMethod.Post,  kudos);
         }
         catch (Exception ex)
         {
@@ -67,7 +66,7 @@ public class GatewayService : IKudosGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", Method.Post, like);
+            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -84,7 +83,7 @@ public class GatewayService : IKudosGateway
 
         try
         {
-            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", Method.Delete, like);
+            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {
