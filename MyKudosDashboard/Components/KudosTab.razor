@@ -66,7 +66,7 @@
 
     }
 
-    private void CommentsDeleted(CommentsRequest pComments)
+    private async void CommentsDeleted(CommentsRequest pComments)
     {
         if (_kudosList == null)
             return;
@@ -83,12 +83,13 @@
                 kudo.Comments.Remove(comments);
             }
 
-            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?
 
         }
     }
 
-    private void CommentsSent(CommentsRequest pComments)
+    private async void CommentsSent(CommentsRequest pComments)
     {
 
         if (_kudosList == null) 
@@ -109,7 +110,8 @@
 
             }
 
-            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?
 
         }
     }
@@ -121,14 +123,14 @@
         ReplyCallBack?.Invoke(kudos);
     }
 
-    private void LoadKudos()
+    private async void LoadKudos()
     {
-        KudosTabView.GetKudos().ContinueWith(t =>
-           {
-               _kudosList = t.Result.ToList();
+        var kudos = await KudosTabView.GetKudos();
 
-               InvokeAsync(StateHasChanged);
-           });
+        _kudosList = kudos.ToList();
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1); // <-- why is this needed to refresh the UI?
     }
 
     private IEnumerable<KudosResponse> GetAllKudos()
@@ -148,7 +150,7 @@
 
 
 
-    private void UpdateKudosCallback(KudosResponse pKudos)
+    private async void UpdateKudosCallback(KudosResponse pKudos)
     {
 
         if (_kudosList == null)
@@ -159,13 +161,14 @@
         if (k == null)
         {
             _kudosList.Add(pKudos);
-            
-            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
         }
     }
 
 
-    private void UpdateLikesCallBack(Like pLike)
+    private async void UpdateLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
@@ -192,12 +195,13 @@
           
             }
 
-            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
            
         }
     }
 
-    private void UpdateUndoLikesCallBack(Like pLike)
+    private async void UpdateUndoLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
@@ -217,7 +221,8 @@
                 kudo.Likes.Remove(like);
             }
 
-            InvokeAsync(StateHasChanged).ConfigureAwait(true);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
 
         }
     }

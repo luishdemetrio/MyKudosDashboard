@@ -53,6 +53,7 @@ public class LikeSent
         catch (Exception ex)
         {
             log.LogError($"Error processing message: {ex.Message}");
+            log.LogError($"Error processing message: {ex.ToString()}");
 
         }
     }

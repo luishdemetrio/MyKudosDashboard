@@ -1970,7 +1970,7 @@
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
             "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
-
+           
             "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
 
             "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
@@ -1990,6 +1990,7 @@
 
             "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
             "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
+            "KudosServiceBus_MessageUpdateddDashboard": "MessageUpdatedDashboard",
 
             "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
 
@@ -2344,7 +2345,16 @@
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]"
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+
+            "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
+
+            "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
+            "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
+
+            "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
+            "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
+            "KudosServiceBus_MessageUpdateddDashboard": "MessageUpdatedDashboard"
 
 
           }
