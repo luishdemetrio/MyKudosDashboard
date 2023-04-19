@@ -100,12 +100,5 @@
       "fontType": "Default",
       "isSubtle": true
     }
-  ],
-  "actions": [
-    {
-      "type": "Action.OpenUrl",
-      "title": "More Details",
-      "url": "https://teams.microsoft.com/l/app/41e97e70-97a3-42ba-9f49-786dce9733b8"
-    }
   ]
 }
