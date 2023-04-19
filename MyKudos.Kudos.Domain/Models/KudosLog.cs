@@ -35,7 +35,7 @@ public class Comments
 public record KudosNotification(
     Person From,
     Person To,
-    Reward Title,
+    Reward Reward,
     string Message,
     DateTime SendOn,
     string ManagerId
@@ -53,7 +53,7 @@ public class Person
     
 }
 
-public record Reward(string Id, string Description);
+public record Reward(string Id, string Title);
 
 
 public class GraphUser
