@@ -9,6 +9,7 @@ public class UserScoreRepository : IUserScoreRepository
 {
 
     private UserScoreDbContext _context;
+    private readonly object _lock = new object();
 
     public UserScoreRepository(UserScoreDbContext scoreContext)
     {
@@ -24,28 +25,33 @@ public class UserScoreRepository : IUserScoreRepository
 
     public bool SetUserScore(UserScore userScore)
     {
-        var score = _context.UserScores?.FirstOrDefault(u => u.UserId == userScore.UserId);
 
-        if (score != null)
+        UserScore score;
+
+        lock (_lock)
         {
-            
-            score.Score += userScore.Score;
-            score.KudosSent += userScore.KudosSent;
-            score.KudosReceived += userScore.KudosReceived;
-            score.LikesSent += userScore.LikesSent;
-            score.LikesReceived += userScore.LikesReceived;
-            score.MessagesReceived += userScore.MessagesReceived;
-            score.MessagesSent += userScore.MessagesSent;
-            
-          
-        }
-        else
-        {
-            _context.UserScores?.Add(userScore);
-            
+            score = _context.UserScores?.FirstOrDefault(u => u.UserId == userScore.UserId);
 
-        }
+            if (score != null)
+            {
 
+                score.Score += userScore.Score;
+                score.KudosSent += userScore.KudosSent;
+                score.KudosReceived += userScore.KudosReceived;
+                score.LikesSent += userScore.LikesSent;
+                score.LikesReceived += userScore.LikesReceived;
+                score.MessagesReceived += userScore.MessagesReceived;
+                score.MessagesSent += userScore.MessagesSent;
+
+
+            }
+            else
+            {
+                _context.UserScores?.Add(userScore);
+
+
+            }
+        }
         return _context.SaveChanges() > 0;
     }
 

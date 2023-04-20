@@ -57,6 +57,7 @@ public class CommentsMessageSender : ICommentsMessageSender
     {
         //gamification
         await _messageSender.SendQueue(comments.FromPersonId, _gamificationMessageSent);
+
         await _messageSender.SendQueue(comments.ToPersonId, _gamificationMessageReceived);
 
         //notification to update the Teams Apps
