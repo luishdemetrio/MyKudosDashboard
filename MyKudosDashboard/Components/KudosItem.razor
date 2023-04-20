@@ -147,23 +147,14 @@
         return filled;
     }
 
-    private async void Like(string kudosId, string toPersonId)
+    private void Like(string kudosId, string toPersonId)
     {
 
         UpdateLikes(kudosId, User.ObjectId);
 
-        //await KudosListView.SendLikeAsync(
-        //            new Like(
-        //                KudosId: kudosId,
-        //                FromPersonId: User.ObjectId,
-        //                ToPersonId: toPersonId
-        //            )
-        //        );
-
-
     }
 
-    private async void ReplyKudos(KudosResponse kudos)
+    private async Task ReplyKudos(KudosResponse kudos)
     {
 
        // ReplyCallBack?.Invoke(kudos);

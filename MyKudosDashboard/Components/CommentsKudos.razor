@@ -267,23 +267,23 @@
     }
 
 
-    private async void LikeKudos(KudosResponse kudos)
+    private async Task LikeKudos(KudosResponse kudos)
     {
 
         if (kudos.Likes.Any(l => l.Id == User.ObjectId))
         {
-             await CommentsView.UndoLikeKudosAsync(
-                      new Like(
-                        KudosId: kudos.Id,
-                        FromPerson: new Person
+            await CommentsView.UndoLikeKudosAsync(
+                     new Like(
+                       KudosId: kudos.Id,
+                       FromPerson: new Person
                             {
                                 Id = User.ObjectId,
                                 Name = User.DisplayName,
                                 Photo = $"data:image/png;base64,{UserPhoto}"
                             },
-                        ToPersonId: kudos.To.Id
-                    )
-                );            
+                       ToPersonId: kudos.To.Id
+                   )
+               );            
         }
         else
         {
@@ -300,12 +300,12 @@
                   )
               );
         }
-      
+
 
         UpdateLikesKudos(kudos.Id, User.ObjectId);
     }
 
-   
+
     private void UpdateLikeCallback(Like like)
     {
         // The person who sent already has the like updated
@@ -347,44 +347,44 @@
         _replyMessage = args.Value.ToString();
     }
 
-    private void PostMessageClick()
+    private async Task PostMessageClick()
     {
 
         if (string.IsNullOrEmpty(_replyMessage))
             return;
 
-        CommentsView.SendComments(
-                        new CommentsRequest()
-                        {
-                            KudosId = _item.Id,
-                            FromPersonId = User.ObjectId,
-                            ToPersonId = _item.To.Id,
-                            Message = _replyMessage,
-                            Date = DateTime.Now
-                        }
-                     ).ContinueWith(c =>
-                     {
-                         _comments.Add(
-                             new CommentsResponse()
-                            {
-                                Id = c.Result,
-                                KudosId = _item.Id,
-                                FromPerson = new Person()
-                                {
-                                    Id = User.ObjectId,
-                                    Photo = UserPhoto,
-                                    Name = User.DisplayName
-                                },
-                                Message = _replyMessage,
+        var comment = await CommentsView.SendComments(
+                         new CommentsRequest()
+                             {
+                                 KudosId = _item.Id,
+                                 FromPersonId = User.ObjectId,
+                                 ToPersonId = _item.To.Id,
+                                 Message = _replyMessage,
+                                 Date = DateTime.Now
+                             }
+                      );
 
-                                Date = DateTime.Now
-                            });
 
-                         _replyMessage = string.Empty;
+        _comments.Add(new CommentsResponse()
+            {
+                Id = comment,
+                KudosId = _item.Id,
+                FromPerson = new Person()
+                {
+                    Id = User.ObjectId,
+                    Photo = UserPhoto,
+                    Name = User.DisplayName
+                },
+                Message = _replyMessage,
 
-                         InvokeAsync(StateHasChanged);
-                     });
+                Date = DateTime.Now
+            });
 
+        _replyMessage = string.Empty;
+
+        await InvokeAsync(StateHasChanged);
+
+        await Task.CompletedTask;
 
     }
 

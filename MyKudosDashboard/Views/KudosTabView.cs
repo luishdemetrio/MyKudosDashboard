@@ -73,7 +73,7 @@ public class KudosTabView : IKudosTabView
 
                 if (like != null)
                 {
-                    LikeCallback?.Invoke(like);
+                    await LikeCallback?.Invoke(like);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message);
@@ -96,7 +96,7 @@ public class KudosTabView : IKudosTabView
 
                 if (like != null)
                 {
-                    UndoLikeCallback?.Invoke(like);
+                    await UndoLikeCallback?.Invoke(like);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
@@ -120,7 +120,7 @@ public class KudosTabView : IKudosTabView
 
                 if (kudos != null)
                 {
-                    KudosCallback?.Invoke(kudos);
+                    await KudosCallback?.Invoke(kudos);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
@@ -144,7 +144,7 @@ public class KudosTabView : IKudosTabView
 
                 if (comments != null)
                 {
-                    CommentsSentCallback?.Invoke(comments);
+                    await CommentsSentCallback?.Invoke(comments);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message);
@@ -168,7 +168,7 @@ public class KudosTabView : IKudosTabView
 
                 if (comments != null)
                 {
-                    CommentsDeletedCallback?.Invoke(comments);
+                    await CommentsDeletedCallback?.Invoke(comments);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message);

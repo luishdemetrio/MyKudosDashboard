@@ -135,7 +135,7 @@
         return filled;
     }
 
-    private async void Like(string kudosId, string toPersonId)
+    private async Task Like(string kudosId, string toPersonId)
     {
 
         var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
@@ -179,13 +179,13 @@
 
         }
 
-        UpdateLikes(kudosId, User.ObjectId);
+        await UpdateLikes(kudosId, User.ObjectId);
 
        
 
     }
 
-    private async void ReplyKudos(KudosResponse kudos)
+    private async Task ReplyKudos(KudosResponse kudos)
     {
 
         ReplyCallBack?.Invoke(kudos);
@@ -193,11 +193,9 @@
     }
 
 
-    private void UpdateLikes(string kudosId, string personId)
+    private async Task UpdateLikes(string kudosId, string personId)
     {
 
-        InvokeAsync(() =>
-        {
             var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
 
             if (kudo != null)
@@ -220,9 +218,9 @@
                     kudo.Likes.Remove(like);
                 }
 
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged);
             }
-        });
+       
     }
 
 

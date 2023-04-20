@@ -48,7 +48,7 @@ public class UserProfileScoreView : IUserProfileScoreView
 
                 if (userScore != null)
                 {
-                    UserScoreCallback?.Invoke(userScore);
+                    await UserScoreCallback?.Invoke(userScore);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);

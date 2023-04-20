@@ -48,11 +48,11 @@
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async void OnInitialized()
     {
-        await base.OnAfterRenderAsync(firstRender);
+        base.OnInitialized();
 
-        if (User != null && firstRender)
+        if (User != null)
         {
             KudosTabView.RegisterForLiveUpdates(User.ObjectId);
 
@@ -61,12 +61,25 @@
             KudosTabView.KudosCallback = UpdateKudosCallback;
             KudosTabView.CommentsDeletedCallback = CommentsDeleted;
             KudosTabView.CommentsSentCallback = CommentsSent;
+        }
+
+        await Task.CompletedTask;
+        
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {           
             LoadKudos();
         }
 
+        await Task.CompletedTask;
     }
 
-    private async void CommentsDeleted(CommentsRequest pComments)
+    private async Task CommentsDeleted(CommentsRequest pComments)
     {
         if (_kudosList == null)
             return;
@@ -89,7 +102,7 @@
         }
     }
 
-    private async void CommentsSent(CommentsRequest pComments)
+    private async Task CommentsSent(CommentsRequest pComments)
     {
 
         if (_kudosList == null) 
@@ -123,7 +136,7 @@
         ReplyCallBack?.Invoke(kudos);
     }
 
-    private async void LoadKudos()
+    private async Task LoadKudos()
     {
         var kudos = await KudosTabView.GetKudos();
 
@@ -150,7 +163,7 @@
 
 
 
-    private async void UpdateKudosCallback(KudosResponse pKudos)
+    private async Task UpdateKudosCallback(KudosResponse pKudos)
     {
 
         if (_kudosList == null)
@@ -165,10 +178,12 @@
             await InvokeAsync(StateHasChanged);
             await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
         }
+
+        //await Task.CompletedTask;
     }
 
 
-    private async void UpdateLikesCallBack(Like pLike)
+    private async Task UpdateLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
@@ -201,7 +216,7 @@
         }
     }
 
-    private async void UpdateUndoLikesCallBack(Like pLike)
+    private async Task UpdateUndoLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated

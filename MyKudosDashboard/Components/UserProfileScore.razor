@@ -120,10 +120,11 @@
 
         _isLoaded = true;
 
-        await InvokeAsync(StateHasChanged);
+        //await InvokeAsync(StateHasChanged);
+        await Task.CompletedTask;
     }
 
-    public async void UpdateScore(UserScore userScore)
+    public async Task UpdateScore(UserScore userScore)
     {
         if(userScore.UserId == User.ObjectId)
         {

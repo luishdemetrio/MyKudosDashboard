@@ -9,7 +9,7 @@ public interface IUserProfileScoreView
 
     public void RegisterForLiveUpdates(string userId);
 
-    public delegate void UpdateScoreCallBack(UserScore userScore);
+    public delegate Task UpdateScoreCallBack(UserScore userScore);
 
     public UpdateScoreCallBack UserScoreCallback { get; set; }
 
