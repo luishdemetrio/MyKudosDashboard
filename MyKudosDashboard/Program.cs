@@ -35,17 +35,17 @@ builder.Services.AddScoped<IReplyView, ReplyView>();
 
 //Services
 
-builder.Services.AddSingleton<ICommentsGateway, CommentsGateway>();
-builder.Services.AddSingleton<IGamificationGateway, GamificationGateway>();
-builder.Services.AddSingleton<IKudosGateway, GatewayService>();
-builder.Services.AddSingleton<IRecognitionGateway, RecognitionGateway>();
-builder.Services.AddSingleton<IUserGateway, UserGateway>();
+builder.Services.AddScoped<ICommentsGateway, CommentsGateway>();
+builder.Services.AddScoped<IGamificationGateway, GamificationGateway>();
+builder.Services.AddScoped<IKudosGateway, GatewayService>();
+builder.Services.AddScoped<IRecognitionGateway, RecognitionGateway>();
+builder.Services.AddScoped<IUserGateway, UserGateway>();
 
 
 
 var config = builder.Configuration;
 
-builder.Services.AddSingleton<IRestClientHelper>(t =>
+builder.Services.AddScoped<IRestClientHelper>(t =>
                 new RestClientHelper(
                    new RestServiceToken(
                     clientId: config["ClientId"],
@@ -83,8 +83,5 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-app.UseCors(builder => builder.WithOrigins("https://localhost:44302")
-                                .AllowAnyMethod()
-                                .AllowAnyHeader());
 app.Run();
 
