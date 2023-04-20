@@ -120,7 +120,8 @@
 
         _isLoaded = true;
 
-        //await InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
         await Task.CompletedTask;
     }
 
