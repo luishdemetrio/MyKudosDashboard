@@ -1,5 +1,4 @@
-﻿using Azure.Messaging.ServiceBus;
-using MyKudosDashboard.Interfaces;
+﻿using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Views;

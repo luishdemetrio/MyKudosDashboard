@@ -48,7 +48,7 @@
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
 
@@ -73,11 +73,13 @@
 
         if (firstRender)
         {           
-            LoadKudos();
+            await LoadKudos();
         }
 
         await Task.CompletedTask;
     }
+
+
 
     private async Task CommentsDeleted(CommentsRequest pComments)
     {
@@ -97,8 +99,8 @@
             }
 
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?
-
+            //await Task.Delay(1); // <-- why is this needed to refresh the UI?
+            await Task.CompletedTask;
         }
     }
 
@@ -124,7 +126,8 @@
             }
 
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?
+            //await Task.Delay(1); // <-- why is this needed to refresh the UI?
+            await Task.CompletedTask;
 
         }
     }
@@ -143,7 +146,8 @@
         _kudosList = kudos.ToList();
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        //await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        await Task.CompletedTask;
     }
 
     private IEnumerable<KudosResponse> GetAllKudos()
@@ -176,7 +180,8 @@
             _kudosList.Add(pKudos);
 
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
+            //await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
+            await Task.CompletedTask;
         }
 
         //await Task.CompletedTask;
@@ -211,7 +216,8 @@
             }
 
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
+            //await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
+            await Task.CompletedTask;
            
         }
     }
@@ -237,8 +243,8 @@
             }
 
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
-
+            //await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
+            await Task.CompletedTask;
         }
     }
 }

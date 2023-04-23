@@ -58,7 +58,13 @@ public class CommentsMessageSender : ICommentsMessageSender
         //gamification
         await _messageSender.SendQueue(comments.FromPersonId, _gamificationMessageSent);
 
-        await _messageSender.SendQueue(comments.ToPersonId, _gamificationMessageReceived);
+        if (comments.ToPersonId != comments.FromPersonId)
+        {
+            //the equality can happens when the person who received the kudos comments on his/her kudos to thanks
+
+            await _messageSender.SendQueue(comments.ToPersonId, _gamificationMessageReceived);
+        }
+        
 
         //notification to update the Teams Apps
         await _messageSender.SendTopic(comments, _messageSentDashboard, "MessageSent");

@@ -34,7 +34,7 @@ public class KudosTabView : IKudosTabView
     private ServiceBusSubscriberHelper _subscriberCommentsDeleted;
 
 
-    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration)
+    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger)
     {
         _gatewayService = gatewayService;
 
@@ -46,11 +46,11 @@ public class KudosTabView : IKudosTabView
         _commentSentDashboard = configuration["KudosServiceBus_MessageSentDashboard"];
         _commentDeletedDashboard = configuration["KudosServiceBus_MessageDeletedDashboard"];
 
-        _subscriberLikeSent = new ServiceBusSubscriberHelper(configuration);
-        _subscriberUndoLike = new ServiceBusSubscriberHelper(configuration);
-        _subscriberKudosSent = new ServiceBusSubscriberHelper(configuration);
-        _subscriberCommentsDeleted = new ServiceBusSubscriberHelper(configuration);
-        _subscriberCommentsSent = new ServiceBusSubscriberHelper(configuration);
+        _subscriberLikeSent = new ServiceBusSubscriberHelper(configuration, logger);
+        _subscriberUndoLike = new ServiceBusSubscriberHelper(configuration, logger);
+        _subscriberKudosSent = new ServiceBusSubscriberHelper(configuration, logger);
+        _subscriberCommentsDeleted = new ServiceBusSubscriberHelper(configuration, logger);
+        _subscriberCommentsSent = new ServiceBusSubscriberHelper(configuration, logger);
     }
 
 

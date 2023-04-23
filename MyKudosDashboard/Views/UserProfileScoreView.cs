@@ -15,13 +15,13 @@ public class UserProfileScoreView : IUserProfileScoreView
     private static string _updatedScoreDashboard = string.Empty;
     private ServiceBusSubscriberHelper _subscriberUserScore;
 
-    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration)
+    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration, ILogger<KudosTabView> logger)
     {
         _gamificationGateway = gamificationGateway;
 
         _updatedScoreDashboard = configuration["KudosServiceBus_ScoreUpdatedDashboard"];
 
-        _subscriberUserScore = new ServiceBusSubscriberHelper(configuration);
+        _subscriberUserScore = new ServiceBusSubscriberHelper(configuration, logger);
     }
 
 

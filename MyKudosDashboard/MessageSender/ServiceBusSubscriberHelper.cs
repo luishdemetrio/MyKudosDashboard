@@ -11,14 +11,15 @@ public class ServiceBusSubscriberHelper
 
     private readonly string _serviceBusConnectionString;
 
-    
+    private ILogger _logger;
 
-    public ServiceBusSubscriberHelper(IConfiguration configuration)
+    public ServiceBusSubscriberHelper(IConfiguration configuration, ILogger logger)
     {
         _serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
 
         _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
 
+        _logger = logger;
     }
 
     public void ServiceBusProcessor(ServiceBusProcessorConfig config)
@@ -39,7 +40,7 @@ public class ServiceBusSubscriberHelper
 
     private async Task ServiceBusProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
     {
-        //        _logger.LogError($"Error processing message: {arg.Exception.Message}");
+                _logger.LogError($"ServiceBusSubscriberHelper: Error processing message: {arg.Exception}");
     }
 
     public async Task CreateASubscriberfItDoesntExistAsync(string topicName, string subscriptionName)
@@ -47,10 +48,14 @@ public class ServiceBusSubscriberHelper
 
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
 
-        //create a temp subscription for the user
-
-        if (!await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
+        
+        if (await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
         {
+
+            await serviceBusAdminClient.DeleteSubscriptionAsync(topicName, subscriptionName);
+
+            //create a subscription for the user
+
             var options = new CreateSubscriptionOptions(topicName, subscriptionName)
             {
                 AutoDeleteOnIdle = TimeSpan.FromHours(12),
