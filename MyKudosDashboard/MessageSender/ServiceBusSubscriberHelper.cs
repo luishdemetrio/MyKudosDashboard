@@ -48,12 +48,12 @@ public class ServiceBusSubscriberHelper
 
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
 
-        
+
         if (await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
         {
 
             await serviceBusAdminClient.DeleteSubscriptionAsync(topicName, subscriptionName);
-
+        }
             //create a subscription for the user
 
             var options = new CreateSubscriptionOptions(topicName, subscriptionName)
