@@ -67,7 +67,7 @@ public class ServiceBusSubscriberHelper
 
             await serviceBusAdminClient.CreateSubscriptionAsync(options);
 
-        }
+        
 
     }
 
