@@ -47,6 +47,7 @@
     [Parameter]
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
+    private readonly object _lock = new object();
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,7 +65,7 @@
         }
 
         await Task.CompletedTask;
-        
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -86,22 +87,27 @@
         if (_kudosList == null)
             return;
 
-        var kudo = _kudosList.FirstOrDefault(k => k.Id == pComments.KudosId);
-
-        if (kudo != null)
+        lock (_lock)
         {
-            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
+            var kudo = _kudosList.FirstOrDefault(k => k.Id == pComments.KudosId);
 
-            if ((comments != null) || (kudo.Comments.Contains(comments)))
+            if (kudo != null)
             {
-                kudo.Comments.Remove(comments);
-            }
+                var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?
-            await Task.CompletedTask;
+
+                if ((comments != null) || (kudo.Comments.Contains(comments)))
+                {
+                    kudo.Comments.Remove(comments);
+                }
+
+
+            }
         }
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        await Task.CompletedTask;
     }
 
     private async Task CommentsSent(CommentsRequest pComments)
@@ -110,26 +116,31 @@
         if (_kudosList == null) 
             return;
 
-
-        var kudo = _kudosList.Where(k => k.Id == pComments.KudosId).FirstOrDefault();
-
-        if (kudo != null)
+        lock (_lock)
         {
-            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
+
+            var kudo = _kudosList.Where(k => k.Id == pComments.KudosId).FirstOrDefault();
 
 
-            if ((comments is null) || (!kudo.Comments.Contains(comments)))
+            if (kudo != null)
             {
+                var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
-                kudo.Comments.Add(comments);
+
+                if ((comments is null) || (!kudo.Comments.Contains(comments)))
+                {
+
+                    kudo.Comments.Add(comments);
+
+                }
+
 
             }
-
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?
-            await Task.CompletedTask;
-
         }
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        await Task.CompletedTask;
     }
 
 
@@ -173,18 +184,21 @@
         if (_kudosList == null)
             return;
 
-        var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
-
-        if (k == null)
+        lock (_lock)
         {
-            _kudosList.Add(pKudos);
+            var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
 
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
-            await Task.CompletedTask;
+            if (k == null)
+            {
+                _kudosList.Add(pKudos);
+
+
+            }
         }
 
-        //await Task.CompletedTask;
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(10);
+        await Task.CompletedTask;
     }
 
 
@@ -193,33 +207,39 @@
 
         // The person who sent already has the like updated
         if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-                return;
-
-        
-        var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
-
-        if (kudo != null)
         {
-            var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
-
-
-            if ((like is null) || (!kudo.Likes.Contains(like)))
-            {
-
-                kudo.Likes.Add(new Person()
-                    {
-                        Id = pLike.FromPerson.Id,
-                        Name = pLike.FromPerson.Name ,
-                        Photo = pLike.FromPerson.Photo
-                    });
-          
-            }
-
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
-            await Task.CompletedTask;
-           
+            //await Task.CompletedTask;
+            return;
         }
+        
+        lock (_lock)
+        {
+            var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+
+            if (kudo != null)
+            {
+                var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
+
+
+                if ((like is null) || (!kudo.Likes.Contains(like)))
+                {
+
+                    kudo.Likes.Add(new Person()
+                        {
+                            Id = pLike.FromPerson.Id,
+                            Name = pLike.FromPerson.Name,
+                            Photo = pLike.FromPerson.Photo
+                        });
+
+                }
+            }
+        }
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(100);
+        await Task.CompletedTask;
+        
+
     }
 
     private async Task UpdateUndoLikesCallBack(Like pLike)
@@ -229,22 +249,26 @@
         if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
             return;
 
-
-        var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
-
-        if (kudo != null)
+        lock (_lock)
         {
-            var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
+            var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
 
-
-            if ((like != null) || (kudo.Likes.Contains(like)))
+            if (kudo != null)
             {
-                kudo.Likes.Remove(like);
-            }
+                var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
 
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?InvokeAsync(StateHasChanged);
-            await Task.CompletedTask;
+
+                if ((like != null) || (kudo.Likes.Contains(like)))
+                {
+                    kudo.Likes.Remove(like);
+                }
+
+
+            }
         }
+
+        await InvokeAsync(StateHasChanged);
+        await Task.Delay(100);
+        await Task.CompletedTask;
     }
 }
