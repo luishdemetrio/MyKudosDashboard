@@ -181,7 +181,7 @@
 
         await UpdateLikes(kudosId, User.ObjectId);
 
-       
+
 
     }
 
@@ -196,30 +196,32 @@
     private async Task UpdateLikes(string kudosId, string personId)
     {
 
-            var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
+        var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
 
-            if (kudo != null)
+        if (kudo != null)
+        {
+            var like = kudo.Likes.Where(k => k.Id == personId).FirstOrDefault();
+
+
+            if ((like is null) || (!kudo.Likes.Contains(like)))
             {
-                var like = kudo.Likes.Where(k => k.Id == personId).FirstOrDefault();
 
-
-                if ((like is null) || (!kudo.Likes.Contains(like)))
-                {
-
-                    kudo.Likes.Add(new Person()
+                kudo.Likes.Add(new Person()
                     {
                         Id = personId,
                         Name = User.DisplayName,
                         Photo = UserPhoto
                     });
-                }
-                else
-                {
-                    kudo.Likes.Remove(like);
-                }
-
-                await InvokeAsync(StateHasChanged);
             }
+            else
+            {
+                kudo.Likes.Remove(like);
+            }
+
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1); // <-- why is this needed to refresh the UI?
+            await Task.CompletedTask;
+        }
        
     }
 
