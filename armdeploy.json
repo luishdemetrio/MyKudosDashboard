@@ -188,7 +188,7 @@
 
     "KudosServiceBus_namespace": "[concat(parameters('baseResourceName'), 'messaging' )]",
 
-    "KudosServiceBus_TopicName": "notifyUserBotTopic",
+    "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
 
     "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
     "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
@@ -209,12 +209,14 @@
     "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
     "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
     "KudosServiceBus_MessageUpdatedDashboard": "MessageUpdatedDashboard",
-    
+
 
     "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
 
     "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
-    "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard"
+    "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
+
+    "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard"
 
 
   },
@@ -966,7 +968,7 @@
           "properties": {
             "PROJECT": "MyKudos.Kudos.Notification.Receiver/MyKudos.Kudos.Notification.Receiver.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('KudosServiceBus_namespace'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
             "agentServiceUrl": "[concat( concat('https://', variables('notification_bot')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
@@ -1969,7 +1971,7 @@
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('KudosServiceBus_namespace'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
 
             "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
 
@@ -2347,7 +2349,7 @@
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",
             "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('kudos_messaging'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
+            "KudosServiceBus_ConnectionString": "[listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('KudosServiceBus_namespace'), 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString]",
 
             "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
 
@@ -2800,7 +2802,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationKudosReceivedTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationKudosReceivedTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2825,7 +2827,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationKudosSentTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationKudosSentTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2850,7 +2852,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationLikeReceivedTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationLikeReceivedTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2875,7 +2877,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationLikeSentTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationLikeSentTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2900,7 +2902,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageReceivedTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationMessageReceivedTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2925,7 +2927,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageSentTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationMessageSentTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2950,7 +2952,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationUndolikeReceivedTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationUndolikeReceivedTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -2975,7 +2977,8 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationUndolikeSentTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationUndolikeSentTopicName'))]",
+
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3000,7 +3003,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_AgentTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_AgentTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3026,7 +3029,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageDeletedFromTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationMessageDeletedFromTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3052,7 +3055,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/queues",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_GamificationMessageDeletedToTopicName')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_GamificationMessageDeletedToTopicName'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3078,7 +3081,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_KudosSentDashboard')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_KudosSentDashboard'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3100,7 +3103,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_LikeSentDashboard')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_LikeSentDashboard'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3122,7 +3125,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_LikeUndoDashboard')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_LikeUndoDashboard'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3144,7 +3147,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageDeletedDashboard')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_MessageDeletedDashboard'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3166,30 +3169,7 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageSentDashboard')]')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
-      ],
-      "properties": {
-        "maxMessageSizeInKilobytes": 256,
-        "defaultMessageTimeToLive": "P14D",
-        "maxSizeInMegabytes": 1024,
-        "requiresDuplicateDetection": false,
-        "duplicateDetectionHistoryTimeWindow": "PT10M",
-        "enableBatchedOperations": true,
-        "status": "Active",
-        "supportOrdering": true,
-        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
-        "enablePartitioning": false,
-        "enableExpress": false
-      }
-    },
-
-    {
-      "type": "Microsoft.ServiceBus/namespaces/topics",
-      "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_MessageUpdatedDashboard')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_MessageSentDashboard'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
@@ -3212,7 +3192,30 @@
     {
       "type": "Microsoft.ServiceBus/namespaces/topics",
       "apiVersion": "2022-10-01-preview",
-      "name": "[concat(variables('KudosServiceBus_namespace'), '/[variables('KudosServiceBus_ScoreUpdatedDashboard')]')]",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_MessageUpdatedDashboard'))]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
+      ],
+      "properties": {
+        "maxMessageSizeInKilobytes": 256,
+        "defaultMessageTimeToLive": "P14D",
+        "maxSizeInMegabytes": 1024,
+        "requiresDuplicateDetection": false,
+        "duplicateDetectionHistoryTimeWindow": "PT10M",
+        "enableBatchedOperations": true,
+        "status": "Active",
+        "supportOrdering": true,
+        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+        "enablePartitioning": false,
+        "enableExpress": false
+      }
+    },
+
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics",
+      "apiVersion": "2022-10-01-preview",
+      "name": "[concat(variables('KudosServiceBus_namespace'), '/', variables('KudosServiceBus_ScoreUpdatedDashboard'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ServiceBus/namespaces', variables('KudosServiceBus_namespace'))]"
