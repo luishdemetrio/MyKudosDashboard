@@ -106,7 +106,7 @@
             }
         }
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        await Task.Delay(1000); 
         await Task.CompletedTask;
     }
 
@@ -139,7 +139,7 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        await Task.Delay(1000);
         await Task.CompletedTask;
     }
 
@@ -157,7 +157,7 @@
         _kudosList = kudos.ToList();
 
         await InvokeAsync(StateHasChanged);
-        //await Task.Delay(1); // <-- why is this needed to refresh the UI?
+        await Task.Delay(1000);
         await Task.CompletedTask;
     }
 
@@ -197,7 +197,7 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(10);
+        await Task.Delay(1000);
         await Task.CompletedTask;
     }
 
@@ -236,7 +236,7 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(100);
+        await Task.Delay(1000);
         await Task.CompletedTask;
         
 
@@ -268,7 +268,7 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(100);
+        await Task.Delay(1000);
         await Task.CompletedTask;
     }
 }

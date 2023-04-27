@@ -10,7 +10,7 @@ public interface IGraphService
     
     Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] users);
     
-    Task<GraphUsers> GetUsers(string name);
+    Task<GraphUsers> GetUsers(string name, string emailDomain);
 
     Task<List<GraphUser>> GetUserInfo(string[] users);
 

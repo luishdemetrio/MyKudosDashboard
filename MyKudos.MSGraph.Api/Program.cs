@@ -1,7 +1,5 @@
-using MyKudos.MSGraph.Api.Grpc;
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Services;
-using MyKudos.MSGraph.gRPC;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +12,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IGraphService, GraphService>();
 
-builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
+//builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 
 var app = builder.Build();
@@ -33,6 +31,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-app.MapGrpcService<GraphGrpc>();
+//app.MapGrpcService<GraphGrpc>();
 
 app.Run();

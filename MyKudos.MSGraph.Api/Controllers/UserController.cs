@@ -11,15 +11,19 @@ public class UserController : ControllerBase
     
     private readonly IGraphService _graphService;
 
-    public UserController(IGraphService graphService)
+    private readonly string _emailDomain;
+
+    public UserController(IGraphService graphService, IConfiguration configuration)
     {
         _graphService= graphService;
+
+        _emailDomain = configuration["EmailDomain"];
     }
 
     [HttpGet(Name = "GetUser/{name}")]
     public Task<GraphUsers> GetUsers(string name)
     {
-        return _graphService.GetUsers(name);
+        return _graphService.GetUsers(name, _emailDomain);
     }
 
    

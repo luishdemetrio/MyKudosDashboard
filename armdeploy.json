@@ -1545,7 +1545,8 @@
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "settings__clientid": "[parameters('MsGraphClientId')]",
             "settings__clientsecret": "[parameters('MsGraphClientSecret')]",
-            "settings__tenantid": "[variables('subscriptionTenantId')]"
+            "settings__tenantid": "[variables('subscriptionTenantId')]",
+            "EmailDomain":  ""
 
           }
         },

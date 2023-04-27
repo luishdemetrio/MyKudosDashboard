@@ -54,12 +54,12 @@ public class GraphService : IGraphService
         return response.Token;
     }
 
-    public async Task<GraphUsers> GetUsers(string name)
+    public async Task<GraphUsers> GetUsers(string name, string emailDomain)
     {
 
         GraphUsers r = new();
 
-        var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
+        var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$count=true&$filter=endsWith(userPrincipalName,'{emailDomain}')&$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
         
         
         var request = new RestRequest();

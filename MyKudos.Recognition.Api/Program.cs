@@ -5,10 +5,15 @@ using MyKudos.Recognition.App.Interfaces;
 using MyKudos.Recognition.App.Services;
 using MyKudos.Recognition.Data.Repository;
 using MyKudos.Recognition.Domain.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+////// Add services to the container.
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
 
 builder.Services.AddControllers();
 
@@ -41,6 +46,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

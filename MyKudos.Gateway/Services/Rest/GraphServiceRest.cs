@@ -7,7 +7,7 @@ namespace MyKudos.Gateway.Services;
 public class GraphServiceRest : IGraphService
 {
        
-    private readonly string _graphServiceUrl;
+    private  string _graphServiceUrl;
 
     private IRestClientHelper _restClientHelper;
 
