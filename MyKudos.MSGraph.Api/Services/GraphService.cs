@@ -193,11 +193,16 @@ public class GraphService : IGraphService
             {
                 foreach (var user in item.Value.EnumerateArray())
                 {
-                    result.Add(new GraphUser()
+                    try
                     {
-                        Id = user.GetProperty("body").GetProperty("id").ToString(),
-                        DisplayName = user.GetProperty("body").GetProperty("displayName").ToString()
-                    });
+                        result.Add(new GraphUser()
+                        {
+                            Id = user.GetProperty("body").GetProperty("id").ToString(),
+                            DisplayName = user.GetProperty("body").GetProperty("displayName").ToString()
+                        });
+                    }
+                    catch { }
+                    
                 }
 
             }
