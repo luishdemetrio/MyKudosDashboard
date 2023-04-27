@@ -2,6 +2,7 @@
 @using MyKudosDashboard.Models;
 
 @inject IKudosTabView KudosTabView;
+@inject ILogger<KudosTab> Logger;
 
 <div class="card-body ">
 
@@ -106,7 +107,8 @@
             }
         }
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(500); 
+        await Task.Delay(300); 
+        Logger.LogInformation($"CommentsDeleted: KudosTab Updated : {pComments.Id}");
         await Task.CompletedTask;
     }
 
@@ -139,7 +141,8 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(500);
+        await Task.Delay(300);
+        Logger.LogInformation($"CommentsSent: KudosTab Updated : {pComments.Id }");
         await Task.CompletedTask;
     }
 
@@ -157,8 +160,8 @@
         _kudosList = kudos.ToList();
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(500);
-        await Task.CompletedTask;
+        await Task.Delay(300);
+       // await Task.CompletedTask;
     }
 
     private IEnumerable<KudosResponse> GetAllKudos()
@@ -197,8 +200,9 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(500);
-        await Task.CompletedTask;
+        await Task.Delay(300);
+        Logger.LogInformation($"UpdateKudosCallback: KudosTab Updated : {pKudos.Id}");
+        //await Task.CompletedTask;
     }
 
 
@@ -236,8 +240,9 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(500);
-        await Task.CompletedTask;
+        Logger.LogInformation($"UpdateLikesCallBack: KudosTab Updated : {pLike.KudosId}");
+        await Task.Delay(300);
+       // await Task.CompletedTask;
         
 
     }
@@ -268,7 +273,8 @@
         }
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(500);
-        await Task.CompletedTask;
+        await Task.Delay(300);
+        Logger.LogInformation($"UpdateUndoLikesCallBack: KudosTab Updated : {pLike.KudosId}");
+        //await Task.CompletedTask;
     }
 }
