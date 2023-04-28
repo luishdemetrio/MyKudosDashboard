@@ -1,5 +1,6 @@
 ﻿@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
+@using System.Collections.Concurrent
 
 @inject IKudosTabView KudosTabView;
 @inject ILogger<KudosTab> Logger;
@@ -41,7 +42,10 @@
     [Parameter]
     public UserInfo User { get; set; }
 
-    private List<KudosResponse> _kudosList;
+    private ConcurrentQueue<KudosResponse> _kudosList;
+
+
+    
 
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
@@ -54,6 +58,7 @@
     {
         base.OnInitialized();
 
+        
         if (User != null)
         {
             KudosTabView.RegisterForLiveUpdates(User.ObjectId);
@@ -78,7 +83,7 @@
             await LoadKudos();
         }
 
-      //  await Task.CompletedTask;
+        //  await Task.CompletedTask;
     }
 
 
@@ -88,28 +93,32 @@
         if (_kudosList == null)
             return;
 
-        lock (_lock)
+
+        var kudo = _kudosList.FirstOrDefault(k => k.Id == pComments.KudosId);
+
+        if (kudo != null)
         {
+            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
-            var kudo = _kudosList.FirstOrDefault(k => k.Id == pComments.KudosId);
 
-            if (kudo != null)
+            if ((comments != null) || (kudo.Comments.Contains(comments)))
             {
-                var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
+                kudo.Comments.Remove(comments);
 
-
-                if ((comments != null) || (kudo.Comments.Contains(comments)))
-                {
-                    kudo.Comments.Remove(comments);
-                }
-
-
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(300);
+                Logger.LogInformation($"CommentsDeleted: KudosTab Updated : {pComments.Id}");
             }
+
+
         }
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(300); 
-        Logger.LogInformation($"CommentsDeleted: KudosTab Updated : {pComments.Id}");
-       // await Task.CompletedTask;
+        else
+        {
+            await LoadKudos();
+        }
+
+
+        // await Task.CompletedTask;
     }
 
     private async Task CommentsSent(CommentsRequest pComments)
@@ -118,31 +127,37 @@
         if (_kudosList == null) 
             return;
 
-        lock (_lock)
+
+
+        var kudo = _kudosList.Where(k => k.Id == pComments.KudosId).FirstOrDefault();
+
+
+        if (kudo != null)
         {
+            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
-            var kudo = _kudosList.Where(k => k.Id == pComments.KudosId).FirstOrDefault();
 
-
-            if (kudo != null)
+            if ((comments is null) || (!kudo.Comments.Contains(comments)))
             {
-                var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
+                kudo.Comments.Add(comments);
 
-                if ((comments is null) || (!kudo.Comments.Contains(comments)))
-                {
-
-                    kudo.Comments.Add(comments);
-
-                }
-
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(300);
+                Logger.LogInformation($"CommentsSent: KudosTab Updated : {pComments.Id}");
 
             }
+
+
+        }
+        else
+        {
+            await LoadKudos();
         }
 
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(300);
-        Logger.LogInformation($"CommentsSent: KudosTab Updated : {pComments.Id }");
+
+
+
         //await Task.CompletedTask;
     }
 
@@ -157,7 +172,7 @@
     {
         var kudos = await KudosTabView.GetKudos();
 
-        _kudosList = kudos.ToList();
+        _kudosList = new ConcurrentQueue<KudosResponse>(kudos); ;
 
         await InvokeAsync(StateHasChanged);
         await Task.Delay(300);
@@ -187,21 +202,20 @@
         if (_kudosList == null)
             return;
 
-        lock (_lock)
+
+        var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
+
+        if (k == null)
         {
-            var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
+            _kudosList.Enqueue(pKudos);
 
-            if (k == null)
-            {
-                _kudosList.Add(pKudos);
-
-
-            }
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(300);
+            Logger.LogInformation($"UpdateKudosCallback: KudosTab Updated : {pKudos.Id}");
         }
 
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(300);
-        Logger.LogInformation($"UpdateKudosCallback: KudosTab Updated : {pKudos.Id}");
+
+
         //await Task.CompletedTask;
     }
 
@@ -216,35 +230,40 @@
             return;
         }
 
-        lock (_lock)
+        var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+
+        if (kudo != null)
         {
-            var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+            var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
 
-            if (kudo != null)
+
+            if ((like is null) || (!kudo.Likes.Contains(like)))
             {
-                var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
+
+                kudo.Likes.Add(new Person()
+                    {
+                        Id = pLike.FromPerson.Id,
+                        Name = pLike.FromPerson.Name,
+                        Photo = pLike.FromPerson.Photo
+                    });
+
+                await InvokeAsync(StateHasChanged);
+                Logger.LogInformation($"UpdateLikesCallBack: KudosTab Updated : {pLike.KudosId}");
+                await Task.Delay(300);
 
 
-                if ((like is null) || (!kudo.Likes.Contains(like)))
-                {
-
-                    kudo.Likes.Add(new Person()
-                        {
-                            Id = pLike.FromPerson.Id,
-                            Name = pLike.FromPerson.Name,
-                            Photo = pLike.FromPerson.Photo
-                        });
-
-                 
-
-                }
             }
         }
-        await InvokeAsync(StateHasChanged);
-        Logger.LogInformation($"UpdateLikesCallBack: KudosTab Updated : {pLike.KudosId}");
-        await Task.Delay(300);
-      //  await Task.CompletedTask;
-        
+        else
+        {
+            //force to reload
+            await LoadKudos();
+        }
+
+
+
+        //  await Task.CompletedTask;
+
 
     }
 
@@ -255,27 +274,33 @@
         if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
             return;
 
-        lock (_lock)
+        var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+
+        if (kudo != null)
         {
-            var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
+            var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
 
-            if (kudo != null)
+
+            if ((like != null) || (kudo.Likes.Contains(like)))
             {
-                var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
+                kudo.Likes.Remove(like);
 
-
-                if ((like != null) || (kudo.Likes.Contains(like)))
-                {
-                    kudo.Likes.Remove(like);
-                }
-
-
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(300);
+                Logger.LogInformation($"UpdateUndoLikesCallBack: KudosTab Updated : {pLike.KudosId}");
             }
+
+
+        }
+        else
+        {
+            //force to reload
+            await LoadKudos();
         }
 
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(300);
-        Logger.LogInformation($"UpdateUndoLikesCallBack: KudosTab Updated : {pLike.KudosId}");
+
+
+
         //await Task.CompletedTask;
     }
 }
