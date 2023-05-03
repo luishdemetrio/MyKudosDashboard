@@ -60,19 +60,34 @@
                                            
                                            >
                             <SelectedTemplate >
-                                <div>
-                                    <img src=@context.Photo
-                                         style="height: 26px;width: 26px;border-radius: 50%"  />
+                                @if (string.IsNullOrEmpty(context.Photo))
+                                {
                                     <span style="margin-left:5px">@context.Name</span>
-                                </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        <img src=@context.Photo
+                                             style="height: 26px;width: 26px;border-radius: 50%" />
+                                        <span style="margin-left:5px">@context.Name</span>
+                                    </div>
+                                }
+                                
                                 
                             </SelectedTemplate>
                             <ResultTemplate >
+                                  @if (string.IsNullOrEmpty(context.Photo))
+                                {
+                                    <span style="margin-left:5px">@context.Name</span>
+                                }
+                                else
+                                {
                                 <div>
                                     <img src=@context.Photo
                                          style="height: 26px;width: 26px;border-radius: 50%;" />
                                     <span style="margin-left:5px">@context.Name</span>
                                 </div>
+                                }
                             </ResultTemplate>
                             <NotFoundTemplate>
                                 Sorry, there weren't any search results.
@@ -92,7 +107,7 @@
                         {
                             <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient"  >
 
-                                @foreach (var item in recognitions)
+                                @foreach (var item in recognitions.OrderBy(r => r.DisplayOrder))
                                 {
 
                                     using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1));

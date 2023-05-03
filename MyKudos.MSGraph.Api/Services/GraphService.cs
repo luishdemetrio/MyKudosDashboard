@@ -102,7 +102,7 @@ public class GraphService : IGraphService
 
         foreach (var item in usersId)
         {
-            batch.Add(new GraphBatchRequestDTO(item, "GET", $"users/{item}/photos/48x48/$value"));
+            batch.Add(new GraphBatchRequestDTO(item, "GET", $"users/{item}/photos/64x64/$value"));
         }
 
         var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
@@ -114,8 +114,9 @@ public class GraphService : IGraphService
         {
             var photosDTO = JsonConvert.DeserializeObject<GraphUserPhotos>(response.Content)!;
 
-            foreach (var photo in photosDTO.responses)
+            foreach (var photo in photosDTO.responses.Where(p => p.status != "404"))
             {
+               
                 photos.Add(new GraphUserPhoto(photo.id, photo.body));
             }
 

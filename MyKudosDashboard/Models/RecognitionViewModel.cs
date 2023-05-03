@@ -7,6 +7,7 @@ public class RecognitionViewModel
     public string Title { get; set; }
     public string Description { get; set; }
     public bool IsSelected { get; set; }
+    public int DisplayOrder { get; set; }
 
     public RecognitionViewModel(string emoji, string description, bool isSelected)
     {

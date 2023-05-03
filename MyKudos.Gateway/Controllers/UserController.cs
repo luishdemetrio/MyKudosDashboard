@@ -37,11 +37,12 @@ public class UserController : Controller
 
         return (from graphUser in graphUsers.value
                 join photo in photos
-                    on graphUser.Id equals photo.id
+                    on graphUser.Id equals photo.id into ph
+                from p in ph.DefaultIfEmpty()
                 select new Person() {
                         Id= graphUser.Id,
                         Name= graphUser.DisplayName,
-                        Photo= "data:image/png;base64," + photo.photo
+                        Photo= string.IsNullOrEmpty(p?.photo)? string.Empty : "data:image/png;base64," + p.photo
                        });
 
     }

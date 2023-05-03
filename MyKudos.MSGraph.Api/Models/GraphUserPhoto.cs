@@ -2,7 +2,7 @@
 
 public record GraphUserPhoto(string id, string photo);
 
-public record GraphUserPhotoDTO(string id, string body);
+public record GraphUserPhotoDTO(string id, string body, string status);
 
 public class GraphUserPhotos
 {
