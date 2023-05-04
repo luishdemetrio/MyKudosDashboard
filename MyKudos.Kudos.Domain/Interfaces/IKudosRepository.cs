@@ -6,7 +6,7 @@ namespace MyKudos.Kudos.Domain.Interfaces;
 public interface IKudosRepository
 {
 
-    IEnumerable<KudosLog> GetKudos();
+    Task<IEnumerable<KudosLog>> GetKudosAsync(int pageNumber = 1, int pageSize = 5);
 
     Guid Add(KudosLog kudos);
 

@@ -18,9 +18,9 @@ public sealed class KudosService : IKudosService
         _commentsRepository = commentsRepository;
     }
 
-    public IEnumerable<KudosLog> GetKudos()
+    public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber , int pageSize )
     {
-        return _kudosRepository.GetKudos();
+        return  _kudosRepository.GetKudosAsync(pageNumber, pageSize);
     }
 
     public Guid Send(KudosLog kudos)

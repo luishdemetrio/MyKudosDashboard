@@ -60,12 +60,17 @@ else
                         <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto /> 
+                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto />
 
-                    <FluentButton style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel()) >
+                    <button type="button" class="btn btn-primary" style="height:60px;margin:5px;"
+                        @onclick=@(()=>OpenSendKudosPanel() )                         >
+                        📩 @Localizer["SendKudos"]
+                    </button>
+
+                  @*  <FluentButton class="btn btn-primary" style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel())>
                         <span>@Localizer["SendKudos"]</span>
                         <FluentIcon Name="@FluentIcons.Send" Slot="start" Size="@IconSize.Size24" Filled=true />
-                    </FluentButton>
+                    </FluentButton>*@
 
 
                     </div>

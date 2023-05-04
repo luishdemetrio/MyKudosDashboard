@@ -7,7 +7,7 @@ public interface IKudosService
 {
     public Guid Send(KudosLog kudos);
 
-    public IEnumerable<KudosLog> GetKudos();
+    public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber, int pageSize);
 
     public bool Like(string kudosId, string personId);
     public bool UndoLike(string kudosId, string personId);

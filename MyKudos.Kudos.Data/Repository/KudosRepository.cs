@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
@@ -10,12 +12,14 @@ public class KudosRepository : IKudosRepository
 
 	private KudosDbContext _kudosDbContext;
 
+	private int _maxPageSize;
 
-
-	public KudosRepository(KudosDbContext kudosDbContext)
+	public KudosRepository(KudosDbContext kudosDbContext, IConfiguration configuration)
 	{
 		_kudosDbContext = kudosDbContext;
-		
+
+		_maxPageSize = int.Parse(configuration["KudosMaxPageSize"]);
+
 	}
 
 	public Guid Add(KudosLog kudos)
@@ -26,9 +30,18 @@ public class KudosRepository : IKudosRepository
 		return kudos.Id;
 	}
 
-	public IEnumerable<KudosLog> GetKudos()
+	public async Task<IEnumerable<KudosLog>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
 	{
-		return _kudosDbContext.Kudos;
+
+		if(pageSize > _maxPageSize)
+		{
+			pageSize = _maxPageSize;
+		}
+
+		return await _kudosDbContext.Kudos.OrderByDescending(k => k.Date)
+					.Skip(pageSize * (pageNumber - 1))
+					.Take(pageSize)
+					.ToListAsync();
 	}
 
 
