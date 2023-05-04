@@ -21,13 +21,13 @@ public class KudosServiceRest: IKudosService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<Models.Kudos>> GetKudosAsync()
+    public async Task<IEnumerable<Models.Kudos>> GetKudosAsync(int pageNumber)
     {
         List<Models.Kudos> result = new();
 
         try
         {
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<Models.Kudos>>($"{_kudosServiceUrl}kudos");
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Models.Kudos>>($"{_kudosServiceUrl}kudos/?pageNumber= {pageNumber}");
             result = kudos.ToList();
         }
         catch (Exception ex)

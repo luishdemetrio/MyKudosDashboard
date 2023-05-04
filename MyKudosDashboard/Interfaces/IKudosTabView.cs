@@ -5,7 +5,7 @@ namespace MyKudosDashboard.Interfaces;
 public interface IKudosTabView
 {
 
-    Task<IEnumerable<KudosResponse>> GetKudos();
+    Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
 
     public void RegisterForLiveUpdates(string userId);
 

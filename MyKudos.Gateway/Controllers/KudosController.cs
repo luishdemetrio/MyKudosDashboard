@@ -45,9 +45,9 @@ public class KudosController : Controller
 
 
     [HttpGet(Name = "GetKudos")]
-    public async Task<IEnumerable<Models.KudosResponse>> Get()
+    public async Task<IEnumerable<Models.KudosResponse>> Get(int pageNumber = 1)
     {
-        var kudos = await _kudosService.GetKudosAsync().ConfigureAwait(false);
+        var kudos = await _kudosService.GetKudosAsync(pageNumber).ConfigureAwait(false);
 
         var from = kudos.Select(u => u.FromPersonId).Distinct().ToList();
 

@@ -7,102 +7,113 @@
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
 
-<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll;width:100%">
+    @*style="height:68.7vh;overflow-y:scroll;width:100%">*@
+<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll;width:100%;overflow:auto">
 
-    @foreach (var item in kudos)
-    {
+    
+    <InfiniteScroll ObserverTargetId="observerTarget"
+                    ObservableTargetReached="(e) => GetMoreKudos()">
 
-        <div class="profile" data-is-focusable="true">
 
-            <div class="avatar">
-                <img src=@item.To.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
-            </div>
+        @foreach (var item in kudos)
+        {
 
-            <div class="info">
+            <div class="profile" data-is-focusable="true">
 
-                <ul class="list-unstyled ">
-                    <li>
-                        <h5>@item.To.Name</h5>
-                    </li>
-
-                    <li>
-                        <div class="text-wrap" style="width: 100%;">
-                            <spam class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </spam>
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <span style="margin-right:5px">@Localizer["SentBy"]:</span>
-                            <img src=@item.From.Photo
-                             style="height: 26px;width: 26px;border-radius: 50%" />
-                            <span style="margin-left:5px;font-weight: bold">@item.From.Name</span>
-
-                        </div>
-
-                    </li>
-                    <li>
-                        <div>
-                            <span style="margin-right:5px">@Localizer["SentOn"]:</span>
-                            
-                            <span style="margin-left:5px">@item.SendOn</span>
-                        </div>
-
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card-body" style="width:100%;padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
-
-                <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;">
-                    @item.Message
-
-                   
+                <div class="avatar">
+                    <img src=@item.To.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
                 </div>
 
-                <div style="float:right">
+                <div class="info">
+
+                    <ul class="list-unstyled ">
+                        <li>
+                            <h5>@item.To.Name</h5>
+                        </li>
+
+                        <li>
+                            <div class="text-wrap" style="width: 100%;">
+                                <spam class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </spam>
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <span style="margin-right:5px">@Localizer["SentBy"]:</span>
+                                <img src=@item.From.Photo
+                                     style="height: 26px;width: 26px;border-radius: 50%" />
+                                <span style="margin-left:5px;font-weight: bold">@item.From.Name</span>
+
+                            </div>
+
+                        </li>
+                        <li>
+                            <div>
+                                <span style="margin-right:5px">@Localizer["SentOn"]:</span>
+
+                                <span style="margin-left:5px">@item.SendOn</span>
+                            </div>
+
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body" style="width:100%;padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
+
+                    <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;">
+                        @item.Message
+
+
+                    </div>
+
+                    <div style="float:right">
 
 
 
-                    <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(item))>
-                        <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                        @item.Comments.Count()
-                    </FluentButton>
+                        <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(item))>
+                            <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
+                            @item.Comments.Count()
+                        </FluentButton>
 
-                    <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
-                        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                Filled=@Filled(item) />
-                        @item.Likes.Count()
-                    </FluentButton>
+                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
+                            <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
+                                    Filled=@Filled(item) />
+                            @item.Likes.Count()
+                        </FluentButton>
 
-                    <FluentTooltip Anchor=@item.Id Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+                        <FluentTooltip Anchor=@item.Id Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
 
-                        @if (item.Likes.Count() > 0)
-                        {
-                            <ul class="list-unstyled ">
-                                @foreach (var like in item.Likes)
-                                {
-                                    <li>
-                                        <div>
-                                            <img src=@like.Photo
-                                                 style="height: 26px;width: 26px;border-radius: 50%;" />
-                                            <span style="margin-left:5px">@like.Name</span>
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                    </FluentTooltip>
+                            @if (item.Likes.Count() > 0)
+                            {
+                                <ul class="list-unstyled ">
+                                    @foreach (var like in item.Likes)
+                                    {
+                                        <li>
+                                            <div>
+                                                <img src=@like.Photo
+                                                     style="height: 26px;width: 26px;border-radius: 50%;" />
+                                                <span style="margin-left:5px">@like.Name</span>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </FluentTooltip>
+
+
+                    </div>
 
 
                 </div>
-
-
             </div>
-        </div>
 
 
-    }
+        }
 
+        <spain id="observerTarget"></spain>
+</InfiniteScroll>
+
+
+   
     
 
 </div>
@@ -119,11 +130,15 @@
     public UserInfo User { get; set; }
 
 
+    [Parameter]
+    public ReplyKudosCallBack ReplyCallBack { get; set; }
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
     [Parameter]
-    public ReplyKudosCallBack ReplyCallBack { get; set; }
+    public LoadMoreKudosCallback MoreKudosCallback { get; set; }
+    public delegate Task LoadMoreKudosCallback();
 
+    
     
     private bool Filled(KudosResponse item)
     {
@@ -179,7 +194,7 @@
 
         }
 
-       await UpdateLikes(kudosId, User.ObjectId);
+        await UpdateLikes(kudosId, User.ObjectId);
 
 
 
@@ -220,9 +235,14 @@
 
             await InvokeAsync(StateHasChanged);
             await Task.Delay(300); 
-            
+
         }
-       
+
+    }
+
+    private async Task GetMoreKudos()
+    {
+        MoreKudosCallback?.Invoke();
     }
 
 

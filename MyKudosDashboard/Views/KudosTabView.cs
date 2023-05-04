@@ -54,9 +54,9 @@ public class KudosTabView : IKudosTabView
     }
 
 
-    public async Task<IEnumerable<KudosResponse>> GetKudos()
+    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
-        return await _gatewayService.GetKudos();
+        return await _gatewayService.GetKudos(pageNumber);
     }
 
 

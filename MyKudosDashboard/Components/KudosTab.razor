@@ -22,7 +22,7 @@
         @if (_kudosList != null)
         {
             <FluentTabPanel >
-                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos  />
+                <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos MoreKudosCallback=@LoadMoreKudosAll  />
             </FluentTabPanel>
             <FluentTabPanel >
                 <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
@@ -38,8 +38,8 @@
 
 @code {
 
-    [Parameter]
-    public IEnumerable<KudosResponse> kudos { get; set; }
+    //[Parameter]
+    //public IEnumerable<KudosResponse> kudos { get; set; }
 
     [Parameter]
     public string UserPhoto { get; set; }
@@ -56,10 +56,13 @@
 
     private readonly object _lock = new object();
 
+    private int _pageNumber ;
+
     protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
 
+        _pageNumber = 1;
 
         if (User != null)
         {
@@ -70,6 +73,7 @@
             KudosTabView.KudosCallback = UpdateKudosCallback;
             KudosTabView.CommentsDeletedCallback = CommentsDeleted;
             KudosTabView.CommentsSentCallback = CommentsSent;
+
         }
 
         await LoadKudos();
@@ -164,18 +168,28 @@
         ReplyCallBack?.Invoke(kudos);
     }
 
-    private async Task LoadKudos()
+    private async Task LoadKudos(int pageNumber =1)
     {
-        var kudos = await KudosTabView.GetKudos().ConfigureAwait(false);
+        var kudos = await KudosTabView.GetKudos(pageNumber).ConfigureAwait(false);
 
         if (kudos != null)
         {
-            _kudosList = new ConcurrentQueue<KudosResponse>(kudos); ;
+            if (_kudosList == null)
+            {
+                _kudosList = new ConcurrentQueue<KudosResponse>(kudos); ;
+            }
+            else
+            {
+                foreach (var item in kudos)
+                {
+                    _kudosList.Enqueue(item);
+                }
+            }
 
             await InvokeAsync(StateHasChanged);
             await Task.Delay(300);
         }
-      
+
     }
 
     private IEnumerable<KudosResponse> GetAllKudos()
@@ -290,9 +304,15 @@
             await LoadKudos();
         }
 
-
-
-
         //await Task.CompletedTask;
+    }
+
+  
+
+    private async Task LoadMoreKudosAll()
+    {
+        _pageNumber++;
+
+        await LoadKudos(_pageNumber);
     }
 }

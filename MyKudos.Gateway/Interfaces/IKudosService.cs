@@ -4,7 +4,7 @@ namespace MyKudos.Gateway.Interfaces;
 
 public interface IKudosService
 {
-    Task<IEnumerable<Models.Kudos>> GetKudosAsync();
+    Task<IEnumerable<Models.Kudos>> GetKudosAsync(int pageNumber);
 
     Task<string> SendAsync(KudosLog kudos);
 

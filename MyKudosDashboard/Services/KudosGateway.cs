@@ -22,14 +22,14 @@ public class GatewayService : IKudosGateway
     }
 
 
-    public async Task<IEnumerable<KudosResponse>> GetKudos()
+    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
 
         IEnumerable<KudosResponse> kudos = null;
 
         try
         {
-            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudos");
+            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudos/?pageNumber={pageNumber}");
         }
         catch (Exception ex)
         {

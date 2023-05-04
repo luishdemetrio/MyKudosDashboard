@@ -8,7 +8,7 @@ public interface IKudosGateway
 
     Task<string> SendKudos(KudosRequest kudos);
 
-    Task<IEnumerable<KudosResponse>> GetKudos();
+    Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
 
 
     Task<bool> Like(Like like);
