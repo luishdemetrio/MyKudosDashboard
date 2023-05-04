@@ -14,11 +14,14 @@ namespace MyKudos.CardNotification.Controllers
         private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "NotificationDefault.json");
         private IConfiguration _configuration;
 
-        public NotificationController(ConversationBot conversation, IConfiguration configuration)
+        private ILogger _logger;
+
+        public NotificationController(ConversationBot conversation, IConfiguration configuration, ILogger logger)
         {
 
             this._conversation = conversation;
             this._configuration = configuration;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -31,6 +34,7 @@ namespace MyKudos.CardNotification.Controllers
 
             if (installations.Count() == 0)
             {
+                _logger.LogWarning($"There are no users with the bot {_configuration.GetSection("BOT_ID")?.Value} installed");
 
                 return Ok($"There are no users with the bot {_configuration.GetSection("BOT_ID")?.Value} installed");
             }
@@ -47,6 +51,7 @@ namespace MyKudos.CardNotification.Controllers
 
                 if (kudos == null)
                 {
+                    _logger.LogWarning($"The Kudos body is missing or is invalid");
                     return Ok("The Kudos body is missing or is invalid");
                 }
             }
@@ -65,6 +70,7 @@ namespace MyKudos.CardNotification.Controllers
 
                     if (members == null)
                     {
+                        _logger.LogWarning("The bot has no members.");
                         return Ok("The bot has no members.");
                     }
 
@@ -96,6 +102,7 @@ namespace MyKudos.CardNotification.Controllers
                 }
             }
 
+            _logger.LogInformation($"Installations: {installations.Count()}\nMembers: {membersCount}\nUsers:{users}");
             return Ok($"Installations: {installations.Count()}\nMembers: {membersCount}\nUsers:{users}");
         }
     }

@@ -4,6 +4,12 @@
 @inject ISendKudosView SendKudosView;
 @inject IJSRuntime JSRuntime;
 
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<App> Localizer
+
+ 
+
 <style>
 
     fluent-card {
@@ -33,26 +39,26 @@
         --scroll-align: flex-end
     }
 
-    
+
 
 </style>
 
 <FluentDialog   @ref=SendKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true" 
                 class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;"   
-                Hidden=@ModalHidden 
->
+                Hidden=@ModalHidden
+              @ondismiss=OnDismiss>
 
 <div style="margin:10px;">
 
-        <h5>👏 Send Kudos to people</h5>
+        <h5>👏 @Localizer["SendKudosToPeople"]</h5>
 
         <table class="table">
             <tbody>
                 <tr>
                     <td scope="row">
                       
-                        <p style="margin-bottom: 5px;">Select colleague</p>
+                        <p style="margin-bottom: 5px;">@Localizer["SelectColleague"]</p>
                     
                          <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
@@ -90,7 +96,7 @@
                                 }
                             </ResultTemplate>
                             <NotFoundTemplate>
-                                Sorry, there weren't any search results.
+                                @Localizer["SorryNoResultsFound"]
                             </NotFoundTemplate>
                         </BlazoredTypeahead>
                    
@@ -101,7 +107,7 @@
                 <tr>
                     <td scope="row">
 
-                        <p style="margin-bottom: 5px;">Category</p>
+                        <p style="margin-bottom: 5px;">@Localizer["Category"]</p>
                         
                         @if (recognitions != null)
                         {
@@ -140,7 +146,7 @@
                 <tr>
                     <td scope="row" >
 
-                        <p style="margin-bottom: 5px;">Message</p>
+                        <p style="margin-bottom: 5px;">@Localizer["Message"]</p>
                         
                         <div class="input-group">
                            
@@ -162,18 +168,18 @@
                         {
                             <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
                        
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>                       
-                        📩 Send                               
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                📩 @Localizer["Send"]
                         </button>
                         }else
                         {
                             <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
-                                📩 Send
+                                📩 @Localizer["Send"]
                             </button>
                         }
 
 
-                        <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>Hide() )>✖️ Cancel</button>
+                        @*<button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>Hide() )>✖️ Cancel</button>*@
 
                     </td>
 
@@ -216,19 +222,30 @@
 
     private FluentDialog SendKudosFluentDialog;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        await base.OnAfterRenderAsync(firstRender);
+        base.OnInitialized();
 
-        if (firstRender && recognitions == null)
-        {
+        recognitions = await SendKudosView.GetRecognitionsAsync();
 
-            recognitions = await SendKudosView.GetRecognitionsAsync();
-        }
+
+      
     }
 
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    await base.OnAfterRenderAsync(firstRender);
 
-    public void SendKudosModal()
+    //    if (firstRender && recognitions == null)
+    //    {
+
+    //        recognitions = await SendKudosView.GetRecognitionsAsync();
+
+    //    }
+    //}
+
+
+    public async Task SendKudosModal()
     {
 
         //sendKudosCallBack = pSendKudosCallBack;
@@ -242,7 +259,9 @@
         ModalHidden = false;
         KudosMessage = string.Empty;
 
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
+
+        await Task.CompletedTask;
         //});
     }
 

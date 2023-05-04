@@ -1,4 +1,6 @@
-﻿namespace MyKudosDashboard.Models
+﻿using System.Collections.Concurrent;
+
+namespace MyKudosDashboard.Models
 {
     public class KudosViewModel
     {

@@ -3,7 +3,11 @@
 
 @inject IKudosListView KudosListView;
 
-<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll">
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<App> Localizer
+
+<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll;width:100%">
 
     @foreach (var item in kudos)
     {
@@ -22,13 +26,13 @@
                     </li>
 
                     <li>
-                        <div class="text-wrap" style="width: 16rem;">
-                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">@item.Title.ToUpper()</spam> kudos</spam>
+                        <div class="text-wrap" style="width: 100%;">
+                            <spam class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </spam>
                         </div>
                     </li>
                     <li>
                         <div>
-                            <span style="margin-right:5px">Sent by</span>
+                            <span style="margin-right:5px">@Localizer["SentBy"]:</span>
                             <img src=@item.From.Photo
                              style="height: 26px;width: 26px;border-radius: 50%" />
                             <span style="margin-left:5px;font-weight: bold">@item.From.Name</span>
@@ -38,7 +42,7 @@
                     </li>
                     <li>
                         <div>
-                            <span style="margin-right:5px">Sent on:</span>
+                            <span style="margin-right:5px">@Localizer["SentOn"]:</span>
                             
                             <span style="margin-left:5px">@item.SendOn</span>
                         </div>
@@ -47,17 +51,16 @@
                 </ul>
             </div>
 
-            <div class="card-body" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
+            <div class="card-body" style="width:100%;padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
 
-                <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
+                <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;">
                     @item.Message
+
+                   
                 </div>
 
                 <div style="float:right">
-                   @* <FluentButton style="margin-left:20px;">
-                        <FluentIcon Name="@FluentIcons.CodeText" Slot="start" Size="@IconSize.Size16" Filled=false />
-                        Read more
-                    </FluentButton>*@
+
 
 
                     <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(item))>
@@ -66,9 +69,8 @@
                     </FluentButton>
 
                     <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
-                        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16" 
-                                    Filled=@Filled(item)
-                            />
+                        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
+                                Filled=@Filled(item) />
                         @item.Likes.Count()
                     </FluentButton>
 
@@ -76,7 +78,7 @@
 
                         @if (item.Likes.Count() > 0)
                         {
-                             <ul class="list-unstyled ">
+                            <ul class="list-unstyled ">
                                 @foreach (var like in item.Likes)
                                 {
                                     <li>
@@ -88,7 +90,7 @@
                                     </li>
                                 }
                             </ul>
-                        }                        
+                        }
                     </FluentTooltip>
 
 
@@ -160,8 +162,6 @@
             }
             else
             {
-
-
                 await KudosListView.SendLikeAsync(
                        new Like(
                            KudosId: kudosId,
@@ -179,7 +179,7 @@
 
         }
 
-        await UpdateLikes(kudosId, User.ObjectId);
+       await UpdateLikes(kudosId, User.ObjectId);
 
 
 
@@ -219,8 +219,8 @@
             }
 
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1); // <-- why is this needed to refresh the UI?
-            await Task.CompletedTask;
+            await Task.Delay(300); 
+            
         }
        
     }

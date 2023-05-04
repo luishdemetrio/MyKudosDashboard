@@ -3,6 +3,11 @@
 
 @inject ITopContributorsView TopContributorsView;
 
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<App> Localizer
+
+
 <div class="card-body w-auto">
 
     
@@ -17,11 +22,11 @@
 
                 <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
                     <div class="avatar">
-                        <img src=@item.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
+                        <img src=@item.Photo style="height:80px;width:80px;border-radius: 50%" />
                     </div>
                     <div class="info">
                         <h5>@item.Name</h5>
-                        <h2 class="card-title pricing-card-title">@item.Score<small class="text-muted fw-light">XP</small></h2>
+                        <h2 class="card-title pricing-card-title">@item.Score<small class="text-muted fw-light"> @Localizer["Points"]</small></h2>
                     </div>
                 </div>
             }

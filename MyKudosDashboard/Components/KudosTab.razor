@@ -5,24 +5,29 @@
 @inject IKudosTabView KudosTabView;
 @inject ILogger<KudosTab> Logger;
 
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<App> Localizer
+
+
 <div class="card-body ">
 
 
 
-    <FluentTabs>
-        <FluentTab Text="All"/>
-        <FluentTab Text="Kudos to me" />
-        <FluentTab Text="Kudos from me" />
+    <FluentTabs style="z-index:auto">
+        <FluentTab Text=@Localizer["All"] style=";z-index:auto" />
+        <FluentTab Text=@Localizer["KudosToMe"] style=";z-index:auto" />
+        <FluentTab Text=@Localizer["KudosFromMe"] style=";z-index:auto" />
 
         @if (_kudosList != null)
         {
-            <FluentTabPanel>
+            <FluentTabPanel >
                 <KudosList kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos  />
             </FluentTabPanel>
-            <FluentTabPanel>
+            <FluentTabPanel >
                 <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
-            <FluentTabPanel>
+            <FluentTabPanel >
                 <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
         }
@@ -44,9 +49,6 @@
 
     private ConcurrentQueue<KudosResponse> _kudosList;
 
-
-    
-
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
     [Parameter]
@@ -58,7 +60,7 @@
     {
         base.OnInitialized();
 
-        
+
         if (User != null)
         {
             KudosTabView.RegisterForLiveUpdates(User.ObjectId);
@@ -70,7 +72,9 @@
             KudosTabView.CommentsSentCallback = CommentsSent;
         }
 
-        await Task.CompletedTask;
+        await LoadKudos();
+
+        //await Task.CompletedTask;
 
     }
 
@@ -78,10 +82,10 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender)
-        {           
-            await LoadKudos();
-        }
+        //if (firstRender)
+        //{           
+        //    await LoadKudos();
+        //}
 
         //  await Task.CompletedTask;
     }
@@ -127,15 +131,12 @@
         if (_kudosList == null) 
             return;
 
-
-
         var kudo = _kudosList.Where(k => k.Id == pComments.KudosId).FirstOrDefault();
 
 
         if (kudo != null)
         {
             var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
-
 
             if ((comments is null) || (!kudo.Comments.Contains(comments)))
             {
@@ -148,17 +149,12 @@
 
             }
 
-
         }
         else
         {
             await LoadKudos();
         }
 
-
-
-
-        //await Task.CompletedTask;
     }
 
 
@@ -170,13 +166,16 @@
 
     private async Task LoadKudos()
     {
-        var kudos = await KudosTabView.GetKudos();
+        var kudos = await KudosTabView.GetKudos().ConfigureAwait(false);
 
-        _kudosList = new ConcurrentQueue<KudosResponse>(kudos); ;
+        if (kudos != null)
+        {
+            _kudosList = new ConcurrentQueue<KudosResponse>(kudos); ;
 
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(300);
-        // await Task.CompletedTask;
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(300);
+        }
+      
     }
 
     private IEnumerable<KudosResponse> GetAllKudos()
@@ -193,8 +192,6 @@
     {
         return _kudosList.Where(k => k.From.Id == User.ObjectId).OrderByDescending(k => k.SendOn);
     }
-
-
 
     private async Task UpdateKudosCallback(KudosResponse pKudos)
     {
@@ -214,9 +211,6 @@
             Logger.LogInformation($"UpdateKudosCallback: KudosTab Updated : {pKudos.Id}");
         }
 
-
-
-        //await Task.CompletedTask;
     }
 
 
@@ -260,9 +254,7 @@
             await LoadKudos();
         }
 
-
-
-        //  await Task.CompletedTask;
+        await Task.CompletedTask;
 
 
     }
@@ -285,9 +277,9 @@
             {
                 kudo.Likes.Remove(like);
 
-                await InvokeAsync(StateHasChanged);
-                await Task.Delay(300);
+                await InvokeAsync(StateHasChanged);                
                 Logger.LogInformation($"UpdateUndoLikesCallBack: KudosTab Updated : {pLike.KudosId}");
+                await Task.Delay(300);
             }
 
 

@@ -3,54 +3,65 @@
 
 @inject ICommentsView CommentsView;
 
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<App> Localizer
+
+
 <FluentDialog @ref=_replyKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true"
                 class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 620px;"
                 Hidden=@ModalHidden
                 @ondismiss=OnDismiss>
 
-    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height: 590px;overflow-y:scroll;margin:5px;width:600px;">
+    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height: 98%;overflow-y:scroll;margin:5px;width:98%;">
 
     
         @if (_item != null)
         {
-            <table class="table" style="width:580px;margin:5px">
+            <table class="table" style="width:98%;margin:5px">
             <tbody>
                 <tr>
-                        <td scope="row" style="padding-top: 0px;padding-bottom: 0px;">
-                      
-                       
-                         <div class="profile" data-is-focusable="true">
+                        <td scope="row" style="padding-top: 0px;padding-bottom: 0px;width:98%;">
+
+
+                            <div class="profile" data-is-focusable="true" style="width:90%">
 
                             <div class="avatar">
                                 <img src=@_item.To.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
                             </div>
 
-                            <div class="info">
+                            <div class="info" style="width:70%">
 
-                                    <ul class="list-unstyled " style="padding-top: 0px;padding-bottom: 0px;">
+                                    <ul class="list-unstyled " style="padding-top: 0px;padding-bottom: 0px;width:98%;float:left">
                                     <li>
                                         <h5>@_item.To.Name</h5>
                                     </li>
 
                                     <li>
-                                        <div class="text-wrap" style="width: 16rem;">
-                                            <spam class="card-title pricing-card-title">received a <spam style="font-weight: bold">@_item.Title.ToUpper()</spam> kudos</spam>
+                                        <div class="text-wrap" style="width: 100%;">
+                                                <spam class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@_item.Title.ToUpper()</spam></spam>
                                         </div>
                                     </li>
                                     <li>
                                         <div>
-                                            <span style="margin-right:5px">Sent by</span>
+                                           <span style="margin-right:5px">@Localizer["SentBy"]:</span>
                                             <img src=@_item.From.Photo
                                                  style="height: 26px;width: 26px;border-radius: 50%" />
-                                            <span style="margin-left:5px;font-weight: bold">@_item.From.Name</span>
-
-                                                <span style="margin-left:5px">on:</span>
-
-                                                <span style="margin-left:5px">@_item.SendOn</span>
+                                                <span style="margin-left:5px;font-weight: bold">@_item.From.Name</span>
+                                         
                                         </div>
+                                 
 
                                     </li>
+                                        <li>
+                                            <div>
+                                                <span style="margin-right:5px">@Localizer["SentOn"]:</span>
+
+                                                <span style="margin-left:5px">@_item.SendOn</span>
+                                            </div>
+
+                                        </li>
                                   @*  <li>
                                         <div>
                                             <span style="margin-right:5px">Sent on:</span>
@@ -69,7 +80,7 @@
                     <tr>
                         <td scope="row">
 
-                            <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:580px">
+                            <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
                                 @_item.Message
                             </div>
 
@@ -131,7 +142,7 @@
 
                             <FluentButton style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick())>
                                 <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=true />
-                                Post
+                                @Localizer["Post"]
                             </FluentButton>
                         </td>
 
@@ -174,14 +185,14 @@
                         </tr>
                     }
 
-                     <tr>
+                   @*  <tr>
 
                         <td scope="row">
 
                             <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>CloseClick() )>✖️ Close</button>
                         </td>
 
-                    </tr>
+                    </tr>*@
                 </tbody>
             </table>
 

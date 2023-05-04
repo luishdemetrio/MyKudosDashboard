@@ -1,3 +1,4 @@
+using Microsoft.Bot.Builder;
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
@@ -29,7 +30,7 @@ builder.Services.AddScoped<IWelcomeView, WelcomeView>();
 builder.Services.AddScoped<IKudosListView, KudosListView>();
 builder.Services.AddScoped<IUserProfileScoreView, UserProfileScoreView>();  
 builder.Services.AddScoped<ITopContributorsView, TopContributorsView>();
-builder.Services.AddTransient<IKudosTabView, KudosTabView>();
+builder.Services.AddScoped<IKudosTabView, KudosTabView>();
 builder.Services.AddScoped<ICommentsView, CommentsView>();
 builder.Services.AddScoped<IReplyView, ReplyView>();
 
@@ -56,6 +57,8 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
                 ));
 
 
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -72,6 +75,18 @@ else
 app.UseStaticFiles();
 
 app.UseRouting();
+
+var selectedCulture = config["SelectedCulture"];
+
+var supportedCultures = new[] { "pt-BR" };
+
+var localizationOptions = new RequestLocalizationOptions()
+    //.AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
+
 
 app.UseAuthentication();
 app.UseAuthorization();
