@@ -1754,8 +1754,10 @@
             "CosmosDb__AccountEndPoint": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName'))).documentEndpoint]",
             "CosmosDb__AccountKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseAccountsKudosName')), '2022-08-15').primaryMasterKey]",
             "CosmosDb__DatabaseName": "kudos-db",
-            "CosmosDb__CommentsDatabaseName": "comments-db"
-
+            "CosmosDb__CommentsDatabaseName": "comments-db",
+            "KudosMaxPageSize": 10,
+            "DefaultPageNumber": 1,
+            "DefaultPageSize": 5
           }
         },
         {
@@ -2000,7 +2002,9 @@
             "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
             "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
 
-            "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard"
+            "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard",
+
+            "TopContributors": 30
 
 
           }
