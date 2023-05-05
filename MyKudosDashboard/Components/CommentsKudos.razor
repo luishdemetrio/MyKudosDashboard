@@ -7,6 +7,7 @@
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
 
+@inject IJSRuntime JSRuntime
 
 <FluentDialog @ref=_replyKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true"
@@ -62,14 +63,7 @@
                                             </div>
 
                                         </li>
-                                  @*  <li>
-                                        <div>
-                                            <span style="margin-right:5px">Sent on:</span>
-
-                                            <span style="margin-left:5px">@_item.SendOn</span>
-                                        </div>
-
-                                    </li>*@
+                                 
                                 </ul>
                             </div>
                         </div>          
@@ -89,7 +83,8 @@
 
                                 <FluentButton style="margin-left:20px;">
                                     <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                    @_item.Comments.Count()
+                                    <div @ref=_numberOfComments>@_item.Comments.Count()</div>
+                                    
                                 </FluentButton>
 
                                 <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
@@ -131,7 +126,7 @@
 
                             <div style="display: flex;padding-bottom: 0px;">
                                 <div style="width:50px;margin-top:5px;;padding-top: 15px">
-                                    <img src=@UserPhoto style="height:40px;width:40px;float:left;border-radius: 50%" />
+                                    <img src=@_userPhoto style="height:40px;width:40px;float:left;border-radius: 50%" />
                                 </div>
 
                                 <div style="width:520px;">
@@ -165,7 +160,7 @@
 
                                             <li>
 
-                                                <ReplyControl   Comment=@comment User=User UserPhoto=UserPhoto 
+                                                <ReplyControl Comment=@comment User=User UserPhoto=@_userPhoto
                                                                 deleteCommentCallBack=@DeleteComment 
                                                                 updateCommentCallBack=@UpdateComment/>
 
@@ -211,8 +206,8 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
-    [Parameter]
-    public string UserPhoto { get; set; }
+
+    private string _userPhoto { get; set; }
 
     [Parameter]
     public UserInfo User { get; set; }
@@ -229,12 +224,14 @@
 
     private bool _showReply;
 
-    public void ShowModal(KudosResponse kudos)
+    private ElementReference _numberOfComments;
+
+    public void ShowModal(KudosResponse kudos, string userPhoto)
     {
 
         _item = kudos;
+        _userPhoto = userPhoto;
 
-    
         ModalHidden = false;
 
         CommentsView.GetComments(_item.Id).ContinueWith(t =>
@@ -290,7 +287,7 @@
                             {
                                 Id = User.ObjectId,
                                 Name = User.DisplayName,
-                                Photo = $"data:image/png;base64,{UserPhoto}"
+                                Photo = $"data:image/png;base64,{_userPhoto}"
                             },
                        ToPersonId: kudos.To.Id
                    )
@@ -305,7 +302,7 @@
                           {
                               Id = User.ObjectId,
                               Name = User.DisplayName,
-                              Photo = $"data:image/png;base64,{UserPhoto}"
+                              Photo = $"data:image/png;base64,{_userPhoto}"
                           },
                       ToPersonId: kudos.To.Id
                   )
@@ -341,7 +338,7 @@
                     {
                         Id = personId,
                         Name = User.DisplayName,
-                        Photo = $"data:image/png;base64,{UserPhoto}"
+                        Photo = $"data:image/png;base64,{_userPhoto}"
                     });
             }
             else
@@ -383,7 +380,7 @@
                 FromPerson = new Person()
                 {
                     Id = User.ObjectId,
-                    Photo = UserPhoto,
+                    Photo = _userPhoto,
                     Name = User.DisplayName
                 },
                 Message = _replyMessage,
@@ -393,9 +390,23 @@
 
         _replyMessage = string.Empty;
 
+        await UpdateNumberOfComments();
+
         await InvokeAsync(StateHasChanged);
 
         await Task.CompletedTask;
+
+    }
+
+    public async Task UpdateNumberOfComments()
+    {
+
+        if (_comments != null)
+        {            
+            await JSRuntime.InvokeVoidAsync(
+               "updateCount", _numberOfComments, _comments.Count);
+
+        }
 
     }
 

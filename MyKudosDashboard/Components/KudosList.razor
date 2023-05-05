@@ -7,8 +7,10 @@
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
 
+@inject IJSRuntime JSRuntime
+
     @*style="height:68.7vh;overflow-y:scroll;width:100%">*@
-<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:68.7vh;overflow-y:scroll;width:100%;overflow:auto">
+<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="min-height:600px;height:80vh;overflow-y:scroll;width:100%;overflow:auto">
 
     
     <InfiniteScroll ObserverTargetId="observerTarget"
@@ -21,7 +23,7 @@
             <div class="profile" data-is-focusable="true">
 
                 <div class="avatar">
-                    <img src=@item.To.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
+                    <img src=@item.To.Photo style="height:64px;width:64px;float:left;border-radius: 50%" />
                 </div>
 
                 <div class="info">
@@ -71,18 +73,24 @@
 
                         <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(item))>
                             <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                            @item.Comments.Count()
+                            <div @ref=numberOfComments[item.Id]>@item.Comments.Count()</div>
+                            
                         </FluentButton>
 
-                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
+
+                        <FluentButton  id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                     Filled=@Filled(item) />
-                            @item.Likes.Count()
+                            <div @ref=numberOfLikes[item.Id]>@item.Likes.Count()</div>
                         </FluentButton>
 
                         <FluentTooltip Anchor=@item.Id Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
 
-                            @if (item.Likes.Count() > 0)
+                            <div @ref=tooltipLikes[item.Id]>
+
+                            </div>
+                          
+                           @* @if (item.Likes.Count() > 0)
                             {
                                 <ul class="list-unstyled ">
                                     @foreach (var like in item.Likes)
@@ -96,7 +104,7 @@
                                         </li>
                                     }
                                 </ul>
-                            }
+                            }*@
                         </FluentTooltip>
 
 
@@ -138,8 +146,73 @@
     public LoadMoreKudosCallback MoreKudosCallback { get; set; }
     public delegate Task LoadMoreKudosCallback();
 
-    
-    
+    private Dictionary<string, ElementReference> numberOfLikes = new();
+
+    private Dictionary<string, ElementReference> tooltipLikes = new();
+
+    private Dictionary<string, ElementReference> numberOfComments = new();
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        foreach (var item in kudos.ToList())
+        {
+            await UpdateNumberOfLikes(item.Id);
+        }
+
+    }
+
+
+    public async Task UpdateNumberOfLikes(string kudosId)
+    {
+
+        var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
+
+        if (kudo != null)
+        {
+            // it's not guaranteed that the kudos will be there since we are using infinite loop
+            if (numberOfLikes.ContainsKey(kudosId))
+            {
+                await JSRuntime.InvokeVoidAsync(
+                       "updateCount", numberOfLikes[kudosId], kudo.Likes.Count);
+
+
+                var innerHtmlToolTip = "<ul class='list-unstyled'>";
+
+                foreach (var like in kudo.Likes)
+                {
+                    innerHtmlToolTip += $"<li><div><img src={like.Photo} style='height: 26px;width: 26px;border-radius: 50%;'/> <span style='margin-left:5px'>{like.Name}</span></div></li>";
+                }
+
+                innerHtmlToolTip += "</ul>";
+
+                await JSRuntime.InvokeVoidAsync(
+                  "updateToolTipLikes", tooltipLikes[kudosId], innerHtmlToolTip);
+            }
+        }
+        
+    }
+
+    public async Task UpdateNumberOfComments(string kudosId)
+    {
+
+        var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
+
+        if (kudo != null)
+        {
+            // it's not guaranteed that the kudos will be there since we are using infinite loop
+            if (numberOfLikes.ContainsKey(kudosId))
+            {
+                await JSRuntime.InvokeVoidAsync(
+                       "updateCount", numberOfComments[kudosId], kudo.Comments.Count);
+
+            }
+        }
+
+    }
+
+
     private bool Filled(KudosResponse item)
     {
         bool filled = false;
@@ -233,8 +306,11 @@
                 kudo.Likes.Remove(like);
             }
 
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(300); 
+             await JSRuntime.InvokeVoidAsync(
+              "updateCount", numberOfLikes[kudosId], kudo.Likes.Count);
+
+          //  await InvokeAsync(StateHasChanged);
+//            await Task.Delay(300); 
 
         }
 

@@ -3,6 +3,8 @@
 @using Microsoft.Fast.Components.FluentUI
 
 @inject IReplyView ReplyView
+@inject IJSRuntime JSRuntime
+
 
 <style>
 /* Style The Dropdown Button */
@@ -97,10 +99,15 @@
                     @onclick=@(()=>LikeComment(Comment))>
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                     Filled=@FilledLikeComments(@Comment) />
-        @Comment.Likes.Count()
+        <div @ref=_numberOfLikeComments>@Comment.Likes.Count()</div>
+        
     </FluentButton>
 
     <FluentTooltip Anchor=@($"reply_{Comment.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+
+        @*<div @ref=tooltipLikes[Comment.Id]>
+
+                            </div>*@
 
         @if (Comment.Likes.Count() > 0)
         {
@@ -166,6 +173,18 @@
     private string _originalMessage;
     private string _updatedComment;
     
+    private ElementReference _numberOfLikeComments;
+    private Dictionary<string, ElementReference> tooltipLikes = new();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //foreach (var item in Comment.Likes)
+        //{
+        //    await UpdateNumberOfLikeComments();
+        //}
+
+    }
 
     private bool FilledLikeComment(KudosResponse item)
     {
@@ -198,20 +217,20 @@
 
     private async void LikeComment(CommentsResponse item)
     {
-        
+
         if (item.Likes.Any(l => l.Id == User.ObjectId))
         {
-             await ReplyView.SendUndoLikeAsync(
-                     new LikeComment(
-                        KudosId: item.KudosId,
-                        FromPerson: new Person
+            await ReplyView.SendUndoLikeAsync(
+                    new LikeComment(
+                       KudosId: item.KudosId,
+                       FromPerson: new Person
                             {
                                 Id = User.ObjectId,
                                 Name = User.DisplayName,
-                                Photo = $"data:image/png;base64,{UserPhoto}"
+                                Photo = UserPhoto
                             }
-                    )
-                );            
+                   )
+               );            
         }
         else
         {
@@ -222,17 +241,17 @@
                           {
                               Id = User.ObjectId,
                               Name = User.DisplayName,
-                              Photo = $"data:image/png;base64,{UserPhoto}"
+                              Photo = UserPhoto
                           }
                   )
               );
         }
 
-        UpdateLikes(item.Id, User.ObjectId);
+        await UpdateLikes(item.Id, User.ObjectId);
 
     }
 
-    private void UpdateLikes(string commentId, string personId)
+    private async Task UpdateLikes(string commentId, string personId)
     {
 
         if (Comment.Id == commentId)
@@ -247,14 +266,44 @@
                     {
                         Id = personId,
                         Name = User.DisplayName,
-                        Photo = $"data:image/png;base64,{UserPhoto}"
+                        Photo = UserPhoto
                     });
             }
             else
             {
                 Comment.Likes.Remove(like);
             }
+
+            await UpdateNumberOfLikeComments();
         }
+    }
+
+    public async Task UpdateNumberOfLikeComments()
+    {
+
+        if (Comment != null)
+        {            
+            await JSRuntime.InvokeVoidAsync(
+               "updateCount", _numberOfLikeComments, Comment.Likes.Count);
+
+            //var innerHtmlToolTip = "<ul class='list-unstyled'>";
+
+            //foreach (var like in Comment.Likes)
+            //{
+            //    innerHtmlToolTip += $"<li><div><img src={like.Photo} style='height: 26px;width: 26px;border-radius: 50%;'/> <span style='margin-left:5px'>{like.Name}</span></div></li>";
+            //}
+
+            //innerHtmlToolTip += "</ul>";
+
+            //if (tooltipLikes.ContainsKey(Comment.Id))
+            //{
+            //    await JSRuntime.InvokeVoidAsync(
+            //      "updateToolTipLikes", tooltipLikes[Comment.Id], innerHtmlToolTip);
+            //}
+            
+
+        }
+
     }
 
     private void ReplyMessageClick()
