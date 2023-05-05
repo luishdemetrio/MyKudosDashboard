@@ -202,7 +202,7 @@
         if (kudo != null)
         {
             // it's not guaranteed that the kudos will be there since we are using infinite loop
-            if (numberOfLikes.ContainsKey(kudosId))
+            if (numberOfComments.ContainsKey(kudosId))
             {
                 await JSRuntime.InvokeVoidAsync(
                        "updateCount", numberOfComments[kudosId], kudo.Comments.Count);
