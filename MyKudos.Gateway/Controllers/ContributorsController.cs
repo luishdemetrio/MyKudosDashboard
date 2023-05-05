@@ -12,17 +12,21 @@ public class ContributorsController : Controller
     private readonly IGamificationService _gamificationService;
     private readonly IGraphService _graphService;
 
-    public ContributorsController(IGamificationService gamificationService, IGraphService graphService)
+    private readonly int _topContributors;
+
+    public ContributorsController(IGamificationService gamificationService, IGraphService graphService, IConfiguration configuration)
     {
         _gamificationService = gamificationService;
         _graphService = graphService;
+
+        _topContributors = int.Parse(configuration["TopContributors"]);
     }
 
     [HttpGet(Name = "GetTopContributors")]
     public async Task<IEnumerable<TopContributors>> Get()
     {
 
-        var scores = await _gamificationService.GetTopUserScoresAsync(20);
+        var scores = await _gamificationService.GetTopUserScoresAsync(_topContributors);
 
         var userIds = scores.Select(s => s.UserId).Distinct().ToArray();
 
