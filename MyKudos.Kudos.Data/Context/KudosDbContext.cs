@@ -9,6 +9,7 @@ public class KudosDbContext : DbContext
 
     public KudosDbContext(DbContextOptions<KudosDbContext> options) : base(options)
     {
+        Database.EnsureCreated();
     }
 
     public DbSet<KudosLog> Kudos { get; set; }  

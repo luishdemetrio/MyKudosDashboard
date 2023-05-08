@@ -120,6 +120,9 @@
   <data name="A" xml:space="preserve">
     <value>um</value>
   </data>
+  <data name="Achievements" xml:space="preserve">
+    <value>Realizações</value>
+  </data>
   <data name="All" xml:space="preserve">
     <value>Todos</value>
   </data>

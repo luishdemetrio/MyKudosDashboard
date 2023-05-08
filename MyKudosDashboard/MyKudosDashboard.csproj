@@ -39,6 +39,10 @@
     <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\badges\" />
+  </ItemGroup>
+
 </Project>
 
 
