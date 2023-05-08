@@ -77,18 +77,33 @@
                     </h5>
 
                 </div>
+
+                @if (_userScore.KudosSent + _userScore.KudosReceived > 0)
+                {
+                    <div style="clear:both;">
+                        <p>@Localizer["Achievements"]</p>
+
+                        
+                        @if (_userScore.KudosSent >0)
+                        {
+                            <img src=@GetKudosSentBadge() style="height:80px;width:80px;padding:5px" />
+                        }
+
+                        @if(_userScore.KudosReceived >= 10)
+                        {
+                            <img src=@GetKudosReceivedBadge() style="height:80px;width:80px;padding:5px" />
+                        }
+
+
+                    </div>
+                }
             }
             
         </div>
 
+       
 
-        @* <div style="clear:both;">
-        <p>Achievements</p>
-
-        <img src="badges/badge01.png" style="height:80px;width:80px;" />
-        <img src="badges/badge02.png" style="height:80px;width:80px;"/>
-        <img src="badges/badge03.png" style="height:80px;width:80px;" />
-        </div>*@
+        
 
 
     </div>
@@ -124,8 +139,8 @@
         _isLoaded = true;
 
         await InvokeAsync(StateHasChanged);
-        await Task.Delay(100);  
-        await Task.CompletedTask;
+        //await Task.Delay(100);  
+        //await Task.CompletedTask;
     }
 
     public async Task UpdateScore(UserScore userScore)
@@ -134,10 +149,59 @@
         {
             _userScore = userScore;
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(100);  
+            //  await Task.Delay(100);  
         }
-        
 
+
+    }
+
+    private string GetKudosSentBadge()
+    {
+        string result = string.Empty;
+
+        switch (_userScore.KudosSent)
+        {
+            case var n when (n >= 1 && n <10):
+                    result = "badges/1kudossent.png";
+                    break;
+
+            case var n when (n >= 10 && n <= 50):
+                result = "badges/10kudossent.png";
+                break;
+
+            case var n when (n > 50 && n <= 100):
+                result = "badges/50kudossent.png";
+                break;
+
+            case var n when (n > 100):
+                result = "badges/100kudossent.png";
+                break;
+        }
+
+        return result;
+    }
+
+    private string GetKudosReceivedBadge()
+    {
+        string result = string.Empty;
+
+        switch (_userScore.KudosReceived)
+        {
+        
+            case var n when (n >= 10 && n <= 50):
+                result = "badges/10kudosreceived.png";
+                break;
+
+            case var n when (n > 50 && n <= 100):
+                result = "badges/50kudosreceived.png";
+                break;
+
+            case var n when (n > 100):
+                result = "badges/50kudosreceived.png";
+                break;
+        }
+
+        return result;
     }
 
 }
