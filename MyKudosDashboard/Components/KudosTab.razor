@@ -118,13 +118,9 @@
             {
                 kudo.Comments.Remove(comments);
 
-                await AllKudosTab.UpdateNumberOfComments(kudo.Id);
+                await AllKudosTab.UpdateNumberOfComments(kudo.Id, kudo.Comments.Count);
 
-                //Logger.LogInformation($"CommentsDeleted: KudosTab Updated : {pComments.Id}");
-
-                //await Task.Delay(500);
-                //await InvokeAsync(StateHasChanged);
-                //await Task.Delay(500);
+               
             }
 
 
@@ -161,14 +157,11 @@
                 kudo.Comments.Add(pComments.KudosId);
 
                 if (AllKudosTab != null)
-                await AllKudosTab.UpdateNumberOfComments(kudo.Id);
+                    await AllKudosTab.UpdateNumberOfComments(kudo.Id, kudo.Comments.Count);
 
                 //Logger.LogInformation($"CommentsSent: KudosTab Updated : {pComments.Id}");
 
-                //await Task.Delay(2000);
-                //await InvokeAsync(StateHasChanged);
-                //await Task.Delay(2000);
-
+              
             }
 
         }

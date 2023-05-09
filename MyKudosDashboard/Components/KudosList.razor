@@ -81,18 +81,20 @@
                         <FluentButton  id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                     Filled=@Filled(item) />
-                            <div @ref=numberOfLikes[item.Id]>@item.Likes.Count()</div>
+                            <div @ref=numberOfLikes[item.Id]>
+                                @item.Likes.Count()
+                                </div>
                         </FluentButton>
 
                         <FluentTooltip Anchor=@item.Id Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
-
+@*
                               @if (item.Likes.Count() > 0)
                             {
                                 <ul class="list-unstyled ">
                                     @foreach (var like in item.Likes)
                                     {
                                         <li>
-                                            <div>
+                                            <div @ref=tooltipLikes[item.Id]>
                                                 <img src=@like.Photo
                                                      style="height: 26px;width: 26px;border-radius: 50%;" />
                                                 <span style="margin-left:5px">@like.Name</span>
@@ -100,11 +102,11 @@
                                         </li>
                                     }
                                 </ul>
-                            }
+                            }*@
 
-                            @*<div @ref=tooltipLikes[item.Id]>
+                            <div @ref=tooltipLikes[item.Id]>
                                
-                            </div>*@
+                            </div>
                          
                         </FluentTooltip>
 
@@ -156,11 +158,11 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-        
-        //foreach (var item in kudos.ToList())
-        //{
-        //    await UpdateNumberOfLikes(item.Id);
-        //}
+
+        foreach (var item in kudos.ToList())
+        {
+            await UpdateNumberOfLikes(item.Id);
+        }
 
     }
 
@@ -221,7 +223,7 @@
             }
             catch (JSDisconnectedException)
             {
-                await UpdateCount(obj, value);
+                await JSRuntime.InvokeVoidAsync(javascriptMethod, obj, value);
             }
 
             await Task.Delay(300);
@@ -256,7 +258,7 @@
                 {
                     await UpdateHtmlBlock(tooltipLikes[kudosId], innerHtmlToolTip);
                 }
-                
+
             }
         }
 
@@ -268,19 +270,19 @@
 
         var kudo = kudos.Where(k => k.Id == pKudos.Id).FirstOrDefault();
 
-        if (kudo != null)
+        if (kudo == null)
         {
-            kudos.Append(kudo);
-
-            await InvokeAsync(StateHasChanged);
+            kudos.Append(pKudos);
 
         }
 
+        await InvokeAsync(StateHasChanged);
+        await UpdateNumberOfLikes(pKudos.Id);
     }
 
 
 
-    public async Task UpdateNumberOfComments(string kudosId)
+    public async Task UpdateNumberOfComments(string kudosId, int kudosCount)
     {
 
         var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
@@ -290,7 +292,7 @@
             // it's not guaranteed that the kudos will be there since we are using infinite loop
             if (numberOfComments.ContainsKey(kudosId))
             {
-                await UpdateCount(numberOfComments[kudosId], kudo.Comments.Count);
+                await UpdateCount(numberOfComments[kudosId], kudosCount);
 
             }
         }
