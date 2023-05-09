@@ -150,27 +150,53 @@
         _isLoaded = true;
 
         await InvokeAsync(StateHasChanged);
-        //await Task.Delay(100);  
-        //await Task.CompletedTask;
+ 
     }
+
 
     public async Task UpdateScore(UserScore userScore)
     {
         if(userScore.UserId == User.ObjectId)
         {
             _userScore = userScore;
-            // await InvokeAsync(StateHasChanged);
-            //  await Task.Delay(100);  
+
+
             if (_userScore != null)
             {
-                await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
 
-                await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
-                await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
-                await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
-                await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
-                await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
-                await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
+                for (int attempts = 0; attempts < 3; attempts++)
+                {
+
+
+                    try
+                    {
+
+                        await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score).ConfigureAwait(false);
+
+                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived).ConfigureAwait(false);
+
+                        break;
+                    }
+                    catch (JSDisconnectedException)
+                    {
+                        await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score).ConfigureAwait(false);
+
+                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived).ConfigureAwait(false);
+                    
+                    }
+
+                    await Task.Delay(300);
+                }
             }
 
         }

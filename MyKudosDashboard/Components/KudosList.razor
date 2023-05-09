@@ -86,9 +86,25 @@
 
                         <FluentTooltip Anchor=@item.Id Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
 
-                            <div @ref=tooltipLikes[item.Id]>
+                              @if (item.Likes.Count() > 0)
+                            {
+                                <ul class="list-unstyled ">
+                                    @foreach (var like in item.Likes)
+                                    {
+                                        <li>
+                                            <div>
+                                                <img src=@like.Photo
+                                                     style="height: 26px;width: 26px;border-radius: 50%;" />
+                                                <span style="margin-left:5px">@like.Name</span>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
 
-                            </div>
+                            @*<div @ref=tooltipLikes[item.Id]>
+                               
+                            </div>*@
                          
                         </FluentTooltip>
 
@@ -139,14 +155,79 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        foreach (var item in kudos.ToList())
+
+        
+        //foreach (var item in kudos.ToList())
+        //{
+        //    await UpdateNumberOfLikes(item.Id);
+        //}
+
+    }
+
+    private async Task UpdateHtmlBlock(object obj, object value)
+    {
+
+        for (int attempts = 0; attempts < 3; attempts++)
         {
-            await UpdateNumberOfLikes(item.Id);
+            try
+            {
+                await UpdateHTMLValue("updateInnerHTML", obj, value);
+
+
+                break;
+            }
+            catch (JSDisconnectedException)
+            {
+                await UpdateHTMLValue("updateInnerHTML", obj, value);
+            }
+
+            await Task.Delay(300);
+        }
+
+    }
+    private async Task UpdateCount(object obj, object value)
+    {
+
+        for (int attempts = 0; attempts < 3; attempts++)
+        {
+            try
+            {
+                await UpdateHTMLValue("updateCount", obj, value);
+
+
+                break;
+            }
+            catch (JSDisconnectedException)
+            {
+                await UpdateHTMLValue("updateCount", obj, value);
+            }
+
+            await Task.Delay(300);
         }
 
     }
 
+    private async Task UpdateHTMLValue(string javascriptMethod, object obj, object value)
+    {
 
+        for (int attempts = 0; attempts < 3; attempts++)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync(javascriptMethod, obj, value);
+
+
+                break;
+            }
+            catch (JSDisconnectedException)
+            {
+                await UpdateCount(obj, value);
+            }
+
+            await Task.Delay(300);
+        }
+
+    }
     public async Task UpdateNumberOfLikes(string kudosId)
     {
 
@@ -157,10 +238,8 @@
             // it's not guaranteed that the kudos will be there since we are using infinite loop
             if (numberOfLikes.ContainsKey(kudosId))
             {
-                await JSRuntime.InvokeVoidAsync(
-                       "updateCount", numberOfLikes[kudosId], kudo.Likes.Count);
 
-                await Task.Delay(300);
+                await UpdateCount(numberOfLikes[kudosId], kudo.Likes.Count);
 
 
                 var innerHtmlToolTip = "<ul class='list-unstyled'>";
@@ -172,10 +251,12 @@
 
                 innerHtmlToolTip += "</ul>";
 
-                await JSRuntime.InvokeVoidAsync(
-                  "updateInnerHTML", tooltipLikes[kudosId], innerHtmlToolTip);
 
-                await Task.Delay(300);
+                if (tooltipLikes.ContainsKey(kudosId))
+                {
+                    await UpdateHtmlBlock(tooltipLikes[kudosId], innerHtmlToolTip);
+                }
+                
             }
         }
 
@@ -192,7 +273,7 @@
             kudos.Append(kudo);
 
             await InvokeAsync(StateHasChanged);
-            
+
         }
 
     }
@@ -209,10 +290,7 @@
             // it's not guaranteed that the kudos will be there since we are using infinite loop
             if (numberOfComments.ContainsKey(kudosId))
             {
-                await JSRuntime.InvokeVoidAsync(
-                       "updateCount", numberOfComments[kudosId], kudo.Comments.Count);
-
-                await Task.Delay(300);
+                await UpdateCount(numberOfComments[kudosId], kudo.Comments.Count);
 
             }
         }
@@ -313,13 +391,13 @@
                 kudo.Likes.Remove(like);
             }
 
-             await JSRuntime.InvokeVoidAsync(
-              "updateCount", numberOfLikes[kudosId], kudo.Likes.Count);
 
-            await Task.Delay(300);
+            if (numberOfLikes.ContainsKey(kudosId))
+            {
+                await UpdateCount(numberOfLikes[kudosId], kudo.Likes.Count);
 
-          //  await InvokeAsync(StateHasChanged);
-//            await Task.Delay(300); 
+            }
+
 
         }
 

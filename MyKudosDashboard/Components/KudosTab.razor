@@ -203,9 +203,7 @@
                     _kudosList.Enqueue(item);
                 }
 
-                //await Task.Delay(2000);
-                //await InvokeAsync(StateHasChanged);
-                //await Task.Delay(2000);
+             
             }
 
             if (AllKudosTab != null)
@@ -257,10 +255,6 @@
 
             await AllKudosTab.UpdateKudos(pKudos);
 
-            //await Task.Delay(2000);
-            //await InvokeAsync(StateHasChanged);
-            //await Task.Delay(2000);
-
         }
 
     }
@@ -295,16 +289,12 @@
 
                await AllKudosTab.UpdateNumberOfLikes(kudo.Id);
 
-               // Logger.LogInformation($"UpdateLikesCallBack: KudosTab Updated : {pLike.KudosId}");
+              
             }
 
-            //await Task.Delay(2000);
-            //await InvokeAsync(StateHasChanged);
-            //await Task.Delay(2000);
         }
         else
         {
-            //force to reload
             await LoadKudos();
         }
 
@@ -331,13 +321,9 @@
             {
                 kudo.Likes.Remove(like);
 
-                //Logger.LogInformation($"UpdateUndoLikesCallBack: KudosTab Updated : {pLike.KudosId}");
                 await AllKudosTab.UpdateNumberOfLikes(kudo.Id);
             }
 
-            //await Task.Delay(2000);
-            //await InvokeAsync(StateHasChanged);
-            //await Task.Delay(2000);
 
         }
         else
@@ -346,7 +332,6 @@
             await LoadKudos();
         }
 
-        //await Task.CompletedTask;
     }
 
   
