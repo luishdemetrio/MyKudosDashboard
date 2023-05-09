@@ -155,11 +155,12 @@
         {
             var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
-            if ((comments is null) || (!kudo.Comments.Contains(comments)))
+            if ((comments is null) || (!kudo.Comments.Contains(pComments.KudosId)))
             {
 
-                kudo.Comments.Add(comments);
+                kudo.Comments.Add(pComments.KudosId);
 
+                if (AllKudosTab != null)
                 await AllKudosTab.UpdateNumberOfComments(kudo.Id);
 
                 //Logger.LogInformation($"CommentsSent: KudosTab Updated : {pComments.Id}");
@@ -253,9 +254,12 @@
 
             Logger.LogInformation($"UpdateKudosCallback: KudosTab Updated : {pKudos.Id}");
 
-            await Task.Delay(2000);
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(2000);
+
+            await AllKudosTab.UpdateKudos(pKudos);
+
+            //await Task.Delay(2000);
+            //await InvokeAsync(StateHasChanged);
+            //await Task.Delay(2000);
 
         }
 

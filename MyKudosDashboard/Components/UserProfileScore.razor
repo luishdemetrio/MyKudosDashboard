@@ -8,6 +8,8 @@
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
 
+@inject IJSRuntime JSRuntime
+
 <div class="card-body" style="padding:2px">
 
     <div class="profile">
@@ -21,7 +23,8 @@
             @if (_isLoaded)
             {
                 <h3 class="card-title pricing-card-title">
-                    @_userScore.Score
+                    <div @ref=_score>@_userScore.Score</div>
+                    
                     <small class="text-muted fw-light"> @Localizer["Points"]</small>
                 </h3>
 
@@ -32,7 +35,7 @@
 
                         <FluentIcon Name="@FluentIcons.ArrowCircleRight" Color="Color.Neutral" />
 
-                        <small class="text-muted fw-light"> @_userScore.KudosSent</small>
+                        <small @ref=_kudosSent class="text-muted fw-light"> @_userScore.KudosSent</small>
                         <small class="text-muted fw-light"> @Localizer["KudosSent"]</small>
                     </h5>
 
@@ -40,7 +43,7 @@
 
                         <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Color="Color.Neutral" />
 
-                        <small class="text-muted fw-light"> @_userScore.KudosReceived</small>
+                        <small @ref=_kudosReceived class ="text-muted fw-light"> @_userScore.KudosReceived</small>
                         <small class="text-muted fw-light"> @Localizer["KudosReceived"]</small>
                     </h5>
 
@@ -48,7 +51,7 @@
 
                         <FluentIcon Name="@FluentIcons.ThumbLike" Color="Color.Neutral" />
 
-                        <small class="text-muted fw-light"> @_userScore.LikesSent</small>
+                        <small @ref=_likesSent class="text-muted fw-light"> @_userScore.LikesSent</small>
                         <small class="text-muted fw-light"> @Localizer["LikesSent"]</small>
                     </h5>
 
@@ -56,7 +59,7 @@
 
                         <FluentIcon Name="@FluentIcons.Heart" Color="Color.Neutral" />
 
-                        <small class="text-muted fw-light"> @_userScore.LikesReceived</small>
+                        <small @ref=_likesReceived class ="text-muted fw-light"> @_userScore.LikesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["LikesReceived"]</small>
                     </h5>
 
@@ -64,7 +67,7 @@
 
                         <FluentIcon Name="@FluentIcons.CommentArrowLeft" Color="Color.Neutral" />
 
-                        <small class="text-muted fw-light"> @_userScore.MessagesSent</small>
+                        <small @ref=_commentsSent class="text-muted fw-light"> @_userScore.MessagesSent</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsSent"]</small>
                     </h5>
 
@@ -72,7 +75,7 @@
 
                         <FluentIcon Name="@FluentIcons.CommentArrowRight" Color="Color.Neutral" />
 
-                        <small class="text-muted fw-light"> @_userScore.MessagesReceived</small>
+                        <small @ref=_commentsReceived class="text-muted fw-light"> @_userScore.MessagesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsReceived"]</small>
                     </h5>
 
@@ -123,6 +126,14 @@
 
     private bool _isLoaded = false;
 
+    private ElementReference _score;
+    private ElementReference _kudosSent;
+    private ElementReference _kudosReceived;
+    private ElementReference _likesSent;
+    private ElementReference _likesReceived;
+    private ElementReference _commentsSent;
+    private ElementReference _commentsReceived;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -148,8 +159,20 @@
         if(userScore.UserId == User.ObjectId)
         {
             _userScore = userScore;
-            await InvokeAsync(StateHasChanged);
+            // await InvokeAsync(StateHasChanged);
             //  await Task.Delay(100);  
+            if (_userScore != null)
+            {
+                await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
+
+                await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
+                await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
+                await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
+                await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
+                await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
+                await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
+            }
+
         }
 
 

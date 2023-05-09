@@ -89,27 +89,10 @@
                             <div @ref=tooltipLikes[item.Id]>
 
                             </div>
-                          
-                           @* @if (item.Likes.Count() > 0)
-                            {
-                                <ul class="list-unstyled ">
-                                    @foreach (var like in item.Likes)
-                                    {
-                                        <li>
-                                            <div>
-                                                <img src=@like.Photo
-                                                     style="height: 26px;width: 26px;border-radius: 50%;" />
-                                                <span style="margin-left:5px">@like.Name</span>
-                                            </div>
-                                        </li>
-                                    }
-                                </ul>
-                            }*@
+                         
                         </FluentTooltip>
 
-
                     </div>
-
 
                 </div>
             </div>
@@ -177,6 +160,8 @@
                 await JSRuntime.InvokeVoidAsync(
                        "updateCount", numberOfLikes[kudosId], kudo.Likes.Count);
 
+                await Task.Delay(300);
+
 
                 var innerHtmlToolTip = "<ul class='list-unstyled'>";
 
@@ -188,11 +173,31 @@
                 innerHtmlToolTip += "</ul>";
 
                 await JSRuntime.InvokeVoidAsync(
-                  "updateToolTipLikes", tooltipLikes[kudosId], innerHtmlToolTip);
+                  "updateInnerHTML", tooltipLikes[kudosId], innerHtmlToolTip);
+
+                await Task.Delay(300);
             }
         }
-        
+
     }
+
+
+    public async Task UpdateKudos(KudosResponse pKudos)
+    {
+
+        var kudo = kudos.Where(k => k.Id == pKudos.Id).FirstOrDefault();
+
+        if (kudo != null)
+        {
+            kudos.Append(kudo);
+
+            await InvokeAsync(StateHasChanged);
+            
+        }
+
+    }
+
+
 
     public async Task UpdateNumberOfComments(string kudosId)
     {
@@ -206,6 +211,8 @@
             {
                 await JSRuntime.InvokeVoidAsync(
                        "updateCount", numberOfComments[kudosId], kudo.Comments.Count);
+
+                await Task.Delay(300);
 
             }
         }
@@ -308,6 +315,8 @@
 
              await JSRuntime.InvokeVoidAsync(
               "updateCount", numberOfLikes[kudosId], kudo.Likes.Count);
+
+            await Task.Delay(300);
 
           //  await InvokeAsync(StateHasChanged);
 //            await Task.Delay(300); 
