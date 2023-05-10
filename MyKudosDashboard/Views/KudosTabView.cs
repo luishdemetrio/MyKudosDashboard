@@ -73,7 +73,7 @@ public class KudosTabView : IKudosTabView
 
                 if (like != null)
                 {
-                    await LikeCallback?.Invoke(like);
+                    LikeCallback?.Invoke(like).ConfigureAwait(true);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message);
@@ -96,10 +96,10 @@ public class KudosTabView : IKudosTabView
 
                 if (like != null)
                 {
-                    await UndoLikeCallback?.Invoke(like);
+                    UndoLikeCallback?.Invoke(like).ConfigureAwait(true);
                 }
 
-                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
+                await arg.CompleteMessageAsync(arg.Message);
             }
         };
 
@@ -123,7 +123,7 @@ public class KudosTabView : IKudosTabView
                     await KudosCallback?.Invoke(kudos);
                 }
 
-                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
+                await arg.CompleteMessageAsync(arg.Message);
             }
         };
 
