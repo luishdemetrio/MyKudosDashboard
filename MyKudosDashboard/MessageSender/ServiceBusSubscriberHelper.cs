@@ -22,20 +22,20 @@ public class ServiceBusSubscriberHelper
         _logger = logger;
     }
 
-    public void ServiceBusProcessor(ServiceBusProcessorConfig config)
+    public async void ServiceBusProcessor(ServiceBusProcessorConfig config)
     {
-        CreateASubscriberfItDoesntExistAsync(config.DashboardName, config.SubscriptionName).ContinueWith(t =>
-        {
+        
+        await CreateASubscriberfItDoesntExistAsync(config.DashboardName, config.SubscriptionName);        
+        
+        _serviceBusProcessor = _serviceBusClient.CreateProcessor(config.DashboardName, config.SubscriptionName);
 
-            _serviceBusProcessor = _serviceBusClient.CreateProcessor(config.DashboardName, config.SubscriptionName);
+        _serviceBusProcessor.ProcessMessageAsync += config.MessageProcessor;
 
-            _serviceBusProcessor.ProcessMessageAsync += config.MessageProcessor;
+        _serviceBusProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
 
-            _serviceBusProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
+        await _serviceBusProcessor.StartProcessingAsync();
 
-            _serviceBusProcessor.StartProcessingAsync();
-
-        });
+        
     }
 
     private async Task ServiceBusProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)

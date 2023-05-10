@@ -33,6 +33,7 @@ public class KudosTabView : IKudosTabView
     private ServiceBusSubscriberHelper _subscriberCommentsSent;
     private ServiceBusSubscriberHelper _subscriberCommentsDeleted;
 
+    private string _subscriberNameSuffix;
 
     public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger)
     {
@@ -51,6 +52,12 @@ public class KudosTabView : IKudosTabView
         _subscriberKudosSent = new ServiceBusSubscriberHelper(configuration, logger);
         _subscriberCommentsDeleted = new ServiceBusSubscriberHelper(configuration, logger);
         _subscriberCommentsSent = new ServiceBusSubscriberHelper(configuration, logger);
+
+
+        Random rand = new Random();
+        int randomNumber = rand.Next(0, 101);
+
+        _subscriberNameSuffix = randomNumber.ToString();
     }
 
 
@@ -182,6 +189,9 @@ public class KudosTabView : IKudosTabView
 
     public void RegisterForLiveUpdates(string userId)
     {
+        userId += "_" + _subscriberNameSuffix;
+
+
         SubscribeKudosSent(userId);
         SubscribeToLikeSent(userId);
         SubscribeUndoToLikeSent(userId);    
