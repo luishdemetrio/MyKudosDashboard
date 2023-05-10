@@ -88,12 +88,6 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        //if (firstRender)
-        //{           
-        //    await LoadKudos();
-        //}
-
-        //  await Task.CompletedTask;
     }
 
 
@@ -106,25 +100,31 @@
             return;
         }
 
-
-        //        var kudo = _kudosList.FirstOrDefault(k => k.Id == pComments.KudosId);
-
         if (_kudosList.ContainsKey(pComments.KudosId))
         {
             var kudo = _kudosList[pComments.KudosId];
 
             var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
-
-            if ((comments != null) || (kudo.Comments.Contains(comments)))
+            if ((comments != null) && (kudo.Comments.Contains(comments)))
             {
                 kudo.Comments.Remove(comments);
 
-                await AllKudosTab.UpdateNumberOfComments(kudo.Id, kudo.Comments.Count);
+                 for (int attempts = 0; attempts < 3; attempts++)
+                {
 
+                    if (AllKudosTab != null)
+                    {
+                        var updated = await AllKudosTab.UpdateNumberOfComments(kudo.Id, kudo.Comments.Count).ConfigureAwait(true);
 
+                        if (updated)
+                            break;
+                    }
+
+                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
+                    await Task.Delay(300).ConfigureAwait(false);
+                }
             }
-
 
         }
         else
@@ -132,8 +132,6 @@
             await LoadKudos();
         }
 
-
-        // await Task.CompletedTask;
     }
 
     private async Task CommentsSent(CommentsRequest pComments)
@@ -145,12 +143,9 @@
             return;
         }
 
-
         if (_kudosList.ContainsKey(pComments.KudosId))
         {
             var kudo = _kudosList[pComments.KudosId];
-
-            //var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
             if (!kudo.Comments.Contains(pComments.Id))
             {
@@ -275,8 +270,7 @@
             await LoadKudos();
             return;
         }
-        //var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
-
+      
         if (_kudosList.ContainsKey(pLike.KudosId))
         {
             var kudo = _kudosList[pLike.KudosId];
@@ -301,14 +295,8 @@
                     if (updated)
                         break;
 
-                    //await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-                    //await Task.Delay(300).ConfigureAwait(false);
                 }
                 
-
-               
-
-              
             }
 
         }
@@ -329,8 +317,7 @@
         if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
             return;
 
-      //  var kudo = _kudosList.FirstOrDefault(k => k.Id == pLike.KudosId);
-
+      
         if (_kudosList.ContainsKey(pLike.KudosId))
         {
             var kudo = _kudosList[pLike.KudosId];
