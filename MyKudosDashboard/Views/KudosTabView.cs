@@ -55,9 +55,8 @@ public class KudosTabView : IKudosTabView
 
 
         Random rand = new Random();
-        int randomNumber = rand.Next(0, 101);
-
-        _subscriberNameSuffix = randomNumber.ToString();
+        
+        _subscriberNameSuffix = rand.Next(0, 101).ToString();
     }
 
 
@@ -189,8 +188,7 @@ public class KudosTabView : IKudosTabView
 
     public void RegisterForLiveUpdates(string userId)
     {
-        userId += "_" + _subscriberNameSuffix;
-
+         userId += $"-{_subscriberNameSuffix}";
 
         SubscribeKudosSent(userId);
         SubscribeToLikeSent(userId);
