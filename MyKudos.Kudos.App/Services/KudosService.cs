@@ -12,6 +12,8 @@ public sealed class KudosService : IKudosService
 
     private readonly ICommentsRepository _commentsRepository;
 
+    
+
     public KudosService(IKudosRepository kudosRepository, ICommentsRepository commentsRepository)
     {
         _kudosRepository = kudosRepository;
@@ -21,6 +23,16 @@ public sealed class KudosService : IKudosService
     public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber , int pageSize )
     {
         return  _kudosRepository.GetKudosAsync(pageNumber, pageSize);
+    }
+
+    public IQueryable<KudosLog> GetUserKudos(string pUserId)
+    {
+        return _kudosRepository.GetUserKudos(pUserId);
+    }
+
+    public Task<IEnumerable<KudosLog>> GetUserKudosByCategories(string pUserId)
+    {
+
     }
 
     public Guid Send(KudosLog kudos)

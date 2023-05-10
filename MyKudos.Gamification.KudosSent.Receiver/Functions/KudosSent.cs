@@ -14,7 +14,7 @@ public class GamificationKudosSent
     private string _kudosSendScore;
 
     private readonly IScoreMessageSender _scoreQueue;
-
+    private readonly IConfiguration configuration;
 
     public GamificationKudosSent(IConfiguration configuration, IUserScoreService userScoreService,
                                  IScoreMessageSender scoreQueue)
