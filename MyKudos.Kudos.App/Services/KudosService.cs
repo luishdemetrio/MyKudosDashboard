@@ -31,13 +31,34 @@ public sealed class KudosService : IKudosService
         return _kudosRepository.GetUserKudos(pUserId);
     }
 
-    public IQueryable<KudosLog> GetUserKudos(string pUserId)
-    {
-        return _kudosRepository.GetUserKudos(pUserId);
-    }
 
-    public Task<IEnumerable<KudosLog>> GetUserKudosByCategories(string pUserId)
+    public Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId)
     {
+
+        var recognitions = _recognitionRepository.GetRecognitions();
+
+        var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new KudosLog
+        {
+            Id = k.Id,
+            TitleId = k.TitleId,
+            ToPersonId = k.ToPersonId
+        }
+        ).ToList();
+
+
+        var result = from kudo in kudos
+                     join recognition in recognitions
+                        on kudo.TitleId equals recognition.Id.ToString()
+                     group kudos by recognition.ValuesCodeGroup into g
+                     select new KudosGroupedByValue()
+                     {
+                         ValueCodeGroup = g.Key,
+                         Count = g.Count()
+                     };
+
+
+        return Task.FromResult(result); 
+
 
     }
 

@@ -10,5 +10,7 @@ public class Recognition
     public string Description { get; set; }
     public bool IsSelected { get; set; }
     public int DisplayOrder { get; set; }
-    
+    public int ValuesCodeGroup { get; set; }
+
+
 }
