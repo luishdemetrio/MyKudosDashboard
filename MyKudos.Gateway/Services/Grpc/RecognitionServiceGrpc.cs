@@ -1,7 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Grpc.Net.Client;
-using MyKudos.Gateway.Interfaces;
-using static MyKudos.Recognition.gRPC.RecognitionService;
+﻿
 
 namespace MyKudos.Gateway.Services;
 

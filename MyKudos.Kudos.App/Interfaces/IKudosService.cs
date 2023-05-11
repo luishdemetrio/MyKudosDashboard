@@ -9,7 +9,7 @@ public interface IKudosService
 
     public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber, int pageSize);
 
-    public IQueryable<KudosLog> GetUserKudos(string pUserId);
+    IQueryable<KudosLog> GetUserKudos(string pUserId);
 
     public bool Like(string kudosId, string personId);
     public bool UndoLike(string kudosId, string personId);

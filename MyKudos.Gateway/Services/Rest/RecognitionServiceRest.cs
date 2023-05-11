@@ -13,7 +13,7 @@ public class RecognitionServiceRest : IRecognitionService
 
     public RecognitionServiceRest(IConfiguration config, ILogger<RecognitionServiceRest> log, IRestClientHelper clientHelper)
     {
-        _recognitionServiceUrl = config["RecognitionServiceUrl"];
+        _recognitionServiceUrl = config["KudosServiceUrl"];
 
         _logger = log;
         _restClientHelper = clientHelper;
