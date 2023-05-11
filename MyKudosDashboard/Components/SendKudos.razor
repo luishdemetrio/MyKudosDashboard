@@ -111,7 +111,7 @@
                         
                         @if (recognitions != null)
                         {
-                            <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient"  >
+                            <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient" style="margin-top:5px"  >
 
                                 @foreach (var item in recognitions.OrderBy(r => r.DisplayOrder))
                                 {
@@ -125,11 +125,11 @@
                                          style="width:@(@size.Width +40)px;height: 55px" >*@
 
                                     <div class="@(item.IsSelected ? "card border border-primary " : "card ")"
-                                         style="width:120px;height: 100px">
+                                         style="width:120px;height: 120px">
 
-                                        <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:medium;overflow-wrap: break-word;" data-toggle="tooltip" data-placement="top" title=@item.Description>
+                                        <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:small;overflow-wrap: break-word;" data-toggle="tooltip" data-placement="top" title=@item.Description>
                                             <h3 style="text-align:center;margin-bottom: 0px;">@item.Emoji</h3>
-                                            <span class="btn stretched-link" style="float: left;padding-top:5px;padding-left:0px;Segoe UI';font-size:medium"
+                                            <span class="btn stretched-link" style="float: left;padding-top:2px;padding-left:0px;Segoe UI';font-size:small"
                                           @onclick=@(() => RecognitionClick(item))>@item.Title</span>
 
                                             

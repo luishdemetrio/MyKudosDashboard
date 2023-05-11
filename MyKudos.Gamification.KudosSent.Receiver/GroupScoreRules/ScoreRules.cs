@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.ScoreRules;
 
-public sealed class ScoreRules
+internal sealed class ScoreRules
 {
 
     private readonly IUserScoreService _userScoreService;

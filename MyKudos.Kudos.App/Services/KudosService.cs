@@ -49,11 +49,11 @@ public sealed class KudosService : IKudosService
         var result = from kudo in kudos
                      join recognition in recognitions
                         on kudo.TitleId equals recognition.Id.ToString()
-                     group kudos by recognition.ValuesCodeGroup into g
+                     group recognition by recognition.ValuesCodeGroup into recognitionGroup
                      select new KudosGroupedByValue()
                      {
-                         ValueCodeGroup = g.Key,
-                         Count = g.Count()
+                         ValueCodeGroup = recognitionGroup.Key,
+                         Count = recognitionGroup.Select(r => r.Id).Distinct().Count()
                      };
 
 

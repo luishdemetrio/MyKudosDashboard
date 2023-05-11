@@ -30,4 +30,9 @@ public class UserScoreService : IUserScoreService
     {
         return _userScoreRepository.GetTopUserScores(top);
     }
+
+    public bool UpdateGroupScore(UserScore userScore)
+    {
+        return _userScoreRepository.UpdateGroupScore(userScore);
+    }
 }

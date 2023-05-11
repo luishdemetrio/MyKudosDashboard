@@ -6,23 +6,23 @@ namespace MyKudos.Kudos.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class KudosGroupedController : Controller
+public class UserKudosController : Controller
 {
     private readonly IKudosService _kudosService;
 
     
 
-    public KudosGroupedController(IKudosService kudosService)
+    public UserKudosController(IKudosService kudosService)
     {
         _kudosService = kudosService;
 
     }
 
     [HttpGet(Name = "Get")]
-    public Task<IEnumerable<KudosGroupedByValue>> Get(string pUserId)
+    public Task<IEnumerable<KudosGroupedByValue>> Get(string userId)
     {
        
 
-        return _kudosService.GetUserKudosByCategory(pUserId);
+        return _kudosService.GetUserKudosByCategory(userId);
     }
 }

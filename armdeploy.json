@@ -485,6 +485,7 @@
             "PROJECT": "MyKudos.Gamification.KudosSent.Receiver/MyKudos.Gamification.Receiver.csproj",
             "SCM_COMMAND_IDLE_TIMEOUT": "120",
             "userScoreServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
+            "UserKudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "ClientId": "[parameters('dashboardAppClientId')]",
             "ClientSecret": "[parameters('dashboardAppClientSecret')]",
             "TenantId": "[subscription().tenantId]",

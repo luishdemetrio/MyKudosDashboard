@@ -52,6 +52,14 @@ public class Startup : FunctionsStartup
                             serviceBusConnectionString: configuration["KudosServiceBus_ConnectionString"]
                         ));
 
+
+        builder.Services.AddScoped<IGroupScoreRules, GroupScoreRules>();
+        
+        builder.Services.AddScoped<IUserKudosService,  UserKudosService>();
+
+
+        builder.Services.AddScoped<IGroupUserScoreService, GroupUserScoreService>();
+
     }
 
    

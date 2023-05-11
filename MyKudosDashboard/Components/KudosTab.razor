@@ -110,7 +110,7 @@
             {
                 kudo.Comments.Remove(comments);
 
-                 for (int attempts = 0; attempts < 3; attempts++)
+                for (int attempts = 0; attempts < 3; attempts++)
                 {
 
                     if (AllKudosTab != null)
@@ -193,6 +193,9 @@
         }
 
         var kudos = await KudosTabView.GetKudos(pageNumber).ConfigureAwait(true);
+        
+        if (kudos is null)
+            return;
 
         foreach (var kudo in kudos)
         {
@@ -295,6 +298,9 @@
                     if (updated)
                         break;
 
+                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
+                    await Task.Delay(300).ConfigureAwait(false);
+
                 }
                 
             }
@@ -329,8 +335,20 @@
             {
                 kudo.Likes.Remove(like);
 
-               // AllKudosTab.kudos = GetAllKudos();
-                await AllKudosTab.UpdateNumberOfLikes(kudo.Id).ConfigureAwait(true);
+               
+                for (int attempts = 0; attempts < 3; attempts++)
+                {
+
+                    var updated = await AllKudosTab.UpdateNumberOfLikes(kudo.Id).ConfigureAwait(true);
+
+                    if (updated)
+                        break;
+
+                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
+                    await Task.Delay(300).ConfigureAwait(false);
+
+                }
+
             }
 
 

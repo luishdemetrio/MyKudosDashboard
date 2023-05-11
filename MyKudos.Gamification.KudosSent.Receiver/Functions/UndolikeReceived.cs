@@ -10,17 +10,14 @@ namespace MyKudos.Gamification.Receiver.Functions;
 
 public class UndolikeReceived
 {
-    private readonly IUserScoreService _userScoreService;
     private string _likeReceiveScore;
 
-    private readonly IScoreMessageSender _scoreQueue;
+    private IGroupScoreRules _groupScoreRules;
 
-    public UndolikeReceived(IConfiguration configuration, IUserScoreService userScoreService,
-                            IScoreMessageSender scoreQueue)
+    public UndolikeReceived(IConfiguration configuration, IGroupScoreRules groupScoreRules)
     {
-        _userScoreService = userScoreService;
         _likeReceiveScore = configuration["LikeReceivedScore"];
-        _scoreQueue = scoreQueue;
+        _groupScoreRules = groupScoreRules;
     }
 
 
@@ -31,23 +28,15 @@ public class UndolikeReceived
         {
             mySbMsg = mySbMsg.Replace("\"", "");
 
-            await _userScoreService.SetUserScoreAsync(
+            var score = 
                     new UserScore()
                     {
                         UserId = mySbMsg,
                         LikesReceived = -1,
                         Score = int.Parse(_likeReceiveScore) * -1
-                    }
-                ) ;
+                    } ;
 
-            var score = await _userScoreService.GetUserScoreAsync(mySbMsg);
-
-            if (score != null)
-            {
-
-                await _scoreQueue.NotifyProfileScoreUpdated(score);
-            }
-
+            await _groupScoreRules.UpdateGroupScoreAsync(score);
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }

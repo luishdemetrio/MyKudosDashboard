@@ -5,24 +5,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
-using MyKudos.Gamification.Receiver.Services;
 
 
 namespace MyKudos.Gamification.Receiver.Functions;
 
 public class LikeSent
 {
-    private readonly IUserScoreService _userScoreService;
+
     private string _likeSendScore;
 
-    private readonly IScoreMessageSender _scoreQueue;
+    private IGroupScoreRules _groupScoreRules;
 
-    public LikeSent(IConfiguration configuration,
-                    IUserScoreService userScoreService, IScoreMessageSender scoreQueue)
+    internal LikeSent(IConfiguration configuration, IGroupScoreRules groupScoreRules)
     {
-        _userScoreService = userScoreService;
+        
         _likeSendScore = configuration["LikeSendScore"];
-        _scoreQueue = scoreQueue;
+        _groupScoreRules = groupScoreRules;
     }
 
     [FunctionName("GamificationLikeSent")]
@@ -32,24 +30,15 @@ public class LikeSent
         {
             mySbMsg = mySbMsg.Replace("\"", "");
 
-            await _userScoreService.SetUserScoreAsync(
+            var score = 
                 new UserScore()
                 {
                     UserId = mySbMsg,
                     LikesSent = 1,
                     Score = int.Parse(_likeSendScore)
-                });
+                };
 
-            var score = await _userScoreService.GetUserScoreAsync(mySbMsg);
-
-            if (score != null)
-            {
-                await _scoreQueue.NotifyProfileScoreUpdated(score);
-            }
-            else
-            {
-                log.LogError($"Error processing message: The returned scoreId is null for the message {mySbMsg}");
-            }
+            await _groupScoreRules.UpdateGroupScoreAsync(score);
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }

@@ -11,4 +11,5 @@ public interface IUserScoreService
 
     IEnumerable<UserScore> GetTopUserScores(int top);
 
+    bool UpdateGroupScore(UserScore userScore);
 }
