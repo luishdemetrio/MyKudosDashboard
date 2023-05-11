@@ -31,9 +31,7 @@
     <Protobuf Include="..\MyKudos.MSGraph.Api\Protos\graph.proto" GrpcServices="Client">
       <Link>Protos\graph.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\MyKudos.Recognition.Api\Proto\recognition.proto" GrpcServices="Client">
-      <Link>Protos\recognition.proto</Link>
-    </Protobuf>
+    
   </ItemGroup>
 
 </Project>
