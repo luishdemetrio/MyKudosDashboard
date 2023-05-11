@@ -9,4 +9,6 @@ public interface IUserScoreRepository
     bool SetUserScore(UserScore userScore);
 
     IEnumerable<UserScore> GetTopUserScores(int top);
+
+    bool UpdateGroupScore(UserScore userScore);
 }

@@ -10,17 +10,15 @@ namespace MyKudos.Gamification.Receiver.Functions;
 
 public class LikeReceived
 {
-    private readonly IUserScoreService _userScoreService;
     private string _likeReceiveScore;
 
-    private readonly IScoreMessageSender _scoreQueue;
+    private IGroupScoreRules _groupScoreRules;
 
-    public LikeReceived(IConfiguration configuration, IUserScoreService userScoreService,
-                        IScoreMessageSender scoreQueue)
+    public LikeReceived(IConfiguration configuration, IGroupScoreRules groupScoreRules)
     {
-        _userScoreService = userScoreService;
         _likeReceiveScore = configuration["LikeReceivedScore"];
-        _scoreQueue = scoreQueue;
+
+        _groupScoreRules = groupScoreRules;
     }
 
 
@@ -32,22 +30,16 @@ public class LikeReceived
 
             mySbMsg = mySbMsg.Replace("\"", "");
 
-            await _userScoreService.SetUserScoreAsync(
+            var score =
                     new UserScore()
                     {
                         UserId = mySbMsg,
                         LikesReceived = 1,
                         Score = int.Parse(_likeReceiveScore)
-                    }
-                );
+                    };
 
-            var score = await _userScoreService.GetUserScoreAsync(mySbMsg);
 
-            if (score != null)
-            {
-
-                await _scoreQueue.NotifyProfileScoreUpdated(score);
-            }
+            await _groupScoreRules.UpdateGroupScoreAsync(score);
 
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");

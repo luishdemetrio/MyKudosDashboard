@@ -32,6 +32,36 @@ public sealed class KudosService : IKudosService
     }
 
 
+    public Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId)
+    {
+
+        var recognitions = _recognitionRepository.GetRecognitions();
+
+        var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new KudosLog
+        {
+            Id = k.Id,
+            TitleId = k.TitleId,
+            ToPersonId = k.ToPersonId
+        }
+        ).ToList();
+
+
+        var result = from kudo in kudos
+                     join recognition in recognitions
+                        on kudo.TitleId equals recognition.Id.ToString()
+                     group recognition by recognition.ValuesCodeGroup into recognitionGroup
+                     select new KudosGroupedByValue()
+                     {
+                         ValueCodeGroup = recognitionGroup.Key,
+                         Count = recognitionGroup.Select(r => r.Id).Distinct().Count()
+                     };
+
+
+        return Task.FromResult(result); 
+
+
+    }
+
     public Guid Send(KudosLog kudos)
     {
         return (_kudosRepository.Add(kudos));

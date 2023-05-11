@@ -12,21 +12,27 @@
 
 <div class="card-body" style="padding:2px">
 
-    <div class="profile">
-        <div class="avatar" style="float:none;align-content:center">
+    <div class="profile" style="width:100%">
+
+        <div class="avatar" style="float:none;width:100%;text-align: center">
+
             <img src=@UserPhoto style="height:64px;width:64px;border-radius: 50%;" />
+
+            
         </div>
 
-        <div class="info">
-            <h5 >@User.DisplayName</h5>
+        <div class="info" style="width:100%">
+            <h5 style="text-align: center;">@User.DisplayName</h5>
 
             @if (_isLoaded)
             {
-                <h3 class="card-title pricing-card-title">
-                    <div @ref=_score>@_userScore.Score</div>
-                    
-                    <small class="text-muted fw-light"> @Localizer["Points"]</small>
-                </h3>
+                <div style="float:none;width:100%;text-align: center">
+                    <h3 class="card-title pricing-card-title">
+                        @*<div @ref=_score>@_userScore.Score</div>*@
+                        <small @ref=_score style="margin-top:10px">@_userScore.Score</small>
+                        <small class="text-muted fw-light" style="margin-top:10px"> @Localizer["Points"]</small>
+                    </h3>
+                </div>
 
            
                 <div style="margin-left:10px">
@@ -96,6 +102,39 @@
                         {
                             <img src=@GetKudosReceivedBadge() style="height:80px;width:80px;padding:5px" />
                         }
+
+                        @if (_userScore.GroupOne > 0 )
+                        {
+                            <img src=@GetKudosValuesBadge(1) style="height:80px;width:80px;padding:5px" />
+                        }
+
+                          @if (_userScore.GroupTwo> 0 )
+                        {
+                            <img src=@GetKudosValuesBadge(2) style="height:80px;width:80px;padding:5px" />
+                        }
+
+
+                        @if (_userScore.GroupThree > 0)
+                        {
+                            <img src=@GetKudosValuesBadge(3) style="height:80px;width:80px;padding:5px" />
+                        }
+
+
+                        @if (_userScore.GroupFour > 0)
+                        {
+                            <img src=@GetKudosValuesBadge(4) style="height:80px;width:80px;padding:5px" />
+                        }
+
+                          @if (_userScore.GroupFive > 0 )
+                        {
+                            <img src=@GetKudosValuesBadge(5) style="height:80px;width:80px;padding:5px" />
+                        }
+
+                        @if (_userScore.GroupAll > 0)
+                        {
+                            <img src=@GetKudosValuesBadge(6) style="height:80px;width:80px;padding:5px" />
+                        }
+
 
 
                     </div>
@@ -211,19 +250,19 @@
         switch (_userScore.KudosSent)
         {
             case var n when (n >= 1 && n <10):
-                    result = "badges/1kudossent.png";
+                result = "images/badges/accomplishments/1kudossent.png";
                     break;
 
             case var n when (n >= 10 && n <= 50):
-                result = "badges/10kudossent.png";
+                result = "images/badges/accomplishments/10kudossent.png";
                 break;
 
             case var n when (n > 50 && n <= 100):
-                result = "badges/50kudossent.png";
+                result = "images/badges/accomplishments/50kudossent.png";
                 break;
 
             case var n when (n > 100):
-                result = "badges/100kudossent.png";
+                result = "images/badges/accomplishments/100kudossent.png";
                 break;
         }
 
@@ -238,19 +277,26 @@
         {
         
             case var n when (n >= 10 && n <= 50):
-                result = "badges/10kudosreceived.png";
+                result = "images/badges/accomplishments/10kudosreceived.png";
                 break;
 
             case var n when (n > 50 && n <= 100):
-                result = "badges/50kudosreceived.png";
+                result = "images/badges/accomplishments/50kudosreceived.png";
                 break;
 
             case var n when (n > 100):
-                result = "badges/50kudosreceived.png";
+                result = "images/badges/accomplishments/50kudosreceived.png";
                 break;
         }
 
         return result;
+    }
+
+
+    private string GetKudosValuesBadge(int group)
+    {
+       
+        return $"images/badges/values/group_{group}.png";
     }
 
 }

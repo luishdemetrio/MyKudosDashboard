@@ -60,4 +60,33 @@ public class UserScoreRepository : IUserScoreRepository
     
         return _context.UserScores.Where(s=> s.Score > 0).OrderByDescending(s=> s.Score).Take(top);
     }
+
+    public bool UpdateGroupScore(UserScore userScore)
+    {
+        UserScore score;
+
+        lock (_lock)
+        {
+            score = _context.UserScores?.FirstOrDefault(u => u.UserId == userScore.UserId);
+
+            if (score != null)
+            {
+
+                score.GroupOne = userScore.GroupOne;
+                score.GroupTwo = userScore.GroupTwo;
+                score.GroupThree = userScore.GroupThree;
+                score.GroupFour = userScore.GroupFour;
+                score.GroupFive = userScore.GroupFive;
+                score.GroupAll = userScore.GroupAll;
+
+            }
+            else
+            {
+                _context.UserScores?.Add(userScore);
+
+
+            }
+        }
+        return _context.SaveChanges() > 0;
+    }
 }

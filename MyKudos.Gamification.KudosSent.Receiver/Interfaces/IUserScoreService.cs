@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Interfaces;
 
-public interface IUserScoreService
+internal interface IUserScoreService
 {
     Task<UserScore> GetUserScoreAsync(string pUserId);
 

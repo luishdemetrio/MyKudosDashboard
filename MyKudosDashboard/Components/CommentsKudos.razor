@@ -233,7 +233,7 @@
         _userPhoto = userPhoto;
 
         ModalHidden = false;
-
+        _comments = new();
         CommentsView.GetComments(_item.Id).ContinueWith(t =>
         {
             _comments = t.Result.ToList();

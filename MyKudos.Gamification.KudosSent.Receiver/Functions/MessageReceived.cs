@@ -12,21 +12,15 @@ namespace MyKudos.Gamification.Receiver.Functions;
 public class MessageReceived
 {
 
-    private readonly ILogger<MessageReceived> _logger;
-    private readonly IUserScoreService _userScoreService;
-    private readonly IScoreMessageSender _scoreQueue;
-
     private string _messageReceivedScore;
 
-    public MessageReceived(ILogger<MessageReceived> log,
-                                       IConfiguration configuration,
-                                       IUserScoreService userScoreService,
-                                       IScoreMessageSender scoreQueue)
+    private IGroupScoreRules _groupScoreRules;
+
+    public MessageReceived(IConfiguration configuration, IGroupScoreRules groupScoreRules)
     {
-        _logger = log;
-        _userScoreService = userScoreService;
         _messageReceivedScore = configuration["MessageReceivedScore"];
-        _scoreQueue = scoreQueue;
+
+        _groupScoreRules = groupScoreRules;
     }
 
 
@@ -37,29 +31,23 @@ public class MessageReceived
         {
             var userId = myQueueItem.Replace("\"", "");
 
-            await _userScoreService.SetUserScoreAsync(
+           var score = 
                 new UserScore()
                 {
                     UserId = userId,
                     MessagesReceived = 1,
                     Score = int.Parse(_messageReceivedScore)
-                });
+                };
 
 
-            var score = await _userScoreService.GetUserScoreAsync(userId);
-
-            if (score != null)
-            {
-
-                await _scoreQueue.NotifyProfileScoreUpdated(score);
-            }
+            await _groupScoreRules.UpdateGroupScoreAsync(score);
 
 
-            _logger.LogInformation($"C# ServiceBus topic trigger function processed message: {myQueueItem}");
+            log.LogInformation($"C# ServiceBus topic trigger function processed message: {myQueueItem}");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error processing message: {ex.Message}");
+            log.LogError($"Error processing message: {ex.Message}");
             throw;
         }
     }
