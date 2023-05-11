@@ -116,14 +116,6 @@
                                 @foreach (var item in recognitions.OrderBy(r => r.DisplayOrder))
                                 {
 
-                                   @* using System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1));
-
-                                    var size = graphics.MeasureString(@item.Title, new System.Drawing.Font("Segoe UI", 16, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point));*@
-
-
-                                 @*   <div class="@(item.IsSelected ? "card border border-primary " : "card ")"
-                                         style="width:@(@size.Width +40)px;height: 55px" >*@
-
                                     <div class="@(item.IsSelected ? "card border border-primary " : "card ")"
                                          style="width:120px;height: 120px">
 
