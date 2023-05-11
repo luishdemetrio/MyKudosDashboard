@@ -8,6 +8,8 @@ public interface IKudosRepository
 
     Task<IEnumerable<KudosLog>> GetKudosAsync(int pageNumber = 1, int pageSize = 5);
 
+    IQueryable<KudosLog> GetUserKudos(string pUserId);
+
     Guid Add(KudosLog kudos);
 
     bool Like(string kudosId, string personId);

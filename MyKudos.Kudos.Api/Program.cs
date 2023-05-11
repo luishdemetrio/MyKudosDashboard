@@ -5,6 +5,7 @@ using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Data.Repository;
 using MyKudos.Kudos.Domain.Interfaces;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -54,6 +55,21 @@ builder.Services.AddScoped<CommentsDbContext>(_ =>
 
     return new CommentsDbContext(options);
 });
+
+
+builder.Services.AddScoped<IRecognitionService, RecognitionService>();
+builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
+
+builder.Services.AddDbContext<RecognitionDbContext>(options =>
+{
+    options.UseCosmos(
+              config["AccountEndPoint"],
+              config["AccountKey"],
+              config["RecognitionDatabaseName"]);
+});
+
+
+
 var app = builder.Build();
 
 

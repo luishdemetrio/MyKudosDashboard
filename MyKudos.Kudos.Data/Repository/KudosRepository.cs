@@ -44,8 +44,14 @@ public class KudosRepository : IKudosRepository
 					.ToListAsync();
 	}
 
+    public IQueryable<KudosLog> GetUserKudos(string pUserId)
+    {
 
-	public bool Like(string kudosId, string personId)
+        return _kudosDbContext.Kudos.Where(k => k.ToPersonId == pUserId).AsQueryable();
+
+    }
+
+    public bool Like(string kudosId, string personId)
 	{
 
 		var kudos = _kudosDbContext.Kudos.Where(k => k.Id == new Guid(kudosId)).First();

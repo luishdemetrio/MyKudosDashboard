@@ -2,7 +2,7 @@
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-
+using System.Dynamic;
 
 namespace MyKudos.Kudos.App.Services;
 
@@ -12,16 +12,25 @@ public sealed class KudosService : IKudosService
 
     private readonly ICommentsRepository _commentsRepository;
 
-    public KudosService(IKudosRepository kudosRepository, ICommentsRepository commentsRepository)
+    private readonly IRecognitionRepository _recognitionRepository;
+
+    public KudosService(IKudosRepository kudosRepository, ICommentsRepository commentsRepository, IRecognitionRepository recognitionRepository)
     {
         _kudosRepository = kudosRepository;
         _commentsRepository = commentsRepository;
+        _recognitionRepository = recognitionRepository;
     }
 
-    public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber , int pageSize )
+    public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber, int pageSize)
     {
-        return  _kudosRepository.GetKudosAsync(pageNumber, pageSize);
+        return _kudosRepository.GetKudosAsync(pageNumber, pageSize);
     }
+
+    public IQueryable<KudosLog> GetUserKudos(string pUserId)
+    {
+        return _kudosRepository.GetUserKudos(pUserId);
+    }
+
 
     public Guid Send(KudosLog kudos)
     {
