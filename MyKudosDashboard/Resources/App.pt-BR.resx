@@ -127,7 +127,7 @@
     <value>Todos</value>
   </data>
   <data name="Category" xml:space="preserve">
-    <value>Categoria</value>
+    <value>Escolha o comportamento</value>
   </data>
   <data name="CommentsReceived" xml:space="preserve">
     <value>comentários recebidos</value>

@@ -1,4 +1,3 @@
-using Microsoft.Bot.Builder;
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
@@ -21,7 +20,8 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddFluentUIComponents();
+LibraryConfiguration configUI = new(ConfigurationGenerator.GetIconConfiguration(), ConfigurationGenerator.GetEmojiConfiguration());
+builder.Services.AddFluentUIComponents(configUI);
 
 
 //Views
@@ -58,6 +58,8 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
 
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+
 
 var app = builder.Build();
 

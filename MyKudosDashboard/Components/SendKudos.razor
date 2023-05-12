@@ -8,7 +8,7 @@
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
 
- 
+@inject IJSRuntime JsRuntime
 
 <style>
 
@@ -51,9 +51,9 @@
 
 <FluentDialog   @ref=SendKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true" 
-                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 680px;"   
+                class="both-gradient"  style="--dialog-height: 640px;--dialog-width: 680px;"   
                 Hidden=@ModalHidden
-              @ondismiss=OnDismiss>
+                >
 
 <div style="margin:10px;">
 
@@ -68,7 +68,7 @@
                     
                          <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
-                                           Debounce="500" style="witdh:80px"
+                                           Debounce="500" style="witdht:80px"
                                            
                                            >
                             <SelectedTemplate >
@@ -140,14 +140,14 @@
 
                             </FluentHorizontalScroll>*@
 
-                            <div id="carouselExample" class="carousel carousel-dark slide" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
+                            <div id="myCarousel" class="carousel carousel-dark slide" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
                                 <div class="carousel-inner" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
 
                                     
                                     @for (int i = 0; i < recognitions.Count(); i++)
                                     {
 
-                                    <div class="@(i == 0 ? "carousel-item active" : "carousel-item")"
+                                    <div id=@recognitions.ElementAt(i).Id class="@(i == 0 ? "carousel-item active" : "carousel-item")"
                                             style="padding-left: 0px;padding-right: 0px;">
 
                                         <div class="bd-placeholder-img bd-placeholder-img-lg d-block w-100">
@@ -166,7 +166,7 @@
                                                         </h5>
 
                                                         <span class="btn stretched-link" style="float: left;padding-top:2px;padding-left:0px;font-size:medium;text-align:center;width:100%"
-                                                      @onclick=@(() => RecognitionClick(recognitions.ElementAt(i)))>@recognitions.ElementAt(i).Description</span>
+                                                      >@recognitions.ElementAt(i).Description</span>
 
 
                                                     </div>
@@ -305,6 +305,16 @@
 
 
       
+    }
+
+    private async Task<string> GetActiveSlide()
+    {
+        var activeElement = await JsRuntime.InvokeAsync<ElementReference>("eval", "$('.carousel-item.active')[0]");
+
+        var index = await JsRuntime.InvokeAsync<string>("jQuery", activeElement);
+
+//        var index = await JsRuntime.InvokeAsync<int>("jQuery", activeElement).InvokeAsync<int>("index", CancellationToken.None);
+        return index;
     }
 
     //protected override async Task OnAfterRenderAsync(bool firstRender)
