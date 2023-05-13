@@ -81,7 +81,7 @@
 
                         <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                    Filled=@Filled(item) />
+                                        Variant=@Filled(item) />
 
                             <div>
                                 @item.Likes.Count()
@@ -299,6 +299,7 @@
         //{
             await InvokeAsync(StateHasChanged).ConfigureAwait(true);
             await Task.Delay(300).ConfigureAwait(false);
+
             return false;
         //}
 
@@ -308,18 +309,19 @@
 
         //}
 
-        return true;
+       // return true;
 
     }
 
 
-    private bool Filled(KudosResponse item)
+    private IconVariant Filled(KudosResponse item)
     {
-        bool filled = false;
+        IconVariant filled = IconVariant.Regular;
 
         @if (User != null)
         {
-          filled =  item.Likes.Any(l => l.Id == User.ObjectId);
+            if (item.Likes.Any(l => l.Id == User.ObjectId))
+                filled = IconVariant.Filled;
         }
 
         return filled;

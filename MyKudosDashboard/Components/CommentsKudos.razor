@@ -11,13 +11,18 @@
 
 <FluentDialog @ref=_replyKudosFluentDialog
                 TrapFocus="true" aria-label="Simple dialog" Modal="true"
-                class="both-gradient"  style="--dialog-height: 600px;--dialog-width: 620px;"
+                class="both-gradient"  style="--dialog-height: 640px;--dialog-width: 640px;"
                 Hidden=@ModalHidden
                 >
 
-    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height: 98%;overflow-y:scroll;margin:5px;width:98%;">
+    <button style="float:right;padding-right:5px" type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=@(() => CloseClick())>
+            <span aria-hidden="true">&times;</span>
+        </button>
 
-    
+    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height: 94%;overflow-y:scroll;margin:5px;width:98%;">
+
+       
+
         @if (_item != null)
         {
             <table class="table" style="width:98%;margin:5px">
@@ -66,12 +71,51 @@
                                  
                                 </ul>
                             </div>
-                        </div>          
+                        </div>
+                            <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
+                                @_item.Message
+                            </div>
+
+                            <div style="float:right">
+
+
+                                <FluentButton style="margin-left:20px;">
+                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                    <div @ref=_numberOfComments>@_item.Comments.Count()</div>
+
+                                </FluentButton>
+
+                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
+                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
+                                            Variant=@FilledLikeKudos(_item) />
+                                    @_item.Likes.Count()
+                                </FluentButton>
+
+                                <FluentTooltip Anchor=@($"Details_{_item.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+
+                                    @if (_item.Likes.Count() > 0)
+                                    {
+                                        <ul class="list-unstyled ">
+                                            @foreach (var like in _item.Likes)
+                                            {
+                                                <li>
+                                                    <div>
+                                                        <img src=@like.Photo
+                                                             style="height: 26px;width: 26px;border-radius: 50%;" />
+                                                        <span style="margin-left:5px">@like.Name</span>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </FluentTooltip>
+
+                            </div>
 
                     </td>
 
                 </tr>
-                    <tr>
+             @*       <tr>
                         <td scope="row">
 
                             <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
@@ -89,7 +133,7 @@
 
                                 <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
                                     <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                            Filled=@FilledLikeKudos(_item) />
+                                            Variant=@FilledLikeKudos(_item) />
                                     @_item.Likes.Count()
                                 </FluentButton>
 
@@ -116,7 +160,7 @@
                            
                         </td>
 
-                    </tr>
+                    </tr>*@
 
                     
                     <tr>
@@ -130,13 +174,15 @@
                                 </div>
 
                                 <div style="width:520px;">
-                                    <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize="TextAreaResize.Vertical" onchange=@PostValueChanged 
-                                                    Value=@_replyMessage/>
+                                  @*  <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize=TextAreaResize.Vertical @onchange=@PostValueChanged 
+                                                    Value=@_replyMessage/>*@
+
+                                    <textarea class="form-control" style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged>@_replyMessage</textarea>
                                 </div>
                             </div>
 
                             <FluentButton style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick())>
-                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=true />
+                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Filled />
                                 @Localizer["Post"]
                             </FluentButton>
                         </td>
@@ -160,9 +206,9 @@
 
                                             <li>
 
-                                                <ReplyControl Comment=@comment User=User UserPhoto=@_userPhoto
-                                                                deleteCommentCallBack=@DeleteComment 
-                                                                updateCommentCallBack=@UpdateComment/>
+                                                <ReplyControl Reply=@comment ReplyUser=@User ReplyUserPhoto=@_userPhoto 
+                                                  replyDeleteCommentCallBack=@DeleteComment
+                                                  replyUpdateCommentCallBack=@UpdateCommentCallBack />
 
                                                 @*<div style="float:left;margin-left:37px">
 
@@ -262,13 +308,14 @@
     }
 
 
-    private bool FilledLikeKudos(KudosResponse item)
+    private IconVariant FilledLikeKudos(KudosResponse item)
     {
-        bool filled = false;
+        IconVariant filled = IconVariant.Regular;
 
         @if (User != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+            if (item.Likes.Any(l => l.Id == User.ObjectId))
+                filled = IconVariant.Filled;
         }
 
         return filled;
@@ -430,7 +477,7 @@
         });
     }
 
-    public void UpdateComment(CommentsResponse comments)
+    public void UpdateCommentCallBack(CommentsResponse comments)
     {
         CommentsView.UpdateComments(comments, _item.To.Id);
     }

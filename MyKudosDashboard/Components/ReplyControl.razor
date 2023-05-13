@@ -56,14 +56,16 @@
 <div style="display: flex;padding-bottom: 0px">
 
     <div style="width:50px;margin-top:5px;padding-top: 15px">
-        <img src=@Comment.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
+        <img src=@Reply.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
     </div>
 
     <div style="width:460px;display: flex;">
 
-        <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly=@_isReplyCommendReadOnly
-                        Value=@Comment.Message Spellcheck="true"
-                        onchange=@PostValueChanged> @Comment.FromPerson.Name</FluentTextArea>
+        @*<FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly=@_isReplyCommendReadOnly
+                        Value=@Reply.Message Spellcheck="true"
+                        onchange=@PostValueChanged> @Reply.FromPerson.Name</FluentTextArea>*@
+
+        <textarea class="form-control" Readonly=@_isReplyCommendReadOnly style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged>@Reply.Message</textarea>
 
 
         @if (CanEditOrDeleteComment())
@@ -75,12 +77,12 @@
                 <div class="dropdown-content">
                     <a href="#" @onclick=EditReplyOnClick>
                         <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
-                                    Filled=true />
+                                    Variant=IconVariant.Filled/>
                     
                     </a>
                     <a href="#" @onclick=DeleteReplyOnClick>
                         <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
-                                    Filled=true />
+                                    Variant=IconVariant.Filled />
                     
                     </a>
                 
@@ -95,24 +97,24 @@
 
 <div style="float:left;margin-left:37px;padding-top: 0px">
 
-    <FluentButton   id=@($"reply_{@Comment.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
-                    @onclick=@(()=>LikeComment(Comment))>
+    <FluentButton   id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
+                    @onclick=@(()=>LikeComment(Reply))>
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                    Filled=@FilledLikeComments(@Comment) />
-        <div @ref=_numberOfLikeComments>@Comment.Likes.Count()</div>
+                    Filled=@FilledLikeComments(@Reply) />
+        <div @ref=_numberOfLikeComments>@Reply.Likes.Count()</div>
         
     </FluentButton>
 
-    <FluentTooltip Anchor=@($"reply_{Comment.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+    <FluentTooltip Anchor=@($"reply_{Reply.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
 
-        @*<div @ref=tooltipLikes[Comment.Id]>
+        @*<div @ref=tooltipLikes[Reply.Id]>
 
                             </div>*@
 
-        @if (Comment.Likes.Count() > 0)
+        @if (Reply.Likes.Count() > 0)
         {
             <ul class="list-unstyled ">
-                @foreach (var like in Comment.Likes)
+                @foreach (var like in Reply.Likes)
                 {
                     <li>
                         <div>
@@ -134,12 +136,12 @@
     @if(_isReplyCommendReadOnly == false)
     {
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=false />
+            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Regular />
             Save Changes
         </FluentButton>
 
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=false />
+            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Regular  />
             Cancel
         </FluentButton>
     }
@@ -150,23 +152,23 @@
 @code {
 
     [Parameter]
-    public string UserPhoto { get; set; }
+    public string ReplyUserPhoto { get; set; }
 
     [Parameter]
-    public CommentsResponse Comment { get; set; }
+    public CommentsResponse Reply { get; set; }
 
     [Parameter]
-    public UserInfo User { get; set; }
+    public UserInfo ReplyUser { get; set; }
 
     public delegate void DeleteCommentCallBack(CommentsResponse comments);
 
     [Parameter]
-    public DeleteCommentCallBack deleteCommentCallBack { get; set; }
+    public DeleteCommentCallBack replyDeleteCommentCallBack { get; set; }
 
     public delegate void UpdateCommentCallBack(CommentsResponse comments);
 
     [Parameter]
-    public UpdateCommentCallBack updateCommentCallBack { get; set; }
+    public UpdateCommentCallBack replyUpdateCommentCallBack { get; set; }
 
     private bool _isReplyCommendReadOnly=true;
 
@@ -177,22 +179,15 @@
     private Dictionary<string, ElementReference> tooltipLikes = new();
 
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //foreach (var item in Comment.Likes)
-        //{
-        //    await UpdateNumberOfLikeComments();
-        //}
-
-    }
+   
 
     private bool FilledLikeComment(KudosResponse item)
     {
         bool filled = false;
 
-        @if (User != null)
+        @if (ReplyUser != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+            filled = item.Likes.Any(l => l.Id == ReplyUser.ObjectId);
         }
 
         return filled;
@@ -200,16 +195,16 @@
 
     private bool CanEditOrDeleteComment()
     {
-        return (Comment.FromPerson.Id == User.ObjectId);
+        return (Reply.FromPerson.Id == ReplyUser.ObjectId);
     }
 
     private bool FilledLikeComments(CommentsResponse item)
     {
         bool filled = false;
 
-        @if (User != null)
+        @if (ReplyUser != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+            filled = item.Likes.Any(l => l.Id == ReplyUser.ObjectId);
         }
 
         return filled;
@@ -218,16 +213,16 @@
     private async void LikeComment(CommentsResponse item)
     {
 
-        if (item.Likes.Any(l => l.Id == User.ObjectId))
+        if (item.Likes.Any(l => l.Id == ReplyUser.ObjectId))
         {
             await ReplyView.SendUndoLikeAsync(
                     new LikeComment(
                        KudosId: item.KudosId,
                        FromPerson: new Person
                             {
-                                Id = User.ObjectId,
-                                Name = User.DisplayName,
-                                Photo = UserPhoto
+                                Id = ReplyUser.ObjectId,
+                                Name = ReplyUser.DisplayName,
+                                Photo = ReplyUserPhoto
                             }
                    )
                );            
@@ -239,39 +234,39 @@
                       KudosId: item.KudosId,
                       FromPerson: new Person
                           {
-                              Id = User.ObjectId,
-                              Name = User.DisplayName,
-                              Photo = UserPhoto
+                              Id = ReplyUser.ObjectId,
+                              Name = ReplyUser.DisplayName,
+                              Photo = ReplyUserPhoto
                           }
                   )
               );
         }
 
-        await UpdateLikes(item.Id, User.ObjectId);
+        await UpdateLikes(item.Id, ReplyUser.ObjectId);
 
     }
 
     private async Task UpdateLikes(string commentId, string personId)
     {
 
-        if (Comment.Id == commentId)
+        if (Reply.Id == commentId)
         {
-            var like = Comment.Likes.Where(k => k.Id == personId).FirstOrDefault();
+            var like = Reply.Likes.Where(k => k.Id == personId).FirstOrDefault();
 
 
-            if ((like is null) || (!Comment.Likes.Contains(like)))
+            if ((like is null) || (!Reply.Likes.Contains(like)))
             {
 
-                Comment.Likes.Add(new Person()
+                Reply.Likes.Add(new Person()
                     {
                         Id = personId,
-                        Name = User.DisplayName,
-                        Photo = UserPhoto
+                        Name = ReplyUser.DisplayName,
+                        Photo = ReplyUserPhoto
                     });
             }
             else
             {
-                Comment.Likes.Remove(like);
+                Reply.Likes.Remove(like);
             }
 
             await UpdateNumberOfLikeComments();
@@ -281,27 +276,12 @@
     public async Task UpdateNumberOfLikeComments()
     {
 
-        if (Comment != null)
+        if (Reply != null)
         {            
             await JSRuntime.InvokeVoidAsync(
-               "updateCount", _numberOfLikeComments, Comment.Likes.Count);
+               "updateCount", _numberOfLikeComments, Reply.Likes.Count);
 
-            //var innerHtmlToolTip = "<ul class='list-unstyled'>";
-
-            //foreach (var like in Comment.Likes)
-            //{
-            //    innerHtmlToolTip += $"<li><div><img src={like.Photo} style='height: 26px;width: 26px;border-radius: 50%;'/> <span style='margin-left:5px'>{like.Name}</span></div></li>";
-            //}
-
-            //innerHtmlToolTip += "</ul>";
-
-            //if (tooltipLikes.ContainsKey(Comment.Id))
-            //{
-            //    await JSRuntime.InvokeVoidAsync(
-            //      "updateToolTipLikes", tooltipLikes[Comment.Id], innerHtmlToolTip);
-            //}
-            
-
+           
         }
 
     }
@@ -317,19 +297,19 @@
 
         _isReplyCommendReadOnly = false;
 
-        _originalMessage = Comment.Message;
+        _originalMessage = Reply.Message;
 
     }
 
     private void DeleteReplyOnClick()
     {
-        deleteCommentCallBack?.Invoke(Comment);
+        replyDeleteCommentCallBack?.Invoke(Reply);
     }
 
     private void CancelEditMessageClick()
     {
         _isReplyCommendReadOnly = true;
-        Comment.Message = _originalMessage;
+        Reply.Message = _originalMessage;
 
     }
 
@@ -337,9 +317,9 @@
     {
         _isReplyCommendReadOnly = true;
 
-        Comment.Message = _updatedComment;
+        Reply.Message = _updatedComment;
 
-        updateCommentCallBack?.Invoke(Comment);
+        replyUpdateCommentCallBack?.Invoke(Reply);
     }
 
     private void PostValueChanged(ChangeEventArgs args)

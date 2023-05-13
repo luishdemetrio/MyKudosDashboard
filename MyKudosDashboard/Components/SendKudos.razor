@@ -23,7 +23,6 @@
         margin-top: 20px;
         margin-left: 0px;
         margin-right: 10px;
-        
     }
 
     .both-gradient {
@@ -39,39 +38,44 @@
         --scroll-align: flex-end
     }
 
-/*    span.carousel-control-next-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23ff0000' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath d='M2.75 0l-1.5 1.5L3.75 4l-2.5 2.5L2.75 8l4-4-4-4z'/%3e%3c/svg%3e");
-    }
+    /*    span.carousel-control-next-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23ff0000' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath d='M2.75 0l-1.5 1.5L3.75 4l-2.5 2.5L2.75 8l4-4-4-4z'/%3e%3c/svg%3e");
+        }
 
-    span.carousel-control-prev-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23ff0000' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath d='M5.25 0l-4 4 4 4 1.5-1.5L4.25 4l2.5-2.5L5.25 0z'/%3e%3c/svg%3e");
+        span.carousel-control-prev-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23ff0000' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath d='M5.25 0l-4 4 4 4 1.5-1.5L4.25 4l2.5-2.5L5.25 0z'/%3e%3c/svg%3e");
 
-    }*/
+        }*/
 </style>
 
-<FluentDialog   @ref=SendKudosFluentDialog
-                TrapFocus="true" aria-label="Simple dialog" Modal="true" 
-                class="both-gradient"  style="--dialog-height: 640px;--dialog-width: 680px;"   
-                Hidden=@ModalHidden
-                >
+<FluentDialog @ref=SendKudosFluentDialog
+              TrapFocus="true" aria-label="Simple dialog" Modal="true"
+              class="both-gradient" style="--dialog-height: 640px;--dialog-width: 680px;"
+              Hidden=@ModalHidden>
 
-<div style="margin:10px;">
+    <div style="margin:10px;" >
 
-        <h5>👏 @Localizer["SendKudosToPeople"]</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">👏 @Localizer["SendKudosToPeople"]</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=@(() => Hide())>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            </div>
+       
 
         <table class="table">
             <tbody>
                 <tr>
                     <td scope="row">
-                      
+
                         <p style="margin-bottom: 5px;">@Localizer["SelectColleague"]</p>
-                    
-                         <BlazoredTypeahead SearchMethod="@SearchEmployees"
+
+                        <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
-                                           Debounce="500" style="witdht:80px"
-                                           
-                                           >
-                            <SelectedTemplate >
+                                           Debounce="500" style="witdh:100%">
+                            <SelectedTemplate>
                                 @if (string.IsNullOrEmpty(context.Photo))
                                 {
                                     <span style="margin-left:5px">@context.Name</span>
@@ -84,28 +88,28 @@
                                         <span style="margin-left:5px">@context.Name</span>
                                     </div>
                                 }
-                                
-                                
+
+
                             </SelectedTemplate>
-                            <ResultTemplate >
-                                  @if (string.IsNullOrEmpty(context.Photo))
+                            <ResultTemplate>
+                                @if (string.IsNullOrEmpty(context.Photo))
                                 {
                                     <span style="margin-left:5px">@context.Name</span>
                                 }
                                 else
                                 {
-                                <div>
-                                    <img src=@context.Photo
-                                         style="height: 26px;width: 26px;border-radius: 50%;" />
-                                    <span style="margin-left:5px">@context.Name</span>
-                                </div>
+                                    <div>
+                                        <img src=@context.Photo
+                                             style="height: 26px;width: 26px;border-radius: 50%;" />
+                                        <span style="margin-left:5px">@context.Name</span>
+                                    </div>
                                 }
                             </ResultTemplate>
                             <NotFoundTemplate>
                                 @Localizer["SorryNoResultsFound"]
                             </NotFoundTemplate>
                         </BlazoredTypeahead>
-                   
+
 
                     </td>
 
@@ -114,60 +118,42 @@
                     <td scope="row">
 
                         <p style="margin-bottom: 5px;">@Localizer["Category"]</p>
-                        
+
                         @if (recognitions != null)
                         {
-                           @* <FluentHorizontalScroll Speed="600" Easing=ScrollEasing.EaseInOut class="both-gradient" style="margin-top:5px"  >
-
-                                @foreach (var item in recognitions.OrderBy(r => r.DisplayOrder))
-                                {
-
-                                    <div class="@(item.IsSelected ? "card border border-primary " : "card ")"
-                                         style="width:120px;height: 120px">
-
-                                        <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:small;overflow-wrap: break-word;" data-toggle="tooltip" data-placement="top" title=@item.Description>
-                                            <h3 style="text-align:center;margin-bottom: 0px;">@item.Emoji</h3>
-                                            <span class="btn stretched-link" style="float: left;padding-top:2px;padding-left:0px;Segoe UI';font-size:small"
-                                          @onclick=@(() => RecognitionClick(item))>@item.Title</span>
-
-                                            
-                                        </div>
-                                    </div>
-
-                                    
-                                }
-
-
-                            </FluentHorizontalScroll>*@
+                           
 
                             <div id="myCarousel" class="carousel carousel-dark slide" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
-                                <div class="carousel-inner" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;">
 
-                                    
+                             
+
+                                <div class="carousel-inner" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:100%">
+
+                                  
                                     @for (int i = 0; i < recognitions.Count(); i++)
                                     {
 
-                                    <div id=@recognitions.ElementAt(i).Id class="@(i == 0 ? "carousel-item active" : "carousel-item")"
-                                            style="padding-left: 0px;padding-right: 0px;">
+                                        <div id=@recognitions.ElementAt(i).Id class="@(i == 0 ? "carousel-item active" : "carousel-item")"
+                                             style="padding-left: 0px;padding-right: 0px;">
 
-                                        <div class="bd-placeholder-img bd-placeholder-img-lg d-block w-100">
+                                            <div class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" style="overflow-wrap: break-word;">
 
                                                 <div class="@(recognitions.ElementAt(i).IsSelected ? "card border border-primary " : "card ")"
-                                                 style="width:600px;height: 120px;">
+                                                     style="width:100%;height: 140px;overflow-wrap: break-word;">
 
-                                                <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:small;overflow-wrap: break-word;"
-                                                     data-toggle="tooltip" data-placement="top"
+                                                    <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:small"
+                                                         data-toggle="tooltip" data-placement="top"
                                                          title=@recognitions.ElementAt(i).Description>
 
-                                                        
 
-                                                    <h5  style="float: left;padding-top:2px;padding-left:0px;text-align:center;width:100%">
+
+                                                        <h5 style="float: left;padding-top:2px;padding-left:0px;text-align:center;width:100%">
                                                             @recognitions.ElementAt(i).Emoji @recognitions.ElementAt(i).Title
                                                         </h5>
 
-                                                        <span class="btn stretched-link" style="float: left;padding-top:2px;padding-left:0px;font-size:medium;text-align:center;width:100%"
-                                                      >@recognitions.ElementAt(i).Description</span>
+                                                        <span style="float: left;padding-top:2px;padding-left:0px;font-size:medium;text-align:center;overflow-wrap: break-word;">@recognitions.ElementAt(i).Description</span>
 
+                                                        <span style="float: left;padding-top:5px;padding-left:0px;font-size:small;text-align:center;width:100%">@i / @(recognitions.Count())</span>
 
                                                     </div>
                                                 </div>
@@ -175,60 +161,35 @@
                                         </div>
 
 
-                                        }
+                                    }
 
-                                  @*  @foreach (var item in recognitions.OrderBy(r => r.DisplayOrder))
-                                    {
-                                        <div class="carousel-item " style="padding-left: 0px;padding-right: 0px;">
-                                                <div class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" >
-                                                    <div class="@(item.IsSelected ? "card border border-primary " : "card ")"
-                                                         style="width:600px;height: 120px;background-color:lightgray">
-
-                                                        <div style="padding:0px;padding-top:2px;font-family:'Segoe UI';font-size:small;overflow-wrap: break-word;" data-toggle="tooltip" data-placement="top" title=@item.Description>
-                                                            <h3 style="text-align:center;margin-bottom: 0px;">@item.Emoji</h3>
-                                                            <span class="btn stretched-link" style="float: left;padding-top:2px;padding-left:0px;Segoe UI';font-size:small;text-forecolor:white"
-                                                          @onclick=@(() => RecognitionClick(item))>@item.Title</span>
-
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        </div>
-
-                                    }*@
-
-                                  @*
-
-                                    <div class="carousel-item">
-                                        <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Third slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#555"></rect><text x="50%" y="50%" fill="#333" dy=".3em">Third slide</text></svg>
-                                    </div>*@
 
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev" >
-                                    <span class="carousel-control-prev-icon" aria-hidden="true" ></span>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">Previous</span>
                                 </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                                <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">Next</span>
                                 </button>
                             </div>
                         }
                     </td>
-                   
+
                 </tr>
 
                 <tr>
-                    <td scope="row" >
+                    <td scope="row">
 
                         <p style="margin-bottom: 5px;">@Localizer["Message"]</p>
-                        
+
                         <div class="input-group">
-                           
+
                             <textarea class="form-control" aria-label="With textarea" style="height:160px"
                                       @onchange="KudosMessageChanged" value=@KudosMessage />
-                                
-                            
+
+
                         </div>
 
                     </td>
@@ -236,17 +197,18 @@
                 </tr>
 
                 <tr>
-                   
-                    <td scope="row" >
+
+                    <td scope="row">
 
                         @if (isLoading)
                         {
                             <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
-                       
-                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                 📩 @Localizer["Send"]
-                        </button>
-                        }else
+                            </button>
+                        }
+                        else
                         {
                             <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
                                 📩 @Localizer["Send"]
@@ -263,7 +225,7 @@
             </tbody>
         </table>
 
-        
+
     </div>
 
 </FluentDialog>
@@ -304,7 +266,7 @@
         recognitions = await SendKudosView.GetRecognitionsAsync();
 
 
-      
+
     }
 
     private async Task<string> GetActiveSlide()
@@ -313,7 +275,7 @@
 
         var index = await JsRuntime.InvokeAsync<string>("jQuery", activeElement);
 
-//        var index = await JsRuntime.InvokeAsync<int>("jQuery", activeElement).InvokeAsync<int>("index", CancellationToken.None);
+        //        var index = await JsRuntime.InvokeAsync<int>("jQuery", activeElement).InvokeAsync<int>("index", CancellationToken.None);
         return index;
     }
 
@@ -362,7 +324,7 @@
     }
 
     private Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
-    {   
+    {
         return SendKudosView.GetUsersAsync(searchText);
 
     }
@@ -438,7 +400,7 @@
 
         if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
         {
-           
+
             await InvokeAsync(() =>
              {
                  BlockSendButton(false);
@@ -448,24 +410,24 @@
              });
 
 
-            }
-        
+        }
+
     }
 
     private void ClearFields()
     {
-        
+
     }
 
-    
+
 
     public void Hide()
     {
         ModalHidden = true;
         SendKudosFluentDialog!.Hide();
-         
-        
-            
+
+
+
     }
 
     private void OnDismiss()
