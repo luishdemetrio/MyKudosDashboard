@@ -11,7 +11,7 @@
     <FluentEmojiGroups>Activities,Animals_Nature,Flags,Food_Drink,Objects,People_Body,Smileys_Emotion,Symbols,Travel_Places</FluentEmojiGroups>
     <FluentEmojiStyles>Color,Flat,HighContrast</FluentEmojiStyles>
 
-    <IsCompilersToolsetPackageReferenced>true</IsCompilersToolsetPackageReferenced>
+    
     
   </PropertyGroup>
 

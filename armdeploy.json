@@ -62,30 +62,30 @@
 
 
 
-    "hostingPlanSku": {
-      "type": "string",
-      "allowedValues": [
-        "Basic",
-        "Standard",
-        "Premium"
-      ],
-      "defaultValue": "Standard",
-      "metadata": {
-        "description": "The pricing tier for the hosting plan."
-      }
-    },
-    "hostingPlanSize": {
-      "type": "string",
-      "allowedValues": [
-        "1",
-        "2",
-        "3"
-      ],
-      "defaultValue": "3",
-      "metadata": {
-        "description": "The size of the hosting plan (small, medium, or large)."
-      }
-    },
+    //"hostingPlanSku": {
+    //  "type": "string",
+    //  "allowedValues": [
+    //    "Basic",
+    //    "Standard",
+    //    "Premium"
+    //  ],
+    //  "defaultValue": "Standard",
+    //  "metadata": {
+    //    "description": "The pricing tier for the hosting plan."
+    //  }
+    //},
+    //"hostingPlanSize": {
+    //  "type": "string",
+    //  "allowedValues": [
+    //    "1",
+    //    "2",
+    //    "3"
+    //  ],
+    //  "defaultValue": "3",
+    //  "metadata": {
+    //    "description": "The size of the hosting plan (small, medium, or large)."
+    //  }
+    //},
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -377,7 +377,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
@@ -611,7 +611,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
@@ -804,13 +804,13 @@
       "name": "[variables('appserviceplan')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[if(variables('isSharedPlan'), concat(variables('skuFamily'), '1'), concat(variables('skuFamily'), parameters('hostingPlanSize')))]",
-        "tier": "[parameters('hostingPlanSku')]",
-        "size": "[concat(variables('skuFamily'), parameters('hostingPlanSize'))]",
-        "family": "[variables('skuFamily')]",
+        "name": "P1v3",
+        "tier": "PremiumV3",
+        "size": "P1v3",
+        "family": "Pv3",
         "capacity": 1
       },
-      "kind": "app",
+      "kind": "linux",
       "properties": {
         "perSiteScaling": false,
         "elasticScaleEnabled": false,
@@ -992,7 +992,7 @@
           "default.aspx",
           "index.php"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
         "remoteDebuggingVersion": "VS2019",
@@ -1448,7 +1448,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
@@ -1663,7 +1663,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
@@ -1907,7 +1907,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
@@ -2041,7 +2041,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v6.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,
@@ -2347,7 +2347,7 @@
           "index.php",
           "hostingstart.html"
         ],
-        "netFrameworkVersion": "v4.0",
+        "netFrameworkVersion": "v7.0",
         "phpVersion": "5.6",
         "requestTracingEnabled": false,
         "remoteDebuggingEnabled": false,

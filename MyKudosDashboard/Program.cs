@@ -60,6 +60,7 @@ builder.Services.AddFluentUIComponents(configUI);
 
 
 
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
