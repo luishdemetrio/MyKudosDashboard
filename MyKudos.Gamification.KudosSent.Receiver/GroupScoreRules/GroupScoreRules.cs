@@ -80,9 +80,11 @@ public class GroupScoreRules : IGroupScoreRules
                 var all = score.GroupOne * score.GroupTwo * score.GroupThree * score.GroupFour * score.GroupFive;
 
                 if ((all != 0) && (all != null))
+                {
                     score.GroupAll = _allGroupCompletedScore;
 
-                await _groupUserScoreService.UpdateGroupScoreAsync(score);
+                    await _groupUserScoreService.UpdateGroupScoreAsync(score);
+                }
             }
 
             await _scoreQueue.NotifyProfileScoreUpdated(score);
