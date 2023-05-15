@@ -11,7 +11,7 @@
 @inject IJSRuntime JSRuntime
 
     @*style="height:68.7vh;overflow-y:scroll;width:100%">*@
-<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="z-index: ;min-height:500px;height:80vh;overflow-y:scroll;width:100%;overflow:auto">
+<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="z-index: auto ;min-height:500px;height:80vh;overflow-y:scroll;width:100%;overflow:auto">
 
     
     <InfiniteScroll ObserverTargetId="observerTarget"
@@ -379,7 +379,7 @@
     {
 
         ReplyCallBack?.Invoke(kudos);
-
+        await Task.CompletedTask;
     }
 
 

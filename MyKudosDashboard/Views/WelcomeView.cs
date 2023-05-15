@@ -87,7 +87,7 @@ public class WelcomeView : IWelcomeView
 
     private async Task _serviceBusScoreProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
     {
-        
+        await Task.CompletedTask;
     }
 
     private async Task _serviceBusScoreProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)

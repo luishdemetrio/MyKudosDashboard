@@ -91,7 +91,7 @@ app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
+ app.UseEndpoints(endpoints =>
 {
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
