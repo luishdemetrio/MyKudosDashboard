@@ -1,17 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    
-    <PublishFluentIconAssets>true</PublishFluentIconAssets>
-    <FluentIconSizes>10,12,16,20,24,28,32,48</FluentIconSizes>
-    <FluentIconVariants>Filled,Regular</FluentIconVariants>
-    <PublishFluentEmojiAssets>true</PublishFluentEmojiAssets>
-    <FluentEmojiGroups>Activities,Animals_Nature,Flags,Food_Drink,Objects,People_Body,Smileys_Emotion,Symbols,Travel_Places</FluentEmojiGroups>
-    <FluentEmojiStyles>Color,Flat,HighContrast</FluentEmojiStyles>
-
-    
     
   </PropertyGroup>
 
@@ -25,20 +16,13 @@
     <Content Remove="build/**/*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <CompilerVisibleProperty Include="PublishFluentIconAssets" />
-    <CompilerVisibleProperty Include="PublishFluentEmojiAssets" />
-    <CompilerVisibleProperty Include="FluentEmojiStyles" />
-    <CompilerVisibleProperty Include="FluentEmojiGroups" />
-    <CompilerVisibleProperty Include="FluentIconSizes" />
-    <CompilerVisibleProperty Include="FluentIconVariants" />
-  </ItemGroup>
+  
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.5" />
     <PackageReference Include="Microsoft.Graph" Version="4.44.0" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="2.3.0"  PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.5.3" />
     <PackageReference Include="Microsoft.TeamsFx" Version="1.2.*" />
     
     

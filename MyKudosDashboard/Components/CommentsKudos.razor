@@ -87,7 +87,7 @@
 
                                 <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
                                     <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                            Variant=@FilledLikeKudos(_item) />
+                                            Filled=@FilledLikeKudos(_item) />
                                     @_item.Likes.Count()
                                 </FluentButton>
 
@@ -145,7 +145,7 @@
 
                        
                             <FluentButton style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick()) disabled=@btnSendKudosDisabled>
-                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Filled />
+                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=true />
                                 @Localizer["Post"]
                                 </FluentButton>
                           
@@ -275,14 +275,13 @@
     }
 
 
-    private IconVariant FilledLikeKudos(KudosResponse item)
+    private bool FilledLikeKudos(KudosResponse item)
     {
-        IconVariant filled = IconVariant.Regular;
+        bool filled = false;
 
         @if (User != null)
         {
-            if (item.Likes.Any(l => l.Id == User.ObjectId))
-                filled = IconVariant.Filled;
+            filled = item.Likes.Any(l => l.Id == User.ObjectId);
         }
 
         return filled;

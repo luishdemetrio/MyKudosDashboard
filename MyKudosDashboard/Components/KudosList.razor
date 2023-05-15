@@ -81,7 +81,7 @@
 
                         <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                        Variant=@Filled(item) />
+                                    Filled=@Filled(item) />
 
                             <div>
                                 @item.Likes.Count()
@@ -314,14 +314,13 @@
     }
 
 
-    private IconVariant Filled(KudosResponse item)
+    private bool Filled(KudosResponse item)
     {
-        IconVariant filled = IconVariant.Regular;
+        bool filled = false;
 
         @if (User != null)
         {
-            if (item.Likes.Any(l => l.Id == User.ObjectId))
-                filled = IconVariant.Filled;
+            filled = item.Likes.Any(l => l.Id == User.ObjectId);
         }
 
         return filled;
