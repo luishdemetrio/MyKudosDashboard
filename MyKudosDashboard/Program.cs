@@ -59,6 +59,7 @@ LibraryConfiguration configUI = new(Microsoft.Fast.Components.FluentUI.Configura
 builder.Services.AddFluentUIComponents(configUI);
 
 
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

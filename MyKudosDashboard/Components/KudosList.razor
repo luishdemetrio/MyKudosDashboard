@@ -424,7 +424,8 @@
 
     private async Task GetMoreKudos()
     {
-        await MoreKudosCallback?.Invoke();
+        if (MoreKudosCallback !=null)
+        await MoreKudosCallback.Invoke();
     }
 
 
