@@ -55,44 +55,59 @@
 
 <div style="display: flex;padding-bottom: 0px">
 
-    <div style="width:50px;margin-top:5px;padding-top: 15px">
-        <img src=@Reply.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
-    </div>
+    <div style="height: auto">
+        <div style="width:50px;margin-top:0px;padding-top: 5px">
+            <img src=@Reply.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
+        </div>
 
-    <div style="width:460px;display: flex;">
+        <div style="width:460px;display: flex;margin-bottom: 0px;">
 
-        @*<FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly=@_isReplyCommendReadOnly
-                        Value=@Reply.Message Spellcheck="true"
-                        onchange=@PostValueChanged> @Reply.FromPerson.Name</FluentTextArea>*@
+            @*<FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Readonly=@_isReplyCommendReadOnly
+                            Value=@Reply.Message Spellcheck="true"
+                            onchange=@PostValueChanged> @Reply.FromPerson.Name</FluentTextArea>*@
 
-        <textarea class="form-control" Readonly=@_isReplyCommendReadOnly style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged>@Reply.Message</textarea>
+           @* <textarea class="form-control" Readonly=@_isReplyCommendReadOnly style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged>@Reply.Message</textarea>*@
 
-
-        @if (CanEditOrDeleteComment())
-        {
+            <div class="form-group" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;">
+                <label for="formGroupExampleInput2">@Reply.FromPerson.Name</label>
+                <textarea  type="text" class="form-control" 
+                           Readonly=@_isReplyCommendReadOnly
+                          style="margin-left:1px;margin-top:0px;width:420px;border:none;background-color:#e9ecef; overflow-y:auto"
+                          @onchange=PostValueChanged>          
+                    @Reply.Message
+                </textarea>
             
-        
-            <div class="dropdown" style="margin-top: 5px;">
-                <button class="dropbtn">...</button>
-                <div class="dropdown-content">
-                    <a href="#" @onclick=EditReplyOnClick>
-                        <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
-                                    Variant=IconVariant.Filled/>
-                    
-                    </a>
-                    <a href="#" @onclick=DeleteReplyOnClick>
-                        <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
-                                    Variant=IconVariant.Filled />
-                    
-                    </a>
-                
-                </div>
             </div>
 
-        }
+            @if (CanEditOrDeleteComment())
+            {
+
+
+                <div class="dropdown" style="margin-top: 0px;padding: 0px">
+                    <button class="dropbtn" style="margin-top: 0px;">
+                        ...
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#" @onclick=EditReplyOnClick>
+                            <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
+                                        Variant=IconVariant.Filled/>
+                    
+                        </a>
+                        <a href="#" @onclick=DeleteReplyOnClick>
+                            <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
+                                        Variant=IconVariant.Filled />
+                    
+                        </a>
+                
+                    </div>
+                </div>
+
+            }
+
+
+        </div>
 
     </div>
-
 </div>
 
 <div style="float:left;margin-left:37px;padding-top: 0px">

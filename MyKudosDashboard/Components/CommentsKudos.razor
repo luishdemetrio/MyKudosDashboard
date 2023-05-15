@@ -115,54 +115,7 @@
                     </td>
 
                 </tr>
-             @*       <tr>
-                        <td scope="row">
-
-                            <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
-                                @_item.Message
-                            </div>
-
-                            <div style="float:right">
-
-
-                                <FluentButton style="margin-left:20px;">
-                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                    <div @ref=_numberOfComments>@_item.Comments.Count()</div>
-                                    
-                                </FluentButton>
-
-                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
-                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                            Variant=@FilledLikeKudos(_item) />
-                                    @_item.Likes.Count()
-                                </FluentButton>
-
-                                <FluentTooltip Anchor=@($"Details_{_item.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
-
-                                    @if (_item.Likes.Count() > 0)
-                                    {
-                                        <ul class="list-unstyled ">
-                                            @foreach (var like in _item.Likes)
-                                            {
-                                                <li>
-                                                    <div>
-                                                        <img src=@like.Photo
-                                                             style="height: 26px;width: 26px;border-radius: 50%;" />
-                                                        <span style="margin-left:5px">@like.Name</span>
-                                                    </div>
-                                                </li>
-                                            }
-                                        </ul>
-                                    }
-                                </FluentTooltip>
-
-                            </div>
-                           
-                        </td>
-
-                    </tr>*@
-
-                    
+           
                     <tr>
 
                         <td scope="row">
@@ -173,18 +126,29 @@
                                     <img src=@_userPhoto style="height:40px;width:40px;float:left;border-radius: 50%" />
                                 </div>
 
-                                <div style="width:520px;">
-                                  @*  <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize=TextAreaResize.Vertical @onchange=@PostValueChanged 
-                                                    Value=@_replyMessage/>*@
-
-                                    <textarea class="form-control" style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged>@_replyMessage</textarea>
+                                <div class="form-group" style="width:520px;">
+                                    <label for="formGroupExampleInput2">@_item.To.Name</label>
+                                    <input type="text" class="form-control" id="formGroupExampleInput2" style="margin-left:1px;margin-top:5px;width:100%" placeholder="Another input" onchange=@PostValueChanged value=@_replyMessage>
                                 </div>
+
+                               @*  <div style="width:520px;">
+                                    <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize="TextAreaResize.Vertical"  onchange=@PostValueChanged 
+                                                    Value=@_replyMessage/>
+                                </div>*@
+
+                              @*  <div style="width:520px;">
+                               
+
+                                    <textarea class="form-control" style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged >@_replyMessage</textarea>
+                                </div>*@
                             </div>
 
-                            <FluentButton style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick())>
+                       
+                            <FluentButton style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick()) disabled=@btnSendKudosDisabled>
                                 <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Filled />
                                 @Localizer["Post"]
-                            </FluentButton>
+                                </FluentButton>
+                          
                         </td>
 
                     </tr>
@@ -272,6 +236,9 @@
 
     private ElementReference _numberOfComments;
 
+     private bool isLoading = false;
+    private bool btnSendKudosDisabled = false;
+
     public void ShowModal(KudosResponse kudos, string userPhoto)
     {
 
@@ -286,7 +253,7 @@
             InvokeAsync(StateHasChanged);
         });
 
-        
+        BlockSendButton(false);
         InvokeAsync(StateHasChanged);
         
     }
@@ -402,11 +369,24 @@
         _replyMessage = args.Value.ToString();
     }
 
+    private void BlockSendButton(bool block)
+    {
+        isLoading = block;
+        btnSendKudosDisabled = block;
+
+    }
+
     private async Task PostMessageClick()
     {
 
         if (string.IsNullOrEmpty(_replyMessage))
             return;
+
+        
+       
+        BlockSendButton(true);
+
+        await InvokeAsync(StateHasChanged);
 
         var comment = await CommentsView.SendComments(
                          new CommentsRequest()
@@ -437,13 +417,18 @@
 
         _replyMessage = string.Empty;
 
+        
+
         await UpdateNumberOfComments();
+
+        BlockSendButton(false);
 
         await InvokeAsync(StateHasChanged);
 
         await Task.CompletedTask;
 
     }
+    
 
     public async Task UpdateNumberOfComments()
     {
@@ -480,6 +465,8 @@
     public void UpdateCommentCallBack(CommentsResponse comments)
     {
         CommentsView.UpdateComments(comments, _item.To.Id);
+
+       
     }
 
 
