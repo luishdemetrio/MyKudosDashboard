@@ -55,7 +55,7 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-LibraryConfiguration configUI = new(ConfigurationGenerator.GetIconConfiguration(), ConfigurationGenerator.GetEmojiConfiguration());
+LibraryConfiguration configUI = new(Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetIconConfiguration(), Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetEmojiConfiguration());
 builder.Services.AddFluentUIComponents(configUI);
 
 
