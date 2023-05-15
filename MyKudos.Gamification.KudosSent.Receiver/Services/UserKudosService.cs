@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Services;
 
-internal class UserKudosService : IUserKudosService
+public class UserKudosService : IUserKudosService
 {
 
     private readonly string _userKudosService;

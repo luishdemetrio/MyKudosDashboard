@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.MessageSenders;
 
-internal class ScoreMessageSender : IScoreMessageSender
+public class ScoreMessageSender : IScoreMessageSender
 {
 
     private IMessageSender _messageSender;

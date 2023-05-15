@@ -16,7 +16,7 @@ public class LikeSent
 
     private IGroupScoreRules _groupScoreRules;
 
-    internal LikeSent(IConfiguration configuration, IGroupScoreRules groupScoreRules)
+    public LikeSent(IConfiguration configuration, IGroupScoreRules groupScoreRules)
     {
         
         _likeSendScore = configuration["LikeSendScore"];

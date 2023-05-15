@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Interfaces;
 
-internal interface IUserKudosService
+public interface IUserKudosService
 {
 
     public Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId);
