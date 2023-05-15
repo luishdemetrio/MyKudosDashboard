@@ -188,15 +188,15 @@ else
 
     private void UpdateScoreCallback(UserScore userScore)
     {
-        _userProfileScore.UpdateScore(userScore);
+         _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
 
     }
 
-    private void OpenSendKudosPanel()
+    private async Task OpenSendKudosPanel()
     {
         _sendKudosIsHidden = false;
 
-        _sendKudosPanel.SendKudosModal();
+        await _sendKudosPanel.SendKudosModal();
 
     }
 

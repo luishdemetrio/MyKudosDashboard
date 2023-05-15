@@ -171,14 +171,14 @@
     //    _shouldRender = 
     //}
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //foreach (var item in kudos.ToList())
-        //{
-        //    await UpdateNumberOfLikes(item.Id);
-        //}
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    //foreach (var item in kudos.ToList())
+    //    //{
+    //    //    await UpdateNumberOfLikes(item.Id);
+    //    //}
 
-    }
+    //}
 
     private async Task UpdateHtmlBlock(object obj, object value)
     {
@@ -418,11 +418,13 @@
 
         }
 
+        await Task.CompletedTask;
+
     }
 
     private async Task GetMoreKudos()
     {
-        MoreKudosCallback?.Invoke();
+        await MoreKudosCallback?.Invoke();
     }
 
 

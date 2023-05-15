@@ -20,10 +20,6 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
 
-LibraryConfiguration configUI = new(ConfigurationGenerator.GetIconConfiguration(), ConfigurationGenerator.GetEmojiConfiguration());
-builder.Services.AddFluentUIComponents(configUI);
-
-
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
 builder.Services.AddScoped<IWelcomeView, WelcomeView>();
@@ -59,6 +55,8 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+LibraryConfiguration configUI = new(ConfigurationGenerator.GetIconConfiguration(), ConfigurationGenerator.GetEmojiConfiguration());
+builder.Services.AddFluentUIComponents(configUI);
 
 
 var app = builder.Build();
