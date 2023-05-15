@@ -24,6 +24,12 @@
 
     window.updateCount = (element, value) => element.innerText = value;
 
+    window.getCarouselActiveSlideIndex = function () {
+        var carouselElement = document.getElementById('myCarousel');
+        var activeSlide = carouselElement.querySelector('.carousel-item.active');
+        var slideIndex = Array.from(carouselElement.querySelectorAll('.carousel-item')).indexOf(activeSlide);
+        return slideIndex;
+    };
 
 </script>
 

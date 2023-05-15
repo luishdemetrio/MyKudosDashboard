@@ -8,8 +8,6 @@
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
 
-@inject IJSRuntime JsRuntime
-
 <style>
 
     fluent-card {
@@ -50,7 +48,7 @@
 
 <FluentDialog @ref=SendKudosFluentDialog
               TrapFocus="true" aria-label="Simple dialog" Modal="true"
-              class="both-gradient" style="--dialog-height: 640px;--dialog-width: 680px;"
+              class="both-gradient" style="--dialog-height: 680px;--dialog-width: 680px;"
               Hidden=@ModalHidden>
 
     <div style="margin:10px;" >
@@ -68,21 +66,21 @@
         <table class="table">
             <tbody>
                 <tr>
-                    <td scope="row">
+                    <td scope="row" style="height:130px">
 
                         <p style="margin-bottom: 5px;">@Localizer["SelectColleague"]</p>
 
                         <BlazoredTypeahead SearchMethod="@SearchEmployees"
                                            @bind-Value="@SelectedEmployee"
-                                           Debounce="500" style="width:100%">
+                                           Debounce="500" style="width:100%;height:40px;">
                             <SelectedTemplate>
                                 @if (string.IsNullOrEmpty(context.Photo))
                                 {
-                                    <span style="margin-left:5px">@context.Name</span>
+                                    <span style="margin-left:5px;">@context.Name</span>
                                 }
                                 else
                                 {
-                                    <div>
+                                    <div style="height:40px;">
                                         <img src=@context.Photo
                                              style="height: 26px;width: 26px;border-radius: 50%" />
                                         <span style="margin-left:5px">@context.Name</span>
@@ -117,7 +115,7 @@
                 <tr>
                     <td scope="row">
 
-                        <p style="margin-bottom: 5px;">@Localizer["Category"]</p>
+                        <p style="margin-bottom: 5px;padding-top:2px">@Localizer["Category"]</p>
 
                         @if (recognitions != null)
                         {
@@ -153,7 +151,7 @@
 
                                                         <span style="float: left;padding-top:2px;padding-left:0px;font-size:medium;text-align:center;overflow-wrap: break-word;">@recognitions.ElementAt(i).Description</span>
 
-                                                        <span style="float: left;padding-top:5px;padding-left:0px;font-size:small;text-align:center;width:100%">@i / @(recognitions.Count())</span>
+                                                        <span style="float: left;padding-top:5px;padding-left:0px;font-size:small;text-align:center;width:100%">@(i+1) / @(recognitions.Count()+1)</span>
 
                                                     </div>
                                                 </div>
@@ -182,7 +180,7 @@
                 <tr>
                     <td scope="row">
 
-                        <p style="margin-bottom: 5px;">@Localizer["Message"]</p>
+                        <p style="margin-bottom: 5px;padding-top:2px">@Localizer["Message"]</p>
 
                         <div class="input-group">
 
@@ -269,28 +267,6 @@
 
     }
 
-    private async Task<string> GetActiveSlide()
-    {
-        var activeElement = await JsRuntime.InvokeAsync<ElementReference>("eval", "$('.carousel-item.active')[0]");
-
-        var index = await JsRuntime.InvokeAsync<string>("jQuery", activeElement);
-
-        //        var index = await JsRuntime.InvokeAsync<int>("jQuery", activeElement).InvokeAsync<int>("index", CancellationToken.None);
-        return index;
-    }
-
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    await base.OnAfterRenderAsync(firstRender);
-
-    //    if (firstRender && recognitions == null)
-    //    {
-
-    //        recognitions = await SendKudosView.GetRecognitionsAsync();
-
-    //    }
-    //}
-
 
     public async Task SendKudosModal()
     {
@@ -348,11 +324,15 @@
 
         KudosRequest kudos = null;
 
+        int slideIndex = await JSRuntime.InvokeAsync<int>("getCarouselActiveSlideIndex");
+
         var t = Task.Run(() =>
         {
-            var recognition = recognitions.Where(r => r.IsSelected).FirstOrDefault();
 
-            if (recognition == null || SelectedEmployee == null || string.IsNullOrEmpty(KudosMessage))
+            var recognition = recognitions.ElementAt(slideIndex);
+
+
+            if ( SelectedEmployee == null || string.IsNullOrEmpty(KudosMessage))
             {
                 JSRuntime.InvokeVoidAsync("alert", "Please inform all fields!");
 
