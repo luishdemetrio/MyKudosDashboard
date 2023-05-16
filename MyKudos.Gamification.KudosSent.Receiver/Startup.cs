@@ -53,12 +53,12 @@ public class Startup : FunctionsStartup
                         ));
 
 
-        builder.Services.AddScoped<IGroupScoreRules, GroupScoreRules>();
+        builder.Services.AddSingleton<IGroupScoreRules, GroupScoreRules>();
         
-        builder.Services.AddScoped<IUserKudosService,  UserKudosService>();
+        builder.Services.AddSingleton<IUserKudosService,  UserKudosService>();
 
 
-        builder.Services.AddScoped<IGroupUserScoreService, GroupUserScoreService>();
+        builder.Services.AddSingleton<IGroupUserScoreService, GroupUserScoreService>();
 
     }
 

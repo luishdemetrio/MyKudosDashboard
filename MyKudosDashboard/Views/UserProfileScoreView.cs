@@ -15,6 +15,8 @@ public class UserProfileScoreView : IUserProfileScoreView
     private static string _updatedScoreDashboard = string.Empty;
     private ServiceBusSubscriberHelper _subscriberUserScore;
 
+    private string _userId;
+
     public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration, ILogger<KudosTabView> logger)
     {
         _gamificationGateway = gamificationGateway;
@@ -32,6 +34,8 @@ public class UserProfileScoreView : IUserProfileScoreView
 
     public void RegisterForLiveUpdates(string userId)
     {
+        _userId = userId;
+
         SubscribeUserScoreUpdate(userId);
     }
 
@@ -46,7 +50,7 @@ public class UserProfileScoreView : IUserProfileScoreView
                 //retrive the message body
                 var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-                if (userScore != null)
+                if ((userScore != null) && (userScore.UserId == _userId)) 
                 {
                     await UserScoreCallback?.Invoke(userScore);
                 }

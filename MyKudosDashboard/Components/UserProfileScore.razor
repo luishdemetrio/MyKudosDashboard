@@ -224,7 +224,7 @@
                     }
                     catch (JSDisconnectedException)
                     {
-                        await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score).ConfigureAwait(false);
+                        await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
 
                         await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent).ConfigureAwait(false);
                         await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived).ConfigureAwait(false);
@@ -235,6 +235,7 @@
                     
                     }
 
+                    await InvokeAsync(StateHasChanged);
                     await Task.Delay(300);
                 }
             }

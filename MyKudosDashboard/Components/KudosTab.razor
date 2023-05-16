@@ -263,7 +263,8 @@
     {
 
         // The person who sent already has the like updated
-        if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+        if (_kudosList == null)
         {
             await Task.CompletedTask;
             return;
@@ -320,7 +321,8 @@
     {
 
         // The person who sent already has the like updated
-        if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+        if (_kudosList == null)
             return;
 
       

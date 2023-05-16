@@ -7,11 +7,11 @@ public interface IWelcomeView
 {
     Task<string> GetUserPhoto(string userId);
 
-    public delegate void UpdateScoreCallBack(UserScore userScore);
+  //  public delegate Task UpdateScoreCallBack(UserScore userScore);
 
-    public UpdateScoreCallBack ScoreCallback { get; set; }
+   // public UpdateScoreCallBack ScoreCallback { get; set; }
 
-    public void RegisterForUserScoreUpdate(string userId);  
+  //  public void RegisterForUserScoreUpdate(string userId);  
 
 
 }

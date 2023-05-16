@@ -169,9 +169,9 @@ else
                 {                    
                     _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
                     
-                    WelcomeView.RegisterForUserScoreUpdate(_user.ObjectId);
+                    //WelcomeView.RegisterForUserScoreUpdate(_user.ObjectId);
 
-                    WelcomeView.ScoreCallback = UpdateScoreCallback;
+                    //WelcomeView.ScoreCallback = UpdateScoreCallback;
 
                 }
             }
@@ -186,9 +186,9 @@ else
 
     }
 
-    private void UpdateScoreCallback(UserScore userScore)
+    private async Task UpdateScoreCallback(UserScore userScore)
     {
-         _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
+        await _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
 
     }
 

@@ -20,17 +20,24 @@ public class WelcomeView : IWelcomeView
 
     private string _serviceBusConnectionString;
 
+    private string _scoreUpdatedDashboardTopic;
+
+  
+
     public WelcomeView(IKudosGateway gatewayService, IConfiguration configuration, IUserGateway userGateway)
     {
         _kudosGateway = gatewayService;
 
-        _serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
+        //_serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
+        //_scoreUpdatedDashboardTopic = configuration["KudosServiceBus_ScoreUpdatedDashboard"]; 
 
-        _serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
+        //_serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
         _userGateway = userGateway;
+
+  
     }
 
-    public IWelcomeView.UpdateScoreCallBack ScoreCallback { get ; set ; }
+//    public IWelcomeView.UpdateScoreCallBack ScoreCallback { get ; set ; }
 
     public async Task<string> GetUserPhoto(string userId)
     {
@@ -39,68 +46,70 @@ public class WelcomeView : IWelcomeView
     }
 
 
-    public void RegisterForUserScoreUpdate(string userId)
-    {
-        //its used later to control the score
-        _userId = userId;
+    //public void RegisterForUserScoreUpdate(string userId)
+    //{
+    //    //its used later to control the score
+    //    _userId = userId;
 
-        ServiceBusScoreProcessor(_userId);
+       
 
-    }
+    //    ServiceBusScoreProcessor(_userId);
 
-    private async Task CreateATopicIfItDoesntExistAsync(string topicName, string subscriptionName)
-    {
-        //create a topic if it doesnt exist
-        var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
+    //}
 
-        if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
-        {
-            await serviceBusAdminClient.CreateTopicAsync(topicName);
-        }
+    //private async Task CreateATopicIfItDoesntExistAsync(string topicName, string subscriptionName)
+    //{
+    //    //create a topic if it doesnt exist
+    //    var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
 
-        //create a temp subscription for the user
+    //    if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
+    //    {
+    //        await serviceBusAdminClient.CreateTopicAsync(topicName);
+    //    }
 
-        if (!await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
-        {
-            var options = new CreateSubscriptionOptions(topicName, subscriptionName)
-            {
-                AutoDeleteOnIdle = TimeSpan.FromHours(1)
-            };
+    //    //create a temp subscription for the user
 
-            await serviceBusAdminClient.CreateSubscriptionAsync(options);
-        }
-    }
+    //    if (!await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
+    //    {
+    //        var options = new CreateSubscriptionOptions(topicName, subscriptionName)
+    //        {
+    //            AutoDeleteOnIdle = TimeSpan.FromHours(1)
+    //        };
 
-    private async void ServiceBusScoreProcessor(string userId)
-    {
+    //        await serviceBusAdminClient.CreateSubscriptionAsync(options);
+    //    }
+    //}
 
-        await CreateATopicIfItDoesntExistAsync("dashboardscoreupdated", userId);
+    //private async void ServiceBusScoreProcessor(string userId)
+    //{
 
-        _serviceBusScoreProcessor = _serviceBusClient.CreateProcessor("dashboardscoreupdated", userId);
+    //    await CreateATopicIfItDoesntExistAsync(_scoreUpdatedDashboardTopic, userId);
 
-        _serviceBusScoreProcessor.ProcessMessageAsync += _serviceBusScoreProcessor_ProcessMessageAsync;
+    //    _serviceBusScoreProcessor = _serviceBusClient.CreateProcessor(_scoreUpdatedDashboardTopic, userId);
 
-        _serviceBusScoreProcessor.ProcessErrorAsync += _serviceBusScoreProcessor_ProcessErrorAsync;
+    //    _serviceBusScoreProcessor.ProcessMessageAsync += _serviceBusScoreProcessor_ProcessMessageAsync;
 
-        await _serviceBusScoreProcessor.StartProcessingAsync();
-    }
+    //    _serviceBusScoreProcessor.ProcessErrorAsync += _serviceBusScoreProcessor_ProcessErrorAsync;
 
-    private async Task _serviceBusScoreProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
-    {
-        await Task.CompletedTask;
-    }
+    //    await _serviceBusScoreProcessor.StartProcessingAsync();
+    //}
 
-    private async Task _serviceBusScoreProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
-    {
-        //retrive the message body
+    //private async Task _serviceBusScoreProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
+    //{
+    //    await Task.CompletedTask;
+    //}
 
-        var score = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
+    //private async Task _serviceBusScoreProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
+    //{
+    //    //retrive the message body
 
-        if ((score != null) && (score.UserId == _userId) )
-        {
-            ScoreCallback?.Invoke(score);
-        }
+    //    var score = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-        await arg.CompleteMessageAsync(arg.Message);
-    }
+    //    if ((score != null) && (score.UserId == _userId) )
+    //    {
+    //        ScoreCallback?.Invoke(score);
+    //    }
+
+    //    await arg.CompleteMessageAsync(arg.Message);
+    //}
 }
