@@ -85,7 +85,9 @@
 
                                 </FluentButton>
 
-                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px" @onclick=@(()=>LikeKudos(_item))>
+                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px"
+                                                @onclick=@(()=>LikeKudos(_item))
+                                               >
                                     <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                             Filled=@FilledLikeKudos(_item) />
                                     @_item.Likes.Count()
@@ -265,6 +267,12 @@
             
     }
 
+    private bool LikeDisabled(KudosResponse item)
+    {
+        return item.To.Id == User.ObjectId;
+    }
+
+
     private void OnDismiss(EventArgs args)
     {
        
@@ -290,6 +298,8 @@
 
     private async Task LikeKudos(KudosResponse kudos)
     {
+        if (LikeDisabled(kudos))
+            return;
 
         if (kudos.Likes.Any(l => l.Id == User.ObjectId))
         {

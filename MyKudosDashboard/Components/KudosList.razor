@@ -79,9 +79,10 @@
                         </FluentButton>
 
 
-                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id))>
+                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id)) 
+                                        >
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                    Filled=@Filled(item) />
+                                    Filled=@Filled(item)  />
 
                             <div>
                                 @item.Likes.Count()
@@ -150,15 +151,6 @@
     public LoadMoreKudosCallback MoreKudosCallback { get; set; }
     public delegate Task LoadMoreKudosCallback();
 
-    //private Dictionary<string, ElementReference> numberOfLikes = new();
-
-    //private Dictionary<string, ElementReference> tooltipLikes = new();
-
-    //private Dictionary<string, ElementReference> numberOfComments = new();
-
-    //private Dictionary<string, ElementReference> kudosHTML = new();
-
-
     private bool _shouldRender =true;
 
     protected override bool ShouldRender()
@@ -166,19 +158,11 @@
         return _shouldRender;
     }
 
-    //protected override void OnParametersSet()
-    //{
-    //    _shouldRender = 
-    //}
+    private bool LikeDisabled(string toPersonId)
+    {
+        return toPersonId == User.ObjectId;
+    }
 
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    //foreach (var item in kudos.ToList())
-    //    //{
-    //    //    await UpdateNumberOfLikes(item.Id);
-    //    //}
-
-    //}
 
     private async Task UpdateHtmlBlock(object obj, object value)
     {
@@ -328,6 +312,8 @@
 
     private async Task Like(string kudosId, string toPersonId)
     {
+        if (LikeDisabled(toPersonId))
+            return;
 
         var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
 

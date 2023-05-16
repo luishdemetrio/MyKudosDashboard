@@ -19,7 +19,7 @@ public class Startup : FunctionsStartup
 
     public override void Configure(IFunctionsHostBuilder builder)
     {
-        builder.Services.AddSingleton<IUserScoreService, UserScoreService>();
+        builder.Services.AddTransient<IUserScoreService, UserScoreService>();
 
         // Send Topic 
         builder.Services.AddSingleton<IScoreMessageSender, ScoreMessageSender>();
@@ -53,12 +53,12 @@ public class Startup : FunctionsStartup
                         ));
 
 
-        builder.Services.AddSingleton<IGroupScoreRules, GroupScoreRules>();
+        builder.Services.AddScoped<IGroupScoreRules, GroupScoreRules>();
         
-        builder.Services.AddSingleton<IUserKudosService,  UserKudosService>();
+        builder.Services.AddScoped<IUserKudosService,  UserKudosService>();
 
 
-        builder.Services.AddSingleton<IGroupUserScoreService, GroupUserScoreService>();
+        builder.Services.AddScoped<IGroupUserScoreService, GroupUserScoreService>();
 
     }
 

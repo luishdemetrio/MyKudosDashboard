@@ -43,25 +43,6 @@ public class UserScoreRepository : IUserScoreRepository
                 score.MessagesReceived += userScore.MessagesReceived;
                 score.MessagesSent += userScore.MessagesSent;
 
-                if (score.KudosSent < 0)
-                    score.KudosSent = 0;
-
-                if (score.KudosReceived < 0)
-                    score.KudosReceived = 0;
-
-                if (score.LikesSent < 0)
-                    score.LikesSent = 0;
-
-                if (score.LikesReceived < 0)
-                    score.LikesReceived = 0;
-
-
-                if (score.MessagesReceived < 0)
-                    score.MessagesReceived = 0;
-
-                if (score.MessagesSent < 0)
-                    score.MessagesSent = 0;
-
             }
             else
             {

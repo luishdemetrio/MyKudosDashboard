@@ -113,7 +113,8 @@
 <div style="float:left;margin-left:37px;padding-top: 0px">
 
     <FluentButton   id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
-                    @onclick=@(()=>LikeComment(Reply))>
+                    @onclick=@(()=>LikeComment(Reply))
+                    >
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                     Filled=@FilledLikeComments(@Reply) />
         <div @ref=_numberOfLikeComments>@Reply.Likes.Count()</div>
@@ -151,12 +152,12 @@
     @if(_isReplyCommendReadOnly == false)
     {
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Regular />
+            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
             Save Changes
         </FluentButton>
 
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Variant=IconVariant.Regular  />
+            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=true />
             Cancel
         </FluentButton>
     }
@@ -207,6 +208,10 @@
 
         return filled;
     }
+    private bool LikeDisabled(CommentsResponse item)
+    {
+        return item.FromPerson.Id == ReplyUser.ObjectId;
+    }
 
     private bool CanEditOrDeleteComment()
     {
@@ -227,6 +232,9 @@
 
     private async void LikeComment(CommentsResponse item)
     {
+
+        if (LikeDisabled(item))
+            return;
 
         if (item.Likes.Any(l => l.Id == ReplyUser.ObjectId))
         {
