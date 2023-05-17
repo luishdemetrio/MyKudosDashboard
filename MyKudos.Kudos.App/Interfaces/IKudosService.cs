@@ -11,7 +11,7 @@ public interface IKudosService
 
     Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId);
 
-    IQueryable<KudosLog> GetUserKudos(string pUserId);
+    IEnumerable<KudosLog> GetUserKudos(string pUserId);
 
     public bool Like(string kudosId, string personId);
     public bool UndoLike(string kudosId, string personId);

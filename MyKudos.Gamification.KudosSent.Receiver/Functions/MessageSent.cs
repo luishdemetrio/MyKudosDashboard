@@ -15,11 +15,14 @@ public class MessageSent
 
     private IGroupScoreRules _groupScoreRules;
 
-    public MessageSent(IConfiguration configuration, IGroupScoreRules groupScoreRules) 
-    { 
+    private readonly IScoreMessageSender _scoreQueue;
+
+    public MessageSent(IConfiguration configuration, IGroupScoreRules groupScoreRules, IScoreMessageSender scoreQueue)
+    {
 
         _messageSentScore = configuration["MessageSentScore"];
         _groupScoreRules = groupScoreRules;
+        _scoreQueue = scoreQueue;
     }
 
     [FunctionName("MessageSent")]
@@ -32,14 +35,16 @@ public class MessageSent
             var score = 
                 new UserScore()
                 {
-                    UserId = userId,
+                    Id = new Guid(userId),
                     MessagesSent = 1,
                     Score = int.Parse(_messageSentScore)
                 };
 
 
-            await _groupScoreRules.UpdateGroupScoreAsync(score);
+            var newScore = await _groupScoreRules.UpdateGroupScoreAsync(score);
 
+            if (newScore != null)
+                await _scoreQueue.NotifyProfileScoreUpdated(newScore);
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {myQueueItem}");
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.ScoreRules;
@@ -25,7 +26,7 @@ internal sealed class ScoreRules
         await _userScoreService.SetUserScoreAsync(
                new UserScore()
                {
-                   UserId = pUserId,
+                   Id = new Guid(pUserId),
                    KudosSent = 1,
                    Score = int.Parse(_kudosSendScore)
                });

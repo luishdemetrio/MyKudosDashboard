@@ -9,6 +9,7 @@ public class UserScoreService : IUserScoreService
 {
 
     private readonly IUserScoreRepository _userScoreRepository;
+   
 
     public UserScoreService(IUserScoreRepository userScoreRepository)
     {
@@ -23,7 +24,9 @@ public class UserScoreService : IUserScoreService
 
     public bool SetUserScore(UserScore userScore)
     {
-        return _userScoreRepository.SetUserScore(userScore);
+       
+            return _userScoreRepository.SetUserScore(userScore);
+       
     }
 
     public IEnumerable<UserScore> GetTopUserScores(int top)

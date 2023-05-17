@@ -27,7 +27,7 @@ public class ContributorsController : Controller
 
         var scores = await _gamificationService.GetTopUserScoresAsync(_topContributors);
 
-        var userIds = scores.Select(s => s.UserId).Distinct().ToArray();
+        var userIds = scores.Select(s => s.Id.ToString()).Distinct().ToArray();
 
         List<Models.GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
 
@@ -35,9 +35,9 @@ public class ContributorsController : Controller
 
         var result = from score in scores
                      join photo in photos
-                        on score.UserId equals photo.id
+                        on score.Id.ToString() equals photo.id
                      join user in users
-                        on score.UserId equals user.Id
+                        on score.Id.ToString() equals user.Id
                      select new TopContributors()
                      {
                          Name = user.DisplayName,

@@ -16,11 +16,14 @@ public class LikeSent
 
     private IGroupScoreRules _groupScoreRules;
 
-    public LikeSent(IConfiguration configuration, IGroupScoreRules groupScoreRules)
+    private readonly IScoreMessageSender _scoreQueue;
+
+    public LikeSent(IConfiguration configuration, IGroupScoreRules groupScoreRules, IScoreMessageSender scoreQueue)
     {
-        
+
         _likeSendScore = configuration["LikeSendScore"];
         _groupScoreRules = groupScoreRules;
+        _scoreQueue = scoreQueue;
     }
 
     [FunctionName("GamificationLikeSent")]
@@ -33,12 +36,22 @@ public class LikeSent
             var score = 
                 new UserScore()
                 {
-                    UserId = mySbMsg,
+                    Id = new Guid(mySbMsg),
                     LikesSent = 1,
                     Score = int.Parse(_likeSendScore)
                 };
 
-            await _groupScoreRules.UpdateGroupScoreAsync(score);
+            var newScore = await _groupScoreRules.UpdateGroupScoreAsync(score);
+
+            if (newScore != null)
+            {
+                await _scoreQueue.NotifyProfileScoreUpdated(newScore);
+            }
+            else
+            {
+                log.LogError($"Error to read score");
+            }
+                
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }

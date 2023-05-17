@@ -2,7 +2,7 @@
 
 public class UserScore
 {
-    public string UserId { get; set; }
+    public Guid Id { get; set; }
     public int Score { get; set; }
     public int KudosSent { get; set; }
     public int KudosReceived { get; set; }

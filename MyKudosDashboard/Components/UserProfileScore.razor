@@ -40,7 +40,7 @@
                     <h5 class="card-title pricing-card-title">
 
                         @*<FluentEmoji Name="@FluentEmojis.UpRightArrow" Size="@EmojiSize.Size32"  />*@
-                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Color="Color.Neutral" />
+                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Filled=false />
 
                         <small @ref=_kudosSent class="text-muted fw-light"> @_userScore.KudosSent</small>
                         <small class="text-muted fw-light"> @Localizer["KudosSent"]</small>
@@ -48,7 +48,7 @@
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Color="Color.Neutral" />
+                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Filled=false />
 
                         <small @ref=_kudosReceived class ="text-muted fw-light"> @_userScore.KudosReceived</small>
                         <small class="text-muted fw-light"> @Localizer["KudosReceived"]</small>
@@ -56,7 +56,7 @@
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.ThumbLike" Color="Color.Neutral" />
+                        <FluentIcon Name="@FluentIcons.ThumbLike" Filled=false />
 
                         <small @ref=_likesSent class="text-muted fw-light"> @_userScore.LikesSent</small>
                         <small class="text-muted fw-light"> @Localizer["LikesSent"]</small>
@@ -64,7 +64,7 @@
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.Heart" Color="Color.Neutral" />
+                        <FluentIcon Name="@FluentIcons.Heart" Filled=false />
 
                         <small @ref=_likesReceived class ="text-muted fw-light"> @_userScore.LikesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["LikesReceived"]</small>
@@ -72,7 +72,7 @@
 
                      <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Color="Color.Neutral" />
+                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false />
 
                         <small @ref=_commentsSent class="text-muted fw-light"> @_userScore.MessagesSent</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsSent"]</small>
@@ -80,7 +80,7 @@
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Color="Color.Neutral" />
+                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false />
 
                         <small @ref=_commentsReceived class="text-muted fw-light"> @_userScore.MessagesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsReceived"]</small>
@@ -166,6 +166,8 @@
 
     private bool _isLoaded = false;
 
+     private bool _shouldRender =true;
+
     private ElementReference _score;
     private ElementReference _kudosSent;
     private ElementReference _kudosReceived;
@@ -179,8 +181,8 @@
     {
         base.OnInitialized();
 
-        UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
-        UserProfileScoreView.UserScoreCallback = UpdateScore;
+         //  UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
+         //UserProfileScoreView.UserScoreCallback = UpdateScore;
 
         _userScore = await UserProfileScoreView.GetUserScore(User.ObjectId);
 
@@ -190,57 +192,64 @@
         _isLoaded = true;
 
         await InvokeAsync(StateHasChanged);
- 
+
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+
+      
+
+    //}
+
+    protected override bool ShouldRender()
+    {
+        return _shouldRender;
     }
 
 
     public async Task UpdateScore(UserScore userScore)
     {
-        if(userScore.UserId == User.ObjectId)
+
+        if (userScore.Id == User.ObjectId)
         {
             _userScore = userScore;
 
+            _shouldRender = true;
 
-            if (_userScore != null)
+            if (_userScore == null)
+                return;
+
+            for (int attempts = 0; attempts < 3; attempts++)
             {
 
-                for (int attempts = 0; attempts < 3; attempts++)
+                try
                 {
 
+                    await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
 
-                    try
-                    {
+                    await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
+                    await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
+                    await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
+                    await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
+                    await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
+                    await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
 
-                        await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
-
-                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
-
-                        break;
-                    }
-                    catch (JSDisconnectedException)
-                    {
-                        await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
-
-                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent).ConfigureAwait(false);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived).ConfigureAwait(false);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent).ConfigureAwait(false);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived).ConfigureAwait(false);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent).ConfigureAwait(false);
-                        await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived).ConfigureAwait(false);
-                    
-                    }
-
+                    break;
+                }
+                catch (JSDisconnectedException)
+                {
                     await InvokeAsync(StateHasChanged);
                     await Task.Delay(300);
                 }
+
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(300);
             }
 
         }
+
+        
 
 
     }

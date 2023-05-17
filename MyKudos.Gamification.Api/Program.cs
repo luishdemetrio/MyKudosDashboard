@@ -1,3 +1,4 @@
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using MyKudos.Gamification.App.Interfaces;
 using MyKudos.Gamification.App.Services;
@@ -24,8 +25,14 @@ builder.Services.AddScoped<UserScoreDbContext>(_ =>
       .UseCosmos(
               config["AccountEndPoint"],
               config["AccountKey"],
-              config["DatabaseName"])
-      .Options;
+              config["DatabaseName"],
+              options =>
+              {
+                  options.ConnectionMode(ConnectionMode.Gateway);
+              
+              })
+      .Options ;
+   
 
     return new UserScoreDbContext(options);
 });

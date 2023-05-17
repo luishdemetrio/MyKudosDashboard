@@ -15,12 +15,14 @@ public class GamificationKudosSent
 
     private IGroupScoreRules _groupScoreRules;
 
+    private readonly IScoreMessageSender _scoreQueue;
 
-    public GamificationKudosSent(IConfiguration configuration, IGroupScoreRules groupScoreRules)
+    public GamificationKudosSent(IConfiguration configuration, IGroupScoreRules groupScoreRules, IScoreMessageSender scoreQueue)
     {
         _kudosSendScore = configuration["KudosSendScore"];
 
         _groupScoreRules = groupScoreRules;
+        _scoreQueue = scoreQueue;
     }
 
     [FunctionName("GamificationKudosSent")]
@@ -33,12 +35,15 @@ public class GamificationKudosSent
 
             var score =  new UserScore()
             {
-                UserId = userId,
+                Id = new Guid(userId),
                 KudosSent = 1,
                 Score = int.Parse(_kudosSendScore)
             };
 
-            await _groupScoreRules.UpdateGroupScoreAsync(score);
+            var newScore = await _groupScoreRules.UpdateGroupScoreAsync(score);
+
+            if (newScore != null)
+                await _scoreQueue.NotifyProfileScoreUpdated(newScore);
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }

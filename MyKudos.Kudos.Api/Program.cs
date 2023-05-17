@@ -20,7 +20,7 @@ builder.Services.AddSwaggerGen(c =>
 
 //builder.Services.AddMediatR(typeof(Program));
 
-builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
+//builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 builder.Services.AddScoped<IKudosService, KudosService>();
 builder.Services.AddScoped<IKudosRepository, KudosRepository>();
@@ -67,6 +67,9 @@ builder.Services.AddDbContext<RecognitionDbContext>(options =>
               config["AccountKey"],
               config["RecognitionDatabaseName"]);
 });
+
+
+
 
 
 

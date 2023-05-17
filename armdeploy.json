@@ -139,93 +139,94 @@
       }
     },
 
-  "variables": {
+    "variables": {
 
-    "hostingPlanName": "[parameters('baseResourceName')]",
-    "sharedSkus": [
-      "Free",
-      "Shared"
-    ],
+      "hostingPlanName": "[parameters('baseResourceName')]",
+      "sharedSkus": [
+        "Free",
+        "Shared"
+      ],
 
-    "isSharedPlan": "[contains(variables('sharedSkus'), parameters('hostingPlanSku'))]",
-    "skuFamily": "[if(equals(parameters('hostingPlanSku'), 'Shared'), 'D', take(parameters('hostingPlanSku'), 1))]",
-    "i18n:DefaultCulture": "[parameters('DefaultCulture')]",
-    "i18n:SupportedCultures": "[parameters('SupportedCultures')]",
-    "subscriptionTenantId": "[subscription().tenantId]",
+      "isSharedPlan": "[contains(variables('sharedSkus'), parameters('hostingPlanSku'))]",
+      "skuFamily": "[if(equals(parameters('hostingPlanSku'), 'Shared'), 'D', take(parameters('hostingPlanSku'), 1))]",
+      "i18n:DefaultCulture": "[parameters('DefaultCulture')]",
+      "i18n:SupportedCultures": "[parameters('SupportedCultures')]",
+      "subscriptionTenantId": "[subscription().tenantId]",
 
-    "databaseAccountsKudosName": "[parameters('baseResourceName')]",
-
-
-
-    "appserviceplan": "[concat(parameters('baseResourceName'), 'plan' )]",
-
-    "msgraph_appservice": "[concat(parameters('baseResourceName'), 'msgraph' )]",
-
-    "kudos_appservice": "[concat(parameters('baseResourceName'), 'kudos' )]",
-
-    "gateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
-
-    "gamification_appservice": "[concat(parameters('baseResourceName'), 'gamification' )]",
-
-    "teams_appservice": "[concat(parameters('baseResourceName'), 'dashboard' )]",
-
-    "userAssignedIdentities_teams_appservice": "[variables('teams_appservice')]",
-
-    "userAssignedIdentities_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', variables('userAssignedIdentities_teams_appservice') )]",
-
-    "notification_bot": "[concat(parameters('baseResourceName'), 'notification' )]",
-
-    "notification_bot_userAssignedIdentities": "[concat(variables('notification_bot'), '_userAssignedIdentities')]",
-
-    "kudos_notificationreceiver": "[concat(parameters('baseResourceName'), 'notificationreceiver' )]",
-
-    "actionGroups_Application_Insights_Smart_Detection_name": "Application Insights Smart Detection",
-
-    "smartdetectoralertrules_failure_anomalies___kudosnotificationreceiver_name": "failure anomalies - kudosnotificationreceiver",
-
-    "gamification_serviceplan": "[concat(parameters('baseResourceName'), 'gamificationplan' )]",
-
-    "notification_serviceplan": "[concat(parameters('baseResourceName'), 'notificationplan' )]",
-
-    "gamification_function": "[concat(parameters('baseResourceName'), 'gamificationfunc' )]",
-
-    "notification_function": "[concat(parameters('baseResourceName'), 'notificationfunc' )]",
+      "databaseAccountsKudosName": "[parameters('baseResourceName')]",
 
 
-    "KudosServiceBus_namespace": "[concat(parameters('baseResourceName'), 'messaging' )]",
 
-    "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
+      "appserviceplan": "[concat(parameters('baseResourceName'), 'plan' )]",
 
-    "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
-    "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
+      "msgraph_appservice": "[concat(parameters('baseResourceName'), 'msgraph' )]",
 
-    "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
-    "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived",
+      "kudos_appservice": "[concat(parameters('baseResourceName'), 'kudos' )]",
 
-    "KudosServiceBus_GamificationUndolikeSentTopicName": "GamificationUndolikeSent",
-    "KudosServiceBus_GamificationUndolikeReceivedTopicName": "GamificationUndolikeReceived",
+      "gateway_appservice": "[concat(parameters('baseResourceName'), 'gateway' )]",
 
-    "KudosServiceBus_GamificationMessageSentTopicName": "GamificationMessageSent",
-    "KudosServiceBus_GamificationMessageReceivedTopicName": "GamificationMessageReceived",
+      "gamification_appservice": "[concat(parameters('baseResourceName'), 'gamification' )]",
 
-    "KudosServiceBus_GamificationMessageDeletedFromTopicName": "GamificationMessageDeletedFrom",
-    "KudosServiceBus_GamificationMessageDeletedToTopicName": "GamificationMessageDeletedTo",
+      "teams_appservice": "[concat(parameters('baseResourceName'), 'dashboard' )]",
+
+      "userAssignedIdentities_teams_appservice": "[variables('teams_appservice')]",
+
+      "userAssignedIdentities_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities/', variables('userAssignedIdentities_teams_appservice') )]",
+
+      "notification_bot": "[concat(parameters('baseResourceName'), 'notification' )]",
+
+      "notification_bot_userAssignedIdentities": "[concat(variables('notification_bot'), '_userAssignedIdentities')]",
+
+      "kudos_notificationreceiver": "[concat(parameters('baseResourceName'), 'notificationreceiver' )]",
+
+      "actionGroups_Application_Insights_Smart_Detection_name": "Application Insights Smart Detection",
+
+      "smartdetectoralertrules_failure_anomalies___kudosnotificationreceiver_name": "failure anomalies - kudosnotificationreceiver",
+
+      "gamification_serviceplan": "[concat(parameters('baseResourceName'), 'gamificationplan' )]",
+
+      "notification_serviceplan": "[concat(parameters('baseResourceName'), 'notificationplan' )]",
+
+      "gamification_function": "[concat(parameters('baseResourceName'), 'gamificationfunc' )]",
+
+      "notification_function": "[concat(parameters('baseResourceName'), 'notificationfunc' )]",
 
 
-    "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
-    "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
-    "KudosServiceBus_MessageUpdatedDashboard": "MessageUpdatedDashboard",
+      "KudosServiceBus_namespace": "[concat(parameters('baseResourceName'), 'messaging' )]",
+
+      "KudosServiceBus_AgentTopicName": "notifyUserBotTopic",
+
+      "KudosServiceBus_GamificationKudosSentTopicName": "GamificationKudosSent",
+      "KudosServiceBus_GamificationKudosReceivedTopicName": "GamificationKudosReceived",
+
+      "KudosServiceBus_GamificationLikeSentTopicName": "GamificationLikeSent",
+      "KudosServiceBus_GamificationLikeReceivedTopicName": "GamificationLikeReceived",
+
+      "KudosServiceBus_GamificationUndolikeSentTopicName": "GamificationUndolikeSent",
+      "KudosServiceBus_GamificationUndolikeReceivedTopicName": "GamificationUndolikeReceived",
+
+      "KudosServiceBus_GamificationMessageSentTopicName": "GamificationMessageSent",
+      "KudosServiceBus_GamificationMessageReceivedTopicName": "GamificationMessageReceived",
+
+      "KudosServiceBus_GamificationMessageDeletedFromTopicName": "GamificationMessageDeletedFrom",
+      "KudosServiceBus_GamificationMessageDeletedToTopicName": "GamificationMessageDeletedTo",
 
 
-    "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
-
-    "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
-    "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
-
-    "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard"
+      "KudosServiceBus_MessageSentDashboard": "MessageSentDashboard",
+      "KudosServiceBus_MessageDeletedDashboard": "MessageDeletedDashboard",
+      "KudosServiceBus_MessageUpdatedDashboard": "MessageUpdatedDashboard",
 
 
-  },
+      "KudosServiceBus_KudosSentDashboard": "KudosSentDashboard",
+
+      "KudosServiceBus_LikeSentDashboard": "LikeSentDashboard",
+      "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
+
+      "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard",
+      "KudosServiceBus_ScoreUpdatedSamePersonDashboard": "scoreUpdatedSamePersonDashboard"
+
+
+    },
   "resources": [
 
     {
@@ -507,6 +508,7 @@
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "FUNCTIONS_EXTENSION_VERSION": "~4",
             "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard",
+            "KudosServiceBus_ScoreUpdatedSamePersonDashboard": "scoreUpdatedSamePersonDashboard",
             "GroupCompletedScore": "30",
             "AllGroupCompletedScore": "100"
 
@@ -1804,6 +1806,10 @@
             "KudosServiceBus_LikeUndoDashboard": "LikeUndoDashboard",
 
             "KudosServiceBus_ScoreUpdatedDashboard": "scoreUpdatedDashboard",
+
+
+            "KudosServiceBus_GamificationLikeSentSamePersonTopicName": "GamificationLikeSentSamePerson",
+            "KudosServiceBus_GamificationUndolikeSentSamePersonTopicName": "GamificationUndolikeSentSamePerson",
 
             "TopContributors": 30
 

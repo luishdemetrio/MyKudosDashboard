@@ -14,10 +14,13 @@ public class UndolikeReceived
 
     private IGroupScoreRules _groupScoreRules;
 
-    public UndolikeReceived(IConfiguration configuration, IGroupScoreRules groupScoreRules)
+    private readonly IScoreMessageSender _scoreQueue;
+
+    public UndolikeReceived(IConfiguration configuration, IGroupScoreRules groupScoreRules, IScoreMessageSender scoreQueue)
     {
         _likeReceiveScore = configuration["LikeReceivedScore"];
         _groupScoreRules = groupScoreRules;
+        _scoreQueue = scoreQueue;
     }
 
 
@@ -31,12 +34,21 @@ public class UndolikeReceived
             var score = 
                     new UserScore()
                     {
-                        UserId = mySbMsg,
+                        Id = new Guid(mySbMsg),
                         LikesReceived = -1,
                         Score = int.Parse(_likeReceiveScore) * -1
                     } ;
 
-            await _groupScoreRules.UpdateGroupScoreAsync(score);
+            var newScore = await _groupScoreRules.UpdateGroupScoreAsync(score);
+
+            if (newScore != null)
+            {
+                await _scoreQueue.NotifyProfileScoreUpdated(newScore);
+            }
+            else
+            {
+                log.LogError($"Error to read score");
+            }
 
             log.LogInformation($"C# ServiceBus topic trigger function processed message: {mySbMsg}");
         }

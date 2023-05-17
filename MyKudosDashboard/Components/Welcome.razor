@@ -137,7 +137,7 @@ else
     private CommentsKudos _replyKudos;
 
 
-    
+
 
     private void OnDismiss()
     {
@@ -160,18 +160,18 @@ else
                 {
                     _user = await teamsUserCredential.GetUserInfoAsync();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    _errorMessage = "You don't have access!";
+                    _errorMessage = ex.Message;
                 }               
 
                 if (_user != null)
                 {                    
                     _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
-                    
-                    //WelcomeView.RegisterForUserScoreUpdate(_user.ObjectId);
 
-                    //WelcomeView.ScoreCallback = UpdateScoreCallback;
+                    WelcomeView.RegisterForUserScoreUpdate(_user.ObjectId);
+
+                    WelcomeView.ScoreCallback = UpdateScoreCallback;
 
                 }
             }
@@ -188,7 +188,13 @@ else
 
     private async Task UpdateScoreCallback(UserScore userScore)
     {
-        await _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
+        if (_userProfileScore != null)
+        {
+            await _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
+            _sendKudosIsHidden = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        
 
     }
 

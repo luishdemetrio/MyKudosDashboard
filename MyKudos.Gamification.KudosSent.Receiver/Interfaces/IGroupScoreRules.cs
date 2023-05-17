@@ -5,5 +5,5 @@ namespace MyKudos.Gamification.Receiver.Interfaces;
 
 public interface IGroupScoreRules
 {
-    Task UpdateGroupScoreAsync(UserScore pUserScore);
+    Task<UserScore> UpdateGroupScoreAsync(UserScore pUserScore);
 }

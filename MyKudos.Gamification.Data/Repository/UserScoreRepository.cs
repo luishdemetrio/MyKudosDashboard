@@ -20,17 +20,24 @@ public class UserScoreRepository : IUserScoreRepository
 
     public UserScore GetUserScore(string pUserId)
     {
-        return _context.UserScores?.FirstOrDefault(u => u.UserId == pUserId);
+        return _context.UserScores?.AsNoTracking().FirstOrDefault(u => u.Id == new Guid(pUserId));
     }
 
     public bool SetUserScore(UserScore userScore)
     {
 
         UserScore score;
+        bool result = false;
 
         lock (_lock)
         {
-            score = _context.UserScores?.FirstOrDefault(u => u.UserId == userScore.UserId);
+
+            // cosmosdb is caching the score
+
+            
+            score = _context.UserScores?.FirstOrDefault(u => u.Id == userScore.Id);
+
+           
 
             if (score != null)
             {
@@ -48,10 +55,16 @@ public class UserScoreRepository : IUserScoreRepository
             {
                 _context.UserScores?.Add(userScore);
 
-
+                
             }
+
+            result = _context.SaveChanges() > 0;
+
+           
         }
-        return _context.SaveChanges() > 0;
+
+        return result;
+
     }
 
     public IEnumerable<UserScore> GetTopUserScores(int top) 
@@ -66,7 +79,7 @@ public class UserScoreRepository : IUserScoreRepository
 
         lock (_lock)
         {
-            score = _context.UserScores?.FirstOrDefault(u => u.UserId == userScore.UserId);
+            score = _context.UserScores?.FirstOrDefault(u => u.Id == userScore.Id);
 
             if (score != null)
             {

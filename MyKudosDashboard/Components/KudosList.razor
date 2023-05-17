@@ -79,8 +79,8 @@
                         </FluentButton>
 
 
-                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>Like(item.Id, item.To.Id)) 
-                                        >
+                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>LikeKudos(item))
+                                      Disabled=@LikeDisabled(item.Id)  >
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                     Filled=@Filled(item)  />
 
@@ -153,14 +153,35 @@
 
     private bool _shouldRender =true;
 
+    private Dictionary<string, bool> _disabledButtons;
+
+    private readonly object _lock = new object();
+
+    protected override void OnInitialized()
+    {
+        _disabledButtons = new();
+    }
+
     protected override bool ShouldRender()
     {
         return _shouldRender;
     }
 
-    private bool LikeDisabled(string toPersonId)
+    private bool LikeDisabled(string kudosId)
     {
-        return toPersonId == User.ObjectId;
+        bool disabled = false;
+
+        if (_disabledButtons.ContainsKey(kudosId))
+        {
+            disabled = _disabledButtons[kudosId];
+        }
+        else
+        {
+            _disabledButtons.Add(kudosId, false);
+        }
+
+
+        return disabled;
     }
 
 
@@ -210,6 +231,8 @@
         if (kudo is null)
             return true;
 
+        // enable like button
+        UpdateDisabledLike(kudosId, false);
 
         _shouldRender = true;
 
@@ -310,12 +333,34 @@
         return filled;
     }
 
-    private async Task Like(string kudosId, string toPersonId)
+    private void UpdateDisabledLike(string kudosId, bool disabled)
     {
-        if (LikeDisabled(toPersonId))
-            return;
+        if (_disabledButtons.ContainsKey(kudosId))
+        {
+            _disabledButtons[kudosId] = disabled;
+        }
+        else
+        {
+            _disabledButtons.Add(kudosId, disabled);
+        }
 
-        var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
+    }
+
+    
+
+    private async Task LikeKudos(KudosResponse item)
+    {
+
+        lock (_lock)
+        {
+            if (LikeDisabled(item.Id))
+                return;
+
+            //disable button to avoid user click twice
+            UpdateDisabledLike(item.Id, true);
+        }
+
+        var kudo = kudos.Where(k => k.Id == item.Id).FirstOrDefault();
 
         if (kudo != null)
         {
@@ -324,14 +369,14 @@
             {
                 await KudosListView.SendUndoLikeAsync(
                     new Like(
-                        KudosId: kudosId,
+                        KudosId: item.Id,
                         FromPerson: new Person
                             {
                                 Id = User.ObjectId,
                                 Name = User.DisplayName,
                                 Photo = UserPhoto
                             },
-                        ToPersonId: toPersonId
+                        ToPersonId: item.To.Id
                     )
                 );
             }
@@ -339,14 +384,14 @@
             {
                 await KudosListView.SendLikeAsync(
                        new Like(
-                           KudosId: kudosId,
+                           KudosId: item.Id,
                            FromPerson: new Person
                                {
                                    Id = User.ObjectId,
                                    Name = User.DisplayName,
                                    Photo = UserPhoto
                                },
-                           ToPersonId: toPersonId
+                           ToPersonId: item.To.Id
                        )
                    );
 

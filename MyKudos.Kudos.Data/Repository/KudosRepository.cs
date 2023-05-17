@@ -44,10 +44,10 @@ public class KudosRepository : IKudosRepository
 					.ToListAsync();
 	}
 
-    public IQueryable<KudosLog> GetUserKudos(string pUserId)
+    public IEnumerable<KudosLog> GetUserKudos(string pUserId)
     {
 
-        return _kudosDbContext.Kudos.Where(k => k.ToPersonId == pUserId).AsQueryable();
+        return _kudosDbContext.Kudos.Where(k => k.ToPersonId == pUserId);
 
     }
 

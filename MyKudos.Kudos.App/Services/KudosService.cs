@@ -14,6 +14,8 @@ public sealed class KudosService : IKudosService
 
     private readonly IRecognitionRepository _recognitionRepository;
 
+    private readonly object _lock = new object();
+
     public KudosService(IKudosRepository kudosRepository, ICommentsRepository commentsRepository, IRecognitionRepository recognitionRepository)
     {
         _kudosRepository = kudosRepository;
@@ -26,7 +28,7 @@ public sealed class KudosService : IKudosService
         return _kudosRepository.GetKudosAsync(pageNumber, pageSize);
     }
 
-    public IQueryable<KudosLog> GetUserKudos(string pUserId)
+    public IEnumerable<KudosLog> GetUserKudos(string pUserId)
     {
         return _kudosRepository.GetUserKudos(pUserId);
     }
@@ -34,32 +36,35 @@ public sealed class KudosService : IKudosService
 
     public Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId)
     {
-
-        var recognitions = _recognitionRepository.GetRecognitions();
-
-        var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new KudosLog
+        lock (_lock)
         {
-            Id = k.Id,
-            TitleId = k.TitleId,
-            ToPersonId = k.ToPersonId
+
+
+            var recognitions = _recognitionRepository.GetRecognitions();
+
+            var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new KudosLog
+            {
+                Id = k.Id,
+                TitleId = k.TitleId,
+                ToPersonId = k.ToPersonId
+            }
+            ).ToList();
+
+
+            var result = from kudo in kudos
+                         join recognition in recognitions
+                            on kudo.TitleId equals recognition.Id.ToString()
+                         group recognition by recognition.ValuesCodeGroup into recognitionGroup
+                         select new KudosGroupedByValue()
+                         {
+                             ValueCodeGroup = recognitionGroup.Key,
+                             Count = recognitionGroup.Select(r => r.Id).Distinct().Count()
+                         };
+
+
+            return Task.FromResult(result);
+
         }
-        ).ToList();
-
-
-        var result = from kudo in kudos
-                     join recognition in recognitions
-                        on kudo.TitleId equals recognition.Id.ToString()
-                     group recognition by recognition.ValuesCodeGroup into recognitionGroup
-                     select new KudosGroupedByValue()
-                     {
-                         ValueCodeGroup = recognitionGroup.Key,
-                         Count = recognitionGroup.Select(r => r.Id).Distinct().Count()
-                     };
-
-
-        return Task.FromResult(result); 
-
-
     }
 
     public Guid Send(KudosLog kudos)

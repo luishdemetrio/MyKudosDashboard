@@ -13,7 +13,7 @@ public class GroupScoreRules : IGroupScoreRules
     private readonly IUserKudosService _userKudosService;
     private readonly IGroupUserScoreService _groupUserScoreService;
 
-    private readonly IScoreMessageSender _scoreQueue;
+  
 
     private readonly int _groupCompletedScore;
 
@@ -21,7 +21,6 @@ public class GroupScoreRules : IGroupScoreRules
 
 
     public GroupScoreRules(IUserScoreService userScoreService,
-                           IScoreMessageSender scoreQueue,
                            IUserKudosService userKudosService,
                            IConfiguration configuration,
                            IGroupUserScoreService groupUserScoreService)
@@ -29,7 +28,6 @@ public class GroupScoreRules : IGroupScoreRules
         _userScoreService = userScoreService;
         _groupUserScoreService = groupUserScoreService;
 
-        _scoreQueue = scoreQueue;
         _userKudosService = userKudosService;
 
         _groupCompletedScore = int.Parse(configuration["GroupCompletedScore"]);
@@ -41,55 +39,58 @@ public class GroupScoreRules : IGroupScoreRules
         return value >= 3 ? _groupCompletedScore : 0;
     }
 
-    public async Task UpdateGroupScoreAsync(UserScore pUserScore)
+    public async Task<UserScore> UpdateGroupScoreAsync(UserScore pUserScore)
     {
 
         await _userScoreService.SetUserScoreAsync(pUserScore);
 
-        var score = await _userScoreService.GetUserScoreAsync(pUserScore.UserId);
-
-        if (score != null)
+        var score = await _userScoreService.GetUserScoreAsync(pUserScore.Id.ToString());
+        try
         {
-            var kudosGroup = await _userKudosService.GetUserKudosByCategory(pUserScore.UserId);
-
-            if (kudosGroup != null)
+            if (score != null)
             {
-                foreach (var item in kudosGroup)
+                var kudosGroup = await _userKudosService.GetUserKudosByCategory(pUserScore.Id.ToString());
+
+                if (kudosGroup != null)
                 {
-                    switch (item.ValueCodeGroup)
+                    foreach (var item in kudosGroup)
                     {
+                        switch (item.ValueCodeGroup)
+                        {
 
-                        case 1:
-                            score.GroupOne = GetGroupScore(item.Count); break;
+                            case 1:
+                                score.GroupOne = GetGroupScore(item.Count); break;
 
-                        case 2:
-                            score.GroupTwo = GetGroupScore(item.Count); break;
+                            case 2:
+                                score.GroupTwo = GetGroupScore(item.Count); break;
 
-                        case 3:
-                            score.GroupThree = GetGroupScore(item.Count); break;
+                            case 3:
+                                score.GroupThree = GetGroupScore(item.Count); break;
 
-                        case 4:
-                            score.GroupFour = GetGroupScore(item.Count); break;
+                            case 4:
+                                score.GroupFour = GetGroupScore(item.Count); break;
 
-                        case 5:
-                            score.GroupFive = GetGroupScore(item.Count); break;
+                            case 5:
+                                score.GroupFive = GetGroupScore(item.Count); break;
 
+                        }
+                    }
+
+                    var all = score.GroupOne * score.GroupTwo * score.GroupThree * score.GroupFour * score.GroupFive;
+
+                    if ((all != 0) && (all != null))
+                    {
+                        score.GroupAll = _allGroupCompletedScore;
+
+                        await _groupUserScoreService.UpdateGroupScoreAsync(score);
                     }
                 }
 
-                var all = score.GroupOne * score.GroupTwo * score.GroupThree * score.GroupFour * score.GroupFive;
 
-                if ((all != 0) && (all != null))
-                {
-                    score.GroupAll = _allGroupCompletedScore;
-
-                    await _groupUserScoreService.UpdateGroupScoreAsync(score);
-                }
             }
-
-            await _scoreQueue.NotifyProfileScoreUpdated(score);
         }
+        catch { }
 
-
+        return score;
     }
 }

@@ -14,12 +14,13 @@ public class UndolikeSent
     private string _likeSendScore;
 
     private IGroupScoreRules _groupScoreRules;
+    private readonly IScoreMessageSender _scoreQueue;
 
-    public UndolikeSent(IConfiguration configuration,IGroupScoreRules groupScoreRules)
+    public UndolikeSent(IConfiguration configuration,IGroupScoreRules groupScoreRules, IScoreMessageSender scoreQueue)
     {
         _groupScoreRules = groupScoreRules;
         _likeSendScore = configuration["LikeSendScore"];
-        
+        _scoreQueue = scoreQueue;
     }
 
     [FunctionName("GamificationUndolikeSent")]
@@ -32,12 +33,21 @@ public class UndolikeSent
             var score = 
                 new UserScore()
                 {
-                    UserId = mySbMsg,
+                    Id = new Guid(mySbMsg),
                     LikesSent = -1,
                     Score = int.Parse(_likeSendScore) * -1
                 };
 
-            await _groupScoreRules.UpdateGroupScoreAsync(score);
+            var newScore = await _groupScoreRules.UpdateGroupScoreAsync(score);
+
+            if (newScore != null)
+            {
+                await _scoreQueue.NotifyProfileScoreUpdated(newScore);
+            }
+            else
+            {
+                log.LogError($"Error to read score");
+            }
 
             log.LogInformation($"C# ServiceBus GamificationUndolikeSent topic trigger function processed message: {mySbMsg}");
         }

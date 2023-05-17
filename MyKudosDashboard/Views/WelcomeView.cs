@@ -1,6 +1,8 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
+using Microsoft.Extensions.Logging;
 using MyKudosDashboard.Interfaces;
+using MyKudosDashboard.MessageSender;
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 
@@ -14,30 +16,29 @@ public class WelcomeView : IWelcomeView
 
     private string _userId;
 
-    private IKudosGateway _kudosGateway;
 
     private IUserGateway _userGateway;
 
-    private string _serviceBusConnectionString;
+    private static string _updatedScoreDashboard = string.Empty;
+    private static string _updatedScoreSamePersonDashboard = string.Empty;
 
-    private string _scoreUpdatedDashboardTopic;
+    private ServiceBusSubscriberHelper _subscriberUserScore;
 
-  
-
-    public WelcomeView(IKudosGateway gatewayService, IConfiguration configuration, IUserGateway userGateway)
+    public WelcomeView(IKudosGateway gatewayService, IConfiguration configuration, IUserGateway userGateway, ILogger<WelcomeView> logger)
     {
-        _kudosGateway = gatewayService;
 
-        //_serviceBusConnectionString = configuration["KudosServiceBus_ConnectionString"];
-        //_scoreUpdatedDashboardTopic = configuration["KudosServiceBus_ScoreUpdatedDashboard"]; 
-
-        //_serviceBusClient = new ServiceBusClient(_serviceBusConnectionString);
         _userGateway = userGateway;
 
-  
+        _updatedScoreDashboard = configuration["KudosServiceBus_ScoreUpdatedDashboard"];
+
+        _updatedScoreSamePersonDashboard = configuration["KudosServiceBus_ScoreUpdatedSamePersonDashboard"];
+
+        _subscriberUserScore = new ServiceBusSubscriberHelper(configuration, logger);
     }
 
-//    public IWelcomeView.UpdateScoreCallBack ScoreCallback { get ; set ; }
+
+
+    public IWelcomeView.UpdateScoreCallBack ScoreCallback { get ; set ; }
 
     public async Task<string> GetUserPhoto(string userId)
     {
@@ -45,71 +46,58 @@ public class WelcomeView : IWelcomeView
         return await _userGateway.GetUserPhoto(userId);
     }
 
+    public void RegisterForUserScoreUpdate(string userId)
+    {
+        _userId = userId;
 
-    //public void RegisterForUserScoreUpdate(string userId)
-    //{
-    //    //its used later to control the score
-    //    _userId = userId;
+        SubscribeUserScoreUpdate(userId);
 
-       
+        SubscribeUserScoreSamePersonUpdate(userId);
+    }
 
-    //    ServiceBusScoreProcessor(_userId);
+    private void SubscribeUserScoreUpdate(string subscriptionName)
+    {
+        var config = new ServiceBusProcessorConfig
+        {
+            DashboardName = _updatedScoreDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
+            {
+                //retrive the message body
+                var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-    //}
+                if ((userScore != null) && (userScore.Id == _userId))
+                {
+                    await ScoreCallback?.Invoke(userScore);
+                }
 
-    //private async Task CreateATopicIfItDoesntExistAsync(string topicName, string subscriptionName)
-    //{
-    //    //create a topic if it doesnt exist
-    //    var serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
+                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
+            }
+        };
 
-    //    if (!await serviceBusAdminClient.TopicExistsAsync(topicName))
-    //    {
-    //        await serviceBusAdminClient.CreateTopicAsync(topicName);
-    //    }
+        _subscriberUserScore.ServiceBusProcessor(config);
+    }
 
-    //    //create a temp subscription for the user
+    private void SubscribeUserScoreSamePersonUpdate(string subscriptionName)
+    {
+        var config = new ServiceBusProcessorConfig
+        {
+            DashboardName = _updatedScoreSamePersonDashboard,
+            SubscriptionName = subscriptionName,
+            MessageProcessor = async arg =>
+            {
+                //retrive the message body
+                var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-    //    if (!await serviceBusAdminClient.SubscriptionExistsAsync(topicName, subscriptionName))
-    //    {
-    //        var options = new CreateSubscriptionOptions(topicName, subscriptionName)
-    //        {
-    //            AutoDeleteOnIdle = TimeSpan.FromHours(1)
-    //        };
+                if ((userScore != null) && (userScore.Id == _userId))
+                {
+                    await ScoreCallback?.Invoke(userScore);
+                }
 
-    //        await serviceBusAdminClient.CreateSubscriptionAsync(options);
-    //    }
-    //}
+                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
+            }
+        };
 
-    //private async void ServiceBusScoreProcessor(string userId)
-    //{
-
-    //    await CreateATopicIfItDoesntExistAsync(_scoreUpdatedDashboardTopic, userId);
-
-    //    _serviceBusScoreProcessor = _serviceBusClient.CreateProcessor(_scoreUpdatedDashboardTopic, userId);
-
-    //    _serviceBusScoreProcessor.ProcessMessageAsync += _serviceBusScoreProcessor_ProcessMessageAsync;
-
-    //    _serviceBusScoreProcessor.ProcessErrorAsync += _serviceBusScoreProcessor_ProcessErrorAsync;
-
-    //    await _serviceBusScoreProcessor.StartProcessingAsync();
-    //}
-
-    //private async Task _serviceBusScoreProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
-    //{
-    //    await Task.CompletedTask;
-    //}
-
-    //private async Task _serviceBusScoreProcessor_ProcessMessageAsync(ProcessMessageEventArgs arg)
-    //{
-    //    //retrive the message body
-
-    //    var score = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
-
-    //    if ((score != null) && (score.UserId == _userId) )
-    //    {
-    //        ScoreCallback?.Invoke(score);
-    //    }
-
-    //    await arg.CompleteMessageAsync(arg.Message);
-    //}
+        _subscriberUserScore.ServiceBusProcessor(config);
+    }
 }

@@ -27,6 +27,9 @@ public class KudosMessageSender : IKudosMessageSender
     private static string _likeSentDashboard = string.Empty;
     private static string _likeUndoDashboard = string.Empty;
 
+    private static string _gamificationLikeSentSamePersonTopicName = string.Empty;
+    private static string _gamificationUndolikeSentSamePersonTopicName = string.Empty;
+
     public KudosMessageSender(IMessageSender queue, IConfiguration configuration)
     {
         _connectionString = configuration["KudosServiceBus_ConnectionString"];
@@ -50,6 +53,10 @@ public class KudosMessageSender : IKudosMessageSender
         _messageSender.CreateTopicIfNotExistsAsync(_kudosSentDashboard).ConfigureAwait(false);
         _messageSender.CreateTopicIfNotExistsAsync(_likeSentDashboard).ConfigureAwait(false);
         _messageSender.CreateTopicIfNotExistsAsync(_likeUndoDashboard).ConfigureAwait(false);
+
+        _messageSender.CreateQueueIfNotExistsAsync(_gamificationLikeSentSamePersonTopicName).ConfigureAwait(false);
+
+        _messageSender.CreateQueueIfNotExistsAsync(_gamificationUndolikeSentSamePersonTopicName).ConfigureAwait(false);
     }
 
     private static void ReadConfigurationSettings(IConfiguration configuration)
@@ -59,6 +66,9 @@ public class KudosMessageSender : IKudosMessageSender
 
         _gamificationLikeSentTopicName = configuration["KudosServiceBus_GamificationLikeSentTopicName"];
         _gamificationLikeReceivedTopicName = configuration["KudosServiceBus_GamificationLikeReceivedTopicName"];
+        
+        _gamificationLikeSentSamePersonTopicName = configuration["KudosServiceBus_GamificationLikeSentSamePersonTopicName"];
+        _gamificationUndolikeSentSamePersonTopicName = configuration["KudosServiceBus_GamificationUndolikeSentSamePersonTopicName"];
 
         _gamificationUndolikeSentTopicName = configuration["KudosServiceBus_GamificationUndolikeSentTopicName"];
         _gamificationUndolikeReceivedTopicName = configuration["KudosServiceBus_GamificationUndolikeReceivedTopicName"];
@@ -104,9 +114,18 @@ public class KudosMessageSender : IKudosMessageSender
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await _messageSender.SendQueue(like.FromPerson.Id, _gamificationLikeSentTopicName);
-        await _messageSender.SendQueue(like.ToPersonId, _gamificationLikeReceivedTopicName);
 
+        if (like.ToPersonId == like.FromPerson.Id)
+        {
+            await _messageSender.SendQueue(like.FromPerson.Id, _gamificationLikeSentSamePersonTopicName);
+        }
+        else
+        {
+
+            await _messageSender.SendQueue(like.FromPerson.Id, _gamificationLikeSentTopicName);
+            await _messageSender.SendQueue(like.ToPersonId, _gamificationLikeReceivedTopicName);
+
+        }
         //notification to update the Teams Apps
         await _messageSender.SendTopic(like, _likeSentDashboard, _likeSentDashboard);
     }
@@ -116,9 +135,15 @@ public class KudosMessageSender : IKudosMessageSender
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        await _messageSender.SendQueue(like.FromPerson.Id, _gamificationUndolikeSentTopicName);
-        await _messageSender.SendQueue(like.ToPersonId, _gamificationUndolikeReceivedTopicName);
-
+        if (like.ToPersonId == like.FromPerson.Id)
+        {
+            await _messageSender.SendQueue(like.FromPerson.Id, _gamificationUndolikeSentSamePersonTopicName);
+        }
+        else
+        {
+            await _messageSender.SendQueue(like.FromPerson.Id, _gamificationUndolikeSentTopicName);
+            await _messageSender.SendQueue(like.ToPersonId, _gamificationUndolikeReceivedTopicName);
+        }
         //notification to update the Teams Apps
         await _messageSender.SendTopic(like, _likeUndoDashboard, _likeUndoDashboard);
     }

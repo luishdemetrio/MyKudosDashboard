@@ -28,6 +28,7 @@ public class UserScoreController : ControllerBase
     [HttpPost(Name = "SetUserScore")]
     public bool SetUserScore([FromBody] UserScore userScore)
     {
+
         return  _userScoreService.SetUserScore(userScore);
 
     }
