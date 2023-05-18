@@ -30,7 +30,7 @@ public class AgentNotificationService : IAgentNotificationService
 
         var request = new RestRequest();
         request.Method = Method.Post;
-        request.AddHeader("Authorization", "Bearer " + token);
+        //request.AddHeader("Authorization", "Bearer " + token);
 
         request.AddHeader("Accept", "application/json");
         request.AddHeader("Content-Type", "application/json");
