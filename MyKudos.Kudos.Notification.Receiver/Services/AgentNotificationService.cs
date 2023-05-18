@@ -22,7 +22,7 @@ public class AgentNotificationService : IAgentNotificationService
     public async Task<bool> SendNotificationAsync(KudosNotification kudos)
     {          
 
-        var uri = $"{_agentServiceUrl}api/cardnotification";
+        var uri = $"{_agentServiceUrl}";
 
         var client = new RestClient(uri);
 
