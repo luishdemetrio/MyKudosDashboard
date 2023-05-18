@@ -173,6 +173,13 @@ else
 
                     WelcomeView.ScoreCallback = UpdateScoreCallback;
 
+
+                    WelcomeView.LikeCallback = UpdateLikesCallBack;
+                    WelcomeView.UndoLikeCallback = UpdateUndoLikesCallBack;
+                    WelcomeView.KudosCallback = UpdateKudosCallback;
+                    WelcomeView.CommentsDeletedCallback = CommentsDeleted;
+                    WelcomeView.CommentsSentCallback = CommentsSent;
+
                 }
             }
             else
@@ -184,6 +191,55 @@ else
             StateHasChanged();
         }
 
+    }
+
+    private async Task UpdateLikesCallBack(Like pLike)
+    {
+        if (_kudosTab != null)
+        {
+            await _kudosTab.UpdateLikesCallBack(pLike).ConfigureAwait(true);
+            _sendKudosIsHidden = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public async Task UpdateUndoLikesCallBack(Like pLike)
+    {
+        if (_kudosTab != null)
+        {
+            await _kudosTab.UpdateUndoLikesCallBack(pLike).ConfigureAwait(true);
+            _sendKudosIsHidden = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+    public async Task UpdateKudosCallback(KudosResponse pKudos)
+    {
+        if (_kudosTab != null)
+        {
+            await _kudosTab.UpdateKudosCallback(pKudos).ConfigureAwait(true);
+            _sendKudosIsHidden = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public async Task CommentsDeleted(CommentsRequest pComments)
+    {
+        if (_kudosTab != null)
+        {
+            await _kudosTab.CommentsDeleted(pComments).ConfigureAwait(true);
+            _sendKudosIsHidden = true;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public async Task CommentsSent(CommentsRequest pComments)
+    {
+        if (_kudosTab != null)
+        {
+            await _kudosTab.CommentsSent(pComments).ConfigureAwait(true);
+            _sendKudosIsHidden = true;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task UpdateScoreCallback(UserScore userScore)

@@ -66,17 +66,18 @@
 
         _pageNumber = 1;
 
-        if (User != null)
-        {
-            KudosTabView.RegisterForLiveUpdates(User.ObjectId);
 
-            KudosTabView.LikeCallback = UpdateLikesCallBack;
-            KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
-            KudosTabView.KudosCallback = UpdateKudosCallback;
-            KudosTabView.CommentsDeletedCallback = CommentsDeleted;
-            KudosTabView.CommentsSentCallback = CommentsSent;
+        //if (User != null)
+        //{
+        //    KudosTabView.RegisterForLiveUpdates(User.ObjectId);
 
-        }
+        //    KudosTabView.LikeCallback = UpdateLikesCallBack;
+        //    KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
+        //    KudosTabView.KudosCallback = UpdateKudosCallback;
+        //    KudosTabView.CommentsDeletedCallback = CommentsDeleted;
+        //    KudosTabView.CommentsSentCallback = CommentsSent;
+
+        //}
 
         await LoadKudos();
 
@@ -92,7 +93,7 @@
 
 
 
-    private async Task CommentsDeleted(CommentsRequest pComments)
+    public async Task CommentsDeleted(CommentsRequest pComments)
     {
         if (_kudosList == null)
         {
@@ -134,7 +135,7 @@
 
     }
 
-    private async Task CommentsSent(CommentsRequest pComments)
+    public async Task CommentsSent(CommentsRequest pComments)
     {
 
         if (_kudosList == null)
@@ -227,7 +228,7 @@
         return _kudosList.Values.Where(k => k.From.Id == User.ObjectId).OrderByDescending(k => k.SendOn);
     }
 
-    private async Task UpdateKudosCallback(KudosResponse pKudos)
+    public async Task UpdateKudosCallback(KudosResponse pKudos)
     {
 
         if (_kudosList == null)
@@ -259,7 +260,7 @@
     }
 
 
-    private async Task UpdateLikesCallBack(Like pLike)
+    public async Task UpdateLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
@@ -317,7 +318,7 @@
 
     }
 
-    private async Task UpdateUndoLikesCallBack(Like pLike)
+    public async Task UpdateUndoLikesCallBack(Like pLike)
     {
 
         // The person who sent already has the like updated
