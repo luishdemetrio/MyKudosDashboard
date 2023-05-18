@@ -198,8 +198,7 @@ else
         if (_kudosTab != null)
         {
             await _kudosTab.UpdateLikesCallBack(pLike).ConfigureAwait(true);
-            _sendKudosIsHidden = true;
-            await InvokeAsync(StateHasChanged);
+        
         }
     }
 
@@ -208,8 +207,7 @@ else
         if (_kudosTab != null)
         {
             await _kudosTab.UpdateUndoLikesCallBack(pLike).ConfigureAwait(true);
-            _sendKudosIsHidden = true;
-            await InvokeAsync(StateHasChanged);
+        
         }
     }
     public async Task UpdateKudosCallback(KudosResponse pKudos)
@@ -217,8 +215,7 @@ else
         if (_kudosTab != null)
         {
             await _kudosTab.UpdateKudosCallback(pKudos).ConfigureAwait(true);
-            _sendKudosIsHidden = true;
-            await InvokeAsync(StateHasChanged);
+        
         }
     }
 
@@ -227,8 +224,7 @@ else
         if (_kudosTab != null)
         {
             await _kudosTab.CommentsDeleted(pComments).ConfigureAwait(true);
-            _sendKudosIsHidden = true;
-            await InvokeAsync(StateHasChanged);
+        
         }
     }
 
@@ -237,8 +233,7 @@ else
         if (_kudosTab != null)
         {
             await _kudosTab.CommentsSent(pComments).ConfigureAwait(true);
-            _sendKudosIsHidden = true;
-            await InvokeAsync(StateHasChanged);
+        
         }
     }
 
@@ -247,8 +242,7 @@ else
         if (_userProfileScore != null)
         {
             await _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
-            _sendKudosIsHidden = true;
-            await InvokeAsync(StateHasChanged);
+        
         }
         
 

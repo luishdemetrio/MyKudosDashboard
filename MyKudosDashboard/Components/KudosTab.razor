@@ -313,6 +313,9 @@
             await LoadKudos();
         }
 
+         await InvokeAsync(StateHasChanged).ConfigureAwait(true);
+         await Task.Delay(300).ConfigureAwait(false);
+
         await Task.CompletedTask;
 
 
@@ -361,6 +364,9 @@
             //force to reload
             await LoadKudos();
         }
+
+        await InvokeAsync(StateHasChanged).ConfigureAwait(true);
+        await Task.Delay(300).ConfigureAwait(false);
 
     }
 

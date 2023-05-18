@@ -166,7 +166,7 @@
 
     private bool _isLoaded = false;
 
-     private bool _shouldRender =true;
+    private bool _shouldRender =true;
 
     private ElementReference _score;
     private ElementReference _kudosSent;
@@ -181,8 +181,8 @@
     {
         base.OnInitialized();
 
-         //  UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
-         //UserProfileScoreView.UserScoreCallback = UpdateScore;
+        //  UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
+        //UserProfileScoreView.UserScoreCallback = UpdateScore;
 
         _userScore = await UserProfileScoreView.GetUserScore(User.ObjectId);
 
@@ -195,12 +195,15 @@
 
     }
 
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
 
-      
+        await base.OnAfterRenderAsync(firstRender);
 
-    //}
+        await UpdateScoreValues();
+
+
+    }
 
     protected override bool ShouldRender()
     {
@@ -217,41 +220,47 @@
 
             _shouldRender = true;
 
-            if (_userScore == null)
-                return;
+            await UpdateScoreValues();
 
-            for (int attempts = 0; attempts < 3; attempts++)
+        }
+
+
+
+
+    }
+
+    private async Task UpdateScoreValues()
+    {
+    
+        if (_userScore == null)
+            return;
+
+        for (int attempts = 0; attempts < 3; attempts++)
+        {
+
+            try
             {
 
-                try
-                {
+                await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
 
-                    await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
+                await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
+                await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
+                await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
+                await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
+                await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
+                await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
 
-                    await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
-                    await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
-                    await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
-                    await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
-                    await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
-                    await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
-
-                    break;
-                }
-                catch (JSDisconnectedException)
-                {
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(300);
-                }
-
+                break;
+            }
+            catch (JSDisconnectedException)
+            {
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(300);
             }
 
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(300);
         }
-
-        
-
-
     }
 
     private string GetKudosSentBadge()
