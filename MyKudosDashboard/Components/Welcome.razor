@@ -60,7 +60,7 @@ else
                         <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto />
+                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto  />
 
                     <button type="button" class="btn btn-primary" style="height:60px;margin:5px;"
                         @onclick=@(()=>OpenSendKudosPanel() )                         >
@@ -101,8 +101,7 @@ else
                 </div>
             </div>
 
-            <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto
-                        sendKudosCallBack=@SendCallBack />
+            <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto/>
 
         </div>
 
@@ -136,8 +135,7 @@ else
 
     private CommentsKudos _replyKudos;
 
-
-
+    
 
     private void OnDismiss()
     {
@@ -168,18 +166,6 @@ else
                 if (_user != null)
                 {                    
                     _userPhoto = await WelcomeView.GetUserPhoto(_user.ObjectId);
-
-                    WelcomeView.RegisterForUserScoreUpdate(_user.ObjectId);
-
-                    WelcomeView.ScoreCallback = UpdateScoreCallback;
-
-
-                    WelcomeView.LikeCallback = UpdateLikesCallBack;
-                    WelcomeView.UndoLikeCallback = UpdateUndoLikesCallBack;
-                    WelcomeView.KudosCallback = UpdateKudosCallback;
-                    WelcomeView.CommentsDeletedCallback = CommentsDeleted;
-                    WelcomeView.CommentsSentCallback = CommentsSent;
-
                 }
             }
             else
@@ -193,60 +179,6 @@ else
 
     }
 
-    private async Task UpdateLikesCallBack(Like pLike)
-    {
-        if (_kudosTab != null)
-        {
-            await _kudosTab.UpdateLikesCallBack(pLike).ConfigureAwait(true);
-        
-        }
-    }
-
-    public async Task UpdateUndoLikesCallBack(Like pLike)
-    {
-        if (_kudosTab != null)
-        {
-            await _kudosTab.UpdateUndoLikesCallBack(pLike).ConfigureAwait(true);
-        
-        }
-    }
-    public async Task UpdateKudosCallback(KudosResponse pKudos)
-    {
-        if (_kudosTab != null)
-        {
-            await _kudosTab.UpdateKudosCallback(pKudos).ConfigureAwait(true);
-        
-        }
-    }
-
-    public async Task CommentsDeleted(CommentsRequest pComments)
-    {
-        if (_kudosTab != null)
-        {
-            await _kudosTab.CommentsDeleted(pComments).ConfigureAwait(true);
-        
-        }
-    }
-
-    public async Task CommentsSent(CommentsRequest pComments)
-    {
-        if (_kudosTab != null)
-        {
-            await _kudosTab.CommentsSent(pComments).ConfigureAwait(true);
-        
-        }
-    }
-
-    private async Task UpdateScoreCallback(UserScore userScore)
-    {
-        if (_userProfileScore != null)
-        {
-            await _userProfileScore.UpdateScore(userScore).ConfigureAwait(true);
-        
-        }
-        
-
-    }
 
     private async Task OpenSendKudosPanel()
     {
@@ -254,11 +186,6 @@ else
 
         await _sendKudosPanel.SendKudosModal();
 
-    }
-
-    private void SendCallBack(KudosResponse pKudos)
-    {
-      //  _kudosTab.SendCallBack(pKudos);
     }
 
     private void ReplyCallBack(KudosResponse pKudos)

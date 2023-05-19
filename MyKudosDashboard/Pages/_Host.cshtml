@@ -31,6 +31,21 @@
         return slideIndex;
     };
 
+    function getValueById(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            return element.innerText;
+        }
+        return null;
+    }
+
+    function setButtonDisabled(buttonId, disabled) {
+        var button = document.getElementById(buttonId);
+        if (button) {
+            button.disabled = disabled;
+        }
+    }
+  
 </script>
 
 <!DOCTYPE html>

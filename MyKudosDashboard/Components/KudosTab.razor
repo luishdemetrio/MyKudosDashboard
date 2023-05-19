@@ -19,18 +19,17 @@
         <FluentTab Text=@Localizer["KudosToMe"] style=";z-index:auto" />
         <FluentTab Text=@Localizer["KudosFromMe"] style=";z-index:auto" />
 
-        @if (_kudosList != null)
-        {
             <FluentTabPanel >
-                <KudosList @ref=AllKudosTab kudos=@GetAllKudos() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos MoreKudosCallback=@LoadMoreKudosAll  />
+                <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
+            
             <FluentTabPanel >
-                <KudosList kudos=@GetKudosToMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+                <KudosList TypeTab=KudosList.KudosTypeTab.ToMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
+            
             <FluentTabPanel >
-                <KudosList kudos=@GetKudosFromMe() User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
-            </FluentTabPanel>
-        }
+                <KudosList TypeTab=KudosList.KudosTypeTab.FromMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+            </FluentTabPanel>      
 
     </FluentTabs>
 
@@ -38,16 +37,11 @@
 
 @code {
 
-    //[Parameter]
-    //public IEnumerable<KudosResponse> kudos { get; set; }
-
     [Parameter]
     public string UserPhoto { get; set; }
 
     [Parameter]
     public UserInfo User { get; set; }
-
-    private ConcurrentDictionary<string,KudosResponse> _kudosList;
 
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
@@ -56,125 +50,47 @@
 
     private readonly object _lock = new object();
 
-    private int _pageNumber ;
-
     private KudosList AllKudosTab;
 
     protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
 
-        _pageNumber = 1;
 
+        if (User != null)
+        {
+            KudosTabView.RegisterForLiveUpdates(User.ObjectId);
 
-        //if (User != null)
-        //{
-        //    KudosTabView.RegisterForLiveUpdates(User.ObjectId);
+            KudosTabView.LikeCallback = UpdateLikesCallBack;
+            KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
+            KudosTabView.KudosCallback = UpdateKudosCallback;
+            KudosTabView.CommentsDeletedCallback = CommentsDeleted;
+            KudosTabView.CommentsSentCallback = CommentsSent;
 
-        //    KudosTabView.LikeCallback = UpdateLikesCallBack;
-        //    KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
-        //    KudosTabView.KudosCallback = UpdateKudosCallback;
-        //    KudosTabView.CommentsDeletedCallback = CommentsDeleted;
-        //    KudosTabView.CommentsSentCallback = CommentsSent;
+        }
 
-        //}
-
-        await LoadKudos();
-
-        //await Task.CompletedTask;
+        await Task.CompletedTask;
 
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-
     }
 
 
 
     public async Task CommentsDeleted(CommentsRequest pComments)
     {
-        if (_kudosList == null)
-        {
-            await LoadKudos();
-            return;
-        }
 
-        if (_kudosList.ContainsKey(pComments.KudosId))
-        {
-            var kudo = _kudosList[pComments.KudosId];
-
-            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
-
-            if ((comments != null) && (kudo.Comments.Contains(comments)))
-            {
-                kudo.Comments.Remove(comments);
-
-                for (int attempts = 0; attempts < 3; attempts++)
-                {
-
-                    if (AllKudosTab != null)
-                    {
-                        var updated = await AllKudosTab.UpdateNumberOfComments(kudo.Id, kudo.Comments.Count).ConfigureAwait(true);
-
-                        if (updated)
-                            break;
-                    }
-
-                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-                    await Task.Delay(300).ConfigureAwait(false);
-                }
-            }
-
-        }
-        else
-        {
-            await LoadKudos();
-        }
-
+        await AllKudosTab.CommentsDeleted(pComments);
+        
     }
 
     public async Task CommentsSent(CommentsRequest pComments)
     {
 
-        if (_kudosList == null)
-        {
-            await LoadKudos();
-            return;
-        }
-
-        if (_kudosList.ContainsKey(pComments.KudosId))
-        {
-            var kudo = _kudosList[pComments.KudosId];
-
-            if (!kudo.Comments.Contains(pComments.Id))
-            {
-
-                kudo.Comments.Add(pComments.Id);
-
-                for (int attempts = 0; attempts < 3; attempts++)
-                {
-
-                    if (AllKudosTab != null)
-                    {
-                        var updated = await AllKudosTab.UpdateNumberOfComments(kudo.Id, kudo.Comments.Count).ConfigureAwait(true);
-
-                        if (updated)
-                            break;
-                    }
-
-                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-                    await Task.Delay(300).ConfigureAwait(false);
-                }
-
-            }
-
-        }
-        else
-        {
-            await LoadKudos();
-        }
+        await AllKudosTab.CommentsSent(pComments);
 
     }
 
@@ -185,197 +101,28 @@
         ReplyCallBack?.Invoke(kudos);
     }
 
-    private async Task LoadKudos(int pageNumber =1)
-    {
-
-        if (_kudosList is null)
-        {
-            _kudosList = new();
-        }
-
-        var kudos = await KudosTabView.GetKudos(pageNumber).ConfigureAwait(true);
-        
-        if (kudos is null)
-            return;
-
-        foreach (var kudo in kudos)
-        {
-            if (!_kudosList.ContainsKey(kudo.Id))
-            {
-                _kudosList.TryAdd(kudo.Id, kudo);
-            }
-        }
-
-        await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-        await Task.Delay(300);
-
-       
-
-    }
-
-    private IEnumerable<KudosResponse> GetAllKudos()
-    {
-        return _kudosList.Values.OrderByDescending(k => k.SendOn);
-    }
-
-    private IEnumerable<KudosResponse> GetKudosToMe()
-    {
-        return _kudosList.Values.Where(k => k.To.Id == User.ObjectId).OrderByDescending(k => k.SendOn);
-    }
-
-    private IEnumerable<KudosResponse> GetKudosFromMe()
-    {
-        return _kudosList.Values.Where(k => k.From.Id == User.ObjectId).OrderByDescending(k => k.SendOn);
-    }
-
-    public async Task UpdateKudosCallback(KudosResponse pKudos)
-    {
-
-        if (_kudosList == null)
-        {
-            await LoadKudos();
-            return;
-        }
-
-
-        //var k = _kudosList.FirstOrDefault(k => k.Id == pKudos.Id);
-
-        if (!_kudosList.ContainsKey(pKudos.Id))
-        {
-
-            if(! _kudosList.TryAdd(pKudos.Id, pKudos) )
-            {
-                await LoadKudos();
-            }
-
-            await InvokeAsync(StateHasChanged);
-
-            await Task.Delay(300);
-            
-            await AllKudosTab.UpdateKudos(pKudos);
-            
-
-        }
-
-    }
-
-
-    public async Task UpdateLikesCallBack(Like pLike)
-    {
-
-        // The person who sent already has the like updated
-        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-        if (_kudosList == null)
-        {
-            await Task.CompletedTask;
-            return;
-        }
-        if (_kudosList.Count() == 0)
-        {
-            await LoadKudos();
-            return;
-        }
-      
-        if (_kudosList.ContainsKey(pLike.KudosId))
-        {
-            var kudo = _kudosList[pLike.KudosId];
-            //var like = kudo.Likes.Where(k => k.Id == pLike.FromPerson.Id).FirstOrDefault();
-
-
-            if (! kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).Any())
-            {
-
-                kudo.Likes.Add(new Person()
-                    {
-                        Id = pLike.FromPerson.Id,
-                        Name = pLike.FromPerson.Name,
-                        Photo = pLike.FromPerson.Photo
-                    });
-
-                for (int attempts = 0; attempts < 3; attempts++)
-                {
-
-                    var updated = await AllKudosTab.UpdateNumberOfLikes(kudo.Id).ConfigureAwait(true);
-
-                    if (updated)
-                        break;
-
-                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-                    await Task.Delay(300).ConfigureAwait(false);
-
-                }
-                
-            }
-
-        }
-        else
-        {
-            await LoadKudos();
-        }
-
-         await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-         await Task.Delay(300).ConfigureAwait(false);
-
-        await Task.CompletedTask;
-
-
-    }
-
-    public async Task UpdateUndoLikesCallBack(Like pLike)
-    {
-
-        // The person who sent already has the like updated
-        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-        if (_kudosList == null)
-            return;
-
-      
-        if (_kudosList.ContainsKey(pLike.KudosId))
-        {
-            var kudo = _kudosList[pLike.KudosId];
-
-            var like = kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).FirstOrDefault();
-
-
-            if (kudo.Likes.Contains(like))
-            {
-                kudo.Likes.Remove(like);
-
-               
-                for (int attempts = 0; attempts < 3; attempts++)
-                {
-
-                    var updated = await AllKudosTab.UpdateNumberOfLikes(kudo.Id).ConfigureAwait(true);
-
-                    if (updated)
-                        break;
-
-                    await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-                    await Task.Delay(300).ConfigureAwait(false);
-
-                }
-
-            }
-
-
-        }
-        else
-        {
-            //force to reload
-            await LoadKudos();
-        }
-
-        await InvokeAsync(StateHasChanged).ConfigureAwait(true);
-        await Task.Delay(300).ConfigureAwait(false);
-
-    }
-
   
 
-    private async Task LoadMoreKudosAll()
+    public void UpdateKudosCallback(KudosResponse pKudos)
     {
-        _pageNumber++;
 
-        await LoadKudos(_pageNumber);
+        AllKudosTab.UpdateKudos(pKudos);
+
     }
+
+
+    public void UpdateLikesCallBack(Like pLike)
+    {
+
+         AllKudosTab.UpdateLikesCallBack(pLike);
+
+    }
+
+    public void UpdateUndoLikesCallBack(Like pLike)
+    {
+
+        AllKudosTab.UpdateUndoLikesCallBack(pLike);
+
+    }
+
 }

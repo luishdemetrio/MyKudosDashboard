@@ -29,7 +29,7 @@
                 <div style="float:none;width:100%;text-align: center">
                     <h3 class="card-title pricing-card-title">
                         @*<div @ref=_score>@_userScore.Score</div>*@
-                        <small @ref=_score style="margin-top:10px">@_userScore.Score</small>
+                        <small @ref=_score style="margin-top:10px">@UserScoreValue.Score</small>
                         <small class="text-muted fw-light" style="margin-top:10px"> @Localizer["Points"]</small>
                     </h3>
                 </div>
@@ -40,98 +40,98 @@
                     <h5 class="card-title pricing-card-title">
 
                         @*<FluentEmoji Name="@FluentEmojis.UpRightArrow" Size="@EmojiSize.Size32"  />*@
-                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Filled=false />
+                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Filled=false  />
 
-                        <small @ref=_kudosSent class="text-muted fw-light"> @_userScore.KudosSent</small>
+                        <small @ref=_kudosSent class="text-muted fw-light"> @UserScoreValue.KudosSent</small>
                         <small class="text-muted fw-light"> @Localizer["KudosSent"]</small>
                     </h5>
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Filled=false />
+                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Filled=false  />
 
-                        <small @ref=_kudosReceived class ="text-muted fw-light"> @_userScore.KudosReceived</small>
+                        <small @ref=_kudosReceived class ="text-muted fw-light"> @UserScoreValue.KudosReceived</small>
                         <small class="text-muted fw-light"> @Localizer["KudosReceived"]</small>
                     </h5>
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.ThumbLike" Filled=false />
+                        <FluentIcon Name="@FluentIcons.ThumbLike" Filled=false  />
 
-                        <small @ref=_likesSent class="text-muted fw-light"> @_userScore.LikesSent</small>
+                        <small @ref=_likesSent class="text-muted fw-light"> @UserScoreValue.LikesSent</small>
                         <small class="text-muted fw-light"> @Localizer["LikesSent"]</small>
                     </h5>
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.Heart" Filled=false />
+                        <FluentIcon Name="@FluentIcons.Heart" Filled=false  />
 
-                        <small @ref=_likesReceived class ="text-muted fw-light"> @_userScore.LikesReceived</small>
+                        <small @ref=_likesReceived class ="text-muted fw-light"> @UserScoreValue.LikesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["LikesReceived"]</small>
                     </h5>
 
                      <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false />
+                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false  />
 
-                        <small @ref=_commentsSent class="text-muted fw-light"> @_userScore.MessagesSent</small>
+                        <small @ref=_commentsSent class="text-muted fw-light"> @UserScoreValue.MessagesSent</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsSent"]</small>
                     </h5>
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false />
+                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false  />
 
-                        <small @ref=_commentsReceived class="text-muted fw-light"> @_userScore.MessagesReceived</small>
+                        <small @ref=_commentsReceived class="text-muted fw-light"> @UserScoreValue.MessagesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsReceived"]</small>
                     </h5>
 
                 </div>
 
-                @if (_userScore.KudosSent + _userScore.KudosReceived > 0)
+                @if (UserScoreValue.KudosSent + UserScoreValue.KudosReceived > 0)
                 {
                     <div style="clear:both;">
                         <p>@Localizer["Achievements"]</p>
 
                         
-                        @if (_userScore.KudosSent >0)
+                        @if (UserScoreValue.KudosSent >0)
                         {
                             <img src=@GetKudosSentBadge() style="height:80px;width:80px;padding:5px" />
                         }
 
-                        @if(_userScore.KudosReceived >= 10)
+                        @if(UserScoreValue.KudosReceived >= 10)
                         {
                             <img src=@GetKudosReceivedBadge() style="height:80px;width:80px;padding:5px" />
                         }
 
-                        @if (_userScore.GroupOne > 0 )
+                        @if (UserScoreValue.GroupOne > 0 )
                         {
                             <img src=@GetKudosValuesBadge(1) style="height:80px;width:80px;padding:5px" />
                         }
 
-                          @if (_userScore.GroupTwo> 0 )
+                          @if (UserScoreValue.GroupTwo> 0 )
                         {
                             <img src=@GetKudosValuesBadge(2) style="height:80px;width:80px;padding:5px" />
                         }
 
 
-                        @if (_userScore.GroupThree > 0)
+                        @if (UserScoreValue.GroupThree > 0)
                         {
                             <img src=@GetKudosValuesBadge(3) style="height:80px;width:80px;padding:5px" />
                         }
 
 
-                        @if (_userScore.GroupFour > 0)
+                        @if (UserScoreValue.GroupFour > 0)
                         {
                             <img src=@GetKudosValuesBadge(4) style="height:80px;width:80px;padding:5px" />
                         }
 
-                          @if (_userScore.GroupFive > 0 )
+                          @if (UserScoreValue.GroupFive > 0 )
                         {
                             <img src=@GetKudosValuesBadge(5) style="height:80px;width:80px;padding:5px" />
                         }
 
-                        @if (_userScore.GroupAll > 0)
+                        @if (UserScoreValue.GroupAll > 0)
                         {
                             <img src=@GetKudosValuesBadge(6) style="height:80px;width:80px;padding:5px" />
                         }
@@ -162,7 +162,8 @@
     [Parameter]
     public UserInfo User { get; set; }
 
-    private UserScore _userScore;
+    [Parameter]
+    public UserScore UserScoreValue { get; set; }
 
     private bool _isLoaded = false;
 
@@ -181,29 +182,27 @@
     {
         base.OnInitialized();
 
-        //  UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
-        //UserProfileScoreView.UserScoreCallback = UpdateScore;
+        UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
+        UserProfileScoreView.UserScoreCallback = UpdateScore;
 
-        _userScore = await UserProfileScoreView.GetUserScore(User.ObjectId);
-
-        if (_userScore == null)
-            _userScore = new();
-
+        UserScoreValue = new();
+        UserScoreValue = await UserProfileScoreView.GetUserScore(User.ObjectId);
         _isLoaded = true;
 
-        await InvokeAsync(StateHasChanged);
-
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    await base.OnAfterRenderAsync(firstRender);
 
-        await base.OnAfterRenderAsync(firstRender);
+    //    if (firstRender)
+    //    {  
+    //    }
 
-        await UpdateScoreValues();
 
 
-    }
+    //    await UpdateScoreValues();
+    //}
 
     protected override bool ShouldRender()
     {
@@ -211,63 +210,65 @@
     }
 
 
-    public async Task UpdateScore(UserScore userScore)
+    public void UpdateScore(UserScore userScore)
     {
 
-        if (userScore.Id == User.ObjectId)
-        {
-            _userScore = userScore;
+         UserScoreValue = userScore;
 
-            _shouldRender = true;
+        var t = InvokeAsync(() =>
+      {
+                 // UpdateScoreValues();
 
-            await UpdateScoreValues();
-
-        }
+                  StateHasChanged();
 
 
+      });
 
-
+        t.Wait();
     }
 
-    private async Task UpdateScoreValues()
+    private void UpdateScoreValues()
     {
-    
-        if (_userScore == null)
-            return;
 
-        for (int attempts = 0; attempts < 3; attempts++)
-        {
+        var t = InvokeAsync(() =>
+      {
+          if (UserScoreValue == null)
+              return;
 
-            try
-            {
+          for (int attempts = 0; attempts < 3; attempts++)
+          {
 
-                await JSRuntime.InvokeVoidAsync("updateCount", _score, _userScore.Score);
+              try
+              {
 
-                await JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, _userScore.KudosSent);
-                await JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, _userScore.KudosReceived);
-                await JSRuntime.InvokeVoidAsync("updateCount", _likesSent, _userScore.LikesSent);
-                await JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, _userScore.LikesReceived);
-                await JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, _userScore.MessagesSent);
-                await JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, _userScore.MessagesReceived);
+                  JSRuntime.InvokeVoidAsync("updateCount", _score, UserScoreValue.Score);
 
-                break;
-            }
-            catch (JSDisconnectedException)
-            {
-                await InvokeAsync(StateHasChanged);
-                await Task.Delay(300);
-            }
+                  JSRuntime.InvokeVoidAsync("updateCount", _kudosSent, UserScoreValue.KudosSent);
+                  JSRuntime.InvokeVoidAsync("updateCount", _kudosReceived, UserScoreValue.KudosReceived);
+                  JSRuntime.InvokeVoidAsync("updateCount", _likesSent, UserScoreValue.LikesSent);
+                  JSRuntime.InvokeVoidAsync("updateCount", _likesReceived, UserScoreValue.LikesReceived);
+                  JSRuntime.InvokeVoidAsync("updateCount", _commentsSent, UserScoreValue.MessagesSent);
+                  JSRuntime.InvokeVoidAsync("updateCount", _commentsReceived, UserScoreValue.MessagesReceived);
 
-            await InvokeAsync(StateHasChanged);
-            await Task.Delay(300);
-        }
+                  break;
+              }
+              catch (JSDisconnectedException)
+              {
+                  StateHasChanged();
+              }
+          }
+      });
+
+        t.Wait();
+
+        
     }
 
     private string GetKudosSentBadge()
     {
         string result = string.Empty;
 
-        switch (_userScore.KudosSent)
+        switch (UserScoreValue.KudosSent)
         {
             case var n when (n >= 1 && n <10):
                 result = "images/badges/accomplishments/1kudossent.png";
@@ -293,7 +294,7 @@
     {
         string result = string.Empty;
 
-        switch (_userScore.KudosReceived)
+        switch (UserScoreValue.KudosReceived)
         {
         
             case var n when (n >= 10 && n <= 50):

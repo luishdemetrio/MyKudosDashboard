@@ -55,7 +55,7 @@ public class Startup : FunctionsStartup
 
         builder.Services.AddSingleton<IGroupScoreRules, GroupScoreRules>();
         
-        builder.Services.AddSingleton<IUserKudosService,  UserKudosService>();
+        builder.Services.AddTransient<IUserKudosService,  UserKudosService>();
 
 
         builder.Services.AddSingleton<IGroupUserScoreService, GroupUserScoreService>();

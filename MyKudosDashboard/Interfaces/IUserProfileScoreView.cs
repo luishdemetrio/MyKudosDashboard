@@ -7,11 +7,11 @@ public interface IUserProfileScoreView
 
     Task<UserScore> GetUserScore(string userId);
 
-    
-    //public void RegisterForLiveUpdates(string userId);
 
-    //public delegate Task UpdateScoreCallBack(UserScore userScore);
+    public void RegisterForLiveUpdates(string userId);
 
-    //public UpdateScoreCallBack UserScoreCallback { get; set; }
+    public delegate void UpdateScoreCallBack(UserScore userScore);
+
+    public UpdateScoreCallBack UserScoreCallback { get; set; }
 
 }

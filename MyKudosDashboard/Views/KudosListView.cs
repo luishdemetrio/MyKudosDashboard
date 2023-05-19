@@ -26,5 +26,9 @@ public class KudosListView : IKudosListView
         return await _gatewayService.UndoLike(like);
     }
 
+    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
+    {
+        return await _gatewayService.GetKudos(pageNumber);
+    }
 
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MyKudos.Gamification.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver;
@@ -19,6 +20,7 @@ public class GroupScoreRules : IGroupScoreRules
 
     private readonly int _allGroupCompletedScore;
 
+    private static SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
     public GroupScoreRules(IUserScoreService userScoreService,
                            IUserKudosService userKudosService,
@@ -42,54 +44,70 @@ public class GroupScoreRules : IGroupScoreRules
     public async Task<UserScore> UpdateGroupScoreAsync(UserScore pUserScore)
     {
 
-        await _userScoreService.SetUserScoreAsync(pUserScore);
 
-        var score = await _userScoreService.GetUserScoreAsync(pUserScore.Id.ToString());
+        UserScore score;
+
+
+        await _semaphore.WaitAsync();
+
+        
         try
         {
-            if (score != null)
+            await _userScoreService.SetUserScoreAsync(pUserScore).ConfigureAwait(false);
+
+             score = await _userScoreService.GetUserScoreAsync(pUserScore.Id.ToString());
+
+            try
             {
-                var kudosGroup = await _userKudosService.GetUserKudosByCategory(pUserScore.Id.ToString());
-
-                if (kudosGroup != null)
+                if (score != null)
                 {
-                    foreach (var item in kudosGroup)
+                    var kudosGroup = await _userKudosService.GetUserKudosByCategory(pUserScore.Id.ToString());
+
+                    if (kudosGroup != null)
                     {
-                        switch (item.ValueCodeGroup)
+                        foreach (var item in kudosGroup)
                         {
+                            switch (item.ValueCodeGroup)
+                            {
 
-                            case 1:
-                                score.GroupOne = GetGroupScore(item.Count); break;
+                                case 1:
+                                    score.GroupOne = GetGroupScore(item.Count); break;
 
-                            case 2:
-                                score.GroupTwo = GetGroupScore(item.Count); break;
+                                case 2:
+                                    score.GroupTwo = GetGroupScore(item.Count); break;
 
-                            case 3:
-                                score.GroupThree = GetGroupScore(item.Count); break;
+                                case 3:
+                                    score.GroupThree = GetGroupScore(item.Count); break;
 
-                            case 4:
-                                score.GroupFour = GetGroupScore(item.Count); break;
+                                case 4:
+                                    score.GroupFour = GetGroupScore(item.Count); break;
 
-                            case 5:
-                                score.GroupFive = GetGroupScore(item.Count); break;
+                                case 5:
+                                    score.GroupFive = GetGroupScore(item.Count); break;
 
+                            }
+                        }
+
+                        var all = score.GroupOne * score.GroupTwo * score.GroupThree * score.GroupFour * score.GroupFive;
+
+                        if ((all != 0) && (all != null))
+                        {
+                            score.GroupAll = _allGroupCompletedScore;
+
+                            await _groupUserScoreService.UpdateGroupScoreAsync(score);
                         }
                     }
 
-                    var all = score.GroupOne * score.GroupTwo * score.GroupThree * score.GroupFour * score.GroupFive;
 
-                    if ((all != 0) && (all != null))
-                    {
-                        score.GroupAll = _allGroupCompletedScore;
-
-                        await _groupUserScoreService.UpdateGroupScoreAsync(score);
-                    }
                 }
-
-
             }
+            catch { }
         }
-        catch { }
+        finally
+        {
+            _semaphore.Release();
+        }
+
 
         return score;
     }
