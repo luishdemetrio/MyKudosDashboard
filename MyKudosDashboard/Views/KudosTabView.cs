@@ -36,7 +36,7 @@ public class KudosTabView : IKudosTabView
 
 
     private static SemaphoreSlim _semaphoreLike = new SemaphoreSlim(1, 1);
-    private static SemaphoreSlim _semaphoreUndoLike = new SemaphoreSlim(1, 1);
+    
 
 
     public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger)
@@ -106,7 +106,7 @@ public class KudosTabView : IKudosTabView
             {
                 //retrive the message body
                
-                await _semaphoreUndoLike.WaitAsync();
+                await _semaphoreLike.WaitAsync();
 
                 try
                 {
@@ -120,7 +120,7 @@ public class KudosTabView : IKudosTabView
                 }
                 finally
                 {
-                    _semaphoreUndoLike.Release();
+                    _semaphoreLike.Release();
                 }
 
                     

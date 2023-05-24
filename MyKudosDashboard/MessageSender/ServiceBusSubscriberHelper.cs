@@ -63,9 +63,10 @@ public class ServiceBusSubscriberHelper
             var options = new CreateSubscriptionOptions(topicName, subscriptionName)
             {
                 AutoDeleteOnIdle = TimeSpan.FromHours(12),
-                LockDuration = TimeSpan.FromMinutes(2),
+                LockDuration = TimeSpan.FromMinutes(5),
                 MaxDeliveryCount = 10,
-                DefaultMessageTimeToLive = TimeSpan.FromMinutes(2)
+                DefaultMessageTimeToLive = TimeSpan.FromMinutes(10)
+                
 
             };
 

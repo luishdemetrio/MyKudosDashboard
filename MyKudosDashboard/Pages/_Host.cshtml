@@ -45,6 +45,10 @@
             button.disabled = disabled;
         }
     }
+
+    window.UpdateUI = function () {
+        blazorComponent.invokeMethodAsync("ExecuteUpdateUI");
+    }
   
 </script>
 

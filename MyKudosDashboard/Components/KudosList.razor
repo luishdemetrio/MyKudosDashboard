@@ -81,7 +81,7 @@
                         </FluentButton>
 
 
-                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>LikeKudos(item))
+                        <FluentButton id=@item.Id style="margin-left:20px;" @onclick=@(()=>LikeKudosClick(item))
                                   Disabled=@LikeDisabled(item.Id)>
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                     Filled=@Filled(item) />
@@ -317,27 +317,30 @@
 
     }
 
-    public void UpdateLikesCallBack(Like pLike)
+
+    public void UpdateLikesCountAndToolTip(Like pLike)
     {
+        // The person who sent already has the like updated
+        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+        if (_kudosList == null)
+        {
+            return;
+        }
+
+
 
         // enable like button
         UpdateDisabledLike(pLike.KudosId, false);
 
+
         var t = InvokeAsync(() =>
         {
-
-            // The person who sent already has the like updated
-            //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-            if (_kudosList == null)
-            {
-                return;
-            }
 
 
             if (_kudosList.ContainsKey(pLike.KudosId))
             {
                 var kudo = _kudosList[pLike.KudosId];
-                
+
                 if (!kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).Any())
                 {
 
@@ -347,77 +350,109 @@
                             Name = pLike.FromPerson.Name,
                             Photo = pLike.FromPerson.Photo
                         });
-                    
-                }
 
-                
-                //_likesToUpdate.TryAdd(pLike.KudosId, kudo.Likes.Count);
-                
-               
-                
-              //  UpdateCount(numberOfLikes[kudo.Id], kudo.Likes.Count);
-               
-                StateHasChanged();
-                
+                }
             }
             else
             {
                 _ = LoadKudos();
             }
 
+            //_likesToUpdate.TryAdd(pLike.KudosId, kudo.Likes.Count);
+
+            //  UpdateCount(numberOfLikes[kudo.Id], kudo.Likes.Count);
+
+            StateHasChanged();
+
+
         });
 
         t.Wait();
 
     }
+       
 
-
-
-    public void UpdateUndoLikesCallBack(Like pLike)
+    public void UpdateLikesCallBack(Like pLike)
     {
 
-          // enable like button
+        if (pLike.FromPerson.Id == User.ObjectId)
+            return;
+
+        UpdateLikesCountAndToolTip(pLike);
+
+
+
+    }
+
+    public void UpdateUndoLikesCountAndToolTip(Like pLike)
+    {
+
+         // The person who sent already has the like updated
+        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
+        if (_kudosList == null)
+            return;
+
+       
+        // enable like button
         UpdateDisabledLike(pLike.KudosId, false);
+
+
+        if (_kudosList.ContainsKey(pLike.KudosId))
+        {
+            var kudo = _kudosList[pLike.KudosId];
+
+            var like = kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).FirstOrDefault();
+
+
+            if (kudo.Likes.Contains(like))
+            {
+                
+
+       
+
+                kudo.Likes.Remove(like);
+            }
+            else
+            {
+                //force to reload
+                _ = LoadKudos();
+            }
+
+            // _likesToUpdate.TryAdd(pLike.KudosId, kudo.Likes.Count);
+
+            // enable like button
+            // UpdateDisabledLike(kudo.Id, false);
+
+            //  UpdateCount(numberOfLikes[kudo.Id], kudo.Likes.Count);
+
+
+
+        }
+        else
+        {
+            //force to reload
+            _ = LoadKudos();
+        }
 
         var t = InvokeAsync(() =>
        {
-           // The person who sent already has the like updated
-           //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-           if (_kudosList == null)
-               return;
-
-
-           if (_kudosList.ContainsKey(pLike.KudosId))
-           {
-               var kudo = _kudosList[pLike.KudosId];
-
-               var like = kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).FirstOrDefault();
-
-
-               if (kudo.Likes.Contains(like))
-               {
-                   kudo.Likes.Remove(like);                   
-               }
-
-               // _likesToUpdate.TryAdd(pLike.KudosId, kudo.Likes.Count);
-               
-               // enable like button
-              // UpdateDisabledLike(kudo.Id, false);
-               
-             //  UpdateCount(numberOfLikes[kudo.Id], kudo.Likes.Count);
-               
-               StateHasChanged();              
-               
-           }
-           else
-           {
-               //force to reload
-               _ = LoadKudos();
-           }
+           StateHasChanged();
+           
 
        });
 
         t.Wait();
+
+      
+    }
+
+    public void UpdateUndoLikesCallBack(Like pLike)
+    {
+
+        if (pLike.FromPerson.Id == User.ObjectId)
+            return;
+
+        UpdateUndoLikesCountAndToolTip(pLike);
 
     }
 
@@ -538,7 +573,7 @@
                 _disabledButtons.Add(kudosId, disabled);
             }
 
-            
+
         });
 
         t.Wait();
@@ -547,8 +582,9 @@
 
 
 
-    private async Task LikeKudos(KudosResponse item)
+    private void LikeKudosClick(KudosResponse item)
     {
+
 
         lock (_lock)
         {
@@ -559,48 +595,50 @@
             UpdateDisabledLike(item.Id, true);
         }
 
-
-        if (_kudosList.ContainsKey(item.Id))
+        var t = InvokeAsync(() =>
         {
-            var kudo = _kudosList[item.Id];
-
-
-            if (kudo.Likes.Any(l => l.Id == User.ObjectId))
+            if (_kudosList.ContainsKey(item.Id))
             {
-                await KudosListView.SendUndoLikeAsync(
-                    new Like(
-                        KudosId: item.Id,
-                        FromPerson: new Person
-                            {
-                                Id = User.ObjectId,
-                                Name = User.DisplayName,
-                                Photo = UserPhoto
-                            },
-                        ToPersonId: item.To.Id
-                    )
-                );
-            }
-            else
-            {
-                await KudosListView.SendLikeAsync(
-                       new Like(
-                           KudosId: item.Id,
-                           FromPerson: new Person
-                               {
-                                   Id = User.ObjectId,
-                                   Name = User.DisplayName,
-                                   Photo = UserPhoto
-                               },
-                           ToPersonId: item.To.Id
-                       )
-                   );
+                var kudo = _kudosList[item.Id];
+
+
+                var requestLike = new Like(KudosId: item.Id,
+                                            FromPerson: new Person
+                                                {
+                                                    Id = User.ObjectId,
+                                                    Name = User.DisplayName,
+                                                    Photo = UserPhoto
+                                                },
+                                            ToPersonId: item.To.Id);
+
+
+
+                if (kudo.Likes.Any(l => l.Id == User.ObjectId))
+                {
+                    KudosListView.SendUndoLikeAsync(requestLike);
+
+                    UpdateUndoLikesCountAndToolTip(requestLike);
+
+                }
+                else
+                {
+
+                    KudosListView.SendLikeAsync(requestLike);
+
+                    UpdateLikesCountAndToolTip(requestLike);
+                }
+
 
             }
 
-        }
+        });
 
-        await Task.CompletedTask;
+        t.Wait();
+
     }
+     
+        
+    
 
     private async Task ReplyKudos(KudosResponse kudos)
     {
@@ -610,44 +648,6 @@
     }
 
 
-    //private async Task UpdateLikes(string kudosId, string personId)
-    //{
-
-    //    var kudo = kudos.Where(k => k.Id == kudosId).FirstOrDefault();
-
-    //    if (kudo != null)
-    //    {
-    //        var like = kudo.Likes.Where(k => k.Id == personId).FirstOrDefault();
-
-
-    //        if ((like is null) || (!kudo.Likes.Contains(like)))
-    //        {
-
-    //            kudo.Likes.Add(new Person()
-    //                {
-    //                    Id = personId,
-    //                    Name = User.DisplayName,
-    //                    Photo = UserPhoto
-    //                });
-    //        }
-    //        else
-    //        {
-    //            kudo.Likes.Remove(like);
-    //        }
-
-
-    //        //if (numberOfLikes.ContainsKey(kudosId))
-    //        //{
-    //        //    await UpdateCount(numberOfLikes[kudosId], kudo.Likes.Count);
-
-    //        //}
-
-
-    //    }
-
-    //    await Task.CompletedTask;
-
-    //}
 
     private async Task GetMoreKudos()
     {
