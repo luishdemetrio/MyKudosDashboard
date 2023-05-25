@@ -5,25 +5,16 @@ namespace MyKudos.Kudos.App.Interfaces;
 
 public interface IKudosService
 {
-    public Guid Send(KudosLog kudos);
+    public int Send(Domain.Models.KudosLog kudos);
 
-    public Task<IEnumerable<KudosLog>> GetKudos(int pageNumber, int pageSize);
+    public Task<IEnumerable<Domain.Models.KudosLog>> GetKudos(int pageNumber, int pageSize);
 
     Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId);
 
-    IEnumerable<KudosLog> GetUserKudos(string pUserId);
+    IEnumerable<Domain.Models.KudosLog> GetUserKudos(string pUserId);
 
-    public bool Like(string kudosId, string personId);
-    public bool UndoLike(string kudosId, string personId);
+    public bool Like(int kudosId, string personId);
+    public bool UndoLike(int kudosId, string personId);
 
-    public bool LikeComment(string kudosId, string personId);
-    public bool UndoLikeComment(string kudosId, string personId);
-
-    string SendComments(Comments comment);
-
-    IEnumerable<Comments> GetComments(string kudosId);
-
-    bool UpdateComments(Comments comments);
-
-    bool DeleteComments(string kudosId, Guid commentId);
+    
 }

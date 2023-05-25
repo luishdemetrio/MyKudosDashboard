@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -29,7 +30,7 @@ public class ContributorsController : Controller
 
         var userIds = scores.Select(s => s.Id.ToString()).Distinct().ToArray();
 
-        List<Models.GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
+        List<GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
 
         var photos = await _graphService.GetUserPhotos(userIds).ConfigureAwait(true);
 

@@ -23,62 +23,23 @@ builder.Services.AddSwaggerGen(c =>
 //builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 builder.Services.AddScoped<IKudosService, KudosService>();
+builder.Services.AddScoped<ICommentsService, CommentsService>();
 builder.Services.AddScoped<IKudosRepository, KudosRepository>();
+builder.Services.AddScoped<IKudosLikeRepository, KudosLikeRepository>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
-
-var config = builder.Configuration.GetSection("CosmosDb");
-
-builder.Services.AddScoped<KudosDbContext>(_ =>
-{
-    var options = new DbContextOptionsBuilder<KudosDbContext>()
-      .UseCosmos(
-              config["AccountEndPoint"],
-              config["AccountKey"],
-              config["DatabaseName"])
-      .Options;
-
-    return new KudosDbContext(options);
-});
-
-
-builder.Services.AddScoped<CommentsDbContext>(_ =>
-{
-    var options = new DbContextOptionsBuilder<CommentsDbContext>()
-      .UseCosmos(
-              config["AccountEndPoint"],
-              config["AccountKey"],
-              config["CommentsDatabaseName"])
-      .Options;
-
-    using var commentsContext = new CommentsDbContext(options);
-    commentsContext.Database.EnsureCreated();
-
-    return new CommentsDbContext(options);
-});
-
 
 builder.Services.AddScoped<IRecognitionService, RecognitionService>();
 builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
 
-builder.Services.AddDbContext<RecognitionDbContext>(options =>
+builder.Services.AddDbContext<KudosDbContext>(options =>
 {
-    options.UseCosmos(
-              config["AccountEndPoint"],
-              config["AccountKey"],
-              config["RecognitionDatabaseName"]);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+
 });
 
 
 
-
-
-
 var app = builder.Build();
-
-
-
-
-
 
 
 // Configure the HTTP request pipeline.

@@ -1,5 +1,5 @@
-﻿using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 
@@ -18,22 +18,22 @@ public class CommentsView : ICommentsView
 
     }
 
-    public Task<bool> LikeKudosAsync(Like like)
+    public Task<bool> LikeKudosAsync(LikeGateway like)
     {
         return _kudosGateway.Like(like);
     }
 
-    public async Task<bool> UndoLikeKudosAsync(Like like)
+    public async Task<bool> UndoLikeKudosAsync(LikeGateway like)
     {
         return await _kudosGateway.UndoLike(like);
     }
 
-    public Task<IEnumerable<CommentsResponse>> GetComments(string kudosId)
+    public Task<IEnumerable<CommentsResponse>> GetComments(int kudosId)
     {
         return _commentsGateway.GetComments(kudosId);
     }
 
-    public Task<string> SendComments(CommentsRequest comment)
+    public Task<int> SendComments(CommentsRequest comment)
     {
         return _commentsGateway.SendCommentsAsync(comment); 
     }

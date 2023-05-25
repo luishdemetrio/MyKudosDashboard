@@ -1,6 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Services;
 
@@ -79,14 +79,14 @@ public class GraphServiceRest : IGraphService
 
     }
 
-    public async Task<List<Models.GraphUser>> GetUserInfo(string[] users)
+    public async Task<List<GraphUser>> GetUserInfo(string[] users)
     {
 
-        var result = new List<Models.GraphUser>();
+        var result = new List<GraphUser>();
 
         try
         {
-            result = await _restClientHelper.GetApiData<string[],List<Models.GraphUser>>($"{_graphServiceUrl}userinfo",users);
+            result = await _restClientHelper.GetApiData<string[],List<GraphUser>>($"{_graphServiceUrl}userinfo",users);
 
         }
         catch (Exception ex)

@@ -1,4 +1,4 @@
-using Microsoft.Azure.Cosmos;
+
 using Microsoft.EntityFrameworkCore;
 using MyKudos.Gamification.App.Interfaces;
 using MyKudos.Gamification.App.Services;
@@ -19,22 +19,9 @@ builder.Services.AddSwaggerGen();
 
 var config = builder.Configuration.GetSection("CosmosDb");
 
-builder.Services.AddScoped<UserScoreDbContext>(_ =>
+builder.Services.AddDbContext<UserScoreDbContext>(options =>
 {
-    var options = new DbContextOptionsBuilder<UserScoreDbContext>()
-      .UseCosmos(
-              config["AccountEndPoint"],
-              config["AccountKey"],
-              config["DatabaseName"],
-              options =>
-              {
-                  options.ConnectionMode(ConnectionMode.Gateway);
-              
-              })
-      .Options ;
-   
-
-    return new UserScoreDbContext(options);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
 });
 
 builder.Services.AddScoped<IUserScoreService, UserScoreService>();

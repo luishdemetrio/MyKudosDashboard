@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
-using System.Security.Cryptography;
+using GatewayDomain = MyKudos.Gateway.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -17,7 +17,7 @@ public class KudosController : Controller
 
     //private readonly IAgentNotificationService _agentNotificationService;
 
-    private IEnumerable<Models.Recognition> _recognitions;
+    private IEnumerable<GatewayDomain.Recognition> _recognitions;
 
     private IKudosMessageSender _kudosQueue;
 
@@ -45,27 +45,29 @@ public class KudosController : Controller
 
 
     [HttpGet(Name = "GetKudos")]
-    public async Task<IEnumerable<Models.KudosResponse>> Get(int pageNumber = 1)
+    public async Task<IEnumerable<KudosResponse>> Get(int pageNumber = 1)
     {
+        //get kudos
         var kudos = await _kudosService.GetKudosAsync(pageNumber).ConfigureAwait(false);
 
+        //get distinct people who sent
         var from = kudos.Select(u => u.FromPersonId).Distinct().ToList();
 
+        //get distinct people who received
         from.AddRange(kudos.Select(u => u.ToPersonId).Distinct());
 
-        List<string> likesId = new();
-
-        //user from likes
-        foreach (var k in kudos)
-        {
-            if (k.Likes != null)
-                likesId.AddRange(k.Likes);
-
-        }
+        //get distinct people who liked
+        List<string> likesId = kudos
+                    .SelectMany(kl => kl.Likes)
+                    .Select(like => like.PersonId)
+                    .Distinct()
+                    .ToList();
 
         from.AddRange(likesId.Distinct());
 
-        List<Models.GraphUser> users = await _graphService.GetUserInfo(from.Distinct().ToArray()).ConfigureAwait(true);
+
+
+        List<GraphUser> users = await _graphService.GetUserInfo(from.Distinct().ToArray()).ConfigureAwait(true);
 
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
 
@@ -76,15 +78,15 @@ public class KudosController : Controller
             if (k.Likes != null)
                 likes.AddRange(from like in k.Likes
                                join u in users
-                                   on like equals u.Id
+                                   on like.PersonId equals u.Id
                                join photo in photos
-                                   on like equals photo.id
+                                   on like.PersonId equals photo.id
                                select new LikeDTO(
 
                                    KudosId: k.Id,
-                                   Person: new MyKudos.Gateway.Models.Person()
+                                   Person: new GatewayDomain.Person()
                                    {
-                                       Id = like,
+                                       Id = like.PersonId,
                                        Name = u.DisplayName,
                                        Photo = $"data:image/png;base64,{photo.photo}"
                                    }
@@ -105,15 +107,15 @@ public class KudosController : Controller
                          on kudo.TitleId equals rec.Id
                      orderby kudo.Date descending
 
-                     select new Models.KudosResponse() {
+                     select new KudosResponse() {
                          Id = kudo.Id,
-                         From = new MyKudos.Gateway.Models.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
-                         To = new MyKudos.Gateway.Models.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
+                         From = new GatewayDomain.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
+                         To = new GatewayDomain.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
                          Title= rec.Title,
                         Message = kudo.Message,
                         SendOn = kudo.Date,
-                        Likes= likes.Where(l => l.KudosId == kudo.Id).Select(l => l.Person),
-                        Comments =  (kudo.Comments is null) ? new List<string>() : kudo.Comments
+                        Likes= likes.Where(l => l.KudosId == kudo.Id).Select(l => l.Person).ToList(),
+                        CommentsCount =  (kudo.Comments is null) ? 0 : kudo.Comments.Count
                      };
         
 
@@ -124,10 +126,10 @@ public class KudosController : Controller
 
     
     [HttpPost(Name = "SendKudos")]
-    public async Task<string> PostAsync([FromBody] Models.KudosRequest kudos)
+    public async Task<int> PostAsync([FromBody] KudosRequest kudos)
     {
 
-        var restKudos = new KudosLog()
+        var restKudos = new Kudos.Domain.Models.KudosLog()
         {
             FromPersonId = kudos.From.Id,
             ToPersonId = kudos.To.Id,
@@ -136,12 +138,12 @@ public class KudosController : Controller
             Date = kudos.SendOn
         };
 
-        string kudosId = await _kudosService.SendAsync(restKudos);
+        int kudosId = await _kudosService.SendAsync(restKudos);
 
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
 
-        var queue = _kudosQueue.SendKudosAsync(kudosId, new MyKudos.Gateway.Models.KudosNotification(
+        var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(
           From: kudos.From,
           To: kudos.To,
           ManagerId: userManagerId,

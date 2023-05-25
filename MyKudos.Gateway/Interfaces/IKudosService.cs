@@ -4,9 +4,9 @@ namespace MyKudos.Gateway.Interfaces;
 
 public interface IKudosService
 {
-    Task<IEnumerable<Models.Kudos>> GetKudosAsync(int pageNumber);
+    Task<IEnumerable<KudosLog>> GetKudosAsync(int pageNumber);
 
-    Task<string> SendAsync(KudosLog kudos);
+    Task<int> SendAsync(Kudos.Domain.Models.KudosLog kudos);
 
     Task<bool> LikeAsync(Kudos.Domain.Models.SendLike like);
 

@@ -8,6 +8,7 @@ public sealed class RecognitionDbContext : DbContext
 
     public RecognitionDbContext(DbContextOptions<RecognitionDbContext> options): base(options)
     {
+        Database.EnsureCreated();
     }
 
     public DbSet<Recognition> Recognitions { get; set; }

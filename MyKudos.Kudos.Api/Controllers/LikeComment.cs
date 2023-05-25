@@ -9,18 +9,18 @@ namespace MyKudos.Kudos.Api.Controllers;
 public class LikeCommentController : Controller
 {
 
-    private readonly IKudosService _kudosService;
+    private readonly ICommentsService _commentsService;
 
-    public LikeCommentController(IKudosService kudosService)
+    public LikeCommentController(ICommentsService commentsService)
     {
-        _kudosService = kudosService;
+        _commentsService = commentsService;
     }
 
     [HttpPost(Name = "LikeComment")]
     public IActionResult Post(SendLike like)
     {
 
-        var r = _kudosService.LikeComment(like.KudosId, like.FromPersonId);
+        var r = _commentsService.LikeComment(like.KudosId, like.FromPersonId);
 
         return Ok(r);
     }
@@ -28,11 +28,8 @@ public class LikeCommentController : Controller
     [HttpDelete(Name = "UndoLikeComment")]
     public IActionResult Delete([FromBody] SendLike like)
     {
-        var r = _kudosService.UndoLikeComment(like.KudosId, like.FromPersonId);
+        var r = _commentsService.UndoLikeComment(like.KudosId, like.FromPersonId);
 
         return Ok(r);
-
-
-
     }
 }

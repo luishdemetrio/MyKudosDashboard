@@ -1,4 +1,5 @@
-﻿using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
@@ -9,7 +10,7 @@ public interface IKudosTabView
 
     public void RegisterForLiveUpdates(string userId);
 
-    public delegate void UpdateLikesCallBack(Like like);
+    public delegate void UpdateLikesCallBack(LikeGateway like);
 
     public UpdateLikesCallBack LikeCallback { get; set; }
     public UpdateLikesCallBack UndoLikeCallback { get; set; }
@@ -20,7 +21,7 @@ public interface IKudosTabView
     public UpdateKudosCallBack KudosCallback { get; set; }
 
 
-    public delegate Task CommentsCallBack(CommentsRequest like);
+    public delegate void CommentsCallBack(CommentsRequest like);
 
     public CommentsCallBack CommentsSentCallback { get; set; }
     public CommentsCallBack CommentsUpdatedCallback { get; set; }

@@ -9,7 +9,7 @@ public class UserScoreRepository : IUserScoreRepository
 {
 
     private UserScoreDbContext _context;
-    private readonly object _lock = new object();
+    private static SemaphoreSlim _semaphoreLike = new SemaphoreSlim(1, 1);
 
     public UserScoreRepository(UserScoreDbContext scoreContext)
     {
@@ -38,16 +38,13 @@ public class UserScoreRepository : IUserScoreRepository
         UserScore? score;
         bool result = false;
 
-        lock (_lock)
+        _semaphoreLike.Wait();
+
+        try
         {
 
-            // cosmosdb is caching the score
-
-            
             score = _context.UserScores?
                     .FirstOrDefault(u => u.Id == userScore.Id);
-
-           
 
             if (score != null)
             {
@@ -65,13 +62,17 @@ public class UserScoreRepository : IUserScoreRepository
             {
                 _context.UserScores?.Add(userScore);
 
-                
+
             }
 
             result = _context.SaveChanges() > 0;
 
-           
         }
+        finally
+        {
+            _semaphoreLike.Release();
+        }   
+        
 
         return result;
 
@@ -86,9 +87,11 @@ public class UserScoreRepository : IUserScoreRepository
     public bool UpdateGroupScore(UserScore userScore)
     {
         UserScore? score;
+        bool result = false;
 
-        lock (_lock)
-        {
+        _semaphoreLike.Wait();
+        
+        try { 
             score = _context.UserScores?.FirstOrDefault(u => u.Id == userScore.Id);
 
             if (score != null)
@@ -108,7 +111,14 @@ public class UserScoreRepository : IUserScoreRepository
 
 
             }
+
+            result = _context.SaveChanges() > 0;
         }
-        return _context.SaveChanges() > 0;
+        finally
+        {
+            _semaphoreLike.Release();
+        }
+
+        return result;
     }
 }

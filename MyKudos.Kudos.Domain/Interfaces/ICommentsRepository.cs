@@ -7,17 +7,17 @@ public  interface ICommentsRepository
 {
 
 
-    Guid Add(Comments comments);
+    int Add(Comments comments);
 
-    bool Like(string commentsId, string personId);
+    bool Like(int commentsId, string personId);
 
-    bool UndoLike(string commentsId, string personId);
+    bool UndoLike(int commentsId, string personId);
 
-    IEnumerable<Comments> GetComments(string kudosId);
+    IEnumerable<Comments> GetComments(int kudosId);
 
     bool Update(Comments comments);
     
-    bool Delete(Guid commentId);
+    bool Delete(int commentId);
 
 
 

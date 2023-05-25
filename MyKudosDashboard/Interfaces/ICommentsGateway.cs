@@ -1,17 +1,17 @@
-﻿using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
 public interface ICommentsGateway
 {
 
-    Task<bool> LikeComment(LikeComment like);
+    Task<bool> LikeComment(LikeCommentGateway like);
 
-    Task<bool> UndoLikeComment(LikeComment like);
+    Task<bool> UndoLikeComment(LikeCommentGateway like);
 
-    Task<string> SendCommentsAsync(CommentsRequest comment);
+    Task<int> SendCommentsAsync(CommentsRequest comment);
 
-    Task<IEnumerable<CommentsResponse>> GetComments(string kudosId);
+    Task<IEnumerable<CommentsResponse>> GetComments(int kudosId);
 
     Task<bool> UpdateComments(CommentsRequest comments);
 

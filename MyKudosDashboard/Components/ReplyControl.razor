@@ -1,4 +1,5 @@
-﻿@using MyKudosDashboard.Interfaces;
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using Microsoft.Fast.Components.FluentUI
 
@@ -89,13 +90,11 @@
                     </button>
                     <div class="dropdown-content">
                         <a href="#" @onclick=EditReplyOnClick>
-                            <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16"
-                                        Variant=IconVariant.Filled/>
+                            <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
                     
                         </a>
                         <a href="#" @onclick=DeleteReplyOnClick>
-                            <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16"
-                                        Variant=IconVariant.Filled />
+                            <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
                     
                         </a>
                 
@@ -239,7 +238,7 @@
         if (item.Likes.Any(l => l.Id == ReplyUser.ObjectId))
         {
             await ReplyView.SendUndoLikeAsync(
-                    new LikeComment(
+                    new LikeCommentGateway(
                        KudosId: item.KudosId,
                        FromPerson: new Person
                             {
@@ -253,7 +252,7 @@
         else
         {
             await ReplyView.SendLikeAsync(
-                    new LikeComment(
+                    new LikeCommentGateway(
                       KudosId: item.KudosId,
                       FromPerson: new Person
                           {
@@ -269,7 +268,7 @@
 
     }
 
-    private async Task UpdateLikes(string commentId, string personId)
+    private async Task UpdateLikes(int commentId, string personId)
     {
 
         if (Reply.Id == commentId)

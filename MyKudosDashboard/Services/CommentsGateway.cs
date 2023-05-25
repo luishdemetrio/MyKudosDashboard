@@ -1,4 +1,5 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
@@ -20,14 +21,14 @@ public class CommentsGateway : ICommentsGateway
         _restClientHelper = clientHelper;
     }
 
-    public async Task<bool> LikeComment(LikeComment like)
+    public async Task<bool> LikeComment(LikeCommentGateway like)
     {
 
         bool result = false;
 
         try
         {
-            result = await _restClientHelper.SendApiData<LikeComment, bool>($"{_gatewayServiceUrl}likescomment", HttpMethod.Post, like);
+            result = await _restClientHelper.SendApiData<LikeCommentGateway, bool>($"{_gatewayServiceUrl}likescomment", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -39,14 +40,14 @@ public class CommentsGateway : ICommentsGateway
 
     }
 
-    public async Task<bool> UndoLikeComment(LikeComment like)
+    public async Task<bool> UndoLikeComment(LikeCommentGateway like)
     {
 
         bool result = false;
 
         try
         {
-            result = await _restClientHelper.SendApiData<LikeComment, bool>($"{_gatewayServiceUrl}likescomment", HttpMethod.Delete, like);
+            result = await _restClientHelper.SendApiData<LikeCommentGateway, bool>($"{_gatewayServiceUrl}likescomment", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {
@@ -58,13 +59,13 @@ public class CommentsGateway : ICommentsGateway
 
     }
 
-    public async Task<string> SendCommentsAsync(CommentsRequest comment)
+    public async Task<int> SendCommentsAsync(CommentsRequest comment)
     {
-        string result = string.Empty;
+        int result = 0;
 
         try
         {
-            result = await _restClientHelper.SendApiData<CommentsRequest, string>($"{_gatewayServiceUrl}Comments", HttpMethod.Post, comment);
+            result = await _restClientHelper.SendApiData<CommentsRequest, int>($"{_gatewayServiceUrl}Comments", HttpMethod.Post, comment);
         }
         catch (Exception ex)
         {
@@ -76,7 +77,7 @@ public class CommentsGateway : ICommentsGateway
 
     }
 
-    public async Task<IEnumerable<CommentsResponse>> GetComments(string kudosId)
+    public async Task<IEnumerable<CommentsResponse>> GetComments(int kudosId)
     {
         List<CommentsResponse> result = new();
 

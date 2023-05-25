@@ -1,4 +1,5 @@
-﻿@using MyKudosDashboard.Interfaces;
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
 @inject ICommentsView CommentsView;
@@ -10,7 +11,7 @@
 @inject IJSRuntime JSRuntime
 
 <FluentDialog @ref=_replyKudosFluentDialog
-                TrapFocus="true" aria-label="Simple dialog" Modal="true"
+                aria-label="Simple dialog" Modal="true"
                 class="both-gradient"  style="--dialog-height: 640px;--dialog-width: 640px;"
                 Hidden=@ModalHidden
                 >
@@ -81,7 +82,7 @@
 
                                 <FluentButton style="margin-left:20px;">
                                     <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                                    <div @ref=_numberOfComments>@_item.Comments.Count()</div>
+                                    <div @ref=_numberOfComments>@_item.CommentsCount</div>
 
                                 </FluentButton>
 
@@ -304,7 +305,7 @@
         if (kudos.Likes.Any(l => l.Id == User.ObjectId))
         {
             await CommentsView.UndoLikeKudosAsync(
-                     new Like(
+                     new LikeGateway(
                        KudosId: kudos.Id,
                        FromPerson: new Person
                             {
@@ -319,7 +320,7 @@
         else
         {
             await CommentsView.LikeKudosAsync(
-                    new Like(
+                    new LikeGateway(
                       KudosId: kudos.Id,
                       FromPerson: new Person
                           {
@@ -337,7 +338,7 @@
     }
 
 
-    private void UpdateLikeCallback(Like like)
+    private void UpdateLikeCallback(LikeGateway like)
     {
         // The person who sent already has the like updated
         if (like.FromPerson.Id == User.ObjectId)
@@ -346,18 +347,18 @@
         UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
     }
 
-    private void UpdateLikesKudos(string commentId, string personId)
+    private void UpdateLikesKudos(int pKudosId, string personId)
     {        
 
-        if (_item.Id == commentId)
+        if (_item.Id == pKudosId)
         {
-            var like = _item.Likes.Where(k => k.Id == personId).FirstOrDefault();
+            var like = _item.Likes.Where(k =>  k.Id == personId).First();
 
 
             if ((like is null) || (!_item.Likes.Contains(like)))
             {
 
-                _item.Likes.Add(new Person()
+                _item.Likes.Append(new Person()
                     {
                         Id = personId,
                         Name = User.DisplayName,
@@ -460,7 +461,7 @@
     {
         CommentsView.DeleteComments(pComments, _item.To.Id).ContinueWith(t =>
         {
-            var comments = _comments.First(c => c.Id == pComments.Id.ToString());
+            var comments = _comments.First(c => c.Id == pComments.Id);
 
             if (_comments.Contains(comments))
                 _comments.Remove(comments);

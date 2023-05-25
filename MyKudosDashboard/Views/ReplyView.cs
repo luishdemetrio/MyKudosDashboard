@@ -1,4 +1,5 @@
-﻿using MyKudosDashboard.Interfaces;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Views;
@@ -15,12 +16,12 @@ public class ReplyView : IReplyView
 
     }
 
-    public Task<bool> SendLikeAsync(LikeComment like)
+    public Task<bool> SendLikeAsync(LikeCommentGateway like)
     {
         return _commentsGateway.LikeComment(like);
     }
 
-    public Task<bool> SendUndoLikeAsync(LikeComment like)
+    public Task<bool> SendUndoLikeAsync(LikeCommentGateway like)
     {
         return _commentsGateway.UndoLikeComment(like);
     }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
 

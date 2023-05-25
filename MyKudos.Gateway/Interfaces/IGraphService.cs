@@ -1,4 +1,5 @@
-﻿using MyKudos.Gateway.Models;
+﻿
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Interfaces;
 
@@ -16,3 +17,7 @@ public interface IGraphService
     Task<string> GetUserManagerAsync(string userid);
 }
 
+public class GraphUsers
+{
+    public List<GraphUser> value { get; set; } = new();
+}

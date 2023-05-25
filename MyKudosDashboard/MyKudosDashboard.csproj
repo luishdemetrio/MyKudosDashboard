@@ -16,6 +16,10 @@
     <Content Remove="build/**/*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="Components\Graph.razor" />
+  </ItemGroup>
+
   
   
   <ItemGroup>
@@ -37,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyKudos.Gateway.Domain\MyKudos.Gateway.Domain.csproj" />
     <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />
   </ItemGroup>
 

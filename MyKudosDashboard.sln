@@ -98,6 +98,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.MessageSender", "My
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Communication.Helper", "MyKudos.RestHelper\MyKudos.Communication.Helper.csproj", "{3C77CA74-F45D-45EF-BA3D-40519899E1D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.Gateway.Domain", "MyKudos.Gateway.Domain\MyKudos.Gateway.Domain.csproj", "{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -192,6 +194,10 @@ Global
 		{3C77CA74-F45D-45EF-BA3D-40519899E1D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C77CA74-F45D-45EF-BA3D-40519899E1D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C77CA74-F45D-45EF-BA3D-40519899E1D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -237,6 +243,7 @@ Global
 		{9C87E338-4C9A-4544-A795-90F8945A0623} = {8F3B1B63-87E1-4799-A9E1-B48E073428C1}
 		{EB69F8D3-ED63-4CDB-8957-E9D3C99DB9CE} = {0CA52694-53D9-410D-8AC3-57624EDE444E}
 		{3C77CA74-F45D-45EF-BA3D-40519899E1D0} = {0CA52694-53D9-410D-8AC3-57624EDE444E}
+		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C} = {5064F191-2C6D-45B5-A6FB-FD0D80DD271D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B9FD23DD-B31F-4099-924D-9B4DC9ADA1DE}

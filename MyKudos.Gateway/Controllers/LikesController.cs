@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -22,11 +22,12 @@ public class LikesController : Controller
     }
 
     [HttpPost(Name = "SendLike")]
-    public  Task<bool> SendLikeAsync([FromBody] LikeGateway like)
+    public  async Task<bool> SendLikeAsync([FromBody] LikeGateway like)
     {
-        _ = _kudosQueue.SendLikeAsync(like);
-
-        return _kudosService.LikeAsync(new Kudos.Domain.Models.SendLike
+        
+        await _kudosQueue.SendLikeAsync(like);
+        
+        return await _kudosService.LikeAsync(new Kudos.Domain.Models.SendLike
         (
             KudosId : like.KudosId,
             FromPersonId : like.FromPerson.Id
@@ -35,11 +36,11 @@ public class LikesController : Controller
     }
 
     [HttpDelete(Name = "Undolike")]
-    public Task<bool> Delete([FromBody] LikeGateway unlike)
+    public async Task<bool> Delete([FromBody] LikeGateway unlike)
     {
-        _ = _kudosQueue.SendUndoLikeAsync(unlike);
+        await _kudosQueue.SendUndoLikeAsync(unlike);
 
-        return _kudosService.UndoLikeAsync(new Kudos.Domain.Models.SendLike
+        return await _kudosService.UndoLikeAsync(new Kudos.Domain.Models.SendLike
         (
             KudosId: unlike.KudosId,
             FromPersonId: unlike.FromPerson.Id

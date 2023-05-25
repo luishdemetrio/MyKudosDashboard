@@ -1,13 +1,14 @@
-﻿using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
 public interface IKudosListView
 {
 
-    Task<bool> SendLikeAsync(Like like);
+    Task<bool> SendLikeAsync(LikeGateway like);
 
-    Task<bool> SendUndoLikeAsync(Like like);
+    Task<bool> SendUndoLikeAsync(LikeGateway like);
 
     Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
 
