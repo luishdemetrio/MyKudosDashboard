@@ -45,23 +45,22 @@ public class GroupScoreRules : IGroupScoreRules
     {
 
 
-        UserScore score;
-
 
         await _semaphore.WaitAsync();
-
         
+        UserScore score;
+
         try
         {
-            await _userScoreService.SetUserScoreAsync(pUserScore).ConfigureAwait(false);
+            score = await _userScoreService.SetUserScoreAsync(pUserScore).ConfigureAwait(false);
 
-             score = await _userScoreService.GetUserScoreAsync(pUserScore.Id.ToString());
+             //score = await _userScoreService.GetUserScoreAsync(pUserScore.UserId);
 
             try
             {
                 if (score != null)
                 {
-                    var kudosGroup = await _userKudosService.GetUserKudosByCategory(pUserScore.Id.ToString());
+                    var kudosGroup = await _userKudosService.GetUserKudosByCategory(pUserScore.UserId);
 
                     if (kudosGroup != null)
                     {

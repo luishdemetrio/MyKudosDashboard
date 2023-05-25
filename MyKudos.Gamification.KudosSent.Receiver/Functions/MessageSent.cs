@@ -35,7 +35,7 @@ public class MessageSent
             var score = 
                 new UserScore()
                 {
-                    Id = new Guid(userId),
+                    UserId = new Guid(userId),
                     MessagesSent = 1,
                     Score = int.Parse(_messageSentScore)
                 };

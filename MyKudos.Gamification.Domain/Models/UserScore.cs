@@ -3,7 +3,8 @@ namespace MyKudos.Gamification.Domain.Models;
 
 public class UserScore
 {
-    public Guid Id { get; set; }     
+    public int UserScoreId { get; set; }   
+    public Guid UserId { get; set; }
     public int Score { get; set; }
     public int KudosSent { get; set; }
     public int KudosReceived { get; set; }

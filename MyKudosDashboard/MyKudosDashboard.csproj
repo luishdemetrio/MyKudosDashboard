@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8d39b9d0-c94f-48b5-9a90-21177c24a57c</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     
   </PropertyGroup>
 
@@ -36,6 +38,8 @@
     <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
 
     <PackageReference Include="bootstrap" Version="5.2.3" />
+
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
     
     
   </ItemGroup>

@@ -21,13 +21,13 @@ public class KudosServiceRest: IKudosService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<KudosLog>> GetKudosAsync(int pageNumber)
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber)
     {
-        List<KudosLog> result = new();
+        List<Kudos.Domain.Models.Kudos> result = new();
 
         try
         {
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<KudosLog>>($"{_kudosServiceUrl}kudos/?pageNumber= {pageNumber}");
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudos/?pageNumber= {pageNumber}");
             result = kudos.ToList();
         }
         catch (Exception ex)
@@ -39,13 +39,13 @@ public class KudosServiceRest: IKudosService
 
     }
 
-    public async Task<int> SendAsync(Kudos.Domain.Models.KudosLog kudos)
+    public async Task<int> SendAsync(Kudos.Domain.Models.Kudos kudos)
     {
         var result = 0;
 
         try
         {
-            result = await _restClientHelper.SendApiData<Kudos.Domain.Models.KudosLog, int>($"{_kudosServiceUrl}kudos", HttpMethod.Post, kudos);
+            result = await _restClientHelper.SendApiData<Kudos.Domain.Models.Kudos, int>($"{_kudosServiceUrl}kudos", HttpMethod.Post, kudos);
         }
         catch (Exception ex)
         {

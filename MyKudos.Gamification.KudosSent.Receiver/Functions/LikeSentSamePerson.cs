@@ -41,7 +41,7 @@ public class LikeSentSamePerson
             var score =
                     new UserScore()
                     {
-                        Id = new Guid(mySbMsg),
+                        UserId = new Guid(mySbMsg),
                         LikesReceived = 1,
                         LikesSent = 1,
                         Score = int.Parse(_likeReceiveScore) + int.Parse(_likeReceiveScore)

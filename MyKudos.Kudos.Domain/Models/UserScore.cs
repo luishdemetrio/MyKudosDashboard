@@ -1,4 +1,5 @@
-﻿namespace MyKudos.Gateway.Domain.Models;
+﻿
+namespace MyKudos.Kudos.Domain.Models;
 
 public class UserScore
 {

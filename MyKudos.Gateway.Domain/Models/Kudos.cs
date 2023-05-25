@@ -44,7 +44,7 @@ public class KudosResponse
     public string Message { get; set; }
     public DateTime SendOn { get; set; }
     public List<Person> Likes { get; set; } = new();
-    public int CommentsCount { get; set; } 
+    public List<int> Comments { get; set; } 
 
 
 

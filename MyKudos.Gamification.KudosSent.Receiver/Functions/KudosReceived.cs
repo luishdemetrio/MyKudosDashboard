@@ -39,7 +39,7 @@ public class GamificationKudosReceived
 
             var score = new UserScore()
             {
-                Id = new Guid(userId),
+                UserId = new Guid(userId),
                 KudosReceived = 1,
                 Score = int.Parse(_kudosReceiveScore)
             };

@@ -24,7 +24,7 @@ public class KudosController : ControllerBase
 
 
     [HttpPost]
-    public int Post([FromBody] Domain.Models.KudosLog kudos)
+    public int Post([FromBody] Domain.Models.Kudos kudos)
     {
         return _kudosService.Send(kudos);
 
@@ -32,7 +32,7 @@ public class KudosController : ControllerBase
     }
 
     [HttpGet(Name = "GetKudos")]
-    public Task<IEnumerable<Domain.Models.KudosLog>> Get(int pageNumber, int pageSize)
+    public Task<IEnumerable<Domain.Models.Kudos>> Get(int pageNumber, int pageSize)
     {
         if (pageNumber == 0)
             pageNumber = _defaultPageNumber;

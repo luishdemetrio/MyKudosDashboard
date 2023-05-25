@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyKudos.Kudos.Domain.Models;
 
-public class KudosLog
+public class Kudos
 {
     
-    public int Id { get; set; } 
+    public int KudosId { get; set; } 
 
     public string FromPersonId { get; set; }
     
@@ -26,7 +26,7 @@ public class KudosLog
 
 public class Comments
 {
-    public int Id { get; set; } 
+    public int CommentsId { get; set; } 
     public int KudosId { get; set; }
     public string FromPersonId { get; set; }
     public string Message { get; set; }
@@ -44,7 +44,7 @@ public class CommentsLikes
 
 public class KudosLike
 {
-    public int Id { get; set; }
+    public int KudosLikeId { get; set; }
     public int KudosId { get; set; }
     public string PersonId { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Services;
 

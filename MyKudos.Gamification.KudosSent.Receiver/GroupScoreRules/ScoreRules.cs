@@ -20,13 +20,13 @@ internal sealed class ScoreRules
         _kudosSendScore = configuration["KudosSendScore"];
     }
 
-    public async Task<UserScore> UpdateUserScoreAsync(string pUserId)
+    public async Task<UserScore> UpdateUserScoreAsync(Guid pUserId)
     {
 
         await _userScoreService.SetUserScoreAsync(
                new UserScore()
                {
-                   Id = new Guid(pUserId),
+                   UserId = pUserId,
                    KudosSent = 1,
                    Score = int.Parse(_kudosSendScore)
                });

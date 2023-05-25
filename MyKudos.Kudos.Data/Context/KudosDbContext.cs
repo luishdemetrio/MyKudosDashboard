@@ -14,7 +14,7 @@ public class KudosDbContext : DbContext
 
     
 
-    public DbSet<Domain.Models.KudosLog> Kudos { get; set; }
+    public DbSet<Domain.Models.Kudos> Kudos { get; set; }
 
     public DbSet<Comments> Comments { get; set; }
 
@@ -23,6 +23,8 @@ public class KudosDbContext : DbContext
     public DbSet<Domain.Models.KudosLike> KudosLike { get; set; }
 
     public DbSet<CommentsLikes> CommentsLikes { get; set; }
+
+    public DbSet<UserScore> UserScores { get; set; }
 
 
 }

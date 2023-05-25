@@ -1,15 +1,15 @@
-﻿using MyKudos.Gamification.App.Interfaces;
-using MyKudos.Gamification.Domain.Intefaces;
-using MyKudos.Gamification.Domain.Models;
+﻿
+using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 
-
-namespace MyKudos.Gamification.App.Services;
+namespace MyKudos.Kudos.App.Services;
 
 public class UserScoreService : IUserScoreService
 {
 
     private readonly IUserScoreRepository _userScoreRepository;
-   
+
 
     public UserScoreService(IUserScoreRepository userScoreRepository)
     {
@@ -19,14 +19,14 @@ public class UserScoreService : IUserScoreService
 
     public UserScore GetUserScore(string pUserId)
     {
-       return _userScoreRepository.GetUserScore(pUserId);
+        return _userScoreRepository.GetUserScore(pUserId);
     }
 
     public UserScore? SetUserScore(UserScore userScore)
     {
-       
-            return _userScoreRepository.SetUserScore(userScore);
-       
+
+        return _userScoreRepository.SetUserScore(userScore);
+
     }
 
     public IEnumerable<UserScore> GetTopUserScores(int top)

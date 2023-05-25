@@ -23,15 +23,15 @@ public class KudosRepository : IKudosRepository
 
 	}
 
-	public int Add(Domain.Models.KudosLog kudos)
+	public int Add(Domain.Models.Kudos kudos)
 	{
 		_kudosDbContext.Kudos.Add(kudos);
 		_kudosDbContext.SaveChanges();
 
-		return kudos.Id;
+		return kudos.KudosId;
 	}
 
-	public async Task<IEnumerable<Domain.Models.KudosLog>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
+	public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
 	{
 
 		if(pageSize > _maxPageSize)
@@ -41,11 +41,13 @@ public class KudosRepository : IKudosRepository
 
 		return await _kudosDbContext.Kudos.OrderByDescending(k => k.Date)
 					.Skip(pageSize * (pageNumber - 1))
-					.Take(pageSize)
+					.Take(pageSize)					
+					.Include(l=> l.Likes)
+					.Include(c=> c.Comments)
 					.ToListAsync();
 	}
 
-    public IEnumerable<Domain.Models.KudosLog> GetUserKudos(string pUserId)
+    public IEnumerable<Domain.Models.Kudos> GetUserKudos(string pUserId)
     {
 
         return _kudosDbContext.Kudos.Where(k => k.ToPersonId == pUserId);

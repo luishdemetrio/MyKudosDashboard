@@ -7,7 +7,7 @@ public interface IUserScoreService
 {
     UserScore GetUserScore(string pUserId);
 
-    bool SetUserScore(UserScore userScore);
+    UserScore? SetUserScore(UserScore userScore);
 
     IEnumerable<UserScore> GetTopUserScores(int top);
 

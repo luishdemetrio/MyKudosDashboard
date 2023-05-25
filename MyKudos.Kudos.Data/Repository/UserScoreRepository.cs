@@ -1,19 +1,24 @@
-﻿using MyKudos.Gamification.Data.Context;
-using MyKudos.Gamification.Domain.Intefaces;
-using MyKudos.Gamification.Domain.Models;
+﻿using MyKudos.Kudos.Data.Context;
+using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Kudos.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace MyKudos.Gamification.Data.Repository;
+namespace MyKudos.Kudos.Data.Repository;
 
 public class UserScoreRepository : IUserScoreRepository
 {
 
-    private UserScoreDbContext _context;
+    private KudosDbContext _context;
     private static SemaphoreSlim _semaphoreLike = new SemaphoreSlim(1, 1);
 
-    public UserScoreRepository(UserScoreDbContext scoreContext)
+    public UserScoreRepository(KudosDbContext scoreContext)
     {
         _context = scoreContext;
-        
+
     }
 
 
@@ -34,8 +39,8 @@ public class UserScoreRepository : IUserScoreRepository
     public UserScore? SetUserScore(UserScore userScore)
     {
 
-        UserScore? score ;
-       
+        UserScore? score;
+
         _semaphoreLike.Wait();
 
         try
@@ -59,27 +64,27 @@ public class UserScoreRepository : IUserScoreRepository
             else
             {
                 _context.UserScores?.Add(userScore);
-
+                score = userScore;
 
             }
 
-            _context.SaveChanges() ;
+            _context.SaveChanges();
 
         }
         finally
         {
             _semaphoreLike.Release();
-        }   
-        
+        }
+
 
         return score;
 
     }
 
-    public IEnumerable<UserScore> GetTopUserScores(int top) 
+    public IEnumerable<UserScore> GetTopUserScores(int top)
     {
-    
-        return _context.UserScores.Where(s=> s.Score > 0).OrderByDescending(s=> s.Score).Take(top);
+
+        return _context.UserScores.Where(s => s.Score > 0).OrderByDescending(s => s.Score).Take(top);
     }
 
     public bool UpdateGroupScore(UserScore userScore)
@@ -88,8 +93,9 @@ public class UserScoreRepository : IUserScoreRepository
         bool result = false;
 
         _semaphoreLike.Wait();
-        
-        try { 
+
+        try
+        {
             score = _context.UserScores?.FirstOrDefault(u => u.UserId == userScore.UserId);
 
             if (score != null)
@@ -120,3 +126,4 @@ public class UserScoreRepository : IUserScoreRepository
         return result;
     }
 }
+

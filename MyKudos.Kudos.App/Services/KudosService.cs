@@ -27,12 +27,12 @@ public sealed class KudosService : IKudosService
         _kudosLikeRepository = kudosLikeRepository;
     }
 
-    public Task<IEnumerable<Domain.Models.KudosLog>> GetKudos(int pageNumber, int pageSize)
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize)
     {
         return _kudosRepository.GetKudosAsync(pageNumber, pageSize);
     }
 
-    public IEnumerable<Domain.Models.KudosLog> GetUserKudos(string pUserId)
+    public IEnumerable<Domain.Models.Kudos> GetUserKudos(string pUserId)
     {
         return _kudosRepository.GetUserKudos(pUserId);
     }
@@ -46,9 +46,9 @@ public sealed class KudosService : IKudosService
 
             var recognitions = _recognitionRepository.GetRecognitions();
 
-            var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new KudosLog
+            var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new MyKudos.Kudos.Domain.Models.Kudos
             {
-                Id = k.Id,
+                KudosId = k.KudosId,
                 TitleId = k.TitleId,
                 ToPersonId = k.ToPersonId
             }
@@ -71,7 +71,7 @@ public sealed class KudosService : IKudosService
         }
     }
 
-    public int Send(Domain.Models.KudosLog kudos)
+    public int Send(Domain.Models.Kudos kudos)
     {
         return (_kudosRepository.Add(kudos));
 

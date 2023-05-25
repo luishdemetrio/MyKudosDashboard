@@ -15,7 +15,7 @@ public class GamificationService : IGamificationService
 
     public GamificationService(IConfiguration config, ILogger<GamificationService> log, IRestClientHelper clientHelper)
     {
-        _gamificationServiceUrl = config["gamificationServiceUrl"];
+        _gamificationServiceUrl = config["kudosServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }

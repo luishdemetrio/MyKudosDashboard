@@ -27,7 +27,7 @@ public class UserKudosService : IUserKudosService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId)
+    public async Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(Guid pUserId)
     {
         IEnumerable<KudosGroupedByValue> result = null ;
 

@@ -76,7 +76,7 @@
                             <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
 
                             <div>
-                                @item.CommentsCount
+                                @item.Comments.Count()
                             </div>
 
                         </FluentButton>
@@ -504,12 +504,30 @@
         {
             var kudo = _kudosList[pComments.KudosId];
 
-            kudo.CommentsCount--;
+            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
 
+            if (kudo.Comments.Contains(comments))
+            {
+                kudo.Comments.Remove(comments);
+
+                var t = InvokeAsync(() =>
+                 {
+                     StateHasChanged();
+                 });
+
+                t.Wait();
+
+            }
+
+        }
+        else
+        {
             var t = InvokeAsync(() =>
-           {
-               StateHasChanged();
-           });
+               {
+                   _ = LoadKudos();
+               });
+
+            t.Wait();
         }
 
     }
@@ -533,13 +551,34 @@
         {
             var kudo = _kudosList[pComments.KudosId];
 
-            kudo.CommentsCount++;
-
-             var t = InvokeAsync(() =>
+            if (!kudo.Comments.Contains(pComments.Id))
             {
-               StateHasChanged();
-            });
+
+                kudo.Comments.Add(pComments.Id);
+
+                var t = InvokeAsync(() =>
+                 {
+                     StateHasChanged();
+                 });
+
+                t.Wait();
+
+            }
+
         }
+        else
+        {
+
+            var t = InvokeAsync(() =>
+             {
+                 _ = LoadKudos();
+             });
+
+            t.Wait();
+
+            
+        }
+
             
     }
 

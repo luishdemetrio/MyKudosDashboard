@@ -85,7 +85,7 @@ public class CommentsController : Controller
                                        on like.FromPersonId equals photo.id
                                    select new LikeMessage(
 
-                                       MessageId: comment.Id,
+                                       MessageId: comment.CommentsId,
                                        Person: new GatewayDomain.Person()
                                        {
                                            Id = like.FromPersonId,
@@ -104,12 +104,12 @@ public class CommentsController : Controller
                         on user.Id equals photo.id
                     select new CommentsResponse()
                     {
-                        Id = comment.Id,
+                        Id = comment.CommentsId,
                         KudosId = comment.KudosId,
                         FromPerson = new GatewayDomain.Person {Id = user.Id, Name = user.DisplayName, Photo = $"data:image/png;base64,{photo.photo}" },
                         Message = comment.Message,
                         Date = comment.Date,
-                        Likes =  likes.Where(l => l.MessageId == comment.Id).Select(l => l.Person).ToList()
+                        Likes =  likes.Where(l => l.MessageId == comment.CommentsId).Select(l => l.Person).ToList()
                     }).ToList();
 
 
@@ -128,7 +128,7 @@ public class CommentsController : Controller
 
         succeed = await  _commentsService.UpdateComments(new Comments()
         {
-            Id = comments.Id,
+            CommentsId = comments.Id,
             KudosId = comments.KudosId,
             Message = comments.Message,
             FromPersonId = comments.FromPersonId,

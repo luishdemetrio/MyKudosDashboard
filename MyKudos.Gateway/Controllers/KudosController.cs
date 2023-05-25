@@ -83,7 +83,7 @@ public class KudosController : Controller
                                    on like.PersonId equals photo.id
                                select new LikeDTO(
 
-                                   KudosId: k.Id,
+                                   KudosId: k.KudosId,
                                    Person: new GatewayDomain.Person()
                                    {
                                        Id = like.PersonId,
@@ -108,14 +108,14 @@ public class KudosController : Controller
                      orderby kudo.Date descending
 
                      select new KudosResponse() {
-                         Id = kudo.Id,
+                         Id = kudo.KudosId,
                          From = new GatewayDomain.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
                          To = new GatewayDomain.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
                          Title= rec.Title,
                         Message = kudo.Message,
                         SendOn = kudo.Date,
-                        Likes= likes.Where(l => l.KudosId == kudo.Id).Select(l => l.Person).ToList(),
-                        CommentsCount =  (kudo.Comments is null) ? 0 : kudo.Comments.Count
+                        Likes= likes.Where(l => l.KudosId == kudo.KudosId).Select(l => l.Person).ToList(),
+                        Comments=  (kudo.Comments is null) ? new List<int>() : kudo.Comments.Select(c=> c.CommentsId).ToList()
                      };
         
 
@@ -129,7 +129,7 @@ public class KudosController : Controller
     public async Task<int> PostAsync([FromBody] KudosRequest kudos)
     {
 
-        var restKudos = new Kudos.Domain.Models.KudosLog()
+        var restKudos = new Kudos.Domain.Models.Kudos()
         {
             FromPersonId = kudos.From.Id,
             ToPersonId = kudos.To.Id,

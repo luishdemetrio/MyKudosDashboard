@@ -1,8 +1,9 @@
-﻿using MyKudos.Gamification.Domain.Models;
+﻿
+using MyKudos.Kudos.Domain.Models;
 
-namespace MyKudos.Gamification.Domain.Intefaces;
+namespace MyKudos.Kudos.App.Interfaces;
 
-public interface IUserScoreRepository
+public interface IUserScoreService
 {
     UserScore GetUserScore(string pUserId);
 
@@ -12,3 +13,4 @@ public interface IUserScoreRepository
 
     bool UpdateGroupScore(UserScore userScore);
 }
+

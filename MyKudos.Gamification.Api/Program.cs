@@ -17,8 +17,6 @@ builder.Services.AddSwaggerGen();
 
 
 
-var config = builder.Configuration.GetSection("CosmosDb");
-
 builder.Services.AddDbContext<UserScoreDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));

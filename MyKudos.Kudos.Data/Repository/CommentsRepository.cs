@@ -1,4 +1,5 @@
-﻿using MyKudos.Kudos.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
@@ -20,18 +21,20 @@ public class CommentsRepository : ICommentsRepository
         _context.Comments.Add(comments);
         _context.SaveChanges();
 
-        return comments.Id;
+        return comments.CommentsId;
     }
 
     public IEnumerable<Comments> GetComments(int kudosId)
     {
-        return _context.Comments.Where(c => c.KudosId == kudosId);
+        return _context.Comments
+                    .Where(c => c.KudosId == kudosId)
+                    .Include(l=> l.Likes);
     }
 
     public bool Like(int commentsId, string personId)
     {
 
-        var commentsLikes = _context.CommentsLikes.Where(k => k.CommentsId == commentsId && k.FromPersonId == personId).First();
+        var commentsLikes = _context.CommentsLikes.Where(k => k.CommentsId == commentsId && k.FromPersonId == personId).FirstOrDefault();
 
         //it is already there
         if (commentsLikes != null)
@@ -68,7 +71,7 @@ public class CommentsRepository : ICommentsRepository
 
     public bool Update(Comments comments)
     {
-        var comment = _context.Comments.FirstOrDefault(c => c.Id == comments.Id);
+        var comment = _context.Comments.FirstOrDefault(c => c.CommentsId == comments.CommentsId);
 
         if (comment != null)
         {
@@ -81,7 +84,7 @@ public class CommentsRepository : ICommentsRepository
     public bool Delete(int commentId)
     {
 
-        var comment = _context.Comments.FirstOrDefault(c => c.Id == commentId);
+        var comment = _context.Comments.FirstOrDefault(c => c.CommentsId == commentId);
 
         if (comment != null)
         {

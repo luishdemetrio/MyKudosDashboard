@@ -21,7 +21,7 @@ public class GroupUserScoreService : IGroupUserScoreService
     public GroupUserScoreService(IConfiguration config, ILogger<UserScoreService> log, IRestClientHelper clientHelper)
     {
 
-        _userScoreServiceUrl = config["userScoreServiceUrl"];
+        _userScoreServiceUrl = config["UserKudosServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }

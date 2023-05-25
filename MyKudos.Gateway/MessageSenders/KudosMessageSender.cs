@@ -102,7 +102,7 @@ public class KudosMessageSender : IKudosMessageSender
                 Message = kudos.Message,
                 Title = kudos.Reward.Title,
                 SendOn = kudos.SendOn,
-                CommentsCount = 0,
+                Comments = new List<int>(),
                 Likes = new List<Person>()
             },
             _kudosSentDashboard, _kudosSentDashboard);

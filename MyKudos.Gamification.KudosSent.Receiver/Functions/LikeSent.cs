@@ -36,7 +36,7 @@ public class LikeSent
             var score = 
                 new UserScore()
                 {
-                    Id = new Guid(mySbMsg),
+                    UserId = new Guid(mySbMsg),
                     LikesSent = 1,
                     Score = int.Parse(_likeSendScore)
                 };

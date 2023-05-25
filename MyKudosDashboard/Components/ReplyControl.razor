@@ -112,8 +112,8 @@
 <div style="float:left;margin-left:37px;padding-top: 0px">
 
     <FluentButton   id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
-                    @onclick=@(()=>LikeComment(Reply))
-                    >
+                    @onclick=@(()=>LikeCommentClick(Reply))
+                  Disabled=@_isLikeButtonDisabled>
         <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                     Filled=@FilledLikeComments(@Reply) />
         <div @ref=_numberOfLikeComments>@Reply.Likes.Count()</div>
@@ -193,6 +193,7 @@
     private ElementReference _numberOfLikeComments;
     private Dictionary<string, ElementReference> tooltipLikes = new();
 
+    private bool _isLikeButtonDisabled = false;
 
    
 
@@ -229,46 +230,69 @@
         return filled;
     }
 
-    private async void LikeComment(CommentsResponse item)
+    private  void LikeCommentClick(CommentsResponse item)
     {
 
-        if (LikeDisabled(item))
+        if (_isLikeButtonDisabled)
             return;
 
-        if (item.Likes.Any(l => l.Id == ReplyUser.ObjectId))
-        {
-            await ReplyView.SendUndoLikeAsync(
-                    new LikeCommentGateway(
-                       KudosId: item.KudosId,
-                       FromPerson: new Person
-                            {
-                                Id = ReplyUser.ObjectId,
-                                Name = ReplyUser.DisplayName,
-                                Photo = ReplyUserPhoto
-                            }
-                   )
-               );            
-        }
-        else
-        {
-            await ReplyView.SendLikeAsync(
-                    new LikeCommentGateway(
-                      KudosId: item.KudosId,
-                      FromPerson: new Person
-                          {
-                              Id = ReplyUser.ObjectId,
-                              Name = ReplyUser.DisplayName,
-                              Photo = ReplyUserPhoto
-                          }
-                  )
-              );
-        }
 
-        await UpdateLikes(item.Id, ReplyUser.ObjectId);
+        try
+        {
+
+            if (item.Likes.Any(l => l.Id == ReplyUser.ObjectId))
+            {
+                var t = InvokeAsync(() =>
+                  {
+                      ReplyView.SendUndoLikeAsync(
+                              new LikeCommentGateway(
+                                 KudosId: item.Id,
+                                 FromPerson: new Person
+                                  {
+                                      Id = ReplyUser.ObjectId,
+                                      Name = ReplyUser.DisplayName,
+                                      Photo = ReplyUserPhoto
+                                  }));
+                  });
+                t.Wait();
+
+            }
+            else
+            {
+                var t = InvokeAsync(() =>
+                  {
+
+                      ReplyView.SendLikeAsync(
+                              new LikeCommentGateway(
+                                KudosId: item.Id,
+                                FromPerson: new Person
+                                {
+                                    Id = ReplyUser.ObjectId,
+                                    Name = ReplyUser.DisplayName,
+                                    Photo = ReplyUserPhoto
+                                }));
+                  });
+                t.Wait();
+            }
+
+            UpdateLikes(item.Id, ReplyUser.ObjectId);
+
+        }
+        finally
+        {
+            _isLikeButtonDisabled = false;
+
+            var t = InvokeAsync(() =>
+                    {
+                        StateHasChanged();
+                    });
+
+            t.Wait();
+        }
 
     }
 
-    private async Task UpdateLikes(int commentId, string personId)
+    private void UpdateLikes(int commentId, string personId)
     {
 
         if (Reply.Id == commentId)
@@ -291,22 +315,22 @@
                 Reply.Likes.Remove(like);
             }
 
-            await UpdateNumberOfLikeComments();
+            //UpdateNumberOfLikeComments();
         }
     }
 
-    public async Task UpdateNumberOfLikeComments()
-    {
+    //public async Task UpdateNumberOfLikeComments()
+    //{
 
-        if (Reply != null)
-        {            
-            await JSRuntime.InvokeVoidAsync(
-               "updateCount", _numberOfLikeComments, Reply.Likes.Count);
+    //    if (Reply != null)
+    //    {            
+    //        await JSRuntime.InvokeVoidAsync(
+    //           "updateCount", _numberOfLikeComments, Reply.Likes.Count);
 
            
-        }
+    //    }
 
-    }
+    //}
 
     private void ReplyMessageClick()
     {
