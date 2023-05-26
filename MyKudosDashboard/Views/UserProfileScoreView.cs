@@ -1,4 +1,5 @@
-﻿using MyKudosDashboard.Interfaces;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.MessageSender;
 using MyKudosDashboard.Models;
 using Newtonsoft.Json;
@@ -65,7 +66,7 @@ public class UserProfileScoreView : IUserProfileScoreView
                 {
                     var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-                    if ((userScore != null) && (userScore.Id == _userId))
+                    if (userScore != null) 
                     {
                         UserScoreCallback?.Invoke(userScore);
                     }
@@ -99,7 +100,7 @@ public class UserProfileScoreView : IUserProfileScoreView
                     //retrive the message body
                     var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
 
-                    if ((userScore != null) && (userScore.Id == _userId))
+                    if (userScore != null)
                     {
                         UserScoreCallback?.Invoke(userScore);
                     }

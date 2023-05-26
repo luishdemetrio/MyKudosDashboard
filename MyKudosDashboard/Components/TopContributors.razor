@@ -1,5 +1,5 @@
 ﻿@using MyKudosDashboard.Interfaces;
-@using MyKudosDashboard.Models;
+@using MyKudos.Gateway.Domain.Models;
 
 @inject ITopContributorsView TopContributorsView;
 
@@ -38,7 +38,7 @@
 </div>
 
 @code {
-    private IEnumerable<Models.TopContributors> _topContributors;
+    private IEnumerable<MyKudos.Gateway.Domain.Models.TopContributors> _topContributors;
     private bool _isLoaded = false;
 
     protected override void OnInitialized()

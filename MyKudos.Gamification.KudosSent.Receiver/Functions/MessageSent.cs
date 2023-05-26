@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MyKudos.Gamification.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 
 namespace MyKudos.Gamification.Receiver.Functions;
@@ -35,7 +35,7 @@ public class MessageSent
             var score = 
                 new UserScore()
                 {
-                    Id = new Guid(userId),
+                    UserId = new Guid(userId),
                     MessagesSent = 1,
                     Score = int.Parse(_messageSentScore)
                 };

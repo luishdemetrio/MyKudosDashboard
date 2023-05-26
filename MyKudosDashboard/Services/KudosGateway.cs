@@ -1,4 +1,5 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
@@ -60,13 +61,13 @@ public class GatewayService : IKudosGateway
 
     }
 
-    public async Task<bool> Like(Like like)
+    public async Task<bool> Like(LikeGateway like)
     {
         bool result = false;
 
         try
         {
-            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Post, like);
+            result = await _restClientHelper.SendApiData<LikeGateway, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -77,13 +78,13 @@ public class GatewayService : IKudosGateway
         return result;
     }
 
-    public async Task<bool> UndoLike(Like like)
+    public async Task<bool> UndoLike(LikeGateway like)
     {
         bool result = false;
 
         try
         {
-            result = await _restClientHelper.SendApiData<Like, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Delete, like);
+            result = await _restClientHelper.SendApiData<LikeGateway, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {

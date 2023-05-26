@@ -1,4 +1,5 @@
-﻿using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
@@ -11,9 +12,9 @@ public interface IKudosGateway
     Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
 
 
-    Task<bool> Like(Like like);
+    Task<bool> Like(LikeGateway like);
 
-    Task<bool> UndoLike(Like like);
+    Task<bool> UndoLike(LikeGateway like);
 
 
 }

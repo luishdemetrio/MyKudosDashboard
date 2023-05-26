@@ -1,6 +1,8 @@
-﻿namespace MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Gateway.Domain.Models;
+
+namespace MyKudos.Gateway.Interfaces;
 
 public interface IRecognitionService
 {
-    Task<IEnumerable<Models.Recognition>> GetRecognitionsAsync();
+    Task<IEnumerable<Recognition>> GetRecognitionsAsync();
 }

@@ -1,4 +1,4 @@
-﻿using MyKudos.Gamification.Domain.Models;
+﻿using MyKudos.Kudos.Domain.Models;
 using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Interfaces;

@@ -1,4 +1,5 @@
-﻿@using MyKudosDashboard.Interfaces;
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
 @inject ICommentsView CommentsView;
@@ -10,7 +11,7 @@
 @inject IJSRuntime JSRuntime
 
 <FluentDialog @ref=_replyKudosFluentDialog
-                TrapFocus="true" aria-label="Simple dialog" Modal="true"
+                aria-label="Simple dialog" Modal="true"
                 class="both-gradient"  style="--dialog-height: 640px;--dialog-width: 640px;"
                 Hidden=@ModalHidden
                 >
@@ -85,9 +86,10 @@
 
                                 </FluentButton>
 
-                                <FluentButton id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px"
-                                                @onclick=@(()=>LikeKudos(_item))
-                                               >
+                                <FluentButton   id=@($"Details_{_item.Id}") style="margin-left:20px;margin-right:20px"
+                                                @onclick=@(()=>LikeKudosClick(_item))
+                                                Disabled=@_isLikeButtonDisabled>
+
                                     <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                             Filled=@FilledLikeKudos(_item) />
                                     @_item.Likes.Count()
@@ -238,8 +240,11 @@
 
     private ElementReference _numberOfComments;
 
-     private bool isLoading = false;
+    private bool isLoading = false;
     private bool btnSendKudosDisabled = false;
+
+    private bool _isLikeButtonDisabled = false;
+
 
     public void ShowModal(KudosResponse kudos, string userPhoto)
     {
@@ -257,14 +262,14 @@
 
         BlockSendButton(false);
         InvokeAsync(StateHasChanged);
-        
+
     }
 
     public void CloseClick()
     {
         ModalHidden = true;
         _replyKudosFluentDialog!.Hide();
-            
+
     }
 
     private bool LikeDisabled(KudosResponse item)
@@ -275,12 +280,14 @@
 
     private void OnDismiss(EventArgs args)
     {
-       
-            ModalHidden = true;
-            
-            _replyKudosFluentDialog!.Hide();
-       
+
+        ModalHidden = true;
+
+        _replyKudosFluentDialog!.Hide();
+
     }
+
+  
 
 
     private bool FilledLikeKudos(KudosResponse item)
@@ -296,48 +303,81 @@
     }
 
 
-    private async Task LikeKudos(KudosResponse kudos)
+    private void LikeKudosClick(KudosResponse kudos)
     {
-        if (LikeDisabled(kudos))
+        if (_isLikeButtonDisabled)
             return;
 
-        if (kudos.Likes.Any(l => l.Id == User.ObjectId))
+
+        try
         {
-            await CommentsView.UndoLikeKudosAsync(
-                     new Like(
-                       KudosId: kudos.Id,
-                       FromPerson: new Person
-                            {
-                                Id = User.ObjectId,
-                                Name = User.DisplayName,
-                                Photo = $"data:image/png;base64,{_userPhoto}"
-                            },
-                       ToPersonId: kudos.To.Id
-                   )
-               );            
-        }
-        else
-        {
-            await CommentsView.LikeKudosAsync(
-                    new Like(
-                      KudosId: kudos.Id,
-                      FromPerson: new Person
-                          {
-                              Id = User.ObjectId,
-                              Name = User.DisplayName,
-                              Photo = $"data:image/png;base64,{_userPhoto}"
-                          },
-                      ToPersonId: kudos.To.Id
-                  )
-              );
-        }
 
 
-        UpdateLikesKudos(kudos.Id, User.ObjectId);
+            _isLikeButtonDisabled = true;
+
+
+            if (kudos.Likes.Any(l => l.Id == User.ObjectId))
+            {
+                var t = InvokeAsync(() =>
+                   {
+                       CommentsView.UndoLikeKudosAsync(
+                         new LikeGateway(
+                           KudosId: kudos.Id,
+                           FromPerson: new Person
+                              {
+                                  Id = User.ObjectId,
+                                  Name = User.DisplayName,
+                                  Photo = $"data:image/png;base64,{_userPhoto}"
+                              },
+                           ToPersonId: kudos.To.Id
+                       )
+                   );
+                   });
+
+                t.Wait();
+
+
+            }
+            else
+            {
+
+                var t = InvokeAsync(() =>
+                   {
+                       CommentsView.LikeKudosAsync(
+                           new LikeGateway(
+                             KudosId: kudos.Id,
+                             FromPerson: new Person
+                             {
+                                 Id = User.ObjectId,
+                                 Name = User.DisplayName,
+                                 Photo = $"data:image/png;base64,{_userPhoto}"
+                             },
+                             ToPersonId: kudos.To.Id
+                            ));
+                   });
+
+                t.Wait();
+                
+            }
+
+            UpdateLikesKudos(kudos.Id, User.ObjectId);
+
+        }
+        finally { 
+
+            _isLikeButtonDisabled = false; 
+
+            var t = InvokeAsync(() =>
+                    {
+                        StateHasChanged();
+                    });
+
+            t.Wait();
+        }
     }
 
 
-    private void UpdateLikeCallback(Like like)
+    private void UpdateLikeCallback(LikeGateway like)
     {
         // The person who sent already has the like updated
         if (like.FromPerson.Id == User.ObjectId)
@@ -346,12 +386,12 @@
         UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
     }
 
-    private void UpdateLikesKudos(string commentId, string personId)
+    private void UpdateLikesKudos(int pKudosId, string personId)
     {        
 
-        if (_item.Id == commentId)
+        if (_item.Id == pKudosId)
         {
-            var like = _item.Likes.Where(k => k.Id == personId).FirstOrDefault();
+            var like = _item.Likes.Where(k =>  k.Id == personId).FirstOrDefault();
 
 
             if ((like is null) || (!_item.Likes.Contains(like)))
@@ -361,7 +401,7 @@
                     {
                         Id = personId,
                         Name = User.DisplayName,
-                        Photo = $"data:image/png;base64,{_userPhoto}"
+                        Photo = (_userPhoto.Contains("data")) ? _userPhoto: $"data:image/png;base64,{_userPhoto}"
                     });
             }
             else
@@ -460,7 +500,7 @@
     {
         CommentsView.DeleteComments(pComments, _item.To.Id).ContinueWith(t =>
         {
-            var comments = _comments.First(c => c.Id == pComments.Id.ToString());
+            var comments = _comments.First(c => c.Id == pComments.Id);
 
             if (_comments.Contains(comments))
                 _comments.Remove(comments);

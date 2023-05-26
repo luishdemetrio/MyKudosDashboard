@@ -1,10 +1,10 @@
-﻿using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
 public interface IReplyView
 {
-    Task<bool> SendLikeAsync(LikeComment like);
-    Task<bool> SendUndoLikeAsync(LikeComment like);
+    Task<bool> SendLikeAsync(LikeCommentGateway like);
+    Task<bool> SendUndoLikeAsync(LikeCommentGateway like);
 
 }

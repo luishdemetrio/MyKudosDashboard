@@ -1,6 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus.Administration;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
 using MyKudos.MessageSender.Interfaces;
 
 namespace MyKudos.Gateway.Queues;
@@ -82,7 +82,7 @@ public class KudosMessageSender : IKudosMessageSender
     }
 
 
-    public async Task SendKudosAsync(string kudosId, KudosNotification kudos)
+    public async Task SendKudosAsync(int kudosId, KudosNotification kudos)
     {
 
         //send notification via Bot
@@ -102,7 +102,7 @@ public class KudosMessageSender : IKudosMessageSender
                 Message = kudos.Message,
                 Title = kudos.Reward.Title,
                 SendOn = kudos.SendOn,
-                Comments = new(),
+                Comments = new List<int>(),
                 Likes = new List<Person>()
             },
             _kudosSentDashboard, _kudosSentDashboard);
@@ -135,15 +135,10 @@ public class KudosMessageSender : IKudosMessageSender
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
 
         //gamification
-        if (like.ToPersonId == like.FromPerson.Id)
-        {
-            await _messageSender.SendQueue(like.FromPerson.Id, _gamificationUndolikeSentSamePersonTopicName);
-        }
-        else
-        {
-            await _messageSender.SendQueue(like.FromPerson.Id, _gamificationUndolikeSentTopicName);
-            await _messageSender.SendQueue(like.ToPersonId, _gamificationUndolikeReceivedTopicName);
-        }
+    
+        await _messageSender.SendQueue(like.FromPerson.Id, _gamificationUndolikeSentTopicName);
+        await _messageSender.SendQueue(like.ToPersonId, _gamificationUndolikeReceivedTopicName);
+    
         //notification to update the Teams Apps
         await _messageSender.SendTopic(like, _likeUndoDashboard, _likeUndoDashboard);
     }

@@ -1,9 +1,12 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace MyKudos.Kudos.Domain.Models;
 
-public class KudosLog
+public class Kudos
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    
+    public int KudosId { get; set; } 
 
     public string FromPersonId { get; set; }
     
@@ -15,22 +18,37 @@ public class KudosLog
 
     public DateTime Date { get; set; }
 
-    public List<string> Likes { get; set; } = new();
+    public List<KudosLike> Likes { get; set; } = new();
 
-    public List<string> Comments { get; set; } = new();
+    public List<Comments> Comments { get; set; } = new();
 }
 
 
 public class Comments
 {
-    public Guid Id { get; set; } = Guid.NewGuid();  
-    public string KudosId { get; set; }
+    public int CommentsId { get; set; } 
+    public int KudosId { get; set; }
     public string FromPersonId { get; set; }
     public string Message { get; set; }
     public DateTime Date { get; set; }
-    public List<string> Likes { get; set; } = new();
+    public List<CommentsLikes> Likes { get; set; } = new();
 
 }
+
+public class CommentsLikes
+{
+    public int Id { get; set; }
+    public int CommentsId { get; set; }
+    public string FromPersonId { get; set; }
+}
+
+public class KudosLike
+{
+    public int KudosLikeId { get; set; }
+    public int KudosId { get; set; }
+    public string PersonId { get; set; }
+}
+
 
 public record KudosNotification(
     Person From,

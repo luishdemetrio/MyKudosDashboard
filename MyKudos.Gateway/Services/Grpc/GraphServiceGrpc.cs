@@ -1,18 +1,4 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using Grpc.Net.Client;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Graph;
-using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
-using MyKudos.MSGraph.gRPC;
-using Newtonsoft.Json;
-using RestSharp;
-using System.Text.Json;
-using static MyKudos.Kudos.gRPC.KudosService;
-using static MyKudos.MSGraph.gRPC.MSGraphService;
-using static MyKudos.MSGraph.gRPC.MSGraphService;
-
+﻿
 namespace MyKudos.Gateway.Services;
 
 public class Settings

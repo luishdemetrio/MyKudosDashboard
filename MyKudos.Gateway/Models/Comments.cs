@@ -2,8 +2,8 @@
 
 public class CommentsRequest
 {
-    public string? Id { get; set; }
-    public string KudosId { get; set; }
+    public int Id { get; set; }
+    public int KudosId { get; set; }
     public string FromPersonId { get; set; }
     public string ToPersonId { get; set; }
     public string Message { get; set; }
@@ -13,8 +13,8 @@ public class CommentsRequest
 
 public class CommentsResponse
 {
-    public string Id { get; set; }
-    public string KudosId { get; set; }
+    public int Id { get; set; }
+    public int KudosId { get; set; }
     public Person FromPerson { get; set; }
     public string Message { get; set; }
     public DateTime Date { get; set; }

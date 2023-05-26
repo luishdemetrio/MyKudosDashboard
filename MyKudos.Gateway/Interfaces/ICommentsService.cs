@@ -9,12 +9,12 @@ public interface ICommentsService
 
     Task<bool> UndoLikeCommentAsync(Kudos.Domain.Models.SendLike dislike);
 
-    Task<string> SendCommentsAsync(Comments comment);
+    Task<int> SendCommentsAsync(Comments comment);
 
-    Task<IEnumerable<Comments>> GetComments(string kudosId);
+    Task<IEnumerable<Comments>> GetComments(int kudosId);
 
     Task<bool> UpdateComments(Comments comments);
 
-    Task<bool> DeleteComments(string kudosId, string commentId);
+    Task<bool> DeleteComments(int kudosId, int commentId);
 
 }

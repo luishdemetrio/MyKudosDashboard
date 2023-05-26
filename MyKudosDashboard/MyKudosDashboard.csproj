@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8d39b9d0-c94f-48b5-9a90-21177c24a57c</UserSecretsId>
+    
     
   </PropertyGroup>
 
@@ -14,6 +16,10 @@
     <None Include=".fx/**/*" />
     <None Remove="build/**/*" />
     <Content Remove="build/**/*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Components\Graph.razor" />
   </ItemGroup>
 
   
@@ -32,11 +38,14 @@
     <PackageReference Include="Blazored.Typeahead" Version="4.7.0" />
 
     <PackageReference Include="bootstrap" Version="5.2.3" />
+
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
     
     
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MyKudos.Gateway.Domain\MyKudos.Gateway.Domain.csproj" />
     <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />
   </ItemGroup>
 

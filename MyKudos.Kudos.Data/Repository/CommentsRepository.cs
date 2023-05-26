@@ -1,4 +1,5 @@
-﻿using MyKudos.Kudos.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
@@ -8,62 +9,61 @@ namespace MyKudos.Kudos.Data.Repository;
 public class CommentsRepository : ICommentsRepository
 {
 
-    private CommentsDbContext _context;
+    private KudosDbContext _context;
 
-    public CommentsRepository(CommentsDbContext context)
+    public CommentsRepository(KudosDbContext context)
     {
         _context = context;
     }
 
-    public Guid Add(Comments comments)
+    public int Add(Comments comments)
     {
         _context.Comments.Add(comments);
         _context.SaveChanges();
 
-        return comments.Id;
+        return comments.CommentsId;
     }
 
-    public IEnumerable<Comments> GetComments(string kudosId)
+    public IEnumerable<Comments> GetComments(int kudosId)
     {
-        return _context.Comments.Where(c=> c.KudosId == kudosId);
+        return _context.Comments
+                    .Where(c => c.KudosId == kudosId)
+                    .Include(l=> l.Likes);
     }
 
-    public bool Like(string commentsId, string personId)
+    public bool Like(int commentsId, string personId)
     {
 
-        var comments = _context.Comments.Where(k => k.KudosId == commentsId).FirstOrDefault();
+        var commentsLikes = _context.CommentsLikes.Where(k => k.CommentsId == commentsId && k.FromPersonId == personId).FirstOrDefault();
 
-        if (comments == null)
-            return false;
+        //it is already there
+        if (commentsLikes != null)
+            return true;
 
-            if (comments.Likes == null)
-            {
-                comments.Likes = new List<string>();
-                comments.Likes.Add(personId);
-            }
-            else if(!comments.Likes.Contains(personId))
-            {
-                comments.Likes.Add(personId);
-   
-            }
+        _context.CommentsLikes.Add(
+                    new CommentsLikes()
+                    {
+                        FromPersonId = personId,
+                        CommentsId = commentsId
+                    });
 
+        
         return _context.SaveChanges() > 0;
 
     }
 
-    public bool UndoLike(string commentsId, string personId)
+    public bool UndoLike(int commentsId, string personId)
     {
 
-        var comments = _context.Comments.Where(k => k.KudosId == commentsId).FirstOrDefault();
+        var commentsLikes = _context.CommentsLikes.Where(k => k.CommentsId == commentsId && k.FromPersonId == personId).First();
 
-        if ((comments == null) || (comments.Likes == null))
-            return false;
+        //it is already removed
+        if (commentsLikes == null)
+            return true;
 
-        if (comments.Likes.Contains(personId))
-        {
-            comments.Likes.Remove(personId);
-        }
 
+        _context.CommentsLikes.Remove(commentsLikes);
+       
         return _context.SaveChanges() > 0;
 
     }
@@ -71,19 +71,20 @@ public class CommentsRepository : ICommentsRepository
 
     public bool Update(Comments comments)
     {
-        var comment = _context.Comments.FirstOrDefault(c => c.Id == comments.Id);
+        var comment = _context.Comments.FirstOrDefault(c => c.CommentsId == comments.CommentsId);
 
         if (comment != null)
         {
             comment.Message = comments.Message;
         }
 
-        return _context.SaveChanges() >0;
+        return _context.SaveChanges() > 0;
     }
 
-    public bool Delete(Guid commentId) {
+    public bool Delete(int commentId)
+    {
 
-        var comment = _context.Comments.FirstOrDefault(c => c.Id == commentId);
+        var comment = _context.Comments.FirstOrDefault(c => c.CommentsId == commentId);
 
         if (comment != null)
         {
@@ -92,4 +93,7 @@ public class CommentsRepository : ICommentsRepository
 
         return _context.SaveChanges() > 0;
     }
+
+
+
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using GatewayDomain = MyKudos.Gateway.Domain.Models;
+using MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
@@ -27,9 +28,9 @@ public class CommentsController : Controller
     }
 
     [HttpPost(Name = "SendMessage")]
-    public async Task<string> Post(CommentsRequest comments)
+    public async Task<int> Post(CommentsRequest comments)
     {
-        string commentId = string.Empty;
+        int commentId ;
 
         commentId =  await _commentsService.SendCommentsAsync(new Comments()
         {
@@ -39,7 +40,7 @@ public class CommentsController : Controller
             Date = comments.Date
         });
 
-        if (!string.IsNullOrEmpty(commentId))
+        if (commentId != 0)
         {
             comments.Id = commentId;
             await _commentsMessageSender.MessageSent(comments);
@@ -49,28 +50,24 @@ public class CommentsController : Controller
     }
 
     [HttpGet(Name = "GetComments")]
-    public async Task<IEnumerable<CommentsResponse>> Get(string kudosId)
+    public async Task<IEnumerable<CommentsResponse>> Get(int kudosId)
     {
 
         var result = new List<CommentsResponse>();
 
         var comments =  await _commentsService.GetComments(kudosId);
 
-        if (comments != null)
-        {
-            var peopleIds = new List<string>();
+        if (comments == null)
+            return result;
 
-            foreach (var comment in comments)
-            {
-                peopleIds.AddRange(comment.Likes.Distinct());
+        
+        var peopleIds  = comments
+            .Where(c => c.KudosId == kudosId)
+            .Select(c => c.FromPersonId)
+            .Distinct()
+            .ToList();
 
-                if (!peopleIds.Contains(comment.FromPersonId))
-                {
-                    peopleIds.Add(comment.FromPersonId);
-                }
-            }
-
-            List<Models.GraphUser> users = await _graphService.GetUserInfo(peopleIds.Distinct().ToArray()).ConfigureAwait(true);
+        List<GraphUser> users = await _graphService.GetUserInfo(peopleIds.Distinct().ToArray()).ConfigureAwait(true);
 
             var photos = await _graphService.GetUserPhotos(peopleIds.Distinct().ToArray()).ConfigureAwait(true);
 
@@ -83,15 +80,15 @@ public class CommentsController : Controller
                 if (comment.Likes != null)
                     likes.AddRange(from like in comment.Likes
                                    join u in users
-                                       on like equals u.Id
+                                       on like.FromPersonId equals u.Id
                                    join photo in photos
-                                       on like equals photo.id
+                                       on like.FromPersonId equals photo.id
                                    select new LikeMessage(
 
-                                       MessageId: comment.Id.ToString(),
-                                       Person: new Models.Person()
+                                       MessageId: comment.CommentsId,
+                                       Person: new GatewayDomain.Person()
                                        {
-                                           Id = like,
+                                           Id = like.FromPersonId,
                                            Name = u.DisplayName,
                                            Photo = $"data:image/png;base64,{photo.photo}"
                                        }
@@ -107,18 +104,15 @@ public class CommentsController : Controller
                         on user.Id equals photo.id
                     select new CommentsResponse()
                     {
-                        Id = comment.Id.ToString(),
+                        Id = comment.CommentsId,
                         KudosId = comment.KudosId,
-                        FromPerson = new Models.Person {Id = user.Id, Name = user.DisplayName, Photo = $"data:image/png;base64,{photo.photo}" },
+                        FromPerson = new GatewayDomain.Person {Id = user.Id, Name = user.DisplayName, Photo = $"data:image/png;base64,{photo.photo}" },
                         Message = comment.Message,
                         Date = comment.Date,
-                        Likes =  likes.Where(l => l.MessageId == comment.Id.ToString()).Select(l => l.Person).ToList()
+                        Likes =  likes.Where(l => l.MessageId == comment.CommentsId).Select(l => l.Person).ToList()
                     }).ToList();
 
 
-
-        }
-        
 
 
         return result;
@@ -134,7 +128,7 @@ public class CommentsController : Controller
 
         succeed = await  _commentsService.UpdateComments(new Comments()
         {
-            Id = Guid.Parse(comments.Id),
+            CommentsId = comments.Id,
             KudosId = comments.KudosId,
             Message = comments.Message,
             FromPersonId = comments.FromPersonId,
@@ -154,7 +148,7 @@ public class CommentsController : Controller
     {
         bool succeed = false;
 
-        succeed = await _commentsService.DeleteComments(comments.KudosId, comments.Id.ToString());
+        succeed = await _commentsService.DeleteComments(comments.KudosId, comments.Id);
 
         if (succeed)
         {   

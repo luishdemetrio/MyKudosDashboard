@@ -3,6 +3,7 @@ using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 using MyKudosDashboard.MessageSender;
 using System.Threading;
+using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudosDashboard.Views;
 
@@ -75,7 +76,7 @@ public class KudosTabView : IKudosTabView
 
                 try
                 {
-                    var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
+                    var like = JsonConvert.DeserializeObject<LikeGateway>(arg.Message.Body.ToString());
 
                     if (like != null)
                     {
@@ -110,7 +111,7 @@ public class KudosTabView : IKudosTabView
 
                 try
                 {
-                    var like = JsonConvert.DeserializeObject<Like>(arg.Message.Body.ToString());
+                    var like = JsonConvert.DeserializeObject<LikeGateway>(arg.Message.Body.ToString());
 
                     if (like != null)
                     {
@@ -171,7 +172,7 @@ public class KudosTabView : IKudosTabView
 
                 if (comments != null)
                 {
-                    await CommentsSentCallback?.Invoke(comments);
+                    CommentsSentCallback?.Invoke(comments);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message);
@@ -195,7 +196,7 @@ public class KudosTabView : IKudosTabView
 
                 if (comments != null)
                 {
-                    await CommentsDeletedCallback?.Invoke(comments);
+                    CommentsDeletedCallback?.Invoke(comments);
                 }
 
                 await arg.CompleteMessageAsync(arg.Message);

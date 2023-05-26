@@ -22,7 +22,7 @@ public class CommentsServiceRest: ICommentsService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<bool> DeleteComments(string kudosId, string commentId)
+    public async Task<bool> DeleteComments(int kudosId, int commentId)
     {
         bool result = false ;
         
@@ -41,7 +41,7 @@ public class CommentsServiceRest: ICommentsService
 
     }
 
-    public async Task<IEnumerable<Comments>> GetComments(string kudosId)
+    public async Task<IEnumerable<Comments>> GetComments(int kudosId)
     {
         List<Comments> result = new();
 
@@ -62,13 +62,13 @@ public class CommentsServiceRest: ICommentsService
 
     }
       
-    public async Task<string> SendCommentsAsync(Comments comment)
+    public async Task<int> SendCommentsAsync(Comments comment)
     {
-        string result =string.Empty;
+        int result =0;
 
         try
         {
-            result = await _restClientHelper.SendApiData<Comments, string>($"{_kudosServiceUrl}Comments", HttpMethod.Post, comment);
+            result = await _restClientHelper.SendApiData<Comments, int>($"{_kudosServiceUrl}Comments", HttpMethod.Post, comment);
         }
         catch (Exception ex)
         {

@@ -1,5 +1,5 @@
-﻿using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 

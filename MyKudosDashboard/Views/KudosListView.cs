@@ -1,4 +1,5 @@
-﻿using MyKudosDashboard.Interfaces;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
 
@@ -16,12 +17,12 @@ public class KudosListView : IKudosListView
 
     }
 
-    public async Task<bool> SendLikeAsync(Like like)
+    public async Task<bool> SendLikeAsync(LikeGateway like)
     {
         return await _gatewayService.Like(like);
     }
 
-    public async Task<bool> SendUndoLikeAsync(Like like)
+    public async Task<bool> SendUndoLikeAsync(LikeGateway like)
     {
         return await _gatewayService.UndoLike(like);
     }

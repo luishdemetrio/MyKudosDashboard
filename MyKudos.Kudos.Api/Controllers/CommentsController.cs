@@ -9,25 +9,25 @@ namespace MyKudos.Kudos.Api.Controllers;
 [Route("[controller]")]
 public class CommentsController : Controller
 {
-    private readonly IKudosService _kudosService;
+    private readonly ICommentsService _commentsService;
 
-    public CommentsController(IKudosService kudosService)
+    public CommentsController(ICommentsService commentsService)
     {
-        _kudosService = kudosService;
+        _commentsService = commentsService;
     }
 
     [HttpPost(Name = "SendMessage")]
-    public string Post(Comments comments)
+    public int Post(Comments comments)
     {
 
-        return _kudosService.SendComments(comments);
+        return _commentsService.SendComments(comments);
     }
 
 
     [HttpGet(Name = "GetComments")]
-    public IEnumerable<Comments> Get(string kudosId)
+    public IEnumerable<Comments> Get(int kudosId)
     {
-        return _kudosService.GetComments(kudosId);
+        return _commentsService.GetComments(kudosId);
     }
 
 
@@ -35,13 +35,13 @@ public class CommentsController : Controller
     [HttpPut(Name = "Update")]
     public bool Put(Comments comments)
     {
-        return _kudosService.UpdateComments(comments);
+        return _commentsService.UpdateComments(comments);
     }
 
     [HttpDelete(Name = "Delete")]
-    public bool Delete(string kudosId, string commentId)
+    public bool Delete(int kudosId, int commentId)
     {
-        return _kudosService.DeleteComments(kudosId, Guid.Parse(commentId));
+        return _commentsService.DeleteComments(kudosId, commentId);
     }
 }
 

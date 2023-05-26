@@ -1,6 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudos.Gateway.Services.Rest;
 
@@ -15,7 +15,7 @@ public class GamificationService : IGamificationService
 
     public GamificationService(IConfiguration config, ILogger<GamificationService> log, IRestClientHelper clientHelper)
     {
-        _gamificationServiceUrl = config["gamificationServiceUrl"];
+        _gamificationServiceUrl = config["kudosServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }

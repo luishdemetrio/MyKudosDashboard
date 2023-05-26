@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -17,7 +18,7 @@ public class RecognitionController : ControllerBase
     }
 
     [HttpGet(Name = "GetRecognitions")]
-    public async Task<IEnumerable<Models.Recognition>> GetAsync()
+    public async Task<IEnumerable<Recognition>> GetAsync()
     {
         return await _recognitionService.GetRecognitionsAsync();
 

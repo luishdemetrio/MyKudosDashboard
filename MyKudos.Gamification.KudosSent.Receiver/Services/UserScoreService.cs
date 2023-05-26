@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyKudos.Communication.Helper.Interfaces;
-using MyKudos.Gamification.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 using System;
 using System.Net.Http;
@@ -21,12 +21,12 @@ public class UserScoreService : IUserScoreService
     public UserScoreService(IConfiguration config, ILogger<UserScoreService> log, IRestClientHelper clientHelper)
     {
         
-        _userScoreServiceUrl = config["userScoreServiceUrl"];
+        _userScoreServiceUrl = config["UserKudosServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }
 
-    public async Task<UserScore> GetUserScoreAsync(string pUserId)
+    public async Task<UserScore> GetUserScoreAsync(Guid pUserId)
     {
         UserScore userScore = null;
 
@@ -44,14 +44,14 @@ public class UserScoreService : IUserScoreService
 
     }
 
-    public async Task<bool> SetUserScoreAsync(UserScore userScore)
+    public async Task<UserScore> SetUserScoreAsync(UserScore userScore)
     {
 
-        bool result = false;
+        UserScore result = null ;
 
         try
         {
-            result = await _restClientHelper.SendApiData<UserScore, bool>($"{_userScoreServiceUrl}UserScore", HttpMethod.Post, userScore);
+            result = await _restClientHelper.SendApiData<UserScore, UserScore?>($"{_userScoreServiceUrl}UserScore", HttpMethod.Post, userScore);
         }
         catch (Exception ex)
         {

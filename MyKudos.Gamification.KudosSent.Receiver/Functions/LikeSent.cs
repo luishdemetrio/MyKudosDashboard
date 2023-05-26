@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MyKudos.Gamification.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 
 
@@ -36,7 +36,7 @@ public class LikeSent
             var score = 
                 new UserScore()
                 {
-                    Id = new Guid(mySbMsg),
+                    UserId = new Guid(mySbMsg),
                     LikesSent = 1,
                     Score = int.Parse(_likeSendScore)
                 };

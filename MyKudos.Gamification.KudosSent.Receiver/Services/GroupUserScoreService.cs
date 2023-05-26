@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyKudos.Communication.Helper.Interfaces;
-using MyKudos.Gamification.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 using System;
 using System.Net.Http;
@@ -21,7 +21,7 @@ public class GroupUserScoreService : IGroupUserScoreService
     public GroupUserScoreService(IConfiguration config, ILogger<UserScoreService> log, IRestClientHelper clientHelper)
     {
 
-        _userScoreServiceUrl = config["userScoreServiceUrl"];
+        _userScoreServiceUrl = config["UserKudosServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }

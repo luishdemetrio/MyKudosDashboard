@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="7.0.1" />
+    <Compile Remove="Context\CommentsDbContext.cs" />
+    <Compile Remove="Context\KudosCommentsDbContext.cs" />
+    <Compile Remove="Context\KudosLikeDbContext.cs" />
+    <Compile Remove="Context\RecognitionDbContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
   </ItemGroup>
 
   <ItemGroup>

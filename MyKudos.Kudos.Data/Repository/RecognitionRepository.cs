@@ -8,9 +8,9 @@ namespace MyKudos.Kudos.Data.Repository;
 public sealed class RecognitionRepository : IRecognitionRepository
 {
 
-    private RecognitionDbContext _context;
+    private KudosDbContext _context;
 
-    public RecognitionRepository(RecognitionDbContext context)
+    public RecognitionRepository(KudosDbContext context)
     {
         _context = context;
     }

@@ -1,5 +1,5 @@
 ﻿using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
 using MyKudos.MessageSender.Interfaces;
 
 namespace MyKudos.Gateway.Queues;

@@ -1,4 +1,5 @@
-﻿@using MyKudosDashboard.Interfaces;
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using System.Collections.Concurrent
 
@@ -80,17 +81,17 @@
 
 
 
-    public async Task CommentsDeleted(CommentsRequest pComments)
+    public void  CommentsDeleted(CommentsRequest pComments)
     {
 
-        await AllKudosTab.CommentsDeleted(pComments);
+         AllKudosTab.CommentsDeleted(pComments);
         
     }
 
-    public async Task CommentsSent(CommentsRequest pComments)
+    public void CommentsSent(CommentsRequest pComments)
     {
 
-        await AllKudosTab.CommentsSent(pComments);
+        AllKudosTab.CommentsSent(pComments);
 
     }
 
@@ -111,14 +112,14 @@
     }
 
 
-    public void UpdateLikesCallBack(Like pLike)
+    public void UpdateLikesCallBack(LikeGateway pLike)
     {
 
          AllKudosTab.UpdateLikesCallBack(pLike);
 
     }
 
-    public void UpdateUndoLikesCallBack(Like pLike)
+    public void UpdateUndoLikesCallBack(LikeGateway pLike)
     {
 
         AllKudosTab.UpdateUndoLikesCallBack(pLike);

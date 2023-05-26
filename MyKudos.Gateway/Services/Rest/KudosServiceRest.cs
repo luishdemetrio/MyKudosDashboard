@@ -1,7 +1,7 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-using RestSharp;
+
 
 namespace MyKudos.Gateway.Services;
 
@@ -21,13 +21,13 @@ public class KudosServiceRest: IKudosService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<Models.Kudos>> GetKudosAsync(int pageNumber)
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber)
     {
-        List<Models.Kudos> result = new();
+        List<Kudos.Domain.Models.Kudos> result = new();
 
         try
         {
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<Models.Kudos>>($"{_kudosServiceUrl}kudos/?pageNumber= {pageNumber}");
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudos/?pageNumber= {pageNumber}");
             result = kudos.ToList();
         }
         catch (Exception ex)
@@ -39,13 +39,13 @@ public class KudosServiceRest: IKudosService
 
     }
 
-    public async Task<string> SendAsync(KudosLog kudos)
+    public async Task<int> SendAsync(Kudos.Domain.Models.Kudos kudos)
     {
-        var result = string.Empty;
+        var result = 0;
 
         try
         {
-            result = await _restClientHelper.SendApiData<KudosLog, string>($"{_kudosServiceUrl}kudos", HttpMethod.Post, kudos);
+            result = await _restClientHelper.SendApiData<Kudos.Domain.Models.Kudos, int>($"{_kudosServiceUrl}kudos", HttpMethod.Post, kudos);
         }
         catch (Exception ex)
         {

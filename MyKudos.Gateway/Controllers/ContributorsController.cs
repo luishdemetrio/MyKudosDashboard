@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Models;
+using MyKudos.Gateway.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -27,17 +28,17 @@ public class ContributorsController : Controller
 
         var scores = await _gamificationService.GetTopUserScoresAsync(_topContributors);
 
-        var userIds = scores.Select(s => s.Id.ToString()).Distinct().ToArray();
+        var userIds = scores.Select(s => s.UserId.ToString()).Distinct().ToArray();
 
-        List<Models.GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
+        List<GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
 
         var photos = await _graphService.GetUserPhotos(userIds).ConfigureAwait(true);
 
         var result = from score in scores
                      join photo in photos
-                        on score.Id.ToString() equals photo.id
+                        on score.UserId.ToString() equals photo.id
                      join user in users
-                        on score.Id.ToString() equals user.Id
+                        on score.UserId.ToString() equals user.Id
                      select new TopContributors()
                      {
                          Name = user.DisplayName,
