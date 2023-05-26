@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyKudos.Communication.Helper.Interfaces;
-using MyKudos.Gamification.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 using System;
 using System.Net.Http;

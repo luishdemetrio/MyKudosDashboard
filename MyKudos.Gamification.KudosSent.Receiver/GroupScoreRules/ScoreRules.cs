@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using MyKudos.Gamification.Domain.Models;
+using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gamification.Receiver.Interfaces;
 using System;
 using System.Threading.Tasks;

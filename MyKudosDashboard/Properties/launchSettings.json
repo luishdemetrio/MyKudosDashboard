@@ -3,7 +3,7 @@
     "Microsoft Teams (browser)": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "https://teams.microsoft.com/l/app/9f9f7715-1f08-497f-8164-bd340bd7f59b?installAppPackage=true&webjoin=true&appTenantId=935d1d6d-2c54-492a-996e-8366e1d992dd&login_hint=admin@MngEnvMCAP728187.onmicrosoft.com",
+      "launchUrl": "https://teams.microsoft.com/l/app/2e107f9b-9f21-4a26-9e21-642b4f592cc6?installAppPackage=true&webjoin=true&appTenantId=935d1d6d-2c54-492a-996e-8366e1d992dd&login_hint=admin@MngEnvMCAP728187.onmicrosoft.com",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -24,7 +24,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/l/app/9f9f7715-1f08-497f-8164-bd340bd7f59b?installAppPackage=true&webjoin=true&appTenantId=935d1d6d-2c54-492a-996e-8366e1d992dd&login_hint=admin@MngEnvMCAP728187.onmicrosoft.com",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/l/app/2e107f9b-9f21-4a26-9e21-642b4f592cc6?installAppPackage=true&webjoin=true&appTenantId=935d1d6d-2c54-492a-996e-8366e1d992dd&login_hint=admin@MngEnvMCAP728187.onmicrosoft.com",
       "publishAllPorts": true,
       "useSSL": true
     }
