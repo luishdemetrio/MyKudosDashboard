@@ -37,7 +37,7 @@ builder.Services.AddScoped<IUserScoreRepository, UserScoreRepository>();
 
 builder.Services.AddDbContext<KudosDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("POSTGREE_SQL_CONNECTIONSTRING"));
 
 });
 
