@@ -32,7 +32,11 @@ public class ServiceBusSubscriberHelper
 
             _serviceBusProcessor.ProcessMessageAsync += config.MessageProcessor;
 
-            _serviceBusProcessor.ProcessErrorAsync += ServiceBusProcessor_ProcessErrorAsync;
+            _serviceBusProcessor.ProcessErrorAsync += async arg => {
+                _logger.LogError($"ServiceBusSubscriberHelper: Error processing message: {arg.Exception}");
+
+                await Task.CompletedTask;
+            };
 
             _serviceBusProcessor.StartProcessingAsync();
 
@@ -41,12 +45,6 @@ public class ServiceBusSubscriberHelper
 
     }
 
-    private async Task ServiceBusProcessor_ProcessErrorAsync(ProcessErrorEventArgs arg)
-    {
-        _logger.LogError($"ServiceBusSubscriberHelper: Error processing message: {arg.Exception}");
-
-        await Task.CompletedTask;
-    }
 
     public async Task CreateASubscriberfItDoesntExistAsync(string topicName, string subscriptionName)
     {

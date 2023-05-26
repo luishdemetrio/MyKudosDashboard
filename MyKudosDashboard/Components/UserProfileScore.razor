@@ -166,6 +166,9 @@
     [Parameter]
     public UserScore UserScoreValue { get; set; }
 
+    [Parameter]
+    public string InstanceNumber { get; set; }
+
     private bool _isLoaded = false;
 
     private bool _shouldRender =true;
@@ -183,8 +186,15 @@
     {
         base.OnInitialized();
 
-        UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId);
-        UserProfileScoreView.UserScoreCallback = UpdateScore;
+        var subscriptionName = User.ObjectId + InstanceNumber;
+
+        if (subscriptionName.Length > 50)
+        {
+            subscriptionName = subscriptionName.Substring(0, 50);
+        }
+
+        UserProfileScoreView.RegisterForLiveUpdates(subscriptionName);
+        UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
 
         UserScoreValue = new();
         UserScoreValue = await UserProfileScoreView.GetUserScore(User.ObjectId);
@@ -211,7 +221,7 @@
     }
 
 
-    public void UpdateScore(UserScore userScore)
+    public void UpdateScoreCallBack(UserScore userScore)
     {
 
         if (userScore.UserId.ToString() != User.ObjectId)
@@ -220,14 +230,11 @@
          UserScoreValue = userScore;
 
         var t = InvokeAsync(() =>
-      {
-                 // UpdateScoreValues();
+        {
+            UpdateScoreValues();
 
-                  StateHasChanged();
-
-
-      });
-
+            StateHasChanged();
+        });
         t.Wait();
     }
 

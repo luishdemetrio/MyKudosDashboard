@@ -49,6 +49,10 @@
     [Parameter]
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
+
+    [Parameter]
+    public string InstanceNumber { get; set; }
+
     private readonly object _lock = new object();
 
     private KudosList AllKudosTab;
@@ -60,6 +64,13 @@
 
         if (User != null)
         {
+            var subscriptionName = User.ObjectId + InstanceNumber;
+
+            if (subscriptionName.Length > 50)
+            {
+                subscriptionName = subscriptionName.Substring(0, 50);
+            }
+
             KudosTabView.RegisterForLiveUpdates(User.ObjectId);
 
             KudosTabView.LikeCallback = UpdateLikesCallBack;

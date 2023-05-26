@@ -7,6 +7,7 @@
 
 @using Microsoft.Fast.Components.FluentUI
 
+@inject NavigationManager Navigator
 
 @inject TeamsFx teamsfx
 @inject TeamsUserCredential teamsUserCredential
@@ -16,6 +17,7 @@
 
 @using Microsoft.Extensions.Localization
 @using System.Globalization
+@using System.Text.RegularExpressions;
 @inject IStringLocalizer<App> Localizer
 
 
@@ -61,7 +63,7 @@ else
                         <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto  />
+                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto InstanceNumber=@_instanceNumber  />
 
                     <button type="button" class="btn btn-primary" style="height:60px;margin:5px;"
                         @onclick=@(()=>OpenSendKudosPanel() )                         >
@@ -84,7 +86,7 @@ else
                         <h4 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"]</h4>
                     </div>
 
-                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack />
+                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack InstanceNumber=@_instanceNumber />
                     
                 </div>
             </div>
@@ -136,7 +138,7 @@ else
 
     private CommentsKudos _replyKudos;
 
-    
+    private string _instanceNumber = string.Empty;
 
     private void OnDismiss()
     {
@@ -158,6 +160,20 @@ else
                 try
                 {
                     _user = await teamsUserCredential.GetUserInfoAsync();
+
+                    
+                    var hostUri = new Uri(Navigator.BaseUri).Host;
+                    
+                    //extract the instance numbers
+                    string pattern = @"-instance(\d+)";
+                    Match match = Regex.Match(hostUri, pattern);
+                    
+                    if (match.Success)
+                    {
+                        _instanceNumber = match.Groups[1].Value;
+                        
+                    }
+
                 }
                 catch (Exception ex)
                 {
