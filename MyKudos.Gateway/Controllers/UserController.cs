@@ -29,7 +29,9 @@ public class UserController : Controller
         if (graphUsers.value.Count() == 0)
             return new List<Person>();
 
-        var photos = await _graphService.GetUserPhotos(graphUsers.value.Select(u => u.Id).Take(20).ToArray());
+        // var photos = await _graphService.GetUserPhotos(graphUsers.value.Select(u => u.Id).Take(20).ToArray());
+
+        var photos = await _graphService.GetUserPhotos(graphUsers.value.Select(u => u.Id).ToArray());
 
 
         return (from graphUser in graphUsers.value

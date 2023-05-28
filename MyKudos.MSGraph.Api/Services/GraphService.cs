@@ -89,6 +89,24 @@ public class GraphService : IGraphService
 
         List<GraphUserPhoto> photos = new();
 
+        //we need to chunck the pending approvals to avoid getting an exception due the request is too long
+        var chunckedUsersIds = usersId.Chunk(20);
+
+        Parallel.ForEach(chunckedUsersIds, async p =>
+        {
+           
+            photos.AddRange(await GetUserPhotosChunck(p));
+        });
+
+        return photos;
+
+    }
+
+    private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunck(string[] usersId)
+    {
+
+        List<GraphUserPhoto> photos = new();
+
         var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
 
         var request = new RestRequest();
@@ -160,7 +178,25 @@ public class GraphService : IGraphService
        
     }
 
+
     public async Task<List<GraphUser>> GetUserInfo(string[] users)
+    {
+        var result = new List<GraphUser>();
+
+
+        //we need to chunck the pending approvals to avoid getting an exception due the request is too long
+        var chunckedUsersIds = users.Chunk(20);
+
+        Parallel.ForEach(chunckedUsersIds, async p =>
+        {
+
+            result.AddRange(await GetUserInfoChunk(p));
+        });
+
+        return result;
+    }
+
+    private async Task<List<GraphUser>> GetUserInfoChunk(string[] users)
     {
 
         var result = new List<GraphUser>();
