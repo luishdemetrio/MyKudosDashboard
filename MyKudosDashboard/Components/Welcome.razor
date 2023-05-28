@@ -18,8 +18,9 @@
 @using Microsoft.Extensions.Localization
 @using System.Globalization
 @using System.Text.RegularExpressions;
-@inject IStringLocalizer<App> Localizer
 
+@inject IStringLocalizer<App> Localizer;
+@inject Logger<Welcome> Log;
 
 @if (_isLoading)
 {
@@ -161,18 +162,25 @@ else
                 {
                     _user = await teamsUserCredential.GetUserInfoAsync();
 
-                    
+                    Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
+
                     var hostUri = new Uri(Navigator.BaseUri).Host;
-                    
-                    //extract the instance numbers
-                    string pattern = @"-instance(\d+)";
-                    Match match = Regex.Match(hostUri, pattern);
-                    
-                    if (match.Success)
-                    {
-                        _instanceNumber = match.Groups[1].Value;
-                        
-                    }
+
+                    Log.LogInformation(hostUri);
+
+                    ////extract the instance numbers
+                    //string pattern = @"-instance(\d+)";
+                    //Match match = Regex.Match(hostUri, pattern);
+
+                    //if (match.Success)
+                    //{
+                    //    _instanceNumber = match.Groups[1].Value;
+
+                    //}
+
+                    _instanceNumber = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
+                    if (_instanceNumber != null)
+                        Log.LogInformation(_instanceNumber);
 
                 }
                 catch (Exception ex)
