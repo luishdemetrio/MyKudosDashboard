@@ -20,7 +20,7 @@
 @using System.Text.RegularExpressions;
 
 @inject IStringLocalizer<App> Localizer;
-@inject Logger<Welcome> Log;
+
 
 @if (_isLoading)
 {
@@ -64,7 +64,7 @@ else
                         <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto InstanceNumber=@_instanceNumber  />
+                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto />
 
                     <button type="button" class="btn btn-primary" style="height:60px;margin:5px;"
                         @onclick=@(()=>OpenSendKudosPanel() )                         >
@@ -87,7 +87,7 @@ else
                         <h4 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"]</h4>
                     </div>
 
-                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack InstanceNumber=@_instanceNumber />
+                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack />
                     
                 </div>
             </div>
@@ -139,8 +139,6 @@ else
 
     private CommentsKudos _replyKudos;
 
-    private string _instanceNumber = string.Empty;
-
     private void OnDismiss()
     {
         _sendKudosIsHidden = true;
@@ -162,25 +160,7 @@ else
                 {
                     _user = await teamsUserCredential.GetUserInfoAsync();
 
-                    Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
-
-                    var hostUri = new Uri(Navigator.BaseUri).Host;
-
-                    Log.LogInformation(hostUri);
-
-                    ////extract the instance numbers
-                    //string pattern = @"-instance(\d+)";
-                    //Match match = Regex.Match(hostUri, pattern);
-
-                    //if (match.Success)
-                    //{
-                    //    _instanceNumber = match.Groups[1].Value;
-
-                    //}
-
-                    _instanceNumber = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
-                    if (_instanceNumber != null)
-                        Log.LogInformation(_instanceNumber);
+                   
 
                 }
                 catch (Exception ex)

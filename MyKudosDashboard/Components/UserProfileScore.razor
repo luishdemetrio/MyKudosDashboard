@@ -166,9 +166,7 @@
     [Parameter]
     public UserScore UserScoreValue { get; set; }
 
-    [Parameter]
-    public string InstanceNumber { get; set; }
-
+    
     private bool _isLoaded = false;
 
     private bool _shouldRender =true;
@@ -186,14 +184,7 @@
     {
         base.OnInitialized();
 
-        var subscriptionName = User.ObjectId + InstanceNumber;
-
-        if (subscriptionName.Length > 50)
-        {
-            subscriptionName = subscriptionName.Substring(0, 50);
-        }
-
-        UserProfileScoreView.RegisterForLiveUpdates(subscriptionName);
+        UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId );
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
 
         UserScoreValue = new();

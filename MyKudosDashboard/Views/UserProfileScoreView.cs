@@ -21,7 +21,7 @@ public class UserProfileScoreView : IUserProfileScoreView
     private static SemaphoreSlim _semaphoreScore = new SemaphoreSlim(1, 1);
     private static SemaphoreSlim _semaphoreSamePersonScore = new SemaphoreSlim(1, 1);
 
-    private string _userId;
+    
 
     public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration, ILogger<UserProfileScoreView> logger)
     {
@@ -43,7 +43,7 @@ public class UserProfileScoreView : IUserProfileScoreView
 
     public void RegisterForLiveUpdates(string userId)
     {
-        _userId = userId;
+    
 
         SubscribeUserScoreUpdate(userId);
 
@@ -55,7 +55,7 @@ public class UserProfileScoreView : IUserProfileScoreView
         var config = new ServiceBusProcessorConfig
         {
             DashboardName = _updatedScoreDashboard,
-            SubscriptionName = subscriptionName,
+            SubscriptionName = _subscriberUserScore.GetInstanceId(subscriptionName),
             MessageProcessor = async arg =>
             {
                 
