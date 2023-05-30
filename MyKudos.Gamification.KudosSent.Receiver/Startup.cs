@@ -19,7 +19,7 @@ public class Startup : FunctionsStartup
 
     public override void Configure(IFunctionsHostBuilder builder)
     {
-        builder.Services.AddTransient<IUserScoreService, UserScoreService>();
+        builder.Services.AddTransient<IUserPointsService, UserPointsService>();
 
         // Send Topic 
         builder.Services.AddSingleton<IScoreMessageSender, ScoreMessageSender>();
@@ -34,8 +34,11 @@ public class Startup : FunctionsStartup
         // Register the IConfiguration instance in the container
         builder.Services.AddSingleton<IConfiguration>(configuration);
 
+        builder.Services.AddScoped<IUserPointsService, UserPointsService>();
+        builder.Services.AddScoped<IScoreMessageSender, ScoreMessageSender>();
 
-        builder.Services.AddSingleton<IRestClientHelper>(t =>
+
+        builder.Services.AddScoped<IRestClientHelper>(t =>
                         new RestClientHelper(
                            new RestServiceToken(
                             clientId: configuration["ClientId"],
@@ -47,18 +50,13 @@ public class Startup : FunctionsStartup
 
 
 
-        builder.Services.AddSingleton<IMessageSender>(t =>
+        builder.Services.AddScoped<IMessageSender>(t =>
                         new ServiceBusMessageSender(
                             serviceBusConnectionString: configuration["KudosServiceBus_ConnectionString"]
                         ));
 
 
-        builder.Services.AddSingleton<IGroupScoreRules, GroupScoreRules>();
         
-        builder.Services.AddTransient<IUserKudosService,  UserKudosService>();
-
-
-        builder.Services.AddSingleton<IGroupUserScoreService, GroupUserScoreService>();
 
     }
 

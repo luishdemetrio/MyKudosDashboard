@@ -60,6 +60,34 @@ public class UserPointsRepository : IUserPointsRepository
                        (result.MessagesReceived * pointsPerAction["receive_reply"]);
 
 
+
+
+        var subquery = from rt in _context.Recognitions
+                       group rt by rt.RecognitionGroupId into g
+                       select new
+                       {
+                           RecognitionGroupId = g.Key,
+                           Total = g.Count()
+                       };
+
+        var bagdes = from k in _context.Kudos
+                    join r in _context.Recognitions on k.RecognitionId equals r.RecognitionId
+                    join rg in _context.RecognitionsGroup on r.RecognitionGroupId equals rg.RecognitionGroupId
+                    join t in subquery on r.RecognitionGroupId equals t.RecognitionGroupId
+                    where k.ToPersonId == pUserId
+                    group k by new { rg.RecognitionGroupId, rg.BadgeName, t.Total } into g
+                    where g.Count() >= g.Key.Total
+                    select g.Key.BadgeName ;
+                    //select new
+                    //{
+                    //    RecognitionGroupId = g.Key.RecognitionGroupId,
+                    //    Count = g.Count(),
+                    //    Total = g.Key.Total
+                    //};
+
+
+        result.EarnedBagdes.AddRange(bagdes.ToList());
+
         return result;
 
     }

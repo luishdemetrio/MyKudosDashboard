@@ -1,11 +1,14 @@
 ﻿using MyKudos.Kudos.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Interfaces;
 
-public interface IScoreMessageSender
+public  interface IScoreMessageSender
 {
-    Task NotifyProfileScoreUpdated(UserScore score);
 
-    Task NotifyProfileScoreSamePersonUpdated(UserScore score);
+    Task NotifyProfileScoreUpdated(UserPointScore score);
 }

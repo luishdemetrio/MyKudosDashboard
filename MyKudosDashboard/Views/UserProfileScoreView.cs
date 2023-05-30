@@ -1,7 +1,6 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.MessageSender;
-using MyKudosDashboard.Models;
 using Newtonsoft.Json;
 
 namespace MyKudosDashboard.Views;
@@ -35,7 +34,7 @@ public class UserProfileScoreView : IUserProfileScoreView
     }
 
 
-    public async Task<UserScore> GetUserScore(string userId)
+    public async Task<UserPointScore> GetUserScore(string userId)
     {
         return await _gamificationGateway.GetUserScoreAsync(userId);
     }
@@ -64,7 +63,7 @@ public class UserProfileScoreView : IUserProfileScoreView
 
                 try
                 {
-                    var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
+                    var userScore = JsonConvert.DeserializeObject<UserPointScore>(arg.Message.Body.ToString());
 
                     if (userScore != null) 
                     {
@@ -98,7 +97,7 @@ public class UserProfileScoreView : IUserProfileScoreView
                 try
                 {
                     //retrive the message body
-                    var userScore = JsonConvert.DeserializeObject<UserScore>(arg.Message.Body.ToString());
+                    var userScore = JsonConvert.DeserializeObject<UserPointScore>(arg.Message.Body.ToString());
 
                     if (userScore != null)
                     {

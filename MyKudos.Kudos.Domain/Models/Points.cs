@@ -23,7 +23,7 @@ public class UserPointScore
     public int MessagesReceived { get; set; }
     public int MessagesSent { get; set; }
 
-    public Dictionary<string, bool> EarnedBagdes { get; set; } = new();
+    public List<string> EarnedBagdes { get; set; } = new();
 }
 
 

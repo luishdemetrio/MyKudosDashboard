@@ -95,7 +95,8 @@
                         <p>@Localizer["Achievements"]</p>
 
                         
-                        @if (UserScoreValue.KudosSent >0)
+
+                         @if (UserScoreValue.KudosSent >0)
                         {
                             <img src=@GetKudosSentBadge() style="height:80px;width:80px;padding:5px" />
                         }
@@ -105,36 +106,16 @@
                             <img src=@GetKudosReceivedBadge() style="height:80px;width:80px;padding:5px" />
                         }
 
-                        @if (UserScoreValue.GroupOne > 0 )
+                        @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
-                            <img src=@GetKudosValuesBadge(1) style="height:80px;width:80px;padding:5px" />
+                            <img src=@($"images/badges/{badge}") style="height:80px;width:80px;padding:5px" />
                         }
 
-                          @if (UserScoreValue.GroupTwo> 0 )
+                       
+
+                        @if (UserScoreValue.EarnedBagdes.Count == 5) // I need to fix it later
                         {
-                            <img src=@GetKudosValuesBadge(2) style="height:80px;width:80px;padding:5px" />
-                        }
-
-
-                        @if (UserScoreValue.GroupThree > 0)
-                        {
-                            <img src=@GetKudosValuesBadge(3) style="height:80px;width:80px;padding:5px" />
-                        }
-
-
-                        @if (UserScoreValue.GroupFour > 0)
-                        {
-                            <img src=@GetKudosValuesBadge(4) style="height:80px;width:80px;padding:5px" />
-                        }
-
-                          @if (UserScoreValue.GroupFive > 0 )
-                        {
-                            <img src=@GetKudosValuesBadge(5) style="height:80px;width:80px;padding:5px" />
-                        }
-
-                        @if (UserScoreValue.GroupAll > 0)
-                        {
-                            <img src=@GetKudosValuesBadge(6) style="height:80px;width:80px;padding:5px" />
+                            <img src="images/badges/all_group.png" style="height:80px;width:80px;padding:5px" />
                         }
 
 
@@ -164,7 +145,7 @@
     public UserInfo User { get; set; }
 
     [Parameter]
-    public UserScore UserScoreValue { get; set; }
+    public UserPointScore UserScoreValue { get; set; }
 
     
     private bool _isLoaded = false;
@@ -212,7 +193,7 @@
     }
 
 
-    public void UpdateScoreCallBack(UserScore userScore)
+    public void UpdateScoreCallBack(UserPointScore userScore)
     {
 
         if (userScore.UserId.ToString() != User.ObjectId)
@@ -316,10 +297,6 @@
     }
 
 
-    private string GetKudosValuesBadge(int group)
-    {
-       
-        return $"images/badges/values/group_{group}.png";
-    }
+   
 
 }
