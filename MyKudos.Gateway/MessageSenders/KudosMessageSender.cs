@@ -2,8 +2,6 @@
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.MessageSender.Interfaces;
-using MyKudos.Kudos.Domain.Models;
-
 
 namespace MyKudos.Gateway.Queues;
 
@@ -21,7 +19,10 @@ public class KudosMessageSender : IKudosMessageSender
     private static string _likeUndoDashboard = string.Empty;
 
     
-    private static string _notifyUserPoints = string.Empty;
+   // private static string _notifyUserPoints = string.Empty;
+
+    private static string _calculateUserScoreTopicEndPoint = string.Empty;
+    private static string _calculateUserStoreTopicKey = string.Empty;
 
     public KudosMessageSender(IMessageSender queue, IConfiguration configuration)
     {       
@@ -34,17 +35,21 @@ public class KudosMessageSender : IKudosMessageSender
         _messageSender.CreateTopicIfNotExistsAsync(_likeSentDashboard).ConfigureAwait(false);
         _messageSender.CreateTopicIfNotExistsAsync(_likeUndoDashboard).ConfigureAwait(false);
 
-        _messageSender.CreateQueueIfNotExistsAsync(_notifyUserPoints).ConfigureAwait(false);
+       // _messageSender.CreateQueueIfNotExistsAsync(_notifyUserPoints).ConfigureAwait(false);
         
     }
 
     private static void ReadConfigurationSettings(IConfiguration configuration)
     {
+
+        _calculateUserScoreTopicEndPoint = configuration["EventGrid_CalculateUserScoreTopic_Endpoint"];
+        _calculateUserStoreTopicKey = configuration["EventGrid_CalculateUserScoreTopic_Key"];
+
         _connectionString = configuration["KudosServiceBus_ConnectionString"];
 
         _notificationTopicName = configuration["KudosServiceBus_TopicName"];
 
-        _notifyUserPoints = configuration["KudosServiceBus_NotifyUserPoints"];       
+        //_notifyUserPoints = configuration["KudosServiceBus_NotifyUserPoints"];       
 
         _likeSentDashboard = configuration["KudosServiceBus_LikeSentDashboard"];
         _likeUndoDashboard = configuration["KudosServiceBus_LikeUndoDashboard"];
@@ -58,12 +63,15 @@ public class KudosMessageSender : IKudosMessageSender
     public async Task SendKudosAsync(int kudosId, Gateway.Domain.Models.KudosNotification kudos)
     {
 
-        //send notification via Bot
+        //send notification to generate the adaptive card
         await _messageSender.SendQueue(kudos, _notificationTopicName);
-       
+
         //notify User Points
-        await _messageSender.SendQueue(kudos.From.Id, _notifyUserPoints);
-        await _messageSender.SendQueue(kudos.To.Id, _notifyUserPoints);
+        //await _messageSender.SendQueue(kudos.From.Id, _notifyUserPoints);
+        //await _messageSender.SendQueue(kudos.To.Id, _notifyUserPoints);
+
+        await _messageSender.SendTopic(kudos.From.Id, "", "CalculateUserScoreTopic ");
+        await _messageSender.SendTopic(kudos.To.Id, "", "CalculateUserScoreTopic ");
 
         //notification to update the Teams Apps
         await _messageSender.SendTopic(
