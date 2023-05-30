@@ -27,7 +27,7 @@ public class GamificationGateway : IGamificationGateway
         try
         {
 
-            result = await _restClientHelper.GetApiData<UserScore>($"{_gatewayServiceUrl}gamification?userid={pUserId}");
+            result = await _restClientHelper.GetApiData<UserScore>($"{_gatewayServiceUrl}userpoints?userid={pUserId}");
             
         }
         catch (Exception ex)

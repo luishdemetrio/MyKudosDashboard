@@ -1,6 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Services;
 
@@ -19,14 +19,14 @@ public class RecognitionGateway : IRecognitionGateway
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
+    public async Task<IEnumerable<Recognition>> GetRecognitionsAsync()
     {
 
-        List<RecognitionViewModel> result = new();
+        List<Recognition> result = new();
 
         try
         {
-            var recognitions = await _restClientHelper.GetApiData<IEnumerable<RecognitionViewModel>>($"{_gatewayServiceUrl}recognition");
+            var recognitions = await _restClientHelper.GetApiData<IEnumerable<Recognition>>($"{_gatewayServiceUrl}recognition");
             result = recognitions.ToList();
         }
         catch (Exception ex)

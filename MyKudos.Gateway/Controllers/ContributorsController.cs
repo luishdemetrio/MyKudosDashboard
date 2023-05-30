@@ -9,14 +9,14 @@ namespace MyKudos.Gateway.Controllers;
 [Route("[controller]")]
 public class ContributorsController : Controller
 {
-    private readonly IGamificationService _gamificationService;
+    private readonly IUserPointsService _topContributorsService  ;
     private readonly IGraphService _graphService;
 
     private readonly int _topContributors;
 
-    public ContributorsController(IGamificationService gamificationService, IGraphService graphService, IConfiguration configuration)
+    public ContributorsController(IUserPointsService topContributorsService, IGraphService graphService, IConfiguration configuration)
     {
-        _gamificationService = gamificationService;
+        _topContributorsService = topContributorsService;
         _graphService = graphService;
 
         _topContributors = int.Parse(configuration["TopContributors"]);
@@ -26,9 +26,9 @@ public class ContributorsController : Controller
     public async Task<IEnumerable<TopContributors>> Get()
     {
 
-        var scores = await _gamificationService.GetTopUserScoresAsync(_topContributors);
+        var scores = await _topContributorsService.GetTopUserScoresAsync(_topContributors);
 
-        var userIds = scores.Select(s => s.UserId.ToString()).Distinct().ToArray();
+        var userIds = scores.Select(s => s.UserId).Distinct().ToArray();
 
         List<GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
 
@@ -43,7 +43,7 @@ public class ContributorsController : Controller
                      {
                          Name = user.DisplayName,
                          Photo = $"data:image/png;base64,{photo.photo}",
-                         Score = score.Score
+                         Score = score.TotalPoints
                      };
 
         return result;

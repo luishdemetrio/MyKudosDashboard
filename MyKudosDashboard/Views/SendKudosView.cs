@@ -19,7 +19,7 @@ public class SendKudosView : ISendKudosView
         _userGateway = userGateway;
     }
 
-    public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
+    public async Task<IEnumerable<Recognition>> GetRecognitionsAsync()
     {
         return await _recognitionGateway.GetRecognitionsAsync();
     }

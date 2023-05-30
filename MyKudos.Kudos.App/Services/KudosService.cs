@@ -49,7 +49,7 @@ public sealed class KudosService : IKudosService
             var kudos = _kudosRepository.GetUserKudos(pUserId).Select(k => new MyKudos.Kudos.Domain.Models.Kudos
             {
                 KudosId = k.KudosId,
-                TitleId = k.TitleId,
+                RecognitionId = k.RecognitionId,
                 ToPersonId = k.ToPersonId
             }
             ).ToList();
@@ -57,12 +57,12 @@ public sealed class KudosService : IKudosService
 
             var result = from kudo in kudos
                          join recognition in recognitions
-                            on kudo.TitleId equals recognition.Id.ToString()
-                         group recognition by recognition.ValuesCodeGroup into recognitionGroup
+                            on kudo.RecognitionId equals recognition.RecognitionId
+                         group recognition by recognition.RecognitionGroupId into recognitionGroup
                          select new KudosGroupedByValue()
                          {
                              ValueCodeGroup = recognitionGroup.Key,
-                             Count = recognitionGroup.Select(r => r.Id).Distinct().Count()
+                             Count = recognitionGroup.Select(r => r.RecognitionId).Distinct().Count()
                          };
 
 
