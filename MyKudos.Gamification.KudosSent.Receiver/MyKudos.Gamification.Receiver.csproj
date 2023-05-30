@@ -12,7 +12,6 @@
         
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MyKudos.Gamification.Domain\MyKudos.Gamification.Domain.csproj" />
     <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
     <ProjectReference Include="..\MyKudos.MessageSender\MyKudos.MessageSender.csproj" />
     <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />

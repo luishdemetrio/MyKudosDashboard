@@ -16,18 +16,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IGraphService, GraphServiceRest>();
-builder.Services.AddSingleton<IRecognitionService, RecognitionServiceRest>();
-builder.Services.AddSingleton<IKudosService, KudosServiceRest>();
-//builder.Services.AddSingleton<IAgentNotificationService, AgentNotificationService>();
-builder.Services.AddSingleton<IGamificationService, GamificationService>();
-builder.Services.AddSingleton<ICommentsService, CommentsServiceRest>();
+builder.Services.AddScoped<IGraphService, GraphServiceRest>();
+builder.Services.AddScoped<IRecognitionService, RecognitionServiceRest>();
+builder.Services.AddScoped<IKudosService, KudosServiceRest>();
+
+builder.Services.AddScoped<IGamificationService, GamificationService>();
+builder.Services.AddScoped<ICommentsService, CommentsServiceRest>();
+
+builder.Services.AddScoped<IUserPointsService, UserPointsService>();
 
 builder.Services.AddSingleton<ICommentsMessageSender, CommentsMessageSender>();
 
 var config = builder.Configuration;
 
-builder.Services.AddSingleton<IRestClientHelper>(t =>
+builder.Services.AddScoped<IRestClientHelper>(t =>
                 new RestClientHelper(
                    new RestServiceToken(
                     clientId: config["ClientId"],
@@ -37,7 +39,7 @@ builder.Services.AddSingleton<IRestClientHelper>(t =>
                 )
                 ));
 
-builder.Services.AddSingleton<IKudosMessageSender, KudosMessageSender>();
+builder.Services.AddScoped<IKudosMessageSender, KudosMessageSender>();
 
 builder.Services.AddSwaggerGen(c =>
 {

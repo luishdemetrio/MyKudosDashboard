@@ -13,7 +13,7 @@ public class ScoreMessageSender : IScoreMessageSender
 
     private string _topicNameScoreUpdated = string.Empty;
 
-    private string _topicNameScoreUpdatedSamePerson = string.Empty;
+    
 
     public ScoreMessageSender(IMessageSender queue, IConfiguration configuration)
     {
@@ -23,7 +23,7 @@ public class ScoreMessageSender : IScoreMessageSender
 
         _messageSender.CreateTopicIfNotExistsAsync(_topicNameScoreUpdated).ConfigureAwait(false);
 
-        _messageSender.CreateTopicIfNotExistsAsync(_topicNameScoreUpdatedSamePerson).ConfigureAwait(false);
+      
 
     }
 
@@ -31,18 +31,15 @@ public class ScoreMessageSender : IScoreMessageSender
     {
         _topicNameScoreUpdated = configuration["KudosServiceBus_ScoreUpdatedDashboard"];
 
-        _topicNameScoreUpdatedSamePerson = configuration["KudosServiceBus_ScoreUpdatedSamePersonDashboard"];
+      
 
     }
 
-    public async Task NotifyProfileScoreUpdated(UserScore score)
+    public async Task NotifyProfileScoreUpdated(UserPointScore score)
     {
         await _messageSender.SendTopic(score, _topicNameScoreUpdated, "ProfileUpdated");
     }
 
-    public async Task NotifyProfileScoreSamePersonUpdated(UserScore score)
-    {
-        await _messageSender.SendTopic(score, _topicNameScoreUpdatedSamePerson, "ProfileSamePersonUpdated");
-    }
+    
 }
 

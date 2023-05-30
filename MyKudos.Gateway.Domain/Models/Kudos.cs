@@ -50,7 +50,7 @@ public class KudosResponse
 
 }
 
-public record Reward(string Id, string Title);
+public record Reward(int Id, string Title);
 
 
 

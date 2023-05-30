@@ -104,7 +104,7 @@ public class KudosController : Controller
                      join photoFrom in photos
                          on kudo.FromPersonId equals photoFrom.id
                      join rec in _recognitions
-                         on kudo.TitleId equals rec.Id
+                         on kudo.RecognitionId equals rec.RecognitionId
                      orderby kudo.Date descending
 
                      select new KudosResponse() {
@@ -133,7 +133,7 @@ public class KudosController : Controller
         {
             FromPersonId = kudos.From.Id,
             ToPersonId = kudos.To.Id,
-            TitleId = kudos.Reward.Id,
+            RecognitionId = kudos.Reward.Id,
             Message = kudos.Message,
             Date = kudos.SendOn
         };

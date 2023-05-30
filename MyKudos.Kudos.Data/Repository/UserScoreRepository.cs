@@ -1,11 +1,7 @@
 ﻿using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace MyKudos.Kudos.Data.Repository;
 

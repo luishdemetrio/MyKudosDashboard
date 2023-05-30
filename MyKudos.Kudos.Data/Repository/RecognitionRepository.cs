@@ -2,6 +2,7 @@
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Data.Data;
 using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -33,5 +34,12 @@ public sealed class RecognitionRepository : IRecognitionRepository
 
             await _context.SaveChangesAsync();
         }
+    }
+
+    public bool SetRecognition(Recognition recognition)
+    {
+        _context.Recognitions.Add(recognition);
+
+        return _context.SaveChanges() > 0;
     }
 }

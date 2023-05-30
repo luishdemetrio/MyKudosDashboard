@@ -1,9 +1,12 @@
 ﻿using MyKudos.Kudos.Domain.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace MyKudos.Gamification.Receiver.Interfaces;
 
-public interface IGroupUserScoreService
+public interface IUserPointsService
 {
-    Task<bool> UpdateGroupScoreAsync(UserScore userScore);
+    Task<UserPointScore> GetUserScore(string pUserId);
+
+    
 }

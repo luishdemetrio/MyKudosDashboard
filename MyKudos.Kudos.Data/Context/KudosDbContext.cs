@@ -12,7 +12,11 @@ public class KudosDbContext : DbContext
         Database.EnsureCreated();
     }
 
-    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //used by the top contributors procedure
+        modelBuilder.Entity<UserPoint>().HasNoKey().ToView(null); ;
+    }
 
     public DbSet<Domain.Models.Kudos> Kudos { get; set; }
 
@@ -25,6 +29,10 @@ public class KudosDbContext : DbContext
     public DbSet<CommentsLikes> CommentsLikes { get; set; }
 
     public DbSet<UserScore> UserScores { get; set; }
+
+    public DbSet<Points> Points { get; set; }
+
+    public DbSet<RecognitionGroup> RecognitionsGroup { get; set; }
 
 
 }

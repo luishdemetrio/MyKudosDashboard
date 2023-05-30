@@ -25,14 +25,17 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IKudosService, KudosService>();
 builder.Services.AddScoped<ICommentsService, CommentsService>();
 builder.Services.AddScoped<IRecognitionService, RecognitionService>();
+builder.Services.AddScoped<IRecognitionGroupService, RecognitionGroupService>();
 builder.Services.AddScoped<IUserScoreService, UserScoreService>();
-
+builder.Services.AddScoped<IUserPointsService, UserPointsService>();
 
 builder.Services.AddScoped<IKudosRepository, KudosRepository>();
 builder.Services.AddScoped<IKudosLikeRepository, KudosLikeRepository>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
+builder.Services.AddScoped<IRecognitionGroupRepository, RecognitionGroupRepository>();
 builder.Services.AddScoped<IUserScoreRepository, UserScoreRepository>();
+builder.Services.AddScoped<IUserPointsRepository, UserPointsRepository>();
 
 
 builder.Services.AddDbContext<KudosDbContext>(options =>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Api.Controllers;
 
@@ -22,10 +23,10 @@ public class RecognitionController : ControllerBase
         return _recognitionService.GetRecognitions();
     }
 
-    [HttpPost(Name = "CheckAndSeedDatabaseAsync")]
-    public async Task CheckAndSeedDatabaseAsync()
+    [HttpPost(Name = "SetRecognition")]
+    public bool SetRecognition([FromBody] Recognition recognition)
     {
-        await _recognitionService.SeedDatabaseAsync();
+        return _recognitionService.SetRecognition(recognition);
 
     }
 }

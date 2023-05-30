@@ -8,14 +8,14 @@ public class GamificationService : IGamificationService
 {
  
 
-    private readonly string _gamificationServiceUrl;
+    private readonly string _kudosServiceUrl;
     private IRestClientHelper _restClientHelper;
 
     private readonly ILogger<GamificationService> _logger;
 
     public GamificationService(IConfiguration config, ILogger<GamificationService> log, IRestClientHelper clientHelper)
     {
-        _gamificationServiceUrl = config["kudosServiceUrl"];
+        _kudosServiceUrl = config["kudosServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }
@@ -26,7 +26,7 @@ public class GamificationService : IGamificationService
 
         try
         {
-            var contributors = await _restClientHelper.GetApiData<IEnumerable<UserScore>>($"{_gamificationServiceUrl}Contributors?top={top}");
+            var contributors = await _restClientHelper.GetApiData<IEnumerable<UserScore>>($"{_kudosServiceUrl}Contributors?top={top}");
             result = contributors.ToList();
 
         }
@@ -48,7 +48,7 @@ public class GamificationService : IGamificationService
         try
         {
 
-            result = await _restClientHelper.GetApiData<UserScore>($"{_gamificationServiceUrl}UserScore?userid={pUserId}");
+            result = await _restClientHelper.GetApiData<UserScore>($"{_kudosServiceUrl}UserScore?userid={pUserId}");
 
         }
         catch (Exception ex)
