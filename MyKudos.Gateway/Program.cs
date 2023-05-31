@@ -5,6 +5,7 @@ using MyKudos.Gateway.Queues;
 using MyKudos.Gateway.Services;
 using MyKudos.Gateway.Services.Rest;
 using MyKudos.MessageSender.Interfaces;
+using MyKudos.MessageSender.Services;
 using MyKudos.Queue.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,10 @@ builder.Services.AddSingleton<IMessageSender>(t =>
                 new ServiceBusMessageSender(
                     serviceBusConnectionString: config["KudosServiceBus_ConnectionString"]
                 ));
+
+
+
+
 
 var app = builder.Build();
 

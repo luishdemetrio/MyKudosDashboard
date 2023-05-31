@@ -1,17 +1,10 @@
 ﻿using Azure;
 using Azure.Messaging.EventGrid;
-using Azure.Messaging.ServiceBus;
-using MyKudos.MessageSender.Interfaces;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyKudos.MessageSender.Services;
 
-public class EventGridMessageSender : IMessageSender
+public class EventGridMessageSender 
 {
     private  string _topicEndpoint;
     private  string _topicKey;
@@ -26,29 +19,12 @@ public class EventGridMessageSender : IMessageSender
         _eventGridPublisherClient = new EventGridPublisherClient(new Uri(_topicEndpoint), new AzureKeyCredential(_topicKey));
     }
 
-    public async Task CreateTopicIfNotExistsAsync(string topicName)
-    {
-        // Azure Event Grid topics are created as separate resources in the Azure portal or using Azure CLI/PowerShell.
-        // There is no direct method to create a topic using the EventGridPublisherClient.
-        // You can create a topic using Azure Management SDKs or Azure Resource Manager templates.
-    }
-
-    public async Task CreateQueueIfNotExistsAsync(string queueName)
-    {
-        // Azure Event Grid does not have the concept of queues. It uses topics and subscriptions for event routing.
-    }
-
-    public async Task SendQueue(object queueMessage, string queueName)
-    {
-        // Azure Event Grid does not have the concept of queues. It uses topics and subscriptions for event routing.
-    }
-
-    public async Task SendTopic(object topicMessage, string topic, string subject)
+    public async Task SendTopic<T>(T topicMessage,  string subject, string eventType)
     {
         var eventGridEvent = new EventGridEvent(
             subject: subject,
             data: JsonConvert.SerializeObject(topicMessage),
-            eventType: "CustomEventType",
+            eventType: eventType,
             dataVersion: "1.0"
         );
 

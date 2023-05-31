@@ -62,6 +62,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Communication.Helpe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Gateway.Domain", "MyKudos.Gateway.Domain\MyKudos.Gateway.Domain.csproj", "{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyKudos.UserScore.Function", "MyKudos.UserScore.Function\MyKudos.UserScore.Function.csproj", "{A00FF6CB-545F-44FA-A63C-748D49A949F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,10 @@ Global
 		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A00FF6CB-545F-44FA-A63C-748D49A949F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A00FF6CB-545F-44FA-A63C-748D49A949F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A00FF6CB-545F-44FA-A63C-748D49A949F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A00FF6CB-545F-44FA-A63C-748D49A949F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +158,7 @@ Global
 		{EB69F8D3-ED63-4CDB-8957-E9D3C99DB9CE} = {0CA52694-53D9-410D-8AC3-57624EDE444E}
 		{3C77CA74-F45D-45EF-BA3D-40519899E1D0} = {0CA52694-53D9-410D-8AC3-57624EDE444E}
 		{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C} = {5064F191-2C6D-45B5-A6FB-FD0D80DD271D}
+		{A00FF6CB-545F-44FA-A63C-748D49A949F3} = {C315AB40-BA6A-416A-B095-DB92EB3710D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B9FD23DD-B31F-4099-924D-9B4DC9ADA1DE}

@@ -2,14 +2,14 @@
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.MessageSender.Interfaces;
+using MyKudos.MessageSender.Services;
 
 namespace MyKudos.Gateway.Queues;
 
 public class KudosMessageSender : IKudosMessageSender
 {
 
-    private IMessageSender _messageSender;
-
+    
     private static string _connectionString = string.Empty;
     private static string _notificationTopicName = string.Empty;
 
@@ -24,16 +24,19 @@ public class KudosMessageSender : IKudosMessageSender
     private static string _calculateUserScoreTopicEndPoint = string.Empty;
     private static string _calculateUserStoreTopicKey = string.Empty;
 
-    public KudosMessageSender(IMessageSender queue, IConfiguration configuration)
-    {       
+    private EventGridMessageSender _calculateScore; 
 
-        _messageSender = queue;       
+    public KudosMessageSender( IConfiguration configuration)
+    {       
 
         ReadConfigurationSettings(configuration);        
 
-        _messageSender.CreateTopicIfNotExistsAsync(_kudosSentDashboard).ConfigureAwait(false);
-        _messageSender.CreateTopicIfNotExistsAsync(_likeSentDashboard).ConfigureAwait(false);
-        _messageSender.CreateTopicIfNotExistsAsync(_likeUndoDashboard).ConfigureAwait(false);
+        _calculateScore = new EventGridMessageSender(_calculateUserScoreTopicEndPoint, _calculateUserStoreTopicKey);
+
+
+        //_messageSender.CreateTopicIfNotExistsAsync(_kudosSentDashboard).ConfigureAwait(false);
+        //_messageSender.CreateTopicIfNotExistsAsync(_likeSentDashboard).ConfigureAwait(false);
+        //_messageSender.CreateTopicIfNotExistsAsync(_likeUndoDashboard).ConfigureAwait(false);
 
        // _messageSender.CreateQueueIfNotExistsAsync(_notifyUserPoints).ConfigureAwait(false);
         
@@ -64,29 +67,29 @@ public class KudosMessageSender : IKudosMessageSender
     {
 
         //send notification to generate the adaptive card
-        await _messageSender.SendQueue(kudos, _notificationTopicName);
+        //await _messageSender.SendQueue(kudos, _notificationTopicName);
 
         //notify User Points
         //await _messageSender.SendQueue(kudos.From.Id, _notifyUserPoints);
         //await _messageSender.SendQueue(kudos.To.Id, _notifyUserPoints);
 
-        await _messageSender.SendTopic(kudos.From.Id, "", "CalculateUserScoreTopic ");
-        await _messageSender.SendTopic(kudos.To.Id, "", "CalculateUserScoreTopic ");
+        await _calculateScore.SendTopic<string>(kudos.From.Id, "SendKudosFrom", "CalculateUserScore");
+        await _calculateScore.SendTopic<string>(kudos.To.Id, "SendKudosTo", "CalculateUserScore");
 
         //notification to update the Teams Apps
-        await _messageSender.SendTopic(
-            new KudosResponse
-            {
-                Id = kudosId,
-                To = kudos.To,
-                From = kudos.From,
-                Message = kudos.Message,
-                Title = kudos.Reward.Title,
-                SendOn = kudos.SendOn,
-                Comments = new List<int>(),
-                Likes = new List<Gateway.Domain.Models.Person>()
-            },
-            _kudosSentDashboard, _kudosSentDashboard);
+        //await _messageSender.SendTopic(
+        //    new KudosResponse
+        //    {
+        //        Id = kudosId,
+        //        To = kudos.To,
+        //        From = kudos.From,
+        //        Message = kudos.Message,
+        //        Title = kudos.Reward.Title,
+        //        SendOn = kudos.SendOn,
+        //        Comments = new List<int>(),
+        //        Likes = new List<Gateway.Domain.Models.Person>()
+        //    },
+        //    _kudosSentDashboard, _kudosSentDashboard);
     }
 
 
@@ -95,12 +98,12 @@ public class KudosMessageSender : IKudosMessageSender
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);        
 
         //notify User Points
-        await _messageSender.SendQueue(like.FromPerson.Id, _notifyUserPoints);
-        await _messageSender.SendQueue(like.ToPersonId, _notifyUserPoints);
+        await _calculateScore.SendTopic<string>(like.FromPerson.Id, "SendLikesFrom", "CalculateUserScore");
+        await _calculateScore.SendTopic<string>(like.ToPersonId,  "SendLikesTo", "CalculateUserScore");
 
 
         //notification to update the Teams Apps
-        await _messageSender.SendTopic(like, _likeSentDashboard, _likeSentDashboard);
+       // await _messageSender.SendTopic(like, _likeSentDashboard, _likeSentDashboard);
     }
 
     public async Task SendUndoLikeAsync(LikeGateway like)
@@ -108,11 +111,11 @@ public class KudosMessageSender : IKudosMessageSender
         var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
       
         //notify User Points
-        await _messageSender.SendQueue(like.FromPerson.Id, _notifyUserPoints);
-        await _messageSender.SendQueue(like.ToPersonId, _notifyUserPoints);
+        await _calculateScore.SendTopic<string>(like.FromPerson.Id, "UndoLikeFrom", "CalculateUserScore");
+        await _calculateScore.SendTopic<string>(like.ToPersonId,  "UndoLikeTo", "CalculateUserScore");
 
         //notification to update the Teams Apps
-        await _messageSender.SendTopic(like, _likeUndoDashboard, _likeUndoDashboard);
+        //await _messageSender.SendTopic(like, _likeUndoDashboard, _likeUndoDashboard);
     }
 
 
