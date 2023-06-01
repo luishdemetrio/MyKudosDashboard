@@ -47,11 +47,11 @@ public class CommentsMessageSender : ICommentsMessageSender
         _dashboardTopicEndPoint = configuration["EventGrid_DashboardTopic_Endpoint"];
         _dashboardTopicKey = configuration["EventGrid_DashboardTopic_Key"];
 
-        _messageSentDashboard = configuration["KudosServiceBus_MessageSentDashboard"];
-        _messageDeletedDashboard = configuration["KudosServiceBus_MessageDeletedDashboard"];
-        _messageUpdatedDashboard = configuration["KudosServiceBus_MessageUpdatedDashboard"];
+        _messageSentDashboard = configuration["EventGrid_MessageSentDashboard"];
+        _messageDeletedDashboard = configuration["EventGrid_MessageDeletedDashboard"];
+        _messageUpdatedDashboard = configuration["EventGrid_MessageUpdatedDashboard"];
 
-        _notifyUserPoints = configuration["KudosServiceBus_NotifyUserPoints"];
+        _notifyUserPoints = configuration["EventGrid_NotifyUserPoints"];
 
     }
 

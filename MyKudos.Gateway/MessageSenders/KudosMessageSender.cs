@@ -9,7 +9,6 @@ namespace MyKudos.Gateway.Queues;
 public class KudosMessageSender : IKudosMessageSender
 {
         
-    private static string _connectionString = string.Empty;
     
     private static string _likeSentDashboard = string.Empty;
     private static string _likeUndoDashboard = string.Empty;
@@ -50,10 +49,8 @@ public class KudosMessageSender : IKudosMessageSender
         _dashboardTopicEndPoint = configuration["EventGrid_DashboardTopic_Endpoint"];
         _dashboardTopicKey = configuration["EventGrid_DashboardTopic_Key"];
 
-        _connectionString = configuration["KudosServiceBus_ConnectionString"];
-
-        _likeSentDashboard = configuration["KudosServiceBus_LikeSentDashboard"];
-        _likeUndoDashboard = configuration["KudosServiceBus_LikeUndoDashboard"];
+        _likeSentDashboard = configuration["EventGrid_LikeSentDashboard"];
+        _likeUndoDashboard = configuration["EventGrid_LikeUndoDashboard"];
 
     }
 
@@ -101,9 +98,7 @@ public class KudosMessageSender : IKudosMessageSender
 
     public async Task SendLikeAsync(LikeGateway like)
     {
-        var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);        
-
-        //notification to update the Teams Apps
+      //notification to update the Teams Apps
         await _dashboardTopic.SendTopic(like, _likeSentDashboard, _likeSentDashboard);
 
 
@@ -124,8 +119,7 @@ public class KudosMessageSender : IKudosMessageSender
 
     public async Task SendUndoLikeAsync(LikeGateway like)
     {
-        var serviceBusAdminClient = new ServiceBusAdministrationClient(_connectionString);
-
+        
         //notification to update the Teams Apps
         await _dashboardTopic.SendTopic(like, _likeUndoDashboard, _likeUndoDashboard);
 

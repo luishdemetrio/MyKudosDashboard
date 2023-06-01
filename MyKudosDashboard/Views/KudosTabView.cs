@@ -12,9 +12,7 @@ public class KudosTabView : IKudosTabView, IObserverKudos, IDisposable
 {
     private IKudosGateway _gatewayService;
 
-    private static string _commentSentDashboard = string.Empty;
-    private static string _commentDeletedDashboard = string.Empty;
-
+   
     public IKudosTabView.UpdateLikesCallBack LikeCallback { get; set; }
 
     public IKudosTabView.UpdateLikesCallBack UndoLikeCallback { get; set; }
@@ -44,54 +42,7 @@ public class KudosTabView : IKudosTabView, IObserverKudos, IDisposable
         KudosCallback?.Invoke(kudos);
     }
 
-    private void SubscribeCommentSent(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _commentSentDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-
-                //retrive the message body
-                var comments = JsonConvert.DeserializeObject<CommentsRequest>(arg.Message.Body.ToString());
-
-                if (comments != null)
-                {
-                    CommentsSentCallback?.Invoke(comments);
-                }
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-      //  _subscriberCommentsSent.ServiceBusProcessor(config);
-    }
-
-    private void SubscribeCommentDeleted(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _commentDeletedDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-
-                //retrive the message body
-                var comments = JsonConvert.DeserializeObject<CommentsRequest>(arg.Message.Body.ToString());
-
-                if (comments != null)
-                {
-                    CommentsDeletedCallback?.Invoke(comments);
-                }
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-      //  _subscriberCommentsDeleted.ServiceBusProcessor(config);
-    }
-
+   
     public void UpdateLikeSent(LikeGateway like)
     {
         LikeCallback?.Invoke(like);
