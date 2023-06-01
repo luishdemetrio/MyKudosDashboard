@@ -1,14 +1,10 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
 public interface IKudosTabView
 {
-
-    //Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
-
-    public void RegisterForLiveUpdates(string userId);
+    //public void RegisterForLiveUpdates(string userId);
 
     public delegate void UpdateLikesCallBack(LikeGateway like);
 

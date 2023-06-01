@@ -26,7 +26,7 @@ builder.Services.AddScoped<ICommentsService, CommentsServiceRest>();
 
 builder.Services.AddScoped<IUserPointsService, UserPointsService>();
 
-builder.Services.AddSingleton<ICommentsMessageSender, CommentsMessageSender>();
+builder.Services.AddScoped<ICommentsMessageSender, CommentsMessageSender>();
 
 var config = builder.Configuration;
 

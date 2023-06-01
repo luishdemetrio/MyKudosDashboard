@@ -10,4 +10,6 @@ public interface IKudosMessageSender
 
     Task SendUndoLikeAsync(LikeGateway like);
 
+    Task UpdateUserScore(Kudos.Domain.Models.UserPointScore userPointScore);
 }
+    

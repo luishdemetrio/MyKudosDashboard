@@ -19,7 +19,7 @@ public class EventGridMessageSender
         _eventGridPublisherClient = new EventGridPublisherClient(new Uri(_topicEndpoint), new AzureKeyCredential(_topicKey));
     }
 
-    public async Task SendTopic<T>(T topicMessage,  string subject, string eventType)
+    public async Task SendTopic(object topicMessage,  string subject, string eventType)
     {
         var eventGridEvent = new EventGridEvent(
             subject: subject,

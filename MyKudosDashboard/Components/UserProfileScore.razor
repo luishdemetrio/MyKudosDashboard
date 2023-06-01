@@ -165,7 +165,6 @@
     {
         base.OnInitialized();
 
-        UserProfileScoreView.RegisterForLiveUpdates(User.ObjectId );
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
 
         UserScoreValue = new();

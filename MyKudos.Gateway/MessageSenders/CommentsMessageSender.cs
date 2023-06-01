@@ -1,19 +1,18 @@
 ﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.MessageSender.Interfaces;
+using MyKudos.MessageSender.Services;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Queues;
 
 public class CommentsMessageSender : ICommentsMessageSender
 {
+    private static string _calculateUserScoreTopicEndPoint = string.Empty;
+    private static string _calculateUserStoreTopicKey = string.Empty;
 
-    private IMessageSender _messageSender;
-
-    //private static string _gamificationMessageSent = string.Empty;
-    //private static string _gamificationMessageReceived = string.Empty;
-
-    //private static string _gamificationMessageDeletedFromTopicName = string.Empty;
-    //private static string _gamificationMessageDeletedToTopicName = string.Empty;
+    private static string _dashboardTopicEndPoint = string.Empty;
+    private static string _dashboardTopicKey = string.Empty;
 
     private static string _messageSentDashboard = string.Empty;
     private static string _messageDeletedDashboard = string.Empty;
@@ -21,22 +20,33 @@ public class CommentsMessageSender : ICommentsMessageSender
 
     private static string _notifyUserPoints = string.Empty;
 
-    public CommentsMessageSender(IMessageSender queue, IConfiguration configuration)
-    {
-        _messageSender = queue;
+    private readonly IUserPointsService _userPointsService;
 
+    private EventGridMessageSender _calculateScore;
+    private EventGridMessageSender _dashboardTopic;
+
+
+    public CommentsMessageSender( IConfiguration configuration, IUserPointsService userPointsService)
+    {
+        
         ReadConfigurationSettings(configuration);
 
-        _messageSender.CreateTopicIfNotExistsAsync(_messageSentDashboard).ConfigureAwait(false);
-        _messageSender.CreateTopicIfNotExistsAsync(_messageDeletedDashboard).ConfigureAwait(false);
-        _messageSender.CreateTopicIfNotExistsAsync(_messageUpdatedDashboard).ConfigureAwait(false);
+        _userPointsService = userPointsService;
 
-        _messageSender.CreateQueueIfNotExistsAsync(_notifyUserPoints).ConfigureAwait(false);
+        _calculateScore = new EventGridMessageSender(_calculateUserScoreTopicEndPoint, _calculateUserStoreTopicKey);
+        _dashboardTopic = new EventGridMessageSender(_dashboardTopicEndPoint, _dashboardTopicKey);
+
     }
 
     private static void ReadConfigurationSettings(IConfiguration configuration)
     {
-       
+
+        _calculateUserScoreTopicEndPoint = configuration["EventGrid_CalculateUserScoreTopic_Endpoint"];
+        _calculateUserStoreTopicKey = configuration["EventGrid_CalculateUserScoreTopic_Key"];
+
+        _dashboardTopicEndPoint = configuration["EventGrid_DashboardTopic_Endpoint"];
+        _dashboardTopicKey = configuration["EventGrid_DashboardTopic_Key"];
+
         _messageSentDashboard = configuration["KudosServiceBus_MessageSentDashboard"];
         _messageDeletedDashboard = configuration["KudosServiceBus_MessageDeletedDashboard"];
         _messageUpdatedDashboard = configuration["KudosServiceBus_MessageUpdatedDashboard"];
@@ -45,19 +55,29 @@ public class CommentsMessageSender : ICommentsMessageSender
 
     }
 
+    public async Task UpdateUserScore(Kudos.Domain.Models.UserPointScore userPointScore)
+    {
+
+        //notification to update the Teams Apps
+        await _dashboardTopic.SendTopic(userPointScore, "UpdateScore", "UpdateUserPointDashboard");
+    }
 
     private async Task NotifyUserScore(CommentsRequest comments)
     {
-        //notify User Points
-        await _messageSender.SendQueue(comments.FromPersonId, _notifyUserPoints);
-
+        //get the user points of who sent to update the Teams Dashboard
+        var userPointsSender = await _userPointsService.GetUserScoreAsync(comments.FromPersonId);
+        await UpdateUserScore(userPointsSender);
 
         if (comments.ToPersonId != comments.FromPersonId)
         {
             //the equality can happens when the person who received the kudos comments on his/her kudos to thanks
             //in this case we dont need to notify it again
-            await _messageSender.SendQueue(comments.ToPersonId, _notifyUserPoints);
+
+            //get the user points of who received to update the Teams Dashboard
+            var userPointsReceiver = await _userPointsService.GetUserScoreAsync(comments.ToPersonId);
+            await UpdateUserScore(userPointsReceiver);            
         }
+
     }
     public async Task MessageSent(CommentsRequest comments)
     {
@@ -65,7 +85,7 @@ public class CommentsMessageSender : ICommentsMessageSender
         await NotifyUserScore(comments);
 
         //notification to update the Teams Apps
-        await _messageSender.SendTopic(comments, _messageSentDashboard, "MessageSent");
+        await _dashboardTopic.SendTopic(comments, _messageSentDashboard, "MessageSent");
     }
 
     public async Task MessageDeleted(CommentsRequest comments)
@@ -74,12 +94,12 @@ public class CommentsMessageSender : ICommentsMessageSender
         await NotifyUserScore(comments);
 
         //notification to update the Teams Apps
-        await _messageSender.SendTopic(comments, _messageDeletedDashboard, "MessageDeleted");
+        await _dashboardTopic.SendTopic(comments, _messageDeletedDashboard, "MessageDeleted");
     }
 
     public async Task MessageUpdated(CommentsRequest comments)
     {
         //notification to update the Teams Apps
-        await _messageSender.SendTopic(comments, _messageUpdatedDashboard, "MessageUpdated");
+        await _dashboardTopic.SendTopic(comments, _messageUpdatedDashboard, "MessageUpdated");
     }
 }

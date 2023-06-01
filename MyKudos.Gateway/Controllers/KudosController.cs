@@ -3,6 +3,7 @@ using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
 using GatewayDomain = MyKudos.Gateway.Domain.Models;
+using Microsoft.Graph;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -14,8 +15,7 @@ public class KudosController : Controller
     private readonly IGraphService _graphService;
     private readonly IRecognitionService _recognitionService;
     private readonly IKudosService _kudosService;
-
-    //private readonly IAgentNotificationService _agentNotificationService;
+   
 
     private IEnumerable<GatewayDomain.Recognition> _recognitions;
 
@@ -29,8 +29,7 @@ public class KudosController : Controller
         _graphService = graphService;
         _recognitionService = recognitionService;
         _kudosService = kudosService;
-
-        //_agentNotificationService = agentNotificationService;
+       
 
         _kudosQueue= kudosQueue;
 
@@ -65,8 +64,6 @@ public class KudosController : Controller
 
         from.AddRange(likesId.Distinct());
 
-
-
         List<GraphUser> users = await _graphService.GetUserInfo(from.Distinct().ToArray()).ConfigureAwait(true);
 
         var photos = await _graphService.GetUserPhotos(from.Distinct().ToArray()).ConfigureAwait(true);
@@ -80,7 +77,8 @@ public class KudosController : Controller
                                join u in users
                                    on like.PersonId equals u.Id
                                join photo in photos
-                                   on like.PersonId equals photo.id
+                               on like.PersonId equals photo.id into photoToGroup
+                               from photo in photoToGroup.DefaultIfEmpty()
                                select new LikeDTO(
 
                                    KudosId: k.KudosId,
@@ -88,11 +86,12 @@ public class KudosController : Controller
                                    {
                                        Id = like.PersonId,
                                        Name = u.DisplayName,
-                                       Photo = $"data:image/png;base64,{photo.photo}"
+                                       Photo = photo != null ? $"data:image/png;base64,{photo.photo}" : $"data:image/png;base64"
                                    }
 
                                ));
         }
+        
 
         var result = from kudo in kudos
                      join userTo in users
@@ -100,24 +99,26 @@ public class KudosController : Controller
                      join userFrom in users
                          on kudo.FromPersonId equals userFrom.Id
                      join photoTo in photos
-                         on kudo.ToPersonId equals photoTo.id
+                         on kudo.ToPersonId equals photoTo.id into photoToGroup
+                     from photoTo in photoToGroup.DefaultIfEmpty()
                      join photoFrom in photos
-                         on kudo.FromPersonId equals photoFrom.id
+                         on kudo.FromPersonId equals photoFrom.id into photoFromGroup
+                     from photoFrom in photoFromGroup.DefaultIfEmpty()
                      join rec in _recognitions
                          on kudo.RecognitionId equals rec.RecognitionId
                      orderby kudo.Date descending
-
-                     select new KudosResponse() {
+                     select new KudosResponse()
+                     {
                          Id = kudo.KudosId,
-                         From = new GatewayDomain.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = $"data:image/png;base64,{photoFrom.photo}" },
-                         To = new GatewayDomain.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = $"data:image/png;base64,{photoTo.photo}" },
-                         Title= rec.Title,
-                        Message = kudo.Message,
-                        SendOn = kudo.Date,
-                        Likes= likes.Where(l => l.KudosId == kudo.KudosId).Select(l => l.Person).ToList(),
-                        Comments=  (kudo.Comments is null) ? new List<int>() : kudo.Comments.Select(c=> c.CommentsId).ToList()
+                         From = new GatewayDomain.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = photoFrom != null ? $"data:image/png;base64,{photoFrom.photo}" : $"data:image/png;base64" },
+                         To = new GatewayDomain.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = photoTo != null ? $"data:image/png;base64,{photoTo.photo}" : $"data:image/png;base64" },
+                         Title = rec.Title,
+                         Message = kudo.Message,
+                         SendOn = kudo.Date,
+                         Likes = likes.Where(l => l.KudosId == kudo.KudosId).Select(l => l.Person).ToList(),
+                         Comments = (kudo.Comments is null) ? new List<int>() : kudo.Comments.Select(c => c.CommentsId).ToList()
                      };
-        
+
 
         return result;
 
@@ -129,6 +130,7 @@ public class KudosController : Controller
     public async Task<int> PostAsync([FromBody] KudosRequest kudos)
     {
 
+
         var restKudos = new Kudos.Domain.Models.Kudos()
         {
             FromPersonId = kudos.From.Id,
@@ -138,11 +140,13 @@ public class KudosController : Controller
             Date = kudos.SendOn
         };
 
+        //Save the Kudos in the database
         int kudosId = await _kudosService.SendAsync(restKudos);
 
+        //get the manager of the person that received kudos. That will be used later to send the adaptive card to the manager
         string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
-
+        //send the kudos notification to the Teams Dashboard
         var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(
           From: kudos.From,
           To: kudos.To,
@@ -151,6 +155,7 @@ public class KudosController : Controller
           Reward: kudos.Reward,
           SendOn: kudos.SendOn
           ));
+
 
         Task.WaitAll(queue);
 
