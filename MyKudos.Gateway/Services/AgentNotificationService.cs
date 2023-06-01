@@ -1,49 +1,64 @@
-﻿//using MyKudos.Gateway.Interfaces;
-//using MyKudos.Gateway.Models;
-//using Newtonsoft.Json;
-//using RestSharp;
+﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Interfaces;
+using MyKudos.Kudos.Domain.Models;
+using Newtonsoft.Json;
+using RestSharp;
 
-//namespace MyKudos.Gateway.Services;
+namespace MyKudos.Gateway.Services;
 
-//public class AgentNotificationService : IAgentNotificationService
-//{
+public class AgentNotificationService : IAgentNotificationService
+{
 
-//    private readonly string _agentServiceUrl;
-//    private readonly IRestServiceToken _serviceToken;
+    private readonly string _agentServiceUrl;
+    private IRestClientHelper _restClientHelper;
 
-//    public AgentNotificationService(IConfiguration config, IRestServiceToken serviceToken)
-//    {
-//        _agentServiceUrl = config["agentServiceUrl"];
-//        _serviceToken = serviceToken;
-//    }
+    private readonly ILogger<KudosServiceRest> _logger;
 
-//    public async Task<bool> SendNotificationAsync(KudosNotification kudos)
-//    {          
+    public AgentNotificationService(IConfiguration config, IRestClientHelper clientHelper, ILogger<KudosServiceRest> logger)
+    {
+        _agentServiceUrl = config["agentServiceUrl"];
+        _restClientHelper = clientHelper;
+        _logger = logger;
+    }
 
-//        var uri = $"{_agentServiceUrl}api/notification";
+    public async Task<bool> SendNotificationAsync(KudosNotification kudos)
+    {
 
-//        var client = new RestClient(uri);
+        bool result = false;
 
-//        var token = await _serviceToken.GetAccessTokenAsync();
+        try
+        {
 
-//        var request = new RestRequest();
-//        request.Method = Method.Post;
-//        request.AddHeader("Authorization", "Bearer " + token);
+            var uri = $"{_agentServiceUrl}";
 
-//        request.AddHeader("Accept", "application/json");
-//        request.AddHeader("Content-Type", "application/json");
+            var client = new RestClient(uri);
 
-//        var body = JsonConvert.SerializeObject(kudos);
+            var request = new RestRequest();
+            request.Method = Method.Post;
 
-//        request.AddParameter("application/json", body, ParameterType.RequestBody);
+            request.AddHeader("Accept", "application/json");
+            request.AddHeader("Content-Type", "application/json");
+
+            var body = JsonConvert.SerializeObject(kudos);
+
+            request.AddParameter("application/json", body, ParameterType.RequestBody);
 
 
-//        RestResponse response = client.Execute(request);
+            RestResponse response = client.Execute(request);
 
-//        return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
-        
-//    }
+            return (response != null && response.StatusCode == System.Net.HttpStatusCode.OK);
 
-   
+            // result = await _restClientHelper.SendApiData<Kudos.Domain.Models.KudosNotification, bool>($"{_agentServiceUrl}api/notification", HttpMethod.Post, kudos);
+        }
+        catch (Exception ex)
+        {
 
-//}
+            _logger.LogError($"Error processing SendKudos: {ex.Message}");
+        }
+
+        return result;
+    }
+
+
+
+}

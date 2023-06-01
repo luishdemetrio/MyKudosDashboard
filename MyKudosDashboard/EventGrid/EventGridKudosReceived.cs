@@ -1,21 +1,32 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventGrid;
 
 public class EventGridKudosReceived : IEventGridKudosReceived
 {
 
-    private List<IObserverKudos> _observers = new List<IObserverKudos>();
+    private ConcurrentQueue<IObserverKudos> _observers = new ConcurrentQueue<IObserverKudos>();
    
     public void Attach(IObserverKudos observer)
     {
-        _observers.Add(observer);
+        _observers.Enqueue(observer);
     }
 
     public void Detach(IObserverKudos observer)
     {
-        _observers.Remove(observer);
+        IObserverKudos removedObserver;
+
+        while (!_observers.IsEmpty)
+        {
+            _observers.TryDequeue(out removedObserver);
+            if (removedObserver != observer)
+                _observers.Enqueue(removedObserver);
+        }
+
+       
     }
 
     public void NotifyKudosSentUpdate(string json)

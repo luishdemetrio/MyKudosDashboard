@@ -28,6 +28,8 @@ builder.Services.AddScoped<IUserPointsService, UserPointsService>();
 
 builder.Services.AddScoped<ICommentsMessageSender, CommentsMessageSender>();
 
+builder.Services.AddScoped<IAgentNotificationService, AgentNotificationService>();
+
 var config = builder.Configuration;
 
 builder.Services.AddScoped<IRestClientHelper>(t =>

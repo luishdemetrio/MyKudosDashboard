@@ -15,7 +15,7 @@ public class KudosController : Controller
     private readonly IGraphService _graphService;
     private readonly IRecognitionService _recognitionService;
     private readonly IKudosService _kudosService;
-   
+   private readonly IAgentNotificationService _agentNotificationService;
 
     private IEnumerable<GatewayDomain.Recognition> _recognitions;
 
@@ -23,13 +23,14 @@ public class KudosController : Controller
 
     
     public KudosController(IGraphService graphService, IRecognitionService recognitionService, 
-                           IKudosService kudosService, IKudosMessageSender kudosQueue)
+                           IKudosService kudosService, IKudosMessageSender kudosQueue,
+                           IAgentNotificationService agentNotificationService)
     {
         
         _graphService = graphService;
         _recognitionService = recognitionService;
         _kudosService = kudosService;
-       
+       _agentNotificationService = agentNotificationService;
 
         _kudosQueue= kudosQueue;
 
@@ -125,7 +126,7 @@ public class KudosController : Controller
 
     }
 
-    
+
     [HttpPost(Name = "SendKudos")]
     public async Task<int> PostAsync([FromBody] KudosRequest kudos)
     {
@@ -156,6 +157,16 @@ public class KudosController : Controller
           SendOn: kudos.SendOn
           ));
 
+        //send the adaptive card
+        await _agentNotificationService.SendNotificationAsync(
+            new Kudos.Domain.Models.KudosNotification(
+                  From: new Kudos.Domain.Models.Person() { Id = kudos.From.Id, Name = kudos.From.Name, Photo = kudos.From.Photo},
+                  To: new Kudos.Domain.Models.Person() { Id = kudos.To.Id, Name = kudos.To.Name, Photo = kudos.To.Photo },
+                  ManagerId: userManagerId,
+                  Message: kudos.Message,
+                  Reward: new Kudos.Domain.Models.Reward( kudos.Reward.Id, kudos.Reward.Title),
+                  SendOn: kudos.SendOn)
+            );
 
         Task.WaitAll(queue);
 
