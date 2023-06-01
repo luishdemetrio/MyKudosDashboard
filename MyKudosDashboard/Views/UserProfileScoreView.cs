@@ -1,37 +1,27 @@
 ﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.EventGrid;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.MessageSender;
-using Newtonsoft.Json;
 
 namespace MyKudosDashboard.Views;
 
-public class UserProfileScoreView : IUserProfileScoreView
+public class UserProfileScoreView : IUserProfileScoreView, IObserverUserPoints, IDisposable
 {
 
     private IGamificationGateway _gamificationGateway;
 
     public IUserProfileScoreView.UpdateScoreCallBack UserScoreCallback { get; set; }
 
-    private static string _updatedScoreDashboard = string.Empty;
-    private static string _updatedScoreSamePersonDashboard = string.Empty;
+    private IEventGridUserPointsReceived _eventGridReceived;
 
-    private ServiceBusSubscriberHelper _subscriberUserScore;
-
-    private static SemaphoreSlim _semaphoreScore = new SemaphoreSlim(1, 1);
-    private static SemaphoreSlim _semaphoreSamePersonScore = new SemaphoreSlim(1, 1);
-
-    
-
-    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration, ILogger<UserProfileScoreView> logger)
+    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration, ILogger<UserProfileScoreView> logger,
+                                IEventGridUserPointsReceived eventGridReceived)
     {
         _gamificationGateway = gamificationGateway;
+        _eventGridReceived = eventGridReceived;
 
-        _updatedScoreDashboard = configuration["KudosServiceBus_ScoreUpdatedDashboard"];
-
-        _updatedScoreSamePersonDashboard = configuration["KudosServiceBus_ScoreUpdatedSamePersonDashboard"];
-
-        _subscriberUserScore = new ServiceBusSubscriberHelper(configuration, logger);
+        _eventGridReceived.Attach(this);
     }
+
 
 
     public async Task<UserPointScore> GetUserScore(string userId)
@@ -39,84 +29,13 @@ public class UserProfileScoreView : IUserProfileScoreView
         return await _gamificationGateway.GetUserScoreAsync(userId);
     }
 
-
-    public void RegisterForLiveUpdates(string userId)
+    public void Dispose()
     {
-    
-
-        SubscribeUserScoreUpdate(userId);
-
-        SubscribeUserScoreSamePersonUpdate(userId);
+        _eventGridReceived.Detach(this);
     }
 
-    private void SubscribeUserScoreUpdate(string subscriptionName)
+    public void UpdateUserScore(UserPointScore score)
     {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _updatedScoreDashboard,
-            SubscriptionName = _subscriberUserScore.GetInstanceId(subscriptionName),
-            MessageProcessor = async arg =>
-            {
-                
-                
-                    await _semaphoreScore.WaitAsync();
-
-                try
-                {
-                    var userScore = JsonConvert.DeserializeObject<UserPointScore>(arg.Message.Body.ToString());
-
-                    if (userScore != null) 
-                    {
-                        UserScoreCallback?.Invoke(userScore);
-                    }
-                }
-                finally
-                {
-                    _semaphoreScore.Release();
-                }
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-        _subscriberUserScore.ServiceBusProcessor(config);
+        UserScoreCallback?.Invoke(score);
     }
-
-    private void SubscribeUserScoreSamePersonUpdate(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _updatedScoreSamePersonDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-              
-
-                    await _semaphoreSamePersonScore.WaitAsync();
-
-                try
-                {
-                    //retrive the message body
-                    var userScore = JsonConvert.DeserializeObject<UserPointScore>(arg.Message.Body.ToString());
-
-                    if (userScore != null)
-                    {
-                        UserScoreCallback?.Invoke(userScore);
-                    }
-                }
-                finally
-                {
-                    _semaphoreSamePersonScore.Release();
-                }
-
-                    
-                
-
-                await arg.CompleteMessageAsync(arg.Message).ConfigureAwait(true);
-            }
-        };
-
-        _subscriberUserScore.ServiceBusProcessor(config);
-    }
-
 }

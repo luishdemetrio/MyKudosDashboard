@@ -60,12 +60,22 @@ public class CommentsController : Controller
         if (comments == null)
             return result;
 
-        
+        //get userId of who commented
         var peopleIds  = comments
             .Where(c => c.KudosId == kudosId)
             .Select(c => c.FromPersonId)
             .Distinct()
             .ToList();
+
+
+        //get distinct people who liked
+        List<string> likesId = comments
+                    .SelectMany(kl => kl.Likes)
+                    .Select(like => like.FromPersonId)
+                    .Distinct()
+                    .ToList();
+
+        peopleIds.AddRange(likesId.Distinct());
 
         List<GraphUser> users = await _graphService.GetUserInfo(peopleIds.Distinct().ToArray()).ConfigureAwait(true);
 

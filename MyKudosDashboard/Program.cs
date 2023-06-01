@@ -1,6 +1,7 @@
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
+using MyKudosDashboard.EventGrid;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
@@ -16,7 +17,13 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddTeamsFx(builder.Configuration.GetSection("TeamsFx"));
 builder.Services.AddScoped<MicrosoftTeams>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
+
+
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
 
@@ -38,7 +45,8 @@ builder.Services.AddScoped<IKudosGateway, GatewayService>();
 builder.Services.AddScoped<IRecognitionGateway, RecognitionGateway>();
 builder.Services.AddScoped<IUserGateway, UserGateway>();
 
-
+builder.Services.AddSingleton<IEventGridKudosReceived, EventGridKudosReceived>();
+builder.Services.AddSingleton<IEventGridUserPointsReceived, EventGridUserPointsReceived>();
 
 var config = builder.Configuration;
 
@@ -96,9 +104,10 @@ app.UseAuthorization();
 
  app.UseEndpoints(endpoints =>
 {
+    endpoints.MapControllers();
     endpoints.MapBlazorHub();
     endpoints.MapFallbackToPage("/_Host");
-    endpoints.MapControllers();
+    
 });
 
 app.Run();

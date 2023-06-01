@@ -4,17 +4,13 @@ using Newtonsoft.Json;
 using MyKudosDashboard.MessageSender;
 using System.Threading;
 using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.EventGrid;
 
 namespace MyKudosDashboard.Views;
 
-public class KudosTabView : IKudosTabView
+public class KudosTabView : IKudosTabView, IObserverKudos, IDisposable
 {
     private IKudosGateway _gatewayService;
-
-    private static string _kudosSentDashboard = string.Empty;
-
-    private static string _likeSentDashboard = string.Empty;
-    private static string _likeUndoDashboard = string.Empty;
 
     private static string _commentSentDashboard = string.Empty;
     private static string _commentDeletedDashboard = string.Empty;
@@ -29,133 +25,23 @@ public class KudosTabView : IKudosTabView
     public IKudosTabView.CommentsCallBack CommentsUpdatedCallback { get; set; }
     public IKudosTabView.CommentsCallBack CommentsDeletedCallback { get; set; }
 
-    private ServiceBusSubscriberHelper _subscriberLikeSent;
-    private ServiceBusSubscriberHelper _subscriberUndoLike;
-    private ServiceBusSubscriberHelper _subscriberKudosSent;
-    private ServiceBusSubscriberHelper _subscriberCommentsSent;
-    private ServiceBusSubscriberHelper _subscriberCommentsDeleted;
 
 
-    private static SemaphoreSlim _semaphoreLike = new SemaphoreSlim(1, 1);
-    
+    private IEventGridKudosReceived _eventGridReceived;
 
-
-    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger)
+    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger, IEventGridKudosReceived eventGridReceived)
     {
         _gatewayService = gatewayService;
 
-        _likeSentDashboard = configuration["KudosServiceBus_LikeSentDashboard"];
-        _likeUndoDashboard = configuration["KudosServiceBus_LikeUndoDashboard"];
+        _eventGridReceived = eventGridReceived;
 
-        _kudosSentDashboard = configuration["KudosServiceBus_KudosSentDashboard"];
-
-        _commentSentDashboard = configuration["KudosServiceBus_MessageSentDashboard"];
-        _commentDeletedDashboard = configuration["KudosServiceBus_MessageDeletedDashboard"];
-
-        _subscriberLikeSent = new ServiceBusSubscriberHelper(configuration, logger);
-        _subscriberUndoLike = new ServiceBusSubscriberHelper(configuration, logger);
-        _subscriberKudosSent = new ServiceBusSubscriberHelper(configuration, logger);
-        _subscriberCommentsDeleted = new ServiceBusSubscriberHelper(configuration, logger);
-        _subscriberCommentsSent = new ServiceBusSubscriberHelper(configuration, logger);
-
+        _eventGridReceived.Attach(this);
+            
     }
 
-
-
-    private void SubscribeToLikeSent(string subscriptionName)
+    public void NotifyKudosCallBack(KudosResponse kudos)
     {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _likeSentDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-                //retrive the message body
-                
-                await _semaphoreLike.WaitAsync();
-
-                try
-                {
-                    var like = JsonConvert.DeserializeObject<LikeGateway>(arg.Message.Body.ToString());
-
-                    if (like != null)
-                    {
-
-                        LikeCallback?.Invoke(like);
-                    }
-                }
-                finally
-                {
-                    _semaphoreLike.Release();
-                }
-
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-        _subscriberLikeSent.ServiceBusProcessor(config);
-    }
-
-    private void SubscribeUndoToLikeSent(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _likeUndoDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-                //retrive the message body
-               
-                await _semaphoreLike.WaitAsync();
-
-                try
-                {
-                    var like = JsonConvert.DeserializeObject<LikeGateway>(arg.Message.Body.ToString());
-
-                    if (like != null)
-                    {
-
-                        UndoLikeCallback?.Invoke(like);
-                    }
-                }
-                finally
-                {
-                    _semaphoreLike.Release();
-                }
-
-                    
-                
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-        _subscriberUndoLike.ServiceBusProcessor(config);
-    }
-
-
-    private void SubscribeKudosSent(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _kudosSentDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-                //retrive the message body
-                var kudos = JsonConvert.DeserializeObject<KudosResponse>(arg.Message.Body.ToString());
-
-                if (kudos != null)
-                {
-                    KudosCallback?.Invoke(kudos);
-                }
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-        _subscriberKudosSent.ServiceBusProcessor(config);
+        KudosCallback?.Invoke(kudos);
     }
 
     private void SubscribeCommentSent(string subscriptionName)
@@ -179,7 +65,7 @@ public class KudosTabView : IKudosTabView
             }
         };
 
-        _subscriberCommentsSent.ServiceBusProcessor(config);
+      //  _subscriberCommentsSent.ServiceBusProcessor(config);
     }
 
     private void SubscribeCommentDeleted(string subscriptionName)
@@ -203,22 +89,41 @@ public class KudosTabView : IKudosTabView
             }
         };
 
-        _subscriberCommentsDeleted.ServiceBusProcessor(config);
+      //  _subscriberCommentsDeleted.ServiceBusProcessor(config);
     }
 
-
-
-    public void RegisterForLiveUpdates(string userId)
+    public void UpdateLikeSent(LikeGateway like)
     {
-        //userId += $"-{_subscriberNameSuffix}";
-
-
-        SubscribeKudosSent(userId);
-        SubscribeToLikeSent(userId);
-        SubscribeUndoToLikeSent(userId);
-        SubscribeCommentSent(userId);
-        SubscribeCommentDeleted(userId);
-
+        LikeCallback?.Invoke(like);
     }
 
+    public void UpdateUndoLikeSent(LikeGateway like)
+    {
+        UndoLikeCallback?.Invoke(like);
+    }
+
+    public void UpdateKudosSent(KudosResponse kudos)
+    {
+        KudosCallback?.Invoke(kudos);
+    }
+
+    public void Dispose()
+    {
+        _eventGridReceived.Detach(this);
+    }
+
+    public void UpdateMessageSent(CommentsRequest comments)
+    {
+        CommentsSentCallback?.Invoke(comments);
+    }
+
+    public void UpdateMessageDeleted(CommentsRequest comments)
+    {
+        CommentsUpdatedCallback?.Invoke(comments);
+    }
+
+    public void UpdateMessageUpdated(CommentsRequest comments)
+    {
+        CommentsDeletedCallback?.Invoke(comments);
+    }
 }

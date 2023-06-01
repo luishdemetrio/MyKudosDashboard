@@ -1,4 +1,4 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Gateway.Interfaces;
 

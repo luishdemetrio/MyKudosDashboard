@@ -25,7 +25,9 @@
   
   
   <ItemGroup>
+    <PackageReference Include="Azure.Messaging.EventGrid" Version="4.16.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.1" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.5" />
     <PackageReference Include="Microsoft.Graph" Version="4.44.0" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.5.3" />

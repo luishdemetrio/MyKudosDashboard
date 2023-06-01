@@ -685,8 +685,9 @@
 
     private async Task GetMoreKudos()
     {
-        if (MoreKudosCallback !=null)
-        await MoreKudosCallback.Invoke();
+        _pageNumber++;
+
+        await LoadKudos(_pageNumber);
     }
 
 
