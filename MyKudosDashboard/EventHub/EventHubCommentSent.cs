@@ -38,7 +38,9 @@ public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCo
     {
         _eventHubScore = new EventHubConsumerHelper<CommentsRequest>(
                                configuration["EventHub_CommentSentConnectionString"],
-                               configuration["EventHub_CommentSentName"]
+                               configuration["EventHub_CommentSentName"],
+                               configuration["EventHub_blobStorageConnectionString"],
+                               configuration["EventHub_blobContainerName"]
                                );
 
         _eventHubScore.UpdateCallback += (score => 

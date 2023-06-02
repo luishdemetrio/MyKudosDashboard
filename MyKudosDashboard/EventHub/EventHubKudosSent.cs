@@ -16,7 +16,9 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
     {
         _eventHubScore = new EventHubConsumerHelper<KudosResponse>(
                                configuration["EventHub_KudosSentConnectionString"],
-                               configuration["EventHub_KudosSentName"]
+                               configuration["EventHub_KudosSentName"],
+                               configuration["EventHub_blobStorageConnectionString"],
+                               configuration["EventHub_blobContainerName"]
                                );
 
         _eventHubScore.UpdateCallback += (score => 

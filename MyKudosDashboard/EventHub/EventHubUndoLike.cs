@@ -39,7 +39,9 @@ public class EventHubUndoLike : IEventHubReceived<EventHubResponse<EventHubLikeO
     {
         _eventHubScore = new EventHubConsumerHelper<LikeGateway>(
                                configuration["EventHub_UndoLikeSentConnectionString"],
-                               configuration["EventHub_UndoLikeSentName"]
+                               configuration["EventHub_UndoLikeSentName"],
+                               configuration["EventHub_blobStorageConnectionString"],
+                               configuration["EventHub_blobContainerName"]
                                );
 
         _eventHubScore.UpdateCallback += (score => 

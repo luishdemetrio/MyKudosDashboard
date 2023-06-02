@@ -39,7 +39,9 @@ public class EventHubLikeSent : IEventHubReceived<EventHubResponse<EventHubLikeO
     {
         _eventHubScore = new EventHubConsumerHelper<LikeGateway>(
                                configuration["EventHub_LikeSentConnectionString"],
-                               configuration["EventHub_LikeSentName"]
+                               configuration["EventHub_LikeSentName"],
+                               configuration["EventHub_blobStorageConnectionString"],
+                               configuration["EventHub_blobContainerName"]
                                );
 
         _eventHubScore.UpdateCallback += (score => 

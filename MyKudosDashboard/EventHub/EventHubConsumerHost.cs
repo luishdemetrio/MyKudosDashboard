@@ -17,9 +17,9 @@ namespace MyKudosDashboard.EventHub;
 public class EventHubConsumerHelper<T>  
 {
 
-    string blobStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=latestkudoseventstorage;AccountKey=9kWHoniW7wmqnxOdhcIFvlcaN75roa8xrwn4ytsSOeeEVAJRxOLSjeUhfJJ2ccCxzPiVSCwKEmC6+ASt7p0CmQ==;EndpointSuffix=core.windows.net";
-    string blobContainerName = "offsetcontainer";
-    string consumerGroup = EventHubConsumerClient.DefaultConsumerGroupName;
+    string _blobStorageConnectionString ;
+    string _blobContainerName ;
+    string _consumerGroup = EventHubConsumerClient.DefaultConsumerGroupName;
 
     EventProcessorClient processor;
     CancellationTokenSource cancellationSource;
@@ -28,17 +28,22 @@ public class EventHubConsumerHelper<T>
 
     public NotifyCallBack UpdateCallback { get; set; }
 
-    public EventHubConsumerHelper(string connectionString, string eventHubName)
+    public EventHubConsumerHelper(string connectionString, string eventHubName,
+                                  string blobStorageConnectionString, string blobContainerName)
     {
         cancellationSource = new CancellationTokenSource();
         cancellationSource.CancelAfter(TimeSpan.FromSeconds(45));
+
+
+        _blobStorageConnectionString = blobStorageConnectionString;
+        _blobContainerName = blobContainerName;
 
         var eventProcessorHostName = Guid.NewGuid().ToString();
 
         var storageClient = new BlobContainerClient(blobStorageConnectionString, blobContainerName);
 
          processor = new EventProcessorClient(storageClient,
-            consumerGroup,
+            _consumerGroup,
             connectionString,
             eventHubName);
 

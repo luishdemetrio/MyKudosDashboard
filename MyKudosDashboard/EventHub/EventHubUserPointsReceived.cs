@@ -16,7 +16,9 @@ public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
     {
         _eventHubScore = new EventHubConsumerHelper<UserPointScore>(
                                configuration["EventHub_ScoreConnectionString"],
-                               configuration["EventHub_ScoreName"]
+                               configuration["EventHub_ScoreName"],
+                               configuration["EventHub_blobStorageConnectionString"],
+                               configuration["EventHub_blobContainerName"]
                                );
 
         _eventHubScore.UpdateCallback += (score => 
