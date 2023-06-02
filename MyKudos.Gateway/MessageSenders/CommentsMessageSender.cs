@@ -8,11 +8,7 @@ namespace MyKudos.Gateway.Queues;
 
 public class CommentsMessageSender : ICommentsMessageSender
 {
-    private static string _calculateUserScoreTopicEndPoint = string.Empty;
-    private static string _calculateUserStoreTopicKey = string.Empty;
-
-    private static string _dashboardTopicEndPoint = string.Empty;
-    private static string _dashboardTopicKey = string.Empty;
+ 
 
     private static string _messageSentDashboard = string.Empty;
     private static string _messageDeletedDashboard = string.Empty;
@@ -22,44 +18,37 @@ public class CommentsMessageSender : ICommentsMessageSender
 
     private readonly IUserPointsService _userPointsService;
 
-    private EventGridMessageSender _calculateScore;
-    private EventGridMessageSender _dashboardTopic;
-
+    private EventHubMessageSender _eventHubScore;
+    private EventHubMessageSender _eventHubCommentSent;
+    private EventHubMessageSender _eventHubCommentDeleted;
+    private EventHubMessageSender _eventHubCommentUpdated;
 
     public CommentsMessageSender( IConfiguration configuration, IUserPointsService userPointsService)
     {
-        
-        ReadConfigurationSettings(configuration);
-
+               
         _userPointsService = userPointsService;
 
-        _calculateScore = new EventGridMessageSender(_calculateUserScoreTopicEndPoint, _calculateUserStoreTopicKey);
-        _dashboardTopic = new EventGridMessageSender(_dashboardTopicEndPoint, _dashboardTopicKey);
+        _eventHubScore = new EventHubMessageSender(configuration["EventHub_ScoreConnectionString"],
+                                                  configuration["EventHub_ScoreName"]);
 
+
+        _eventHubCommentSent = new EventHubMessageSender(configuration["EventHub_CommentSentConnectionString"],
+                                                         configuration["EventHub_CommentSentName"]);
+
+        _eventHubCommentDeleted = new EventHubMessageSender(configuration["EventHub_CommentDeletedConnectionString"],
+                                                     configuration["EventHub_CommentDeletedName"]);
+
+        _eventHubCommentUpdated = new EventHubMessageSender(configuration["EventHub_CommentUpdatedConnectionString"],
+                                                    configuration["EventHub_CommentUpdatedName"]);
     }
 
-    private static void ReadConfigurationSettings(IConfiguration configuration)
-    {
-
-        _calculateUserScoreTopicEndPoint = configuration["EventGrid_CalculateUserScoreTopic_Endpoint"];
-        _calculateUserStoreTopicKey = configuration["EventGrid_CalculateUserScoreTopic_Key"];
-
-        _dashboardTopicEndPoint = configuration["EventGrid_DashboardTopic_Endpoint"];
-        _dashboardTopicKey = configuration["EventGrid_DashboardTopic_Key"];
-
-        _messageSentDashboard = configuration["KudosServiceBus_MessageSentDashboard"];
-        _messageDeletedDashboard = configuration["KudosServiceBus_MessageDeletedDashboard"];
-        _messageUpdatedDashboard = configuration["KudosServiceBus_MessageUpdatedDashboard"];
-
-        _notifyUserPoints = configuration["KudosServiceBus_NotifyUserPoints"];
-
-    }
+ 
 
     public async Task UpdateUserScore(Kudos.Domain.Models.UserPointScore userPointScore)
     {
 
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(userPointScore, "UpdateScore", "UpdateUserPointDashboard");
+        await _eventHubScore.PublishAsync<Kudos.Domain.Models.UserPointScore>(userPointScore);
     }
 
     private async Task NotifyUserScore(CommentsRequest comments)
@@ -85,7 +74,8 @@ public class CommentsMessageSender : ICommentsMessageSender
         await NotifyUserScore(comments);
 
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(comments, _messageSentDashboard, "MessageSent");
+        await _eventHubCommentSent.PublishAsync<CommentsRequest>(comments);
+     
     }
 
     public async Task MessageDeleted(CommentsRequest comments)
@@ -94,12 +84,12 @@ public class CommentsMessageSender : ICommentsMessageSender
         await NotifyUserScore(comments);
 
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(comments, _messageDeletedDashboard, "MessageDeleted");
+        await _eventHubCommentDeleted.PublishAsync<CommentsRequest>(comments);
     }
 
     public async Task MessageUpdated(CommentsRequest comments)
     {
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(comments, _messageUpdatedDashboard, "MessageUpdated");
+        await _eventHubCommentUpdated.PublishAsync<CommentsRequest>(comments);
     }
 }

@@ -159,6 +159,9 @@
   <data name="LikesSent" xml:space="preserve">
     <value>Curtidas enviadas</value>
   </data>
+  <data name="LoadingMoreItems" xml:space="preserve">
+    <value>Carregando mais reconhecimentos ...</value>
+  </data>
   <data name="Message" xml:space="preserve">
     <value>Mensagem</value>
   </data>

@@ -19,7 +19,19 @@
 }
 
 <script>
-    
+     window.addInfiniteScrollListener = async (element, instance) => {
+        element.addEventListener('scroll', async (event) => {
+            const target = event.target;
+            const scrollHeight = target.scrollHeight;
+            const scrollTop = target.scrollTop;
+            const clientHeight = target.clientHeight;
+
+            if (scrollHeight - scrollTop <= clientHeight + 1) {
+                await instance.invokeMethodAsync('OnScrollAsync');
+            }
+        });
+    };
+
     window.updateInnerHTML = (element, value) => element.innerHTML = value;
 
     window.updateCount = (element, value) => element.innerText = value;

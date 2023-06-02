@@ -147,7 +147,7 @@
     [Parameter]
     public UserPointScore UserScoreValue { get; set; }
 
-    
+
     private bool _isLoaded = false;
 
     private bool _shouldRender =true;
@@ -166,6 +166,7 @@
         base.OnInitialized();
 
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
+       
 
         UserScoreValue = new();
         UserScoreValue = await UserProfileScoreView.GetUserScore(User.ObjectId);

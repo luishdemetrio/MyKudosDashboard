@@ -5,16 +5,19 @@ using MyKudosDashboard.MessageSender;
 using System.Threading;
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventGrid;
+using MyKudosDashboard.EventHub;
+using MyKudosDashboard.EventHub.Enums;
 
 namespace MyKudosDashboard.Views;
 
-public class KudosTabView : IKudosTabView, IObserverKudos, IDisposable
-{
+public class KudosTabView : IKudosTabView, 
+                            IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>, 
+                            IObserverEventHub<KudosResponse>,
+                            IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>
+{ 
     private IKudosGateway _gatewayService;
 
-    private static string _commentSentDashboard = string.Empty;
-    private static string _commentDeletedDashboard = string.Empty;
-
+   
     public IKudosTabView.UpdateLikesCallBack LikeCallback { get; set; }
 
     public IKudosTabView.UpdateLikesCallBack UndoLikeCallback { get; set; }
@@ -25,93 +28,38 @@ public class KudosTabView : IKudosTabView, IObserverKudos, IDisposable
     public IKudosTabView.CommentsCallBack CommentsUpdatedCallback { get; set; }
     public IKudosTabView.CommentsCallBack CommentsDeletedCallback { get; set; }
 
+   
+    IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>> _eventHubUndoLikeSent;
+    IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>> eventHubLikeSent;
+
+    IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>> _eventHubCommentSent;
 
 
-    private IEventGridKudosReceived _eventGridReceived;
+    EventHubConsumerHelper<KudosResponse> _eventHubKudosSent;
 
-    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration, ILogger<KudosTabView> logger, IEventGridKudosReceived eventGridReceived)
+
+    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration,
+                        ILogger<KudosTabView> logger,
+                        IEventHubReceived<KudosResponse> eventHubKudosSent)
     {
         _gatewayService = gatewayService;
 
-        _eventGridReceived = eventGridReceived;
+      
+        eventHubLikeSent = EventHubLikeSent.GetInstance(configuration);
+        eventHubLikeSent.Attach(this);
 
-        _eventGridReceived.Attach(this);
-            
+        _eventHubUndoLikeSent = EventHubUndoLike.GetInstance(configuration);
+        _eventHubUndoLikeSent.Attach(this);
+
+        _eventHubCommentSent = EventHubCommentSent.GetInstance(configuration);
+        _eventHubCommentSent.Attach(this);
+
     }
 
-    public void NotifyKudosCallBack(KudosResponse kudos)
-    {
-        KudosCallback?.Invoke(kudos);
-    }
 
-    private void SubscribeCommentSent(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _commentSentDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
+   
 
-                //retrive the message body
-                var comments = JsonConvert.DeserializeObject<CommentsRequest>(arg.Message.Body.ToString());
-
-                if (comments != null)
-                {
-                    CommentsSentCallback?.Invoke(comments);
-                }
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-      //  _subscriberCommentsSent.ServiceBusProcessor(config);
-    }
-
-    private void SubscribeCommentDeleted(string subscriptionName)
-    {
-        var config = new ServiceBusProcessorConfig
-        {
-            DashboardName = _commentDeletedDashboard,
-            SubscriptionName = subscriptionName,
-            MessageProcessor = async arg =>
-            {
-
-                //retrive the message body
-                var comments = JsonConvert.DeserializeObject<CommentsRequest>(arg.Message.Body.ToString());
-
-                if (comments != null)
-                {
-                    CommentsDeletedCallback?.Invoke(comments);
-                }
-
-                await arg.CompleteMessageAsync(arg.Message);
-            }
-        };
-
-      //  _subscriberCommentsDeleted.ServiceBusProcessor(config);
-    }
-
-    public void UpdateLikeSent(LikeGateway like)
-    {
-        LikeCallback?.Invoke(like);
-    }
-
-    public void UpdateUndoLikeSent(LikeGateway like)
-    {
-        UndoLikeCallback?.Invoke(like);
-    }
-
-    public void UpdateKudosSent(KudosResponse kudos)
-    {
-        KudosCallback?.Invoke(kudos);
-    }
-
-    public void Dispose()
-    {
-        _eventGridReceived.Detach(this);
-    }
-
+   
     public void UpdateMessageSent(CommentsRequest comments)
     {
         CommentsSentCallback?.Invoke(comments);
@@ -125,5 +73,50 @@ public class KudosTabView : IKudosTabView, IObserverKudos, IDisposable
     public void UpdateMessageUpdated(CommentsRequest comments)
     {
         CommentsDeletedCallback?.Invoke(comments);
+    }
+
+
+
+    public void NotifyUpdate(KudosResponse score)
+    {
+
+        KudosCallback?.Invoke(score);
+
+       
+    }
+
+    public void NotifyUpdate(EventHubResponse<EventHubLikeOptions, LikeGateway> score)
+    {
+        switch (score.Kind)
+        {
+            case EventHubLikeOptions.LikeSent:
+                LikeCallback?.Invoke(score.Event);
+                break;
+            case EventHubLikeOptions.UndoLike:
+                UndoLikeCallback?.Invoke(score.Event);
+                break;
+
+
+        }
+    }
+
+    public void NotifyUpdate(EventHubResponse<EventHubCommentOptions, CommentsRequest> score)
+    {
+        switch (score.Kind)
+        {
+
+            
+            case EventHubCommentOptions.CommentSent:
+                CommentsSentCallback?.Invoke(score.Event);
+                break;
+            case EventHubCommentOptions.CommentUpdated:
+                CommentsUpdatedCallback?.Invoke(score.Event);
+                break;
+            case EventHubCommentOptions.CommentDeleted:
+                CommentsDeletedCallback?.Invoke(score.Event);
+                break;
+            default:
+                break;
+        }
     }
 }

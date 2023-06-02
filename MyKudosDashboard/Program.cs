@@ -1,7 +1,9 @@
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventGrid;
+using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
@@ -45,10 +47,17 @@ builder.Services.AddScoped<IKudosGateway, GatewayService>();
 builder.Services.AddScoped<IRecognitionGateway, RecognitionGateway>();
 builder.Services.AddScoped<IUserGateway, UserGateway>();
 
-builder.Services.AddSingleton<IEventGridKudosReceived, EventGridKudosReceived>();
-builder.Services.AddSingleton<IEventGridUserPointsReceived, EventGridUserPointsReceived>();
+//builder.Services.AddSingleton<IEventGridKudosReceived, EventGridKudosReceived>();
+//builder.Services.AddSingleton<IEventGridUserPointsReceived, EventGridUserPointsReceived>();
+
+builder.Services.AddSingleton<IEventHubReceived<UserPointScore>, EventHubUserPointsReceived>();
+
+
+builder.Services.AddSingleton<IEventHubReceived<KudosResponse>, EventHubKudosSent>();
 
 var config = builder.Configuration;
+
+
 
 builder.Services.AddScoped<IRestClientHelper>(t =>
                 new RestClientHelper(
@@ -92,7 +101,7 @@ var selectedCulture = config["SelectedCulture"];
 var supportedCultures = new[] { "pt-BR" };
 
 var localizationOptions = new RequestLocalizationOptions()
-    //.AddSupportedCultures(supportedCultures)
+    .AddSupportedCultures(supportedCultures)
     .AddSupportedUICultures(supportedCultures);
 
 app.UseRequestLocalization(localizationOptions);

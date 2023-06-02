@@ -190,7 +190,12 @@ public class GraphService : IGraphService
         Parallel.ForEach(chunckedUsersIds, async p =>
         {
 
-            result.AddRange(await GetUserInfoChunk(p));
+            var userInfoChunk = await GetUserInfoChunk(p);
+            lock (result)
+            {
+                result.AddRange(userInfoChunk);
+            }
+
         });
 
         return result;

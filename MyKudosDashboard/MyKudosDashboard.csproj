@@ -26,8 +26,12 @@
   
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.EventGrid" Version="4.16.0" />
+    <PackageReference Include="Azure.Messaging.EventHubs" Version="5.9.1" />
+    <PackageReference Include="Azure.Messaging.EventHubs.Processor" Version="5.9.1" />
+    <PackageReference Include="Blazorise" Version="1.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
     <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.1" />
+    <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="4.3.2" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.5" />
     <PackageReference Include="Microsoft.Graph" Version="4.44.0" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.5.3" />
@@ -42,6 +46,8 @@
     <PackageReference Include="bootstrap" Version="5.2.3" />
 
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
+
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="6.2.2" />
     
     
   </ItemGroup>

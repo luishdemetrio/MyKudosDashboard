@@ -1,27 +1,61 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventGrid;
+using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 
-public class UserProfileScoreView : IUserProfileScoreView, IObserverUserPoints, IDisposable
+public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<UserPointScore>
 {
 
     private IGamificationGateway _gamificationGateway;
 
     public IUserProfileScoreView.UpdateScoreCallBack UserScoreCallback { get; set; }
 
-    private IEventGridUserPointsReceived _eventGridReceived;
 
-    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration, ILogger<UserProfileScoreView> logger,
-                                IEventGridUserPointsReceived eventGridReceived)
+    private IConfiguration _configuration;
+
+    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration,
+                                ILogger<UserProfileScoreView> logger,
+                                IEventHubReceived<UserPointScore> eventHubUserPointsReceived
+                                )
     {
         _gamificationGateway = gamificationGateway;
-        _eventGridReceived = eventGridReceived;
 
-        _eventGridReceived.Attach(this);
+        eventHubUserPointsReceived.Attach(this);
+        
+
+        _configuration = configuration;
+
+     //   _eventHubScore = eventHubScore;
+
+        //_eventHubScore = new EventHubConsumerHelper<UserPointScore>(
+        //                       _configuration["EventHub_ScoreConnectionString"],
+        //                       _configuration["EventHub_ScoreName"]
+        //                       );
+
+        //_eventHubScore.UpdateCallback += (score => {
+        //    UserScoreCallback?.Invoke(score);
+        //});
+
+        //_eventHubScore.Start();
+
+
     }
 
+    //private async Task RegisterUpdateScore()
+    //{
+    //    _eventHubScore = new EventHubConsumerHelper<UserPointScore>(
+    //                            _configuration["EventHub_ScoreConnectionString"],
+    //                            _configuration["EventHub_ScoreName"]
+    //                            );
+
+    //    _eventHubScore.UpdateCallback += (score => {
+    //        UserScoreCallback?.Invoke(score);
+    //    });
+
+    //    await _eventHubScore.Start();
+    //}
 
 
     public async Task<UserPointScore> GetUserScore(string userId)
@@ -29,12 +63,8 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverUserPoints, 
         return await _gamificationGateway.GetUserScoreAsync(userId);
     }
 
-    public void Dispose()
-    {
-        _eventGridReceived.Detach(this);
-    }
-
-    public void UpdateUserScore(UserPointScore score)
+   
+    public void NotifyUpdate(UserPointScore score)
     {
         UserScoreCallback?.Invoke(score);
     }

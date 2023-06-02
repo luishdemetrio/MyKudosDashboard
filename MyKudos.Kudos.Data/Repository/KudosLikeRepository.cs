@@ -38,7 +38,7 @@ public class KudosLikeRepository : IKudosLikeRepository
     {
         bool result = true;
 
-        var kudos = _context.KudosLike.Where(k => k.KudosId == kudosId && k.PersonId == personId).First();
+        var kudos = _context.KudosLike.Where(k => k.KudosId == kudosId && k.PersonId == personId).FirstOrDefault();
 
         
         if (kudos != null)
