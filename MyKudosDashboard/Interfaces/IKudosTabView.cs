@@ -6,6 +6,7 @@ public interface IKudosTabView
 {
     //public void RegisterForLiveUpdates(string userId);
 
+    //Task RegisterForUpdates();
     public delegate void UpdateLikesCallBack(LikeGateway like);
 
     public UpdateLikesCallBack LikeCallback { get; set; }

@@ -12,19 +12,36 @@
 
 @inject IJSRuntime JSRuntime
 
-    @*style="height:68.7vh;overflow-y:scroll;width:100%">*@
-<div class="list-group list-group-checkable d-grid gap-1 border-0 " style="z-index: auto ;min-height:500px;height:80vh;overflow-y:scroll;width:100%;overflow:auto">
+<style>
+    .infinite-scroll-container {
+    height: 300px;
+    overflow-y: auto;
+    border: 0px solid #ccc;
+}
 
-    
-    <InfiniteScroll ObserverTargetId="observerTarget"
-                    ObservableTargetReached="(e) => GetMoreKudos()">
+.list-item {
+    padding: 10px;
+    border-bottom: 0px solid #ccc;
+}
 
+.loading-indicator {
+    text-align: center;
+    padding: 10px;
+}
 
+</style>
+<div 
+     style="z-index: auto ;min-height:500px;height:80vh;overflow-y:scroll;width:100%;overflow:auto"
+     class="infinite-scroll-container" @ref="scrollContainer">
+
+    <div class="list-item" >
+
+        
 
         @foreach (var item in _kudosList.Values.OrderByDescending(k => k.SendOn))
         {
 
-            <div  class="profile" data-is-focusable="true">
+            <div class="profile" data-is-focusable="true">
 
                 <div class="avatar">
                     <img src=@item.To.Photo style="height:64px;width:64px;float:left;border-radius: 50%" />
@@ -67,7 +84,7 @@
 
                     <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;">
                         @item.Message
-                       
+
                     </div>
 
                     <div style="float:right">
@@ -87,7 +104,7 @@
                             <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                                     Filled=@Filled(item) />
 
-                            <div @ref=numberOfLikes[item.Id] id=@($"likevalue_{item.Id}") >
+                            <div @ref=numberOfLikes[item.Id] id=@($"likevalue_{item.Id}")>
                                 @item.Likes.Count()
                             </div>
 
@@ -95,9 +112,9 @@
 
                         <FluentTooltip Anchor=@item.Id.ToString() Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
 
-                           @* <div @ref=tooltipLikes[item.Id]>
-                               
-                            </div>*@
+                            @* <div @ref=tooltipLikes[item.Id]>
+
+                        </div>*@
 
                             @if (item.Likes.Count() > 0)
                             {
@@ -105,7 +122,7 @@
                                     @foreach (var like in item.Likes)
                                     {
                                         <li>
-                                            <div >
+                                            <div>
                                                 <img src=@like.Photo
                                                      style="height: 26px;width: 26px;border-radius: 50%;" />
                                                 <span style="margin-left:5px">@like.Name</span>
@@ -114,7 +131,7 @@
                                     }
                                 </ul>
                             }
-                         
+
                         </FluentTooltip>
 
                     </div>
@@ -124,17 +141,19 @@
 
 
         }
+    </div>
 
-      
-        <spain id="observerTarget"></spain>
-</InfiniteScroll>
-
-
-   
-    
+    @if (isLoading)
+    {
+        <div class="loading-indicator">@Localizer["LoadingMoreItems"]</div>
+    }
 
 </div>
 
+
+
+
+                         
 @code {
 
     public enum KudosTypeTab
@@ -174,45 +193,58 @@
 
     private int _pageNumber;
 
+    private ElementReference scrollContainer;
+    private ElementReference contentContainer;
+    private bool isLoading = false;
+
+
     protected override void OnInitialized()
     {
         _kudosList = new();
         _disabledButtons = new();
 
-        _pageNumber = 1;
+        _pageNumber = 0;
+
+
 
     }
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
         if (firstRender)
         {
-            await LoadKudos();
+            await LoadMoreItems();
+            await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
         }
-
-        //foreach (var item in kudos.ToList())
-        //{
-        //    await UpdateNumberOfLikes(item.Id);
-        //}
-
-        //foreach (var item in _likesToUpdate)
-        //{
-        //    if (numberOfLikes.ContainsKey(item.Key))
-        //        await UpdateCount(numberOfLikes[item.Key], item.Value).ConfigureAwait(true);
-
-        //    _likesToUpdate.TryRemove(item);
-        //}   
-        // await InvokeAsync(StateHasChanged);
     }
 
-    private async Task LoadMoreKudosAll()
+    [JSInvokable]
+    public async Task OnScrollAsync()
     {
-        _pageNumber++;
-
-        await LoadKudos(_pageNumber);
+        if (!isLoading)
+        {
+            await LoadMoreItems();
+        }
     }
+
+    private async Task LoadMoreItems()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        await GetMoreKudos();
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    //private async Task LoadMoreKudosAll()
+    //{
+    //    _pageNumber++;
+
+    //    await LoadKudos(_pageNumber);
+    //}
 
     private async Task LoadKudos(int pageNumber = 1)
     {

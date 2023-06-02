@@ -159,6 +159,9 @@
   <data name="LikesSent" xml:space="preserve">
     <value>Likes Sent</value>
   </data>
+  <data name="LoadingMoreItems" xml:space="preserve">
+    <value>Loading more items...</value>
+  </data>
   <data name="Message" xml:space="preserve">
     <value>Message</value>
   </data>

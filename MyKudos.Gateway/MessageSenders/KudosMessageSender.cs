@@ -10,61 +10,46 @@ public class KudosMessageSender : IKudosMessageSender
 {
         
     
-    private static string _likeSentDashboard = string.Empty;
-    private static string _likeUndoDashboard = string.Empty;
-
-    private static string _calculateUserScoreTopicEndPoint = string.Empty;
-    private static string _calculateUserStoreTopicKey = string.Empty;
-
-    private static string _dashboardTopicEndPoint = string.Empty;
-    private static string _dashboardTopicKey = string.Empty;
-
-    private EventGridMessageSender _calculateScore;
-
-    private EventGridMessageSender _dashboardTopic;
-
+    private EventHubMessageSender _eventHubScore;
+    private EventHubMessageSender _eventHubLikeSent;
+    private EventHubMessageSender _eventHubUndoLikeSent;
+    private EventHubMessageSender _eventHubKudosSent;
 
     private readonly IUserPointsService _userPointsService;
 
 
+    
     public KudosMessageSender(IConfiguration configuration,
                               IUserPointsService userPointsService)
     {       
 
-        ReadConfigurationSettings(configuration);
 
         _userPointsService = userPointsService;
 
-        _calculateScore = new EventGridMessageSender(_calculateUserScoreTopicEndPoint, _calculateUserStoreTopicKey);
-        _dashboardTopic = new EventGridMessageSender(_dashboardTopicEndPoint, _dashboardTopicKey);
-        
 
+        _eventHubScore = new EventHubMessageSender(configuration["EventHub_ScoreConnectionString"],
+                                                   configuration["EventHub_ScoreName"]);
+
+
+        _eventHubLikeSent = new EventHubMessageSender(configuration["EventHub_LikeSentConnectionString"],
+                                                      configuration["EventHub_LikeSentName"]);
+
+        _eventHubUndoLikeSent = new EventHubMessageSender(configuration["EventHub_UndoLikeSentConnectionString"],
+                                                     configuration["EventHub_UndoLikeSentName"]);
+
+        _eventHubKudosSent = new EventHubMessageSender(configuration["EventHub_KudosSentConnectionString"],
+                                                    configuration["EventHub_KudosSentName"]);
     }
 
-    private static void ReadConfigurationSettings(IConfiguration configuration)
-    {
-        _calculateUserScoreTopicEndPoint = configuration["EventGrid_CalculateUserScoreTopic_Endpoint"];
-        _calculateUserStoreTopicKey = configuration["EventGrid_CalculateUserScoreTopic_Key"];
-
-        _dashboardTopicEndPoint = configuration["EventGrid_DashboardTopic_Endpoint"];
-        _dashboardTopicKey = configuration["EventGrid_DashboardTopic_Key"];
-
-        _likeSentDashboard = configuration["EventGrid_LikeSentDashboard"];
-        _likeUndoDashboard = configuration["EventGrid_LikeUndoDashboard"];
-
-    }
+ 
 
 
     public async Task SendKudosAsync(int kudosId, Gateway.Domain.Models.KudosNotification kudos)
     {
-        //send notification to generate the adaptive card
-        //await _messageSender.SendQueue(kudos, _notificationTopicName);
-
-        await _calculateScore.SendTopic(kudos.From.Id, "SendKudosFrom", "CalculateUserScore");
-        await _calculateScore.SendTopic(kudos.To.Id, "SendKudosTo", "CalculateUserScore");
 
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(
+
+        await _eventHubLikeSent.PublishAsync<KudosResponse>(
             new KudosResponse
             {
                 Id = kudosId,
@@ -75,8 +60,7 @@ public class KudosMessageSender : IKudosMessageSender
                 SendOn = kudos.SendOn,
                 Comments = new List<int>(),
                 Likes = new List<Gateway.Domain.Models.Person>()
-            },
-            "SendKudos", "SendKudosDashboard");
+            });
 
         //get the user points of who sent to update the Teams Dashboard
         var userPointsSender = await _userPointsService.GetUserScoreAsync(kudos.From.Id);
@@ -85,22 +69,23 @@ public class KudosMessageSender : IKudosMessageSender
         //get the user points of who received to update the Teams Dashboard
         var userPointsReceiver = await _userPointsService.GetUserScoreAsync(kudos.To.Id);
         await UpdateUserScore(userPointsReceiver);
+
+        
     }
 
 
     public async Task UpdateUserScore(Kudos.Domain.Models.UserPointScore userPointScore)
     {
-        
+        await _eventHubScore.PublishAsync<Kudos.Domain.Models.UserPointScore>(userPointScore);
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(userPointScore,  "UpdateScore", "UpdateUserPointDashboard");
+       // await _dashboardTopic.SendTopic(userPointScore,  "UpdateScore", "UpdateUserPointDashboard");
     }
 
 
     public async Task SendLikeAsync(LikeGateway like)
     {
       //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(like, _likeSentDashboard, _likeSentDashboard);
-
+        await _eventHubLikeSent.PublishAsync<LikeGateway>(like);
 
         //get the user points of who sent to update the Teams Dashboard
         var userPointsSender = await _userPointsService.GetUserScoreAsync(like.FromPerson.Id);
@@ -119,9 +104,9 @@ public class KudosMessageSender : IKudosMessageSender
 
     public async Task SendUndoLikeAsync(LikeGateway like)
     {
-        
+
         //notification to update the Teams Apps
-        await _dashboardTopic.SendTopic(like, _likeUndoDashboard, _likeUndoDashboard);
+        await _eventHubUndoLikeSent.PublishAsync<LikeGateway>(like);
 
         //get the user points of who sent to update the Teams Dashboard
         var userPointsSender = await _userPointsService.GetUserScoreAsync(like.FromPerson.Id);

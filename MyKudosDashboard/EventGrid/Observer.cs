@@ -16,6 +16,12 @@ public interface IObserverKudos
 
 }
 
+public interface IObserverEventHub<T>
+{
+    void NotifyUpdate(T score);
+
+
+}
 
 public interface IObserverUserPoints
 {
