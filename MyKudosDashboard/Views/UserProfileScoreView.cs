@@ -1,5 +1,4 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.EventGrid;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 
@@ -12,51 +11,23 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
 
     public IUserProfileScoreView.UpdateScoreCallBack UserScoreCallback { get; set; }
 
+    private ILogger<UserProfileScoreView> _logger;
 
-    private IConfiguration _configuration;
 
-    public UserProfileScoreView(IGamificationGateway gamificationGateway, IConfiguration configuration,
+    public UserProfileScoreView(IGamificationGateway gamificationGateway, 
                                 ILogger<UserProfileScoreView> logger,
                                 IEventHubReceived<UserPointScore> eventHubUserPointsReceived
                                 )
     {
+        _logger = logger;
+
         _gamificationGateway = gamificationGateway;
 
         eventHubUserPointsReceived.Attach(this);
         
 
-        _configuration = configuration;
-
-     //   _eventHubScore = eventHubScore;
-
-        //_eventHubScore = new EventHubConsumerHelper<UserPointScore>(
-        //                       _configuration["EventHub_ScoreConnectionString"],
-        //                       _configuration["EventHub_ScoreName"]
-        //                       );
-
-        //_eventHubScore.UpdateCallback += (score => {
-        //    UserScoreCallback?.Invoke(score);
-        //});
-
-        //_eventHubScore.Start();
-
 
     }
-
-    //private async Task RegisterUpdateScore()
-    //{
-    //    _eventHubScore = new EventHubConsumerHelper<UserPointScore>(
-    //                            _configuration["EventHub_ScoreConnectionString"],
-    //                            _configuration["EventHub_ScoreName"]
-    //                            );
-
-    //    _eventHubScore.UpdateCallback += (score => {
-    //        UserScoreCallback?.Invoke(score);
-    //    });
-
-    //    await _eventHubScore.Start();
-    //}
-
 
     public async Task<UserPointScore> GetUserScore(string userId)
     {
@@ -66,6 +37,10 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
    
     public void NotifyUpdate(UserPointScore score)
     {
+        _logger.LogInformation($"Score received: \nScore: {score.Score}\nKudos sent: {score.KudosSent}\nLikes Received: {score.LikesReceived}");
+
         UserScoreCallback?.Invoke(score);
     }
+
+    
 }

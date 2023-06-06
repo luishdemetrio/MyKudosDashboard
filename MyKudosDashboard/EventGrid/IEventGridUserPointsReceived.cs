@@ -1,4 +1,6 @@
-﻿namespace MyKudosDashboard.EventGrid;
+﻿using MyKudosDashboard.EventHub;
+
+namespace MyKudosDashboard.EventGrid;
 
 public interface IEventGridUserPointsReceived
 {

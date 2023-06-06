@@ -29,7 +29,6 @@
             {
                 <div style="float:none;width:100%;text-align: center">
                     <h3 class="card-title pricing-card-title">
-                        @*<div @ref=_score>@_userScore.Score</div>*@
                         <small @ref=_score style="margin-top:10px">@UserScoreValue.Score</small>
                         <small class="text-muted fw-light" style="margin-top:10px"> @Localizer["Points"]</small>
                     </h3>
@@ -73,7 +72,7 @@
 
                      <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false  />
+                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false />
 
                         <small @ref=_commentsSent class="text-muted fw-light"> @UserScoreValue.MessagesSent</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsSent"]</small>
@@ -81,7 +80,7 @@
 
                     <h5 class="card-title pricing-card-title">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false  />
+                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false />
 
                         <small @ref=_commentsReceived class="text-muted fw-light"> @UserScoreValue.MessagesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsReceived"]</small>
@@ -210,6 +209,7 @@
         t.Wait();
     }
 
+    
     private void UpdateScoreValues()
     {
 

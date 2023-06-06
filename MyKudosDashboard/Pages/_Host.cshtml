@@ -32,6 +32,12 @@
         });
     };
 
+    window.updateReplyMessage = function(replyElementId, value) {
+        var textarea = document.getElementById(replyElementId);
+        textarea.value = value;
+    };
+
+
     window.updateInnerHTML = (element, value) => element.innerHTML = value;
 
     window.updateCount = (element, value) => element.innerText = value;

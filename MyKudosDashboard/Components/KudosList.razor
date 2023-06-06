@@ -408,7 +408,7 @@
     public void UpdateLikesCallBack(LikeGateway pLike)
     {
 
-        if (pLike.FromPerson.Id == User.ObjectId)
+        if (pLike.FromPerson is null)  
             return;
 
         UpdateLikesCountAndToolTip(pLike);
@@ -482,8 +482,8 @@
     public void UpdateUndoLikesCallBack(LikeGateway pLike)
     {
 
-        if (pLike.FromPerson.Id == User.ObjectId)
-            return;
+        //if (pLike.FromPerson.Id == User.ObjectId)
+            //return;
 
         UpdateUndoLikesCountAndToolTip(pLike);
 
@@ -678,7 +678,7 @@
                                             ToPersonId: item.To.Id);
 
 
-
+                // I am sending all the information as it will update via Event Hub the others users
                 if (kudo.Likes.Any(l => l.Id == User.ObjectId))
                 {
                     KudosListView.SendUndoLikeAsync(requestLike);

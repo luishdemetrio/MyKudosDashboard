@@ -130,19 +130,19 @@
     <value>Escolha o comportamento</value>
   </data>
   <data name="CommentsReceived" xml:space="preserve">
-    <value>comentários recebidos</value>
+    <value>Comentário(s) recebido(s)</value>
   </data>
   <data name="CommentsSent" xml:space="preserve">
-    <value>comentários enviados</value>
+    <value>Comentário(s) enviado(s)</value>
   </data>
   <data name="Kudos" xml:space="preserve">
     <value>reconhecimento</value>
   </data>
   <data name="KudosFromMe" xml:space="preserve">
-    <value>Reconhecimentos enviados</value>
+    <value>Reconhecimento(s) enviado(s)</value>
   </data>
   <data name="KudosReceived" xml:space="preserve">
-    <value>reconhecimentos recebidos</value>
+    <value>Reconhecimento(s) recebido(s)</value>
   </data>
   <data name="KudosSent" xml:space="preserve">
     <value>reconhecimentos enviados</value>
@@ -154,10 +154,10 @@
     <value>Reconhecimentos recebidos</value>
   </data>
   <data name="LikesReceived" xml:space="preserve">
-    <value>Curtidas recebidas</value>
+    <value>Curtida(s) recebida(s)</value>
   </data>
   <data name="LikesSent" xml:space="preserve">
-    <value>Curtidas enviadas</value>
+    <value>Curtida(s) enviada(s)</value>
   </data>
   <data name="LoadingMoreItems" xml:space="preserve">
     <value>Carregando mais reconhecimentos ...</value>
@@ -199,6 +199,6 @@
     <value>Nenhum resultado encontrado</value>
   </data>
   <data name="TopContributors" xml:space="preserve">
-    <value>Top Contribuidores</value>
+    <value>Top Contribuidores(as)</value>
   </data>
 </root>

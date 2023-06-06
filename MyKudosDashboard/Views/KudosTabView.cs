@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using MyKudosDashboard.MessageSender;
 using System.Threading;
 using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.EventGrid;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
 
@@ -35,12 +34,11 @@ public class KudosTabView : IKudosTabView,
     IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>> _eventHubCommentSent;
 
 
-    EventHubConsumerHelper<KudosResponse> _eventHubKudosSent;
+    IEventHubReceived<KudosResponse> _eventHubKudosSent;
 
 
     public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration,
-                        ILogger<KudosTabView> logger,
-                        IEventHubReceived<KudosResponse> eventHubKudosSent)
+                        ILogger<KudosTabView> logger)
     {
         _gatewayService = gatewayService;
 
@@ -53,6 +51,9 @@ public class KudosTabView : IKudosTabView,
 
         _eventHubCommentSent = EventHubCommentSent.GetInstance(configuration);
         _eventHubCommentSent.Attach(this);
+
+        _eventHubKudosSent = EventHubKudosSent.GetInstance(configuration); ;
+        _eventHubKudosSent.Attach(this);
 
     }
 

@@ -49,7 +49,7 @@ public class KudosMessageSender : IKudosMessageSender
 
         //notification to update the Teams Apps
 
-        await _eventHubLikeSent.PublishAsync<KudosResponse>(
+        await _eventHubKudosSent.PublishAsync<KudosResponse>(
             new KudosResponse
             {
                 Id = kudosId,
@@ -76,9 +76,9 @@ public class KudosMessageSender : IKudosMessageSender
 
     public async Task UpdateUserScore(Kudos.Domain.Models.UserPointScore userPointScore)
     {
-        await _eventHubScore.PublishAsync<Kudos.Domain.Models.UserPointScore>(userPointScore);
         //notification to update the Teams Apps
-       // await _dashboardTopic.SendTopic(userPointScore,  "UpdateScore", "UpdateUserPointDashboard");
+        await _eventHubScore.PublishAsync<Kudos.Domain.Models.UserPointScore>(userPointScore);
+       
     }
 
 

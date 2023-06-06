@@ -12,6 +12,6 @@ public interface IUserProfileScoreView
 
     public UpdateScoreCallBack UserScoreCallback { get; set; }
 
-   // Task RegisterForUpdates();
+    
 
 }

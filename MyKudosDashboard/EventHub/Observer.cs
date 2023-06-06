@@ -1,6 +1,6 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 
-namespace MyKudosDashboard.EventGrid;
+namespace MyKudosDashboard.EventHub;
 
 public interface IObserverKudos
 {

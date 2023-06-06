@@ -12,11 +12,15 @@ public class SendKudosView : ISendKudosView
 
     private IUserGateway _userGateway;
 
+    
     public SendKudosView(IKudosGateway dashboardService, IRecognitionGateway recognitionGateway, IUserGateway userGateway)
     {
         _kudosGateway = dashboardService;
         _recognitionGateway = recognitionGateway;
         _userGateway = userGateway;
+
+
+        
     }
 
     public async Task<IEnumerable<Recognition>> GetRecognitionsAsync()
@@ -34,4 +38,5 @@ public class SendKudosView : ISendKudosView
      
         return await _kudosGateway.SendKudos(kudos);
     }
+
 }

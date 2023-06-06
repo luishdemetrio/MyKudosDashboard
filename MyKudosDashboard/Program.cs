@@ -1,14 +1,14 @@
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.EventGrid;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
-
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,9 +52,6 @@ builder.Services.AddScoped<IUserGateway, UserGateway>();
 
 builder.Services.AddSingleton<IEventHubReceived<UserPointScore>, EventHubUserPointsReceived>();
 
-
-builder.Services.AddSingleton<IEventHubReceived<KudosResponse>, EventHubKudosSent>();
-
 var config = builder.Configuration;
 
 
@@ -72,9 +69,12 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
+
 builder.Services.AddFluentUIComponents();
 //LibraryConfiguration configUI = new(Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetIconConfiguration(), Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetEmojiConfiguration());
 //builder.Services.AddFluentUIComponents(configUI);
+
+
 
 
 

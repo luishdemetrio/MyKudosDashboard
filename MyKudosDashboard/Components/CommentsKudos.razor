@@ -327,7 +327,7 @@
                               {
                                   Id = User.ObjectId,
                                   Name = User.DisplayName,
-                                  Photo = $"data:image/png;base64,{_userPhoto}"
+                                  Photo = _userPhoto
                               },
                            ToPersonId: kudos.To.Id
                        )
@@ -350,7 +350,7 @@
                              {
                                  Id = User.ObjectId,
                                  Name = User.DisplayName,
-                                 Photo = $"data:image/png;base64,{_userPhoto}"
+                                 Photo = _userPhoto
                              },
                              ToPersonId: kudos.To.Id
                             ));
@@ -380,8 +380,8 @@
     private void UpdateLikeCallback(LikeGateway like)
     {
         // The person who sent already has the like updated
-        if (like.FromPerson.Id == User.ObjectId)
-            return;
+       // if (like.FromPerson.Id == User.ObjectId)
+       //     return;
 
         UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
     }

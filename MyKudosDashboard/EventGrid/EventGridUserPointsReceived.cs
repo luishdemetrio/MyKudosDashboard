@@ -1,4 +1,5 @@
 ﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.EventHub;
 using Newtonsoft.Json;
 
 

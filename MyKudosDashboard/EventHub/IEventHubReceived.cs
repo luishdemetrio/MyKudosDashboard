@@ -1,5 +1,4 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.EventGrid;
 
 namespace MyKudosDashboard.EventHub;
 
