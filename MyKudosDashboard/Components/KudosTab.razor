@@ -16,20 +16,20 @@
 
 
     <FluentTabs style="z-index:auto">
-        <FluentTab Text=@Localizer["All"] style=";z-index:auto" />
-        <FluentTab Text=@Localizer["KudosToMe"] style=";z-index:auto" />
-        <FluentTab Text=@Localizer["KudosFromMe"] style=";z-index:auto" />
+        <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
+        <FluentTab Text=@Localizer["KudosToMe"] style="z-index:auto" @onclick=OnTabToMeClick />
+        <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
 
-            <FluentTabPanel >
+            <FluentTabPanel   >
                 <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
             
             <FluentTabPanel >
-                <KudosList TypeTab=KudosList.KudosTypeTab.ToMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+            <KudosList @ref=ToMeKudosTab TypeTab =KudosList.KudosTypeTab.ToMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
             
             <FluentTabPanel >
-                <KudosList TypeTab=KudosList.KudosTypeTab.FromMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+                <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>      
 
     </FluentTabs>
@@ -49,11 +49,11 @@
     [Parameter]
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
-
-    
     private readonly object _lock = new object();
 
     private KudosList AllKudosTab;
+    private KudosList ToMeKudosTab;
+    private KudosList FromMeKudosTab;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,12 +64,14 @@
         {
             var subscriptionName = User.ObjectId ;
 
-            
-          
+
+
 
             KudosTabView.LikeCallback = UpdateLikesCallBack;
             KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
+
             KudosTabView.KudosCallback = UpdateKudosCallback;
+
             KudosTabView.CommentsDeletedCallback = CommentsDeleted;
             KudosTabView.CommentsSentCallback = CommentsSent;
 
@@ -77,6 +79,21 @@
 
         await Task.CompletedTask;
 
+    }
+
+    private async Task OnTabAllClick(MouseEventArgs args)
+    {
+        await AllKudosTab.LoadKudos();
+    }
+
+    private async Task OnTabToMeClick(MouseEventArgs args)
+    {
+        await ToMeKudosTab.LoadKudos();
+    }
+
+    private async Task OnTabFromMeClick(MouseEventArgs args)
+    {
+        await FromMeKudosTab.LoadKudos();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -26,15 +26,15 @@ public class UserController : Controller
 
         var graphUsers = await _graphService.GetUsers(name);
 
-        if (graphUsers.value.Count() == 0)
+        if (graphUsers.Count() == 0)
             return new List<Person>();
 
         // var photos = await _graphService.GetUserPhotos(graphUsers.value.Select(u => u.Id).Take(20).ToArray());
 
-        var photos = await _graphService.GetUserPhotos(graphUsers.value.Select(u => u.Id).ToArray());
+        var photos = await _graphService.GetUserPhotos(graphUsers.Select(u => u.Id).ToArray());
 
 
-        return (from graphUser in graphUsers.value
+        return (from graphUser in graphUsers
                 join photo in photos
                     on graphUser.Id equals photo.id into ph
                 from p in ph.DefaultIfEmpty()

@@ -93,4 +93,37 @@ public class KudosServiceRest: IKudosService
 
     }
 
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber)
+    {
+        List<Kudos.Domain.Models.Kudos> result = new();
+
+        try
+        {
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudosfromme/?userid={userId}&pageNumber= {pageNumber}");
+            result = kudos.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMeAsync(string userId, int pageNumber)
+    {
+        List<Kudos.Domain.Models.Kudos> result = new();
+
+        try
+        {
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudostome/?userid={userId}&pageNumber= {pageNumber}");
+            result = kudos.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return result;
+    }
 }

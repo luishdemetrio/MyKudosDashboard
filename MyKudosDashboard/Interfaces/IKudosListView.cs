@@ -11,6 +11,8 @@ public interface IKudosListView
     Task<bool> SendUndoLikeAsync(LikeGateway like);
 
     Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
+    Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber);
+    Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber);
 
 
 

@@ -86,5 +86,13 @@ public sealed class KudosService : IKudosService
         return _kudosLikeRepository.UndoLike(kudosId, personId);
     }
 
-   
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5)
+    {
+        return _kudosRepository.GetKudosFromMeAsync(pUserId, pageNumber, pageSize);
+    }
+
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5)
+    {
+        return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize);
+    }
 }

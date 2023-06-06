@@ -1,6 +1,5 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
 
 
 namespace MyKudosDashboard.Views;
@@ -36,4 +35,13 @@ public class KudosListView : IKudosListView
            
     }
 
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber)
+    {
+        return await _gatewayService.GetKudosToMe(userId, pageNumber);
+    }
+
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
+    {
+        return await _gatewayService.GetKudosFromMe(userId, pageNumber);
+    }
 }

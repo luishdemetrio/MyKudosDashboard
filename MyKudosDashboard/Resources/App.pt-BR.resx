@@ -145,13 +145,13 @@
     <value>Reconhecimento(s) recebido(s)</value>
   </data>
   <data name="KudosSent" xml:space="preserve">
-    <value>reconhecimentos enviados</value>
+    <value>Reconhecimento(s) enviado(s)</value>
   </data>
   <data name="KudosTabTitle" xml:space="preserve">
     <value>Reconhecimentos</value>
   </data>
   <data name="KudosToMe" xml:space="preserve">
-    <value>Reconhecimentos recebidos</value>
+    <value>Reconhecimento(s) recebido(s)</value>
   </data>
   <data name="LikesReceived" xml:space="preserve">
     <value>Curtida(s) recebida(s)</value>

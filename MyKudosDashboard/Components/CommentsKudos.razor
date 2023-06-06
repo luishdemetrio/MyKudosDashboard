@@ -246,6 +246,7 @@
     private bool _isLikeButtonDisabled = false;
 
 
+
     public void ShowModal(KudosResponse kudos, string userPhoto)
     {
 
@@ -254,6 +255,7 @@
 
         ModalHidden = false;
         _comments = new();
+
         CommentsView.GetComments(_item.Id).ContinueWith(t =>
         {
             _comments = t.Result.ToList();
@@ -357,7 +359,7 @@
                    });
 
                 t.Wait();
-                
+
             }
 
             UpdateLikesKudos(kudos.Id, User.ObjectId);
@@ -380,8 +382,8 @@
     private void UpdateLikeCallback(LikeGateway like)
     {
         // The person who sent already has the like updated
-       // if (like.FromPerson.Id == User.ObjectId)
-       //     return;
+        if (like.FromPerson.Id == User.ObjectId)
+            return;
 
         UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
     }
@@ -431,8 +433,8 @@
         if (string.IsNullOrEmpty(_replyMessage))
             return;
 
-        
-       
+
+
         BlockSendButton(true);
 
         await InvokeAsync(StateHasChanged);
@@ -466,7 +468,7 @@
 
         _replyMessage = string.Empty;
 
-        
+
 
         await UpdateNumberOfComments();
 
@@ -477,7 +479,7 @@
         await Task.CompletedTask;
 
     }
-    
+
 
     public async Task UpdateNumberOfComments()
     {
@@ -498,17 +500,30 @@
 
     public void DeleteComment(CommentsResponse pComments)
     {
-        CommentsView.DeleteComments(pComments, _item.To.Id).ContinueWith(t =>
-        {
-            var comments = _comments.First(c => c.Id == pComments.Id);
 
-            if (_comments.Contains(comments))
-                _comments.Remove(comments);
+        var t = InvokeAsync(() =>
+                     {
+                         CommentsView.DeleteComments(pComments, _item.To.Id);
 
-            InvokeAsync(StateHasChanged);
+                     });
 
-            
-        });
+        t.Wait();
+
+
+        var comments = _comments.First(c => c.Id == pComments.Id);
+
+        if (_comments.Contains(comments))
+            _comments.Remove(comments);
+
+        var t2 = InvokeAsync(() =>
+                {
+                    UpdateNumberOfComments();
+
+                    });
+
+        t.Wait();
+
+        StateHasChanged();
     }
 
     public void UpdateCommentCallBack(CommentsResponse comments)

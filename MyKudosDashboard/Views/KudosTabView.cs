@@ -1,8 +1,4 @@
 ﻿using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
-using Newtonsoft.Json;
-using MyKudosDashboard.MessageSender;
-using System.Threading;
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
@@ -14,8 +10,7 @@ public class KudosTabView : IKudosTabView,
                             IObserverEventHub<KudosResponse>,
                             IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>
 { 
-    private IKudosGateway _gatewayService;
-
+  
    
     public IKudosTabView.UpdateLikesCallBack LikeCallback { get; set; }
 
@@ -32,16 +27,16 @@ public class KudosTabView : IKudosTabView,
     IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>> eventHubLikeSent;
 
     IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>> _eventHubCommentSent;
+    IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>> _eventHubCommentDeleted;
 
 
     IEventHubReceived<KudosResponse> _eventHubKudosSent;
 
 
-    public KudosTabView(IKudosGateway gatewayService, IConfiguration configuration,
+    public KudosTabView(IConfiguration configuration,
                         ILogger<KudosTabView> logger)
     {
-        _gatewayService = gatewayService;
-
+        
       
         eventHubLikeSent = EventHubLikeSent.GetInstance(configuration);
         eventHubLikeSent.Attach(this);
@@ -52,30 +47,15 @@ public class KudosTabView : IKudosTabView,
         _eventHubCommentSent = EventHubCommentSent.GetInstance(configuration);
         _eventHubCommentSent.Attach(this);
 
+        _eventHubCommentDeleted = EventHubCommentDeleted.GetInstance(configuration);
+        _eventHubCommentDeleted.Attach(this);
+
         _eventHubKudosSent = EventHubKudosSent.GetInstance(configuration); ;
         _eventHubKudosSent.Attach(this);
 
+        
+
     }
-
-
-   
-
-   
-    public void UpdateMessageSent(CommentsRequest comments)
-    {
-        CommentsSentCallback?.Invoke(comments);
-    }
-
-    public void UpdateMessageDeleted(CommentsRequest comments)
-    {
-        CommentsUpdatedCallback?.Invoke(comments);
-    }
-
-    public void UpdateMessageUpdated(CommentsRequest comments)
-    {
-        CommentsDeletedCallback?.Invoke(comments);
-    }
-
 
 
     public void NotifyUpdate(KudosResponse score)

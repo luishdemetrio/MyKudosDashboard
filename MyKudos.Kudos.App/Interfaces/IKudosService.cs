@@ -13,6 +13,9 @@ public interface IKudosService
 
     IEnumerable<Domain.Models.Kudos> GetUserKudos(string pUserId);
 
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5);
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5);
+
     public bool Like(int kudosId, string personId);
     public bool UndoLike(int kudosId, string personId);
 

@@ -95,5 +95,38 @@ public class GatewayService : IKudosGateway
         return result;
 
     }
-    
+
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
+    {
+        IEnumerable<KudosResponse> kudos = null;
+
+        try
+        {
+            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosfromme/?userid={userId}&pageNumber={pageNumber}");
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return kudos;
+    }
+
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber)
+    {
+        IEnumerable<KudosResponse> kudos = null;
+
+        try
+        {
+            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosTome/?userid={userId}&pageNumber={pageNumber}");
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return kudos;
+    }
 }

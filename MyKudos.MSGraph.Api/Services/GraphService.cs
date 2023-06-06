@@ -42,7 +42,7 @@ public class GraphService : IGraphService
         
     }
 
-    public async Task<string> GetAppOnlyTokenAsync()
+    public string GetAppOnlyTokenAsync()
     {
         // Ensure credential isn't null
         _ = _clientSecretCredential ??
@@ -50,14 +50,14 @@ public class GraphService : IGraphService
 
         // Request token with given scopes
         var context = new TokenRequestContext(new[] { "https://graph.microsoft.com/.default" });
-        var response = await _clientSecretCredential.GetTokenAsync(context);
+        var response =  _clientSecretCredential.GetToken(context);
         return response.Token;
     }
 
-    public async Task<GraphUsers> GetUsers(string name, string emailDomain)
+    public  IEnumerable<GraphUser> GetUsers(string name, string emailDomain)
     {
 
-        GraphUsers r = new();
+        List<GraphUser> result = new();
 
         //var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
         var client = new RestClient($"https://graph.microsoft.com/v1.0/users/?$count=true&$filter=endsWith(userPrincipalName,'{emailDomain}')&$search=\"displayname:{name}\"&$select=id,displayname,userprincipalname");
@@ -67,13 +67,16 @@ public class GraphService : IGraphService
 
         request.Method = Method.Get;
         request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+        request.AddHeader("Authorization", $"Bearer { GetAppOnlyTokenAsync()}");
 
         RestResponse response = client.Execute(request);
 
         if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            r = JsonConvert.DeserializeObject<GraphUsers>(response.Content)!;
+            var users = JsonConvert.DeserializeObject<GraphUsers>(response.Content)!;
+
+            if ((users != null) && (users.value != null))
+                result.AddRange(users.value);
 
         }
         else
@@ -81,7 +84,7 @@ public class GraphService : IGraphService
             throw new Exception(response.Content);
         }
 
-        return r;
+        return result;
     }
 
     public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] usersId)
@@ -113,7 +116,7 @@ public class GraphService : IGraphService
 
         request.Method = Method.Post;
         request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+        request.AddHeader("Authorization", $"Bearer {GetAppOnlyTokenAsync()}");
 
 
         List<GraphBatchRequestDTO> batch = new();
@@ -212,7 +215,7 @@ public class GraphService : IGraphService
 
         request.Method = Method.Post;
         request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer {await GetAppOnlyTokenAsync()}");
+        request.AddHeader("Authorization", $"Bearer { GetAppOnlyTokenAsync()}");
 
 
         List<GraphBatchRequestDTO> batch = new();

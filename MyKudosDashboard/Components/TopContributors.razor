@@ -53,6 +53,19 @@
             _isLoaded = true;
             InvokeAsync(StateHasChanged);
         });
+
+        TopContributorsView.TopContributorsCallBack = UpdateTopContributorsCallBack;
+    }
+
+    private void UpdateTopContributorsCallBack()
+    {
+        TopContributorsView.GetTopContributors().ContinueWith(t =>
+        {
+            _topContributors = t.Result;
+            _isLoaded = true;
+            InvokeAsync(StateHasChanged);
+        });
+        
     }
 
 }

@@ -21,14 +21,14 @@ public class GraphServiceRest : IGraphService
 
     }
 
-    public async Task<GraphUsers> GetUsers(string name)
+    public async Task<List<GraphUser>> GetUsers(string name)
     {
-        GraphUsers result = new();
+        List<GraphUser> result = new();
 
         try
         {
-            result = await _restClientHelper.GetApiData<GraphUsers>($"{_graphServiceUrl}user/?name={name}");
-            
+            result = await _restClientHelper.GetApiData<List<GraphUser>>($"{_graphServiceUrl}user/?name={name}");
+
         }
         catch (Exception ex)
         {

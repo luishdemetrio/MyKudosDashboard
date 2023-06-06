@@ -187,7 +187,6 @@
 
     private readonly object _lock = new object();
 
-    //private ConcurrentDictionary<string, int> _likesToUpdate = new();
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
 
@@ -239,14 +238,8 @@
         StateHasChanged();
     }
 
-    //private async Task LoadMoreKudosAll()
-    //{
-    //    _pageNumber++;
 
-    //    await LoadKudos(_pageNumber);
-    //}
-
-    private async Task LoadKudos(int pageNumber = 1)
+    public async Task LoadKudos( int pageNumber = 1)
     {
 
         if (_kudosList is null)
@@ -254,25 +247,30 @@
             _kudosList = new();
         }
 
-        var kudos = await KudosListView.GetKudos(pageNumber).ConfigureAwait(true);
+        IEnumerable<KudosResponse> kudos = null; 
 
-        if (kudos is null)
-            return;
+        
 
         switch (TypeTab)
         {
+            case KudosTypeTab.All:
+                kudos = await KudosListView.GetKudos(pageNumber).ConfigureAwait(true);
+                break;
+
             case KudosTypeTab.FromMe:
 
-                kudos = kudos.Where(k => k.From.Id == User.ObjectId);
+                kudos = await KudosListView.GetKudosFromMe(User.ObjectId, pageNumber).ConfigureAwait(true);
                 break;
 
             case KudosTypeTab.ToMe:
 
-                kudos = kudos.Where(k => k.To.Id == User.ObjectId);
+                kudos = await KudosListView.GetKudosToMe(User.ObjectId, pageNumber).ConfigureAwait(true);
                 break;
 
         }
 
+        if (kudos is null)
+            return;
 
 
         foreach (var kudo in kudos)
@@ -451,15 +449,7 @@
                 _ = LoadKudos();
             }
 
-            // _likesToUpdate.TryAdd(pLike.KudosId, kudo.Likes.Count);
-
-            // enable like button
-            // UpdateDisabledLike(kudo.Id, false);
-
-            //  UpdateCount(numberOfLikes[kudo.Id], kudo.Likes.Count);
-
-
-
+         
         }
         else
         {
