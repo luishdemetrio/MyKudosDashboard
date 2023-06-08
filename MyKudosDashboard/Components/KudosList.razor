@@ -74,7 +74,7 @@
                             <div>
                                 <span style="margin-right:5px">@Localizer["SentOn"]:</span>
 
-                                <span style="margin-left:5px">@GetCurrentDateTime(item.SendOn)</span>
+                                <span style="margin-left:5px">item.SendOn</span>
                             </div>
 
                         </li>
@@ -220,12 +220,12 @@
         }
     }
 
-    private DateTime GetCurrentDateTime(DateTime datetime)
-    {
-        var selectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById(SelectedTimeZoneId);
-        var currentDateTime = TimeZoneInfo.ConvertTimeFromUtc(datetime, selectedTimeZone);
-        return currentDateTime;
-    }
+    //private DateTime GetCurrentDateTime(DateTime datetime)
+    //{
+    //    var selectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById(SelectedTimeZoneId);
+    //    var currentDateTime = TimeZoneInfo.ConvertTimeFromUtc(datetime, selectedTimeZone);
+    //    return currentDateTime;
+    //}
 
     [JSInvokable]
     public async Task OnScrollAsync()
