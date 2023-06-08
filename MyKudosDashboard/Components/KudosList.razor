@@ -2,6 +2,7 @@
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
+
 @inject IKudosListView KudosListView;
 
 @using Microsoft.Extensions.Localization
@@ -73,7 +74,7 @@
                             <div>
                                 <span style="margin-right:5px">@Localizer["SentOn"]:</span>
 
-                                <span style="margin-left:5px">@item.SendOn</span>
+                                <span style="margin-left:5px">@GetCurrentDateTime(item.SendOn)</span>
                             </div>
 
                         </li>
@@ -196,6 +197,7 @@
     private ElementReference contentContainer;
     private bool isLoading = false;
 
+    private string SelectedTimeZoneId { get; set; } = "Brazil is Brasília Standard Time (BRT)";
 
     protected override void OnInitialized()
     {
@@ -216,6 +218,13 @@
             await LoadMoreItems();
             await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
         }
+    }
+
+    private DateTime GetCurrentDateTime(DateTime datetime)
+    {
+        var selectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById(SelectedTimeZoneId);
+        var currentDateTime = TimeZoneInfo.ConvertTimeFromUtc(datetime, selectedTimeZone);
+        return currentDateTime;
     }
 
     [JSInvokable]
