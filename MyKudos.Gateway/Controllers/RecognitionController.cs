@@ -11,6 +11,7 @@ public class RecognitionController : ControllerBase
 {
 
     private readonly IRecognitionService _recognitionService;
+    
 
     public RecognitionController( IRecognitionService recognitionService)
     {

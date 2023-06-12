@@ -177,6 +177,9 @@
   <data name="Received" xml:space="preserve">
     <value>Recebeu</value>
   </data>
+  <data name="ReceivedAllRecognitionsOf" xml:space="preserve">
+    <value>Recebeu todos os reconhecimentos de</value>
+  </data>
   <data name="SelectColleague" xml:space="preserve">
     <value>Selecionar pessoa</value>
   </data>

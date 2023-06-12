@@ -93,29 +93,24 @@
                     <div style="clear:both;">
                         <p>@Localizer["Achievements"]</p>
 
+
                         
-
-                         @if (UserScoreValue.KudosSent >0)
+                            @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
-                            <img src=@GetKudosSentBadge() style="height:80px;width:80px;padding:5px" />
+                            <img id=@($"badge_{badge.UserBadgeId}") src=@($"images/badges/{badge.BadgeName}")
+                                 style="height:80px;width:80px;padding:5px" />
+
+                            <FluentTooltip  Anchor=@($"badge_{badge.UserBadgeId}") 
+                                            Position=TooltipPosition.Right>@badge.BadgeDescription</FluentTooltip>
                         }
 
-                        @if(UserScoreValue.KudosReceived >= 10)
-                        {
-                            <img src=@GetKudosReceivedBadge() style="height:80px;width:80px;padding:5px" />
-                        }
-
-                        @foreach (var badge in UserScoreValue.EarnedBagdes)
-                        {
-                            <img src=@($"images/badges/{badge}") style="height:80px;width:80px;padding:5px" />
-                        }
 
                        
 
-                        @if (UserScoreValue.EarnedBagdes.Count == 5) // I need to fix it later
+                     @*   @if (UserScoreValue.EarnedBagdes.Count == 5) // I need to fix it later
                         {
                             <img src="images/badges/all_group.png" style="height:80px;width:80px;padding:5px" />
-                        }
+                        }*@
 
 
 

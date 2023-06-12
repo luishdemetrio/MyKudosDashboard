@@ -19,12 +19,15 @@ public class KudosController : Controller
 
     private IEnumerable<GatewayDomain.Recognition> _recognitions;
 
+    private string _defaultProfilePicture;
+
     private IKudosMessageSender _kudosQueue;
 
     
     public KudosController(IGraphService graphService, IRecognitionService recognitionService, 
                            IKudosService kudosService, IKudosMessageSender kudosQueue,
-                           IAgentNotificationService agentNotificationService)
+                           IAgentNotificationService agentNotificationService,
+                           IConfiguration configuration)
     {
         
         _graphService = graphService;
@@ -35,6 +38,8 @@ public class KudosController : Controller
         _kudosQueue= kudosQueue;
 
         _ = PopulateRecognitionsAsync();
+
+        _defaultProfilePicture = configuration["DefaultProfilePicture"];
 
     }
 
@@ -87,7 +92,7 @@ public class KudosController : Controller
                                    {
                                        Id = like.PersonId,
                                        Name = u.DisplayName,
-                                       Photo = photo != null ? $"data:image/png;base64,{photo.photo}" : $"data:image/png;base64"
+                                       Photo = photo != null ? $"data:image/png;base64,{photo.photo}" : _defaultProfilePicture
                                    }
 
                                ));
@@ -111,8 +116,8 @@ public class KudosController : Controller
                      select new KudosResponse()
                      {
                          Id = kudo.KudosId,
-                         From = new GatewayDomain.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = photoFrom != null ? $"data:image/png;base64,{photoFrom.photo}" : $"data:image/png;base64" },
-                         To = new GatewayDomain.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = photoTo != null ? $"data:image/png;base64,{photoTo.photo}" : $"data:image/png;base64" },
+                         From = new GatewayDomain.Person() { Id = kudo.FromPersonId, Name = userFrom.DisplayName, Photo = photoFrom != null ? $"data:image/png;base64,{photoFrom.photo}" : _defaultProfilePicture },
+                         To = new GatewayDomain.Person() { Id = kudo.ToPersonId, Name = userTo.DisplayName, Photo = photoTo != null ? $"data:image/png;base64,{photoTo.photo}" : _defaultProfilePicture },
                          Title = rec.Title,
                          Message = kudo.Message,
                          SendOn = kudo.Date,

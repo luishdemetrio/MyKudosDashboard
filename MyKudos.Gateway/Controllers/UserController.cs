@@ -12,9 +12,13 @@ public class UserController : Controller
 
     private IGraphService _graphService;
 
-    public UserController(IGraphService graphService)
+    private string _defaultProfilePicture;
+
+    public UserController(IGraphService graphService, IConfiguration configuration)
     {
-        _graphService = graphService;   
+        _graphService = graphService;
+
+        _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
 
 
@@ -41,7 +45,7 @@ public class UserController : Controller
                 select new Person() {
                         Id= graphUser.Id,
                         Name= graphUser.DisplayName,
-                        Photo= string.IsNullOrEmpty(p?.photo)? string.Empty : "data:image/png;base64," + p.photo
+                        Photo= string.IsNullOrEmpty(p?.photo)? _defaultProfilePicture : "data:image/png;base64," + p.photo
                        });
 
     }
