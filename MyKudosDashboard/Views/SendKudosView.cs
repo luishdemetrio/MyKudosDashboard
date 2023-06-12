@@ -23,9 +23,32 @@ public class SendKudosView : ISendKudosView
         
     }
 
-    public async Task<IEnumerable<Recognition>> GetRecognitionsAsync()
+    public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
     {
-        return await _recognitionGateway.GetRecognitionsAsync();
+
+        var recognitions = _recognitionGateway.GetRecognitionsAsync();
+
+        var recognitionsGroup = _recognitionGateway.GetRecognitionGroups();
+
+        await Task.WhenAll(recognitions, recognitionsGroup);
+
+        var result = from g in recognitionsGroup.Result
+                                      join r in recognitions.Result
+                                        on g.RecognitionGroupId equals r.RecognitionGroupId
+                                      select new RecognitionViewModel
+                                      {
+                                          Description = r.Description,
+                                          DisplayOrder = r.DisplayOrder,
+                                          Emoji = r.Emoji,
+                                          GroupName = g.Description,
+                                          RecognitionId = r.RecognitionId,
+                                          Title = r.Title
+                                      };
+
+
+
+
+        return result;
     }
 
     public async Task<IEnumerable<UserViewModel>> GetUsersAsync(string name)

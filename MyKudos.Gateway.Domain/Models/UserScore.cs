@@ -36,5 +36,15 @@ public class UserPointScore
     public int MessagesReceived { get; set; }
     public int MessagesSent { get; set; }
 
-    public List<string> EarnedBagdes { get; set; } = new();
+    public List<UserBadge> EarnedBagdes { get; set; } = new();
+
+    
+}
+
+
+public class UserBadge
+{
+    public int UserBadgeId { get; set; }
+    public string BadgeName { get; set; }
+    public string BadgeDescription { get; set; }
 }

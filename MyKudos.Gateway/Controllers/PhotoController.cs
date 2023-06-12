@@ -9,17 +9,26 @@ public class PhotoController : Controller
 {
 
     private IGraphService _graphService;
+    private string _defaultProfilePicture;
 
-    public PhotoController(IGraphService graphService)
+    public PhotoController(IGraphService graphService, IConfiguration configuration)
     {
         _graphService = graphService;
+
+        _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
 
     [HttpGet(Name = "GetUserphoto/{userid}")]        
     public async Task<string> GetUserPhoto(string userid)
     {
         
-        return $"data:image/png;base64,{await _graphService.GetUserPhoto(userid)}";
+        string userProfile  = await _graphService.GetUserPhoto(userid);
+
+        if (string.IsNullOrEmpty(userProfile))
+        {
+            return _defaultProfilePicture;
+        }
+        return $"data:image/png;base64,{userProfile}";
 
     }
 }

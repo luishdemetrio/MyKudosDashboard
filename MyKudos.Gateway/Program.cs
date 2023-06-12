@@ -19,6 +19,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGraphService, GraphServiceRest>();
 builder.Services.AddScoped<IRecognitionService, RecognitionServiceRest>();
+builder.Services.AddScoped<IRecognitionGroupService, RecognitionGroupServiceRest>();
 builder.Services.AddScoped<IKudosService, KudosServiceRest>();
 
 builder.Services.AddScoped<IGamificationService, GamificationService>();

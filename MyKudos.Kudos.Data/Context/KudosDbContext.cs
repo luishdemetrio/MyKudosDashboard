@@ -28,7 +28,7 @@ public class KudosDbContext : DbContext
 
     public DbSet<CommentsLikes> CommentsLikes { get; set; }
 
-    public DbSet<UserScore> UserScores { get; set; }
+    public DbSet<BadgeRules> BadgeRules{ get; set; }
 
     public DbSet<Points> Points { get; set; }
 

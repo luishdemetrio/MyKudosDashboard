@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
@@ -16,10 +17,16 @@ public class UserPointsRepository : IUserPointsRepository
 
     private KudosDbContext _context;
 
+    private string _allGroupCompletedImage;
+    private string _allGroupCompletedDescription;
 
-    public UserPointsRepository(KudosDbContext scoreContext)
+    public UserPointsRepository(KudosDbContext scoreContext, IConfiguration configuration)
     {
         _context = scoreContext;
+
+
+        _allGroupCompletedImage = configuration["AllGroupCompletedImage"];
+        _allGroupCompletedDescription = configuration["AllGroupCompletedDescription"];
 
     }
 
@@ -69,24 +76,67 @@ public class UserPointsRepository : IUserPointsRepository
                            RecognitionGroupId = g.Key,
                            Total = g.Count()
                        };
+        int index= 1;
 
-        var bagdes = from k in _context.Kudos
-                    join r in _context.Recognitions on k.RecognitionId equals r.RecognitionId
-                    join rg in _context.RecognitionsGroup on r.RecognitionGroupId equals rg.RecognitionGroupId
-                    join t in subquery on r.RecognitionGroupId equals t.RecognitionGroupId
-                    where k.ToPersonId == pUserId
-                    group k by new { rg.RecognitionGroupId, rg.BadgeName, t.Total } into g
-                    where g.Count() >= g.Key.Total
-                    select g.Key.BadgeName ;
-                    //select new
-                    //{
-                    //    RecognitionGroupId = g.Key.RecognitionGroupId,
-                    //    Count = g.Count(),
-                    //    Total = g.Key.Total
-                    //};
+        var badges = (from k in _context.Kudos
+                     join r in _context.Recognitions on k.RecognitionId equals r.RecognitionId
+                     join rg in _context.RecognitionsGroup on r.RecognitionGroupId equals rg.RecognitionGroupId
+                     join t in subquery on r.RecognitionGroupId equals t.RecognitionGroupId
+                     where k.ToPersonId == pUserId
+                     group k by new { rg.RecognitionGroupId, rg.BadgeName, rg.Description, t.Total } into g
+                     where g.Count() >= g.Key.Total
+                     select g.Key).AsEnumerable()
+                      .Select(g => new UserBadge
+                      {
+                          BadgeName = g.BadgeName,
+                          BadgeDescription = g.Description,
+                          UserBadgeId = index++
+                      });
 
+        if ( subquery.Count() == badges.Count())
+        {
+            result.EarnedBagdes.Add(new UserBadge
+            {
+                BadgeName = _allGroupCompletedImage,
+                BadgeDescription = _allGroupCompletedDescription
+            });
+        }
 
-        result.EarnedBagdes.AddRange(bagdes.ToList());
+        var kudosSentBadges = (from row in _context.BadgeRules
+                               where (row.ActionType == "send_kudos") && (
+                                                (result.KudosSent >= row.Initial && result.KudosSent <= row.Final) ||
+                                                (result.KudosSent >= row.Initial && row.Final == null))
+                               select new UserBadge
+                               {
+                                   BadgeName = row.ImageName,
+                                   BadgeDescription = row.Description
+                               }).AsEnumerable()
+                             .Select (row => new UserBadge
+                              {
+                                  BadgeName = row.BadgeName,
+                                  BadgeDescription = row.BadgeDescription,
+                                  UserBadgeId = index++
+                              });
+
+        var kudosReceivedBadges =   (from row in _context.BadgeRules
+                                    where (row.ActionType == "received_kudos") && (
+                                                        (result.KudosReceived >= row.Initial && result.KudosReceived <= row.Final) ||
+                                                        (result.KudosReceived >= row.Initial && row.Final == null))
+                                    select new UserBadge
+                                    {
+                                        BadgeName = row.ImageName,
+                                        BadgeDescription = row.Description
+                                    }).AsEnumerable()
+                             .Select(row => new UserBadge
+                             {
+                                 BadgeName = row.BadgeName,
+                                 BadgeDescription = row.BadgeDescription,
+                                 UserBadgeId = index++
+                             });
+
+        result.EarnedBagdes.AddRange(badges.ToList());
+        result.EarnedBagdes.AddRange(kudosSentBadges.ToList());
+        result.EarnedBagdes.AddRange(kudosReceivedBadges.ToList());
 
         return result;
 
