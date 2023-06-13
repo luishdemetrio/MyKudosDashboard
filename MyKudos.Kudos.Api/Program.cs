@@ -29,11 +29,11 @@ builder.Services.AddScoped<IRecognitionGroupService, RecognitionGroupService>();
 
 builder.Services.AddScoped<IUserPointsService, UserPointsService>();
 
-builder.Services.AddScoped<IKudosRepository, KudosRepository>();
-builder.Services.AddScoped<IKudosLikeRepository, KudosLikeRepository>();
-builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
-builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
-builder.Services.AddScoped<IRecognitionGroupRepository, RecognitionGroupRepository>();
+builder.Services.AddTransient<IKudosRepository, KudosRepository>();
+builder.Services.AddTransient<IKudosLikeRepository, KudosLikeRepository>();
+builder.Services.AddTransient<ICommentsRepository, CommentsRepository>();
+builder.Services.AddTransient<IRecognitionRepository, RecognitionRepository>();
+builder.Services.AddTransient<IRecognitionGroupRepository, RecognitionGroupRepository>();
 builder.Services.AddTransient<IUserPointsRepository, UserPointsRepository>();
 
 
