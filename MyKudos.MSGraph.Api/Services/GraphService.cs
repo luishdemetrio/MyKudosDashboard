@@ -19,11 +19,18 @@ public class Settings
 public class GraphService : IGraphService
 {
 
+    
+
     // App-ony auth token credential
     private ClientSecretCredential _clientSecretCredential;
 
     // Client configured with app-only authentication
     private GraphServiceClient _appClient;
+
+    private Dictionary<string, GraphUserPhoto> _userPhotos;
+
+    private Dictionary<string, string> _profilePictures;
+
 
     public GraphService(IConfiguration configuration)
     {
@@ -39,7 +46,11 @@ public class GraphService : IGraphService
             // Use the default scope, which will request the scopes
             // configured on the app registration
             new[] { "https://graph.microsoft.com/.default" });
-        
+
+        _userPhotos = new();
+
+        _profilePictures = new();
+
     }
 
     public string GetAppOnlyTokenAsync()
@@ -105,12 +116,46 @@ public class GraphService : IGraphService
 
     }
 
+
+
+
     private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunck(string[] usersId)
     {
-
         List<GraphUserPhoto> photos = new();
+        List<string> missingUsers = new();
 
-        var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
+        foreach (string userId in usersId)
+        {
+            if (_userPhotos.TryGetValue(userId, out GraphUserPhoto graphUserPhoto))
+            {
+                photos.Add(graphUserPhoto);
+            }
+            else
+            {
+                missingUsers.Add(userId);
+            }
+        }
+
+        if (missingUsers.Count > 0)
+        {
+            var missingPhotos = await GetUserPhotosChunckGraph(missingUsers.ToArray());
+            photos.AddRange(missingPhotos);
+
+            foreach (var photo in missingPhotos)
+            {
+                _userPhotos.TryAdd(photo.id, photo);
+            }
+        }
+
+        return photos;
+    }
+
+    private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunckGraph(string[] usersId)
+        {
+
+            List<GraphUserPhoto> photos = new();
+
+            var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
 
         var request = new RestRequest();
 
@@ -169,15 +214,24 @@ public class GraphService : IGraphService
 
     public async Task<string> GetUserPhoto(string userid)
     {
-       
-        System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
-        .Request()
-        .GetAsync();
+        string profilePicture ;
 
-        using MemoryStream ms = new MemoryStream();
-        photo.CopyTo(ms);
+        if (!_profilePictures.TryGetValue(userid, out profilePicture))
+        {
 
-        return Convert.ToBase64String(ms.ToArray());
+            System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
+            .Request()
+            .GetAsync();
+
+            using MemoryStream ms = new MemoryStream();
+            photo.CopyTo(ms);
+
+            profilePicture =  Convert.ToBase64String(ms.ToArray());
+            
+            _profilePictures.Add(userid, profilePicture);
+        }
+
+        return profilePicture;
        
     }
 
