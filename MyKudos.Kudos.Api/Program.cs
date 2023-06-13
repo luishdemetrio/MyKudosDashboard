@@ -34,7 +34,7 @@ builder.Services.AddScoped<IKudosLikeRepository, KudosLikeRepository>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
 builder.Services.AddScoped<IRecognitionGroupRepository, RecognitionGroupRepository>();
-builder.Services.AddScoped<IUserPointsRepository, UserPointsRepository>();
+builder.Services.AddTransient<IUserPointsRepository, UserPointsRepository>();
 
 
 builder.Services.AddDbContext<KudosDbContext>(options =>
