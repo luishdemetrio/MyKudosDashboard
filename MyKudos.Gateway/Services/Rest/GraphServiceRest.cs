@@ -41,13 +41,13 @@ public class GraphServiceRest : IGraphService
     }
 
 
-    public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] usersId)
+    public async Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(Guid[] usersId)
     {
         List<GraphUserPhoto> result = new();
 
         try
         {
-            var photos = await _restClientHelper.GetApiData<string[],IEnumerable<GraphUserPhoto>>($"{_graphServiceUrl}photos", usersId);
+            var photos = await _restClientHelper.GetApiData<Guid[],IEnumerable<GraphUserPhoto>>($"{_graphServiceUrl}photos", usersId);
             result = photos.ToList();
 
         }
@@ -60,7 +60,7 @@ public class GraphServiceRest : IGraphService
         return result;
     }
 
-    public async Task<string> GetUserPhoto(string userid)
+    public async Task<string> GetUserPhoto(Guid userid)
     {
         string result = string.Empty;
 
@@ -79,14 +79,14 @@ public class GraphServiceRest : IGraphService
 
     }
 
-    public async Task<List<GraphUser>> GetUserInfo(string[] users)
+    public async Task<List<GraphUser>> GetUserInfo(Guid[] users)
     {
 
         var result = new List<GraphUser>();
 
         try
         {
-            result = await _restClientHelper.GetApiData<string[],List<GraphUser>>($"{_graphServiceUrl}userinfo",users);
+            result = await _restClientHelper.GetApiData<Guid[],List<GraphUser>>($"{_graphServiceUrl}userinfo",users);
 
         }
         catch (Exception ex)
@@ -100,13 +100,13 @@ public class GraphServiceRest : IGraphService
        
     }
 
-    public async Task<string> GetUserManagerAsync(string userid)
+    public async Task<Guid> GetUserManagerAsync(Guid userid)
     {
-        string result = string.Empty;
+        var result = Guid.Empty;
 
         try
         {
-            result = await _restClientHelper.GetApiData<string>($"{_graphServiceUrl}manager/?userid={userid}");
+            result = await _restClientHelper.GetApiData<Guid>($"{_graphServiceUrl}manager/?userid={userid}");
 
         }
         catch (Exception ex)

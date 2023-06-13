@@ -62,7 +62,7 @@ public class KudosController : Controller
         from.AddRange(kudos.Select(u => u.ToPersonId).Distinct());
 
         //get distinct people who liked
-        List<string> likesId = kudos
+        List<Guid> likesId = kudos
                     .SelectMany(kl => kl.Likes)
                     .Select(like => like.PersonId)
                     .Distinct()
@@ -150,7 +150,7 @@ public class KudosController : Controller
         int kudosId = await _kudosService.SendAsync(restKudos);
 
         //get the manager of the person that received kudos. That will be used later to send the adaptive card to the manager
-        string userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
+        Guid userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
 
         //send the kudos notification to the Teams Dashboard
         var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(

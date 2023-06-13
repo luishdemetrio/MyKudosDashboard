@@ -54,7 +54,7 @@ public class KudosToMeController : Controller
         from.AddRange(kudos.Select(u => u.ToPersonId).Distinct());
 
         //get distinct people who liked
-        List<string> likesId = kudos
+        List<Guid> likesId = kudos
                     .SelectMany(kl => kl.Likes)
                     .Select(like => like.PersonId)
                     .Distinct()

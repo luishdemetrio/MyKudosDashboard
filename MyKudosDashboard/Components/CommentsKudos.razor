@@ -276,7 +276,7 @@
 
     private bool LikeDisabled(KudosResponse item)
     {
-        return item.To.Id == User.ObjectId;
+        return item.To.Id.ToString() == User.ObjectId;
     }
 
 
@@ -298,7 +298,7 @@
 
         @if (User != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+            filled = item.Likes.Any(l => l.Id.ToString() == User.ObjectId);
         }
 
         return filled;
@@ -318,7 +318,7 @@
             _isLikeButtonDisabled = true;
 
 
-            if (kudos.Likes.Any(l => l.Id == User.ObjectId))
+            if (kudos.Likes.Any(l => l.Id.ToString() == User.ObjectId))
             {
                 var t = InvokeAsync(() =>
                    {
@@ -327,7 +327,7 @@
                            KudosId: kudos.Id,
                            FromPerson: new Person
                               {
-                                  Id = User.ObjectId,
+                                  Id = new Guid(User.ObjectId),
                                   Name = User.DisplayName,
                                   Photo = _userPhoto
                               },
@@ -350,7 +350,7 @@
                              KudosId: kudos.Id,
                              FromPerson: new Person
                              {
-                                 Id = User.ObjectId,
+                                 Id = new Guid(User.ObjectId),
                                  Name = User.DisplayName,
                                  Photo = _userPhoto
                              },
@@ -362,7 +362,7 @@
 
             }
 
-            UpdateLikesKudos(kudos.Id, User.ObjectId);
+            UpdateLikesKudos(kudos.Id, new Guid(User.ObjectId));
 
         }
         finally { 
@@ -382,13 +382,13 @@
     private void UpdateLikeCallback(LikeGateway like)
     {
         // The person who sent already has the like updated
-        if (like.FromPerson.Id == User.ObjectId)
+        if (like.FromPerson.Id.ToString() == User.ObjectId)
             return;
 
         UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
     }
 
-    private void UpdateLikesKudos(int pKudosId, string personId)
+    private void UpdateLikesKudos(int pKudosId, Guid personId)
     {        
 
         if (_item.Id == pKudosId)
@@ -443,7 +443,7 @@
                          new CommentsRequest()
                              {
                                  KudosId = _item.Id,
-                                 FromPersonId = User.ObjectId,
+                                 FromPersonId = new Guid(User.ObjectId),
                                  ToPersonId = _item.To.Id,
                                  Message = _replyMessage,
                                  Date = DateTime.Now
@@ -457,7 +457,7 @@
                 KudosId = _item.Id,
                 FromPerson = new Person()
                 {
-                    Id = User.ObjectId,
+                    Id = new Guid(User.ObjectId),
                     Photo = _userPhoto,
                     Name = User.DisplayName
                 },

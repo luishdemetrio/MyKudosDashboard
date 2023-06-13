@@ -32,13 +32,13 @@ public sealed class KudosService : IKudosService
         return _kudosRepository.GetKudosAsync(pageNumber, pageSize);
     }
 
-    public IEnumerable<Domain.Models.Kudos> GetUserKudos(string pUserId)
+    public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
     {
         return _kudosRepository.GetUserKudos(pUserId);
     }
 
 
-    public Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId)
+    public Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(Guid pUserId)
     {
         lock (_lock)
         {
@@ -76,22 +76,22 @@ public sealed class KudosService : IKudosService
         return (_kudosRepository.Add(kudos));
 
     }
-    public bool Like(int kudosId, string personId)
+    public bool Like(int kudosId, Guid personId)
     {
         return _kudosLikeRepository.Like(kudosId, personId);
     }
 
-    public bool UndoLike(int kudosId, string personId)
+    public bool UndoLike(int kudosId, Guid personId)
     {
         return _kudosLikeRepository.UndoLike(kudosId, personId);
     }
 
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5)
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
     {
         return _kudosRepository.GetKudosFromMeAsync(pUserId, pageNumber, pageSize);
     }
 
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5)
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
     {
         return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize);
     }

@@ -48,7 +48,7 @@ public class KudosRepository : IKudosRepository
 	}
 
 
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
     {
 
         if (pageSize > _maxPageSize)
@@ -66,7 +66,7 @@ public class KudosRepository : IKudosRepository
                     .ToListAsync();
     }
 
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
     {
 
         if (pageSize > _maxPageSize)
@@ -86,7 +86,7 @@ public class KudosRepository : IKudosRepository
 
 
     //this method is used to calculate the badge
-    public IEnumerable<Domain.Models.Kudos> GetUserKudos(string pUserId)
+    public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
     {
 
         return _kudosDbContext.Kudos.Where(k => k.ToPersonId == pUserId);

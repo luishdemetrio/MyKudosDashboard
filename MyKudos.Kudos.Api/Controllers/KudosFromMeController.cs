@@ -24,7 +24,7 @@ public class KudosFromMeController : ControllerBase
 
 
     [HttpGet(Name = "GetKudosFromMeController")]
-    public Task<IEnumerable<Domain.Models.Kudos>> Get(string userId, int pageNumber, int pageSize)
+    public Task<IEnumerable<Domain.Models.Kudos>> Get(Guid userId, int pageNumber, int pageSize)
     {
         if (pageNumber == 0)
             pageNumber = _defaultPageNumber;

@@ -4,8 +4,8 @@ public class CommentsRequest
 {
     public int Id { get; set; }
     public int KudosId { get; set; }
-    public string FromPersonId { get; set; }
-    public string ToPersonId { get; set; }
+    public Guid FromPersonId { get; set; }
+    public Guid ToPersonId { get; set; }
     public string Message { get; set; }
     public DateTime Date { get; set; }    
 }

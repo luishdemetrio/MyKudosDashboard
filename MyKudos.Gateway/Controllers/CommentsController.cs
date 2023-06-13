@@ -69,7 +69,7 @@ public class CommentsController : Controller
 
 
         //get distinct people who liked
-        List<string> likesId = comments
+        List<Guid> likesId = comments
                     .SelectMany(kl => kl.Likes)
                     .Select(like => like.FromPersonId)
                     .Distinct()

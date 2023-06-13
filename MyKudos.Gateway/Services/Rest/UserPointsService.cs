@@ -39,7 +39,7 @@ public class UserPointsService : IUserPointsService
 
     }
 
-    public async Task<UserPointScore> GetUserScoreAsync(string pUserId)
+    public async Task<UserPointScore> GetUserScoreAsync(Guid pUserId)
     {
         UserPointScore result = new();
 

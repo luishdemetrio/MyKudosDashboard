@@ -14,7 +14,7 @@ public class KudosLikeRepository : IKudosLikeRepository
         _context = kudosLikeDbContext;
     }
 
-    public bool Like(int kudosId, string personId)
+    public bool Like(int kudosId, Guid personId)
     {
 
         bool result = true;
@@ -34,7 +34,7 @@ public class KudosLikeRepository : IKudosLikeRepository
     }
 
 
-    public bool UndoLike(int kudosId, string personId)
+    public bool UndoLike(int kudosId, Guid personId)
     {
         bool result = true;
 

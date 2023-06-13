@@ -1,3 +1,3 @@
 ﻿namespace MyKudosDashboard.Models;
 
-public record UserViewModel(string Id, string Name, string Photo);
+public record UserViewModel(Guid Id, string Name, string Photo);

@@ -31,7 +31,7 @@ public class CommentsRepository : ICommentsRepository
                     .Include(l=> l.Likes);
     }
 
-    public bool Like(int commentsId, string personId)
+    public bool Like(int commentsId, Guid personId)
     {
 
         var commentsLikes = _context.CommentsLikes.Where(k => k.CommentsId == commentsId && k.FromPersonId == personId).FirstOrDefault();
@@ -52,7 +52,7 @@ public class CommentsRepository : ICommentsRepository
 
     }
 
-    public bool UndoLike(int commentsId, string personId)
+    public bool UndoLike(int commentsId, Guid personId)
     {
 
         var commentsLikes = _context.CommentsLikes.Where(k => k.CommentsId == commentsId && k.FromPersonId == personId).First();

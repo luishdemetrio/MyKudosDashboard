@@ -38,7 +38,7 @@ public class CommentsView : ICommentsView
         return _commentsGateway.SendCommentsAsync(comment); 
     }
 
-    public Task<bool> UpdateComments(CommentsResponse comment, string toPersonId)
+    public Task<bool> UpdateComments(CommentsResponse comment, Guid toPersonId)
     {
         return _commentsGateway.UpdateComments(new CommentsRequest()
         {
@@ -51,7 +51,7 @@ public class CommentsView : ICommentsView
         });
     }
 
-    public  Task<bool> DeleteComments(CommentsResponse comment, string toPersonId)
+    public  Task<bool> DeleteComments(CommentsResponse comment, Guid toPersonId)
     {
         return _commentsGateway.DeleteComments(new CommentsRequest()
         {

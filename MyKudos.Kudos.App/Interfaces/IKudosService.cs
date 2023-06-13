@@ -9,15 +9,15 @@ public interface IKudosService
 
     public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize);
 
-    Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(string pUserId);
+    Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(Guid pUserId);
 
-    IEnumerable<Domain.Models.Kudos> GetUserKudos(string pUserId);
+    IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId);
 
-    Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5);
-    Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(string pUserId, int pageNumber = 1, int pageSize = 5);
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5);
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5);
 
-    public bool Like(int kudosId, string personId);
-    public bool UndoLike(int kudosId, string personId);
+    public bool Like(int kudosId, Guid personId);
+    public bool UndoLike(int kudosId, Guid personId);
 
     
 }

@@ -154,7 +154,7 @@
 
                                                         <span style="float: left;padding-top:2px;padding-left:0px;font-size:medium;text-align:center;overflow-wrap: break-word;">@recognitions.ElementAt(i).Description</span>
 
-                                                        <span style="float: left;padding-top:5px;padding-left:0px;font-size:small;text-align:center;width:100%">@(i+1) / @(recognitions.Count())</span>
+                                                        <span style="float: left;padding-top:10px;padding-left:0px;font-size:small;text-align:center;width:100%">@(i+1) / @(recognitions.Count())</span>
 
                                                     </div>
                                                 </div>
@@ -353,7 +353,7 @@
             kudos = new(
                     From: new Person()
                         {
-                            Id = UserProfile.ObjectId,
+                            Id = new Guid(UserProfile.ObjectId),
                             Name = UserProfile.DisplayName,
                             Photo = UserPhoto
                         },

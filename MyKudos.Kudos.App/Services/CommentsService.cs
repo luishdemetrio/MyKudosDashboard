@@ -45,12 +45,12 @@ public class CommentsService : ICommentsService
         
     }
 
-    public bool LikeComment(int kudosId, string personId)
+    public bool LikeComment(int kudosId, Guid personId)
     {
         return _commentsRepository.Like(kudosId, personId);
     }
 
-    public bool UndoLikeComment(int kudosId, string personId)
+    public bool UndoLikeComment(int kudosId, Guid personId)
     {
         return _commentsRepository.UndoLike(kudosId, personId);
     }

@@ -6,15 +6,15 @@ namespace MyKudos.Gateway.Interfaces;
 public interface IGraphService
 {
     
-    Task<string> GetUserPhoto(string userid);
+    Task<string> GetUserPhoto(Guid userid);
     
-    Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(string[] users);
+    Task<IEnumerable<GraphUserPhoto>> GetUserPhotos(Guid[] users);
 
     Task<List<GraphUser>> GetUsers(string name);
 
-    Task<List<GraphUser>> GetUserInfo(string[] users);
+    Task<List<GraphUser>> GetUserInfo(Guid[] users);
 
-    Task<string> GetUserManagerAsync(string userid);
+    Task<Guid> GetUserManagerAsync(Guid userid);
 }
 
 public class GraphUsers

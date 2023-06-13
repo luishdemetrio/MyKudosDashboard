@@ -19,7 +19,7 @@ public class UserKudosController : Controller
     }
 
     [HttpGet(Name = "Get")]
-    public Task<IEnumerable<KudosGroupedByValue>> Get(string userId)
+    public Task<IEnumerable<KudosGroupedByValue>> Get(Guid userId)
     {
        
 

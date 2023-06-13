@@ -5,7 +5,7 @@ namespace MyKudos.Kudos.Domain.Interfaces;
 public interface IUserPointsRepository
 {
 
-    UserPointScore GetUserScore(string pUserId);
+    UserPointScore GetUserScore(Guid pUserId);
 
     List<UserPoint> GetTopUserScores(int top);
 }

@@ -191,19 +191,19 @@
 
         @if (ReplyUser != null)
         {
-            filled = item.Likes.Any(l => l.Id == ReplyUser.ObjectId);
+            filled = item.Likes.Any(l => l.Id.ToString() == ReplyUser.ObjectId);
         }
 
         return filled;
     }
     private bool LikeDisabled(CommentsResponse item)
     {
-        return item.FromPerson.Id == ReplyUser.ObjectId;
+        return item.FromPerson.Id.ToString() == ReplyUser.ObjectId;
     }
 
     private bool CanEditOrDeleteComment()
     {
-        return (Reply.FromPerson.Id == ReplyUser.ObjectId);
+        return (Reply.FromPerson.Id.ToString() == ReplyUser.ObjectId);
     }
 
     private bool FilledLikeComments(CommentsResponse item)
@@ -212,7 +212,7 @@
 
         @if (ReplyUser != null)
         {
-            filled = item.Likes.Any(l => l.Id == ReplyUser.ObjectId);
+            filled = item.Likes.Any(l => l.Id.ToString() == ReplyUser.ObjectId);
         }
 
         return filled;
@@ -228,7 +228,7 @@
         try
         {
 
-            if (item.Likes.Any(l => l.Id == ReplyUser.ObjectId))
+            if (item.Likes.Any(l => l.Id.ToString() == ReplyUser.ObjectId))
             {
                 var t = InvokeAsync(() =>
                   {
@@ -237,7 +237,7 @@
                                  KudosId: item.Id,
                                  FromPerson: new Person
                                   {
-                                      Id = ReplyUser.ObjectId,
+                                      Id = new Guid(ReplyUser.ObjectId),
                                       Name = ReplyUser.DisplayName,
                                       Photo = ReplyUserPhoto
                                   }));
@@ -255,7 +255,7 @@
                                 KudosId: item.Id,
                                 FromPerson: new Person
                                 {
-                                    Id = ReplyUser.ObjectId,
+                                    Id = new Guid(ReplyUser.ObjectId),
                                     Name = ReplyUser.DisplayName,
                                     Photo = ReplyUserPhoto
                                 }));
@@ -263,7 +263,7 @@
                 t.Wait();
             }
 
-            UpdateLikes(item.Id, ReplyUser.ObjectId);
+            UpdateLikes(item.Id, new Guid(ReplyUser.ObjectId));
 
         }
         finally
@@ -280,7 +280,7 @@
 
     }
 
-    private void UpdateLikes(int commentId, string personId)
+    private void UpdateLikes(int commentId, Guid personId)
     {
 
         if (Reply.Id == commentId)

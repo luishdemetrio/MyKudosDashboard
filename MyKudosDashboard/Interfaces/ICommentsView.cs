@@ -13,7 +13,7 @@ public interface ICommentsView
 
     Task<IEnumerable<CommentsResponse>> GetComments(int kudosId);
 
-    Task<bool> UpdateComments(CommentsResponse comment, string toPersonId);
+    Task<bool> UpdateComments(CommentsResponse comment, Guid toPersonId);
 
-    Task<bool> DeleteComments(CommentsResponse comment, string toPersonId);
+    Task<bool> DeleteComments(CommentsResponse comment, Guid toPersonId);
 }

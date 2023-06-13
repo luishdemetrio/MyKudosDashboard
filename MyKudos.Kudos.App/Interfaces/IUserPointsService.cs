@@ -12,5 +12,5 @@ public interface IUserPointsService
 
     List<UserPoint> GetTopUserScores(int top);
 
-    UserPointScore GetUserScore(string pUserId);
+    UserPointScore GetUserScore(Guid pUserId);
 }

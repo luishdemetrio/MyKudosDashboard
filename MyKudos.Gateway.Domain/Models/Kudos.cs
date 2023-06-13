@@ -29,7 +29,7 @@ public record KudosNotification
     Reward Reward,
     string Message,
     DateTime SendOn,
-    string ManagerId
+    Guid ManagerId
     
 );
 

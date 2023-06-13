@@ -19,7 +19,7 @@ public class PhotoController : Controller
     }
 
     [HttpGet(Name = "GetUserphoto/{userid}")]        
-    public async Task<string> GetUserPhoto(string userid)
+    public async Task<string> GetUserPhoto(Guid userid)
     {
         
         string userProfile  = await _graphService.GetUserPhoto(userid);

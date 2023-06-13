@@ -21,7 +21,7 @@ public class UserPointsService : IUserPointsService
         return _repository.GetTopUserScores(top);
     }
 
-    public UserPointScore GetUserScore(string pUserId)
+    public UserPointScore GetUserScore(Guid pUserId)
     {
         return _repository.GetUserScore(pUserId);   
     }

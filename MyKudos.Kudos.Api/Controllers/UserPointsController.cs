@@ -17,7 +17,7 @@ public class UserPointsController : Controller
     }
 
     [HttpGet(Name = "GetUserPoints")]
-    public UserPointScore Get(string userId)
+    public UserPointScore Get(Guid userId)
     {
 
         return _userPointsService.GetUserScore(userId);

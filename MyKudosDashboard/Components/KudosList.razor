@@ -619,7 +619,7 @@
 
         @if (User != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.ObjectId);
+            filled = item.Likes.Any(l => l.Id.ToString() == User.ObjectId);
         }
 
         return filled;
@@ -670,7 +670,7 @@
                 var requestLike = new LikeGateway(KudosId: item.Id,
                                             FromPerson: new Person
                                                 {
-                                                    Id = User.ObjectId,
+                                                    Id = new Guid(User.ObjectId),
                                                     Name = User.DisplayName,
                                                     Photo = UserPhoto
                                                 },
@@ -678,7 +678,7 @@
 
 
                 // I am sending all the information as it will update via Event Hub the others users
-                if (kudo.Likes.Any(l => l.Id == User.ObjectId))
+                if (kudo.Likes.Any(l => l.Id.ToString() == User.ObjectId))
                 {
                     KudosListView.SendUndoLikeAsync(requestLike);
 

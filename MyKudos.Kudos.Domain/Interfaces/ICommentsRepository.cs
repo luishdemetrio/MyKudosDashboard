@@ -9,9 +9,9 @@ public  interface ICommentsRepository
 
     int Add(Comments comments);
 
-    bool Like(int commentsId, string personId);
+    bool Like(int commentsId, Guid personId);
 
-    bool UndoLike(int commentsId, string personId);
+    bool UndoLike(int commentsId, Guid personId);
 
     IEnumerable<Comments> GetComments(int kudosId);
 

@@ -6,7 +6,6 @@ using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 using System.Data;
-using System.Linq;
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -41,7 +40,7 @@ public class UserPointsRepository : IUserPointsRepository
         return result;
     }
 
-    public UserPointScore GetUserScore(string pUserId)
+    public UserPointScore GetUserScore(Guid pUserId)
     {
 
         UserPointScore result = new();

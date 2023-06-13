@@ -36,9 +36,9 @@ public class ContributorsController : Controller
 
         var result = from score in scores
                      join photo in photos
-                        on score.UserId.ToString() equals photo.id
+                        on score.UserId equals photo.id
                      join user in users
-                        on score.UserId.ToString() equals user.Id
+                        on score.UserId equals user.Id
                      select new TopContributors()
                      {
                          Name = user.DisplayName,

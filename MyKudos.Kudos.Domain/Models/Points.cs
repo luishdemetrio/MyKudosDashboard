@@ -10,7 +10,7 @@ public class Points
 
 public class UserPointScore
 {
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
     
     public int Score { get; set; }
 
@@ -31,7 +31,7 @@ public class UserPointScore
 
 public class UserPoint
 {
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
     public int TotalPoints { get; set; }
 }
 

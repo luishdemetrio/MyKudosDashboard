@@ -7,7 +7,7 @@ public interface IUserPointsService
 
     public Task<List<UserPoint>> GetTopUserScoresAsync(int top);
 
-    public Task<UserPointScore> GetUserScoreAsync(string pUserId);
+    public Task<UserPointScore> GetUserScoreAsync(Guid pUserId);
     
 
 }
