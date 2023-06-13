@@ -242,28 +242,7 @@ public class GraphService : IGraphService
 
     public async Task<List<GraphUser>> GetUserInfo(string[] users)
     {
-        var result = new List<GraphUser>();
-
-
-        //we need to chunck the pending approvals to avoid getting an exception due the request is too long
-        var chunckedUsersIds = users.Chunk(20);
-
-        Parallel.ForEach(chunckedUsersIds, async p =>
-        {
-
-            var userInfoChunk = await GetUserInfoChunk(p);
-            lock (result)
-            {
-                result.AddRange(userInfoChunk);
-            }
-
-        });
-
-        return result;
-    }
-
-    private async Task<List<GraphUser>> GetUserInfoChunk(string[] users)
-    {
+   
         var result = new List<GraphUser>();
 
         List<string> missingUsers = new();
@@ -282,13 +261,24 @@ public class GraphService : IGraphService
 
         if (missingUsers.Count > 0)
         {
-            var missingUserInfo = await GetUserInfoChunkGraph(missingUsers.ToArray());
-            result.AddRange(missingUserInfo);
+            //we need to chunck the pending approvals to avoid getting an exception due the request is too long
+            var chunckedUsersIds = users.Chunk(20);
 
-            foreach (var info in missingUserInfo)
+            foreach (var userId in chunckedUsersIds)
             {
-                _userInfo.TryAdd(info.Id, info);
+
+                var missingUserInfo = await GetUserInfoChunkGraph(missingUsers.ToArray());
+
+                result.AddRange(missingUserInfo);
+
+                foreach (var info in missingUserInfo)
+                {
+                    _userInfo.TryAdd(info.Id, info);
+                }
+
             }
+
+            
         }
 
         return result;
