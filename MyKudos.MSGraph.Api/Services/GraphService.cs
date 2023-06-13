@@ -5,6 +5,7 @@ using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Models;
 using Newtonsoft.Json;
 using RestSharp;
+using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace MyKudos.MSGraph.Api.Services;
@@ -27,10 +28,11 @@ public class GraphService : IGraphService
     // Client configured with app-only authentication
     private GraphServiceClient _appClient;
 
-    private Dictionary<string, GraphUserPhoto> _userPhotos;
+    private ConcurrentDictionary<string, GraphUserPhoto> _userPhotos;
 
-    private Dictionary<string, string> _profilePictures;
+    private ConcurrentDictionary<string, string> _profilePictures;
 
+    private ConcurrentDictionary<string, GraphUser> _userInfo;
 
     public GraphService(IConfiguration configuration)
     {
@@ -50,6 +52,8 @@ public class GraphService : IGraphService
         _userPhotos = new();
 
         _profilePictures = new();
+
+        _userInfo = new();
 
     }
 
@@ -151,11 +155,11 @@ public class GraphService : IGraphService
     }
 
     private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunckGraph(string[] usersId)
-        {
+    {
 
-            List<GraphUserPhoto> photos = new();
+        List<GraphUserPhoto> photos = new();
 
-            var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
+        var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
 
         var request = new RestRequest();
 
@@ -182,7 +186,7 @@ public class GraphService : IGraphService
 
             foreach (var photo in photosDTO.responses.Where(p => p.status != "404"))
             {
-               
+
                 photos.Add(new GraphUserPhoto(photo.id, photo.body));
             }
 
@@ -228,7 +232,7 @@ public class GraphService : IGraphService
 
             profilePicture =  Convert.ToBase64String(ms.ToArray());
             
-            _profilePictures.Add(userid, profilePicture);
+            _profilePictures.TryAdd(userid, profilePicture);
         }
 
         return profilePicture;
@@ -260,7 +264,38 @@ public class GraphService : IGraphService
 
     private async Task<List<GraphUser>> GetUserInfoChunk(string[] users)
     {
+        var result = new List<GraphUser>();
 
+        List<string> missingUsers = new();
+
+        foreach (string userId in users)
+        {
+            if (_userInfo.TryGetValue(userId, out GraphUser graphUserInfo))
+            {
+                result.Add(graphUserInfo);
+            }
+            else
+            {
+                missingUsers.Add(userId);
+            }
+        }
+
+        if (missingUsers.Count > 0)
+        {
+            var missingUserInfo = await GetUserInfoChunkGraph(missingUsers.ToArray());
+            result.AddRange(missingUserInfo);
+
+            foreach (var info in missingUserInfo)
+            {
+                _userInfo.TryAdd(info.Id, info);
+            }
+        }
+
+        return result;
+    }
+
+    private async Task<List<GraphUser>> GetUserInfoChunkGraph(string[] users)
+    {
         var result = new List<GraphUser>();
 
         var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
