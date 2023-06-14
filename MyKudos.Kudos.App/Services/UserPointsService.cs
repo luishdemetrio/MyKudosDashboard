@@ -1,6 +1,6 @@
 ﻿using MyKudos.Kudos.App.Interfaces;
-using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
+using MyKudos.Kudos.Domain.Interfaces;
 
 namespace MyKudos.Kudos.App.Services;
 

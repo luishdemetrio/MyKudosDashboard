@@ -8,3 +8,5 @@ public class GraphUserPhotos
 {
     public GraphUserPhotoDTO[] responses { get; set; }
 }
+
+

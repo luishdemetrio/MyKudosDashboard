@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Communication.Helper.Services;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.App.Services;
 using MyKudos.Kudos.Data.Context;
@@ -28,6 +30,7 @@ builder.Services.AddTransient<IRecognitionService, RecognitionService>();
 builder.Services.AddTransient<IRecognitionGroupService, RecognitionGroupService>();
 
 builder.Services.AddTransient<IUserPointsService, UserPointsService>();
+builder.Services.AddTransient<IUserProfileService, UserProfileService>();
 
 builder.Services.AddTransient<IKudosRepository, KudosRepository>();
 builder.Services.AddTransient<IKudosLikeRepository, KudosLikeRepository>();
@@ -35,6 +38,19 @@ builder.Services.AddTransient<ICommentsRepository, CommentsRepository>();
 builder.Services.AddTransient<IRecognitionRepository, RecognitionRepository>();
 builder.Services.AddTransient<IRecognitionGroupRepository, RecognitionGroupRepository>();
 builder.Services.AddTransient<IUserPointsRepository, UserPointsRepository>();
+builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
+
+var config = builder.Configuration;
+
+builder.Services.AddScoped<IRestClientHelper>(t =>
+                new RestClientHelper(
+                   new RestServiceToken(
+                    clientId: config["ClientId"],
+                    clientSecret: config["ClientSecret"],
+                    tenantId: config["TenantId"],
+                    exposedAPI: config["ExposedApi"]
+                )
+                ));
 
 
 builder.Services.AddDbContext<KudosDbContext>(options =>

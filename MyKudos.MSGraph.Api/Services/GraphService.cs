@@ -326,8 +326,33 @@ public class GraphService : IGraphService
         return result;
     }
 
+    public async Task<List<GraphUser>> GetAllUsers(string domain)
+    {
 
-    
+        var result = new List<GraphUser>();
 
+        var users = await _appClient.Users
+          .Request()
+          .Header("ConsistencyLevel", "eventual")
+          .Select("id,displayName,userPrincipalName")
+          .GetAsync();
 
+        foreach (var user in users)
+        {
+            if (user.UserPrincipalName.EndsWith($"@{domain}"))
+            {
+                var u = new GraphUser
+                {
+                    Id = user.Id,
+                    DisplayName = user.DisplayName,
+                    UserPrincipalName = user.UserPrincipalName
+                };
+
+                result.Add(u);
+            }
+        }
+
+            return result;
+
+    }
 }

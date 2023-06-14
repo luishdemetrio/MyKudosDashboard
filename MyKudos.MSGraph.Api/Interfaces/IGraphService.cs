@@ -4,7 +4,6 @@ namespace MyKudos.MSGraph.Api.Interfaces;
 
 public interface IGraphService
 {
-    //Task<string> GetAppOnlyTokenAsync();
     
     Task<string> GetUserPhoto(string userid);
     
@@ -15,5 +14,9 @@ public interface IGraphService
     Task<List<GraphUser>> GetUserInfo(string[] users);
 
     Task<string> GetUserManager(string userid);
+
+
+    Task<List<GraphUser>>  GetAllUsers(string domain);
+
 }
 

@@ -34,5 +34,7 @@ public class KudosDbContext : DbContext
 
     public DbSet<RecognitionGroup> RecognitionsGroup { get; set; }
 
+    public DbSet<UserProfile> UserProfiles { get; set; }
+
 
 }
