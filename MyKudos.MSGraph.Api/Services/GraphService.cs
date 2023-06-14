@@ -106,26 +106,6 @@ public class GraphService : IGraphService
     {
 
         List<GraphUserPhoto> photos = new();
-
-        //we need to chunck the pending approvals to avoid getting an exception due the request is too long
-        var chunckedUsersIds = usersId.Chunk(20);
-
-        Parallel.ForEach(chunckedUsersIds, async p =>
-        {
-           
-            photos.AddRange(await GetUserPhotosChunck(p));
-        });
-
-        return photos;
-
-    }
-
-
-
-
-    private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunck(string[] usersId)
-    {
-        List<GraphUserPhoto> photos = new();
         List<string> missingUsers = new();
 
         foreach (string userId in usersId)
@@ -142,12 +122,21 @@ public class GraphService : IGraphService
 
         if (missingUsers.Count > 0)
         {
-            var missingPhotos = await GetUserPhotosChunckGraph(missingUsers.ToArray());
-            photos.AddRange(missingPhotos);
 
-            foreach (var photo in missingPhotos)
+            //we need to chunck the pending approvals to avoid getting an exception due the request is too long
+            var chunckedUsersIds = usersId.Chunk(20);
+
+            foreach (var userId in chunckedUsersIds)
             {
-                _userPhotos.TryAdd(photo.id, photo);
+
+                var missingPhotos = await GetUserPhotosChunckGraph(missingUsers.ToArray());
+                photos.AddRange(missingPhotos);
+
+                foreach (var photo in missingPhotos)
+                {
+                    _userPhotos.TryAdd(photo.id, photo);
+                }
+
             }
         }
 
