@@ -8,23 +8,23 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.21.5" />
+    <!--<PackageReference Include="Google.Protobuf" Version="3.21.5" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.49.0" />
     <PackageReference Include="Grpc.Tools" Version="2.49.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    </PackageReference>-->
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
   </ItemGroup>
 
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Protobuf Include="..\MyKudos.MSGraph.Api\Protos\graph.proto" GrpcServices="Client">
       <Link>Protos\graph.proto</Link>
     </Protobuf>
     
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>

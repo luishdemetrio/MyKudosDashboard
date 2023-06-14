@@ -31,6 +31,9 @@ public class KudosRepository : IKudosRepository
 		return kudos.KudosId;
 	}
 
+
+
+
 	public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
 	{
 
@@ -44,7 +47,10 @@ public class KudosRepository : IKudosRepository
 					.Take(pageSize)					
 					.Include(l=> l.Likes)
 					.Include(c=> c.Comments)
-					.ToListAsync();
+                    .Include(u => u.UserFrom)
+                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognition)
+                    .ToListAsync();
 	}
 
 
@@ -63,6 +69,9 @@ public class KudosRepository : IKudosRepository
                     .Take(pageSize)
                     .Include(l => l.Likes)
                     .Include(c => c.Comments)
+                     .Include(u => u.UserFrom)
+                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognition)
                     .ToListAsync();
     }
 
@@ -81,6 +90,9 @@ public class KudosRepository : IKudosRepository
                     .Take(pageSize)
                     .Include(l => l.Likes)
                     .Include(c => c.Comments)
+                     .Include(u => u.UserFrom)
+                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognition)
                     .ToListAsync();
     }
 

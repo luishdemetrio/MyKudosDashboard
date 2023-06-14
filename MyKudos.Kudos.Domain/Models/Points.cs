@@ -32,6 +32,8 @@ public class UserPointScore
 public class UserPoint
 {
     public Guid UserId { get; set; }
+    public string DisplayName { get; set; }
+    public string Photo { get; set; }
     public int TotalPoints { get; set; }
 }
 

@@ -10,16 +10,18 @@ namespace MyKudos.Gateway.Controllers;
 public class ContributorsController : Controller
 {
     private readonly IUserPointsService _topContributorsService  ;
-    private readonly IGraphService _graphService;
-
+   
     private readonly int _topContributors;
 
-    public ContributorsController(IUserPointsService topContributorsService, IGraphService graphService, IConfiguration configuration)
+    private string _defaultProfilePicture;
+
+    public ContributorsController(IUserPointsService topContributorsService, IConfiguration configuration)
     {
         _topContributorsService = topContributorsService;
-        _graphService = graphService;
-
+        
         _topContributors = int.Parse(configuration["TopContributors"]);
+
+        _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
 
     [HttpGet(Name = "GetTopContributors")]
@@ -28,21 +30,11 @@ public class ContributorsController : Controller
 
         var scores = await _topContributorsService.GetTopUserScoresAsync(_topContributors);
 
-        var userIds = scores.Select(s => s.UserId).Distinct().ToArray();
-
-        List<GraphUser> users = await _graphService.GetUserInfo(userIds).ConfigureAwait(true);
-
-        var photos = await _graphService.GetUserPhotos(userIds).ConfigureAwait(true);
-
         var result = from score in scores
-                     join photo in photos
-                        on score.UserId equals photo.id
-                     join user in users
-                        on score.UserId equals user.Id
                      select new TopContributors()
                      {
-                         Name = user.DisplayName,
-                         Photo = $"data:image/png;base64,{photo.photo}",
+                         Name = score.DisplayName,
+                         Photo = string.IsNullOrEmpty(score.Photo)? _defaultProfilePicture : $"data:image/png;base64,{score.Photo}",
                          Score = score.TotalPoints
                      };
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Models;
 
@@ -13,24 +14,28 @@ public class AllUsersController : Controller
 
     private readonly string[] _emailDomain;
 
-    public AllUsersController(IGraphService graphService, IConfiguration configuration)
+    private readonly IUserProfileRepository _userProfileRepository;
+
+    public AllUsersController(IGraphService graphService, IConfiguration configuration,
+                              IUserProfileRepository userProfileRepository)
     {
         _graphService = graphService;
 
         _emailDomain = configuration["EmailDomain"].ToString().Split(",");
+
+        _userProfileRepository = userProfileRepository;
     }
 
     [HttpGet(Name = "GetAllUsers")]
-    public async Task<IEnumerable<GraphUser>> GetAllUsers()
+    public async Task<bool> GetAllUsers()
     {
 
         List<GraphUser> result = new();
 
-        foreach (var domain in _emailDomain)
-        {
-            result.AddRange(await _graphService.GetAllUsers( domain));
-        }
+        
+        await _graphService.GetAllUsers(_userProfileRepository, _emailDomain);
+        
 
-        return result;
+        return true;
     }
 }

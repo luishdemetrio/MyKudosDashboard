@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyKudos.Kudos.Domain.Models;
 
@@ -21,6 +22,16 @@ public class Kudos
     public List<KudosLike> Likes { get; set; } = new();
 
     public List<Comments> Comments { get; set; } = new();
+
+    [ForeignKey("FromPersonId")]
+    public UserProfile UserFrom { get; set; }
+
+    [ForeignKey("ToPersonId")]
+    public UserProfile UserTo { get; set; }
+
+    [ForeignKey("RecognitionId")]
+    public Recognition Recognition { get; set; }
+
 }
 
 
@@ -47,6 +58,9 @@ public class KudosLike
     public int KudosLikeId { get; set; }
     public int KudosId { get; set; }
     public Guid PersonId { get; set; }
+
+    [ForeignKey("PersonId")]
+    public UserProfile Person { get; set; }
 }
 
 

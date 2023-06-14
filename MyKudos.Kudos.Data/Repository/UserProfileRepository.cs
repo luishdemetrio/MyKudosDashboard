@@ -21,6 +21,12 @@ public class UserProfileRepository : IUserProfileRepository
         return _context.SaveChanges() > 0;
     }
 
+    public bool AddRange(List<UserProfile> user)
+    {
+        _context.UserProfiles.AddRange(user);
+        return _context.SaveChanges() > 0;
+    }
+
     public List<UserProfile> GetAll()
     {
         return _context.UserProfiles.ToList();

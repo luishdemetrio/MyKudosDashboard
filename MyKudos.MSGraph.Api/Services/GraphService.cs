@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
+using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Models;
 using Newtonsoft.Json;
@@ -326,33 +327,90 @@ public class GraphService : IGraphService
         return result;
     }
 
-    public async Task<List<GraphUser>> GetAllUsers(string domain)
+    public async Task<bool> GetAllUsers(IUserProfileRepository userProfileRepository, string[] domains)
     {
 
-        var result = new List<GraphUser>();
+        var graphUsers = new Dictionary<Guid, MyKudos.Kudos.Domain.Models.UserProfile>();
 
-        var users = await _appClient.Users
+        var usersPage = await _appClient.Users
           .Request()
           .Header("ConsistencyLevel", "eventual")
           .Select("id,displayName,userPrincipalName")
           .GetAsync();
 
-        foreach (var user in users)
+        while (usersPage != null)
         {
-            if (user.UserPrincipalName.EndsWith($"@{domain}"))
-            {
-                var u = new GraphUser
-                {
-                    Id = user.Id,
-                    DisplayName = user.DisplayName,
-                    UserPrincipalName = user.UserPrincipalName
-                };
+            var userIds = new List<string>();
 
-                result.Add(u);
+            foreach (var user in usersPage)
+            {
+                // Check if the user belongs to any of the specified domains
+                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}")))
+                {
+                    var employee = new MyKudos.Kudos.Domain.Models.UserProfile
+                    {
+                        UserProfileId = new Guid(user.Id),
+                        DisplayName = user.DisplayName
+                    };
+
+                    if (!graphUsers.ContainsKey(employee.UserProfileId))
+                    {
+                        graphUsers.Add(employee.UserProfileId, employee);
+                        userIds.Add(user.Id);
+                    }
+                    
+                }
             }
+
+            // Get user photos in batches
+            var batchSize = 20;
+
+           
+
+            for (int i = 0; i < userIds.Count; i += batchSize)
+            {
+                var batch = new BatchRequestContent();
+                List<string> usersDictionary = new();
+
+                for (int j = i; j < i + batchSize && j < userIds.Count; j++)
+                {
+                    usersDictionary.Add(userIds[j]);
+                }
+
+                var photos = await GetUserPhotosChunckGraph(usersDictionary.ToArray());
+
+
+                foreach (var photo in photos)
+                {
+                    
+
+                        if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
+                        {
+
+                        user.Photo = photo.photo;
+
+                        }
+                }
+            }
+
+            if (usersPage.NextPageRequest != null)
+            {
+                usersPage = await usersPage.NextPageRequest.GetAsync();
+            }
+            else
+            {
+                usersPage = null;
+            }
+
+
         }
 
-            return result;
+
+        userProfileRepository.AddRange(graphUsers.Values.ToList());
+
+
+        return true;
+            
 
     }
 }

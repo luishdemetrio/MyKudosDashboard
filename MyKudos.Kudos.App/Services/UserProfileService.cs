@@ -38,11 +38,14 @@ public class UserProfileService : IUserProfileService
 
     public bool PopulateUserProfile()
     {
+        var graphUsers = GetUsersViaGraph();
+
         return true;
     }
 
 
-    private async Task<List<UserProfile>> GetUsersViaGraph() {
+    private async Task<List<UserProfile>> GetUsersViaGraph() 
+    {
 
         List<UserProfile> result = new();
 

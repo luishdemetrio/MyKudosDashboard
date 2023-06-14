@@ -6,7 +6,7 @@ public interface IUserProfileRepository
 {
   
     bool Add(UserProfile user);
-  
+    bool AddRange(List<UserProfile> user);
 
     List<UserProfile> GetAll();
    

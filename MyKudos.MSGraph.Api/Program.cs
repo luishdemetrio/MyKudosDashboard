@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using MyKudos.Kudos.Data.Context;
+using MyKudos.Kudos.Data.Repository;
+using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Services;
 
@@ -12,8 +16,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IGraphService, GraphService>();
 
-//builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
+builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
 
+builder.Services.AddDbContext<KudosDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING"));
+
+});
 
 var app = builder.Build();
 

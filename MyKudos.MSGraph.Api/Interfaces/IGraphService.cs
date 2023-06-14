@@ -1,4 +1,5 @@
-﻿using MyKudos.MSGraph.Api.Models;
+﻿using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.MSGraph.Api.Models;
 
 namespace MyKudos.MSGraph.Api.Interfaces;
 
@@ -16,7 +17,7 @@ public interface IGraphService
     Task<string> GetUserManager(string userid);
 
 
-    Task<List<GraphUser>>  GetAllUsers(string domain);
+    Task<bool> GetAllUsers(IUserProfileRepository userProfileRepository, string[] domains);
 
 }
 
