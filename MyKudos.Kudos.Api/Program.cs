@@ -24,21 +24,21 @@ builder.Services.AddSwaggerGen(c =>
 
 //builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
-builder.Services.AddTransient<IKudosService, KudosService>();
-builder.Services.AddTransient<ICommentsService, CommentsService>();
-builder.Services.AddTransient<IRecognitionService, RecognitionService>();
-builder.Services.AddTransient<IRecognitionGroupService, RecognitionGroupService>();
+builder.Services.AddScoped<IKudosService, KudosService>();
+builder.Services.AddScoped<ICommentsService, CommentsService>();
+builder.Services.AddScoped<IRecognitionService, RecognitionService>();
+builder.Services.AddScoped<IRecognitionGroupService, RecognitionGroupService>();
 
-builder.Services.AddTransient<IUserPointsService, UserPointsService>();
-builder.Services.AddTransient<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IUserPointsService, UserPointsService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
-builder.Services.AddTransient<IKudosRepository, KudosRepository>();
-builder.Services.AddTransient<IKudosLikeRepository, KudosLikeRepository>();
-builder.Services.AddTransient<ICommentsRepository, CommentsRepository>();
-builder.Services.AddTransient<IRecognitionRepository, RecognitionRepository>();
-builder.Services.AddTransient<IRecognitionGroupRepository, RecognitionGroupRepository>();
-builder.Services.AddTransient<IUserPointsRepository, UserPointsRepository>();
-builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IKudosRepository, KudosRepository>();
+builder.Services.AddScoped<IKudosLikeRepository, KudosLikeRepository>();
+builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
+builder.Services.AddScoped<IRecognitionRepository, RecognitionRepository>();
+builder.Services.AddScoped<IRecognitionGroupRepository, RecognitionGroupRepository>();
+builder.Services.AddScoped<IUserPointsRepository, UserPointsRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
 var config = builder.Configuration;
 
