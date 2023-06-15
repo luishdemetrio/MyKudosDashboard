@@ -1,7 +1,7 @@
-﻿using MyKudos.Kudos.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -34,6 +34,8 @@ public class UserProfileRepository : IUserProfileRepository
 
     public List<UserProfile> GetUsers(string name)
     {
-        return _context.UserProfiles.Where(u => u.DisplayName.Contains(name)).ToList();
+        return _context.UserProfiles
+            .Where(u => EF.Functions.Like(u.DisplayName, $"%{name}%"))
+            .ToList();
     }
 }
