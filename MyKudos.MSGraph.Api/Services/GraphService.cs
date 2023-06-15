@@ -350,7 +350,7 @@ public class GraphService : IGraphService
                     var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
                         UserProfileId = new Guid(user.Id),
-                        DisplayName = user.DisplayName
+                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60): user.DisplayName  
                     };
 
                     if (!graphUsers.ContainsKey(employee.UserProfileId))
