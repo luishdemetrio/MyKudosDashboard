@@ -98,11 +98,14 @@ app.UseRouting();
 
 var selectedCulture = config["SelectedCulture"];
 
-var supportedCultures = new[] { "pt-BR" };
+var supportedCultures = new[] { new CultureInfo("pt-BR") };
 
-var localizationOptions = new RequestLocalizationOptions()
-    .AddSupportedCultures(supportedCultures)
-    .AddSupportedUICultures(supportedCultures);
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(selectedCulture),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
 
 app.UseRequestLocalization(localizationOptions);
 

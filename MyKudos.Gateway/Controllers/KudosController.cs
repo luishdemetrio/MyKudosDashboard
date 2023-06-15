@@ -97,7 +97,8 @@ public class KudosController : Controller
             ToPersonId = kudos.To.Id,
             RecognitionId = kudos.Reward.Id,
             Message = kudos.Message,
-            Date = kudos.SendOn
+            Date = kudos.SendOn,
+            
         };
 
         //Save the Kudos in the database

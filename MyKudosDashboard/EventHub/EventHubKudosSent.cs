@@ -6,8 +6,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubKudosSent : IEventHubReceived<KudosResponse>
 {
-    private ConcurrentQueue<IObserverEventHub<KudosResponse>> _observers
-                        = new ConcurrentQueue<IObserverEventHub<KudosResponse>>();
+    private ConcurrentBag<IObserverEventHub<KudosResponse>> _observers
+                        = new ConcurrentBag<IObserverEventHub<KudosResponse>>();
 
     private EventHubConsumerHelper<KudosResponse> _eventHubKudos;
 
@@ -56,19 +56,28 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
     }
     public void Attach(IObserverEventHub<KudosResponse> observer)
     {
-        _observers.Enqueue(observer);
+
+       // Detach(observer);
+        _observers.Add(observer);
     }
 
     public void Detach(IObserverEventHub<KudosResponse> observer)
     {
-        IObserverEventHub<KudosResponse> removedObserver;
 
-        while (!_observers.IsEmpty)
-        {
-            _observers.TryDequeue(out removedObserver);
-            if (removedObserver != observer)
-                _observers.Enqueue(removedObserver);
-        }
+        _observers.TryTake(out observer);
+        //IObserverEventHub<KudosResponse> removedObserver;
+
+        //var tempQueue = new ConcurrentQueue<IObserverEventHub<KudosResponse>>();
+
+        //while (_observers.TryDequeue(out removedObserver))
+        //{
+        //    if (removedObserver != observer)
+        //    {
+        //        tempQueue.Enqueue(removedObserver);
+        //    }
+        //}
+
+        //_observers = tempQueue;
     }
 
    

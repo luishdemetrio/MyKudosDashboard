@@ -30,6 +30,26 @@
     padding: 10px;
 }
 
+    h1 {
+        font-size: 5.9vw;
+    }
+
+    h2 {
+        font-size: 3.0vh;
+    }
+
+    h4 {
+        font-size: 3.0vh;
+    }
+
+    h5 {
+        font-size: 3.0vh;
+    }
+
+    p {
+        font-size: 2vmin;
+    }
+
 </style>
 <div 
      style="z-index: auto ;min-height:500px;height:80vh;overflow-y:scroll;width:100%;overflow:auto"
@@ -45,7 +65,7 @@
             <div class="profile" data-is-focusable="true">
 
                 <div class="avatar">
-                    <img src=@item.To.Photo style="height:64px;width:64px;float:left;border-radius: 50%" />
+                    <img src=@item.To.Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
                 </div>
 
                 <div class="info">
@@ -56,35 +76,35 @@
                         </li>
 
                         <li>
-                            <div class="text-wrap" style="width: 100%;">
-                                <spam class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </spam>
+                            <div class="text-wrap small55" style="width: 100%;">
+                                <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </small>
                             </div>
                         </li>
                         <li>
-                            <div>
-                                <span style="margin-right:5px">@Localizer["SentBy"]:</span>
+                            <div class="small55">
+                                <small style="margin-right:5px;">@Localizer["SentBy"]:</small>
                                 <img src=@item.From.Photo
                                      style="height: 26px;width: 26px;border-radius: 50%" />
-                                <span style="margin-left:5px;font-weight: bold">@item.From.Name</span>
+                                <small style="margin-left:5px;font-weight: bold">@item.From.Name</small>
 
                             </div>
 
                         </li>
                         <li>
-                            <div>
-                                <span style="margin-right:5px">@Localizer["SentOn"]:</span>
+                            <div class="small55" >
+                                <small style="margin-right:5px">@Localizer["SentOn"]:</small>
 
-                                <span style="margin-left:5px">@item.SendOn</span>
+                                <small style="margin-left:5px">@item.SendOn</small>
                             </div>
 
                         </li>
                     </ul>
                 </div>
 
-                <div class="card-body" style="width:100%;padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);}">
+                <div class="card-body small55" style="width:100%;padding: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);">
 
                     <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;">
-                        @item.Message
+                        <small>@item.Message</small>
 
                     </div>
 

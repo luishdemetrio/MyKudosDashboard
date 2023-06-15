@@ -12,7 +12,7 @@
 
 <FluentDialog @ref=_replyKudosFluentDialog
                 aria-label="Simple dialog" Modal="true"
-                class="both-gradient"  style="--dialog-height: 640px;--dialog-width: 640px;"
+               class="both-gradient" style="--dialog-min-height: 640px;--dialog-min-width: 580px;"
                 Hidden=@ModalHidden
                 >
 
@@ -28,17 +28,17 @@
         {
             <table class="table" style="width:98%;margin:5px">
             <tbody>
-                <tr>
+                    <tr style="height:80px">
                         <td scope="row" style="padding-top: 0px;padding-bottom: 0px;width:98%;">
 
 
                             <div class="profile" data-is-focusable="true" style="width:90%">
 
-                            <div class="avatar">
-                                <img src=@_item.To.Photo style="height:80px;width:80px;float:left;border-radius: 50%" />
-                            </div>
+                                <div class="avatar">
+                                        <img src=@_item.To.Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
+                                </div>
 
-                            <div class="info" style="width:70%">
+                                <div class="info" style="width:70%">
 
                                     <ul class="list-unstyled " style="padding-top: 0px;padding-bottom: 0px;width:98%;float:left">
                                     <li>
@@ -46,26 +46,26 @@
                                     </li>
 
                                     <li>
-                                        <div class="text-wrap" style="width: 100%;">
-                                                <spam class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@_item.Title.ToUpper()</spam></spam>
+                                            <div class="text-wrap small55" style="width: 100%;">
+                                                <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <small style="font-weight: bold">@_item.Title.ToUpper()</small></small>
                                         </div>
                                     </li>
                                     <li>
-                                        <div>
-                                           <span style="margin-right:5px">@Localizer["SentBy"]:</span>
+                                        <div class="small55">
+                                            <small style="margin-right:5px">@Localizer["SentBy"]:</small>
                                             <img src=@_item.From.Photo
                                                  style="height: 26px;width: 26px;border-radius: 50%" />
-                                                <span style="margin-left:5px;font-weight: bold">@_item.From.Name</span>
+                                            <small style="margin-left:5px;font-weight: bold">@_item.From.Name</small>
                                          
                                         </div>
                                  
 
                                     </li>
                                         <li>
-                                            <div>
-                                                <span style="margin-right:5px">@Localizer["SentOn"]:</span>
+                                            <div class="small55">
+                                                <small style="margin-right:5px">@Localizer["SentOn"]:</small>
 
-                                                <span style="margin-left:5px">@_item.SendOn</span>
+                                                <small style="margin-left:5px">@_item.SendOn</small>
                                             </div>
 
                                         </li>
@@ -73,8 +73,8 @@
                                 </ul>
                             </div>
                         </div>
-                            <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
-                                @_item.Message
+                            <div class="text-wrap small55" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
+                                <small>@_item.Message</small>
                             </div>
 
                             <div style="float:right">
@@ -130,25 +130,15 @@
                                     <img src=@_userPhoto style="height:40px;width:40px;float:left;border-radius: 50%" />
                                 </div>
 
-                                <div class="form-group" style="width:520px;">
-                                    <label for="formGroupExampleInput2">@User.DisplayName</label>
+                                <div class="form-group small55" style="width:520px;">
+                                    <small for="formGroupExampleInput2">@User.DisplayName</small>
                                     <input type="text" class="form-control" id="formGroupExampleInput2" style="margin-left:1px;margin-top:5px;width:100%" placeholder="Another input" onchange=@PostValueChanged value=@_replyMessage>
                                 </div>
-
-                               @*  <div style="width:520px;">
-                                    <FluentTextArea style="margin-left:1px;margin-top:5px;width:100%" Resize="TextAreaResize.Vertical"  onchange=@PostValueChanged 
-                                                    Value=@_replyMessage/>
-                                </div>*@
-
-                              @*  <div style="width:520px;">
-                               
-
-                                    <textarea class="form-control" style="margin-left:1px;margin-top:5px;width:100%" @onchange=@PostValueChanged >@_replyMessage</textarea>
-                                </div>*@
+                              
                             </div>
 
-                       
-                            <FluentButton style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick()) disabled=@btnSendKudosDisabled>
+                            
+                            <FluentButton class="small55" style="margin-left:60px;padding-top: 0px;height: 28px;" @onclick=@(()=>PostMessageClick()) disabled=@btnSendKudosDisabled>
                                 <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=true />
                                 @Localizer["Post"]
                                 </FluentButton>

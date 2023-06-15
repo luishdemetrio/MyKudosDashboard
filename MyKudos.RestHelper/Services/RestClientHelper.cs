@@ -86,9 +86,9 @@ public class RestClientHelper : IRestClientHelper
 
         using var response = await httpClient.SendAsync(request);
 
-        response.EnsureSuccessStatusCode();
-
         var responseContent = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
 
         return JsonConvert.DeserializeObject<TResponse>(responseContent);
 

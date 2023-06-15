@@ -24,13 +24,13 @@ public class Kudos
     public List<Comments> Comments { get; set; } = new();
 
     [ForeignKey("FromPersonId")]
-    public UserProfile UserFrom { get; set; }
+    public UserProfile? UserFrom { get; set; } 
 
     [ForeignKey("ToPersonId")]
-    public UserProfile UserTo { get; set; }
+    public UserProfile? UserTo { get; set; } 
 
     [ForeignKey("RecognitionId")]
-    public Recognition Recognition { get; set; }
+    public Recognition? Recognition { get; set; } 
 
 }
 

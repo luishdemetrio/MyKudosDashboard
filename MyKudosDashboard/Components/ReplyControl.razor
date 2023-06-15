@@ -64,8 +64,8 @@
         <div style="width:460px;display: flex;margin-bottom: 0px;">
 
        
-            <div class="form-group" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;">
-                <label for="formGroupExampleInput2">@Reply.FromPerson.Name</label>
+            <div class="form-group small55" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;">
+                <small for="formGroupExampleInput2">@Reply.FromPerson.Name</small>
                 <textarea id=@($"textareareply_{@Reply.Id}") type ="text" class="form-control"
                           Readonly=@_isReplyCommendReadOnly
                           style="margin-left:1px;margin-top:0px;width:420px;border:none;background-color:#e9ecef; overflow-y:auto"

@@ -11,80 +11,83 @@
 
 @inject IJSRuntime JSRuntime
 
+
+
 <div class="card-body" style="padding:2px">
 
     <div class="profile" style="width:100%">
 
         <div class="avatar" style="float:none;width:100%;text-align: center">
 
-            <img src=@UserPhoto style="height:64px;width:64px;border-radius: 50%;" />
+            <img src=@UserPhoto style="height:10vh;width:10vh;border-radius: 50%;" />
 
             
         </div>
 
-        <div class="info" style="width:100%">
-            <h5 style="text-align: center;">@User.DisplayName</h5>
+        <div class="info " style="width:100%;margin-bottom: 0px;">
+            <h4 style="text-align: center;padding:0px;margin-bottom: 0px">@User.DisplayName</h4>
 
             @if (_isLoaded)
             {
-                <div style="float:none;width:100%;text-align: center">
-                    <h3 class="card-title pricing-card-title">
-                        <small @ref=_score style="margin-top:10px">@UserScoreValue.Score</small>
-                        <small class="text-muted fw-light" style="margin-top:10px"> @Localizer["Points"]</small>
-                    </h3>
-                </div>
+                <div style="width:100%;text-align: center;padding:0px">
+                    <h4 class="card-title pricing-card-title" style="margin-bottom: 0px;">
+                        <small @ref=_score style="font-size: 3vmin">@UserScoreValue.Score</small>
+                        <small class="text-muted fw-light" style="font-size: 3vmin"> @Localizer["Points"]</small>
+                    </h4>
 
+                </div>
+             
            
                 <div style="margin-left:10px">
 
-                    <h5 class="card-title pricing-card-title">
-
+                    <div class="card-title pricing-card-title small60" style="margin-bottom: 0px; margin-bottom: 1vh;">
+                        
                         @*<FluentEmoji Name="@FluentEmojis.UpRightArrow" Size="@EmojiSize.Size32"  />*@
-                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Filled=false  />
+                        <FluentIcon Name="@FluentIcons.ArrowCircleRight" Filled=false style="width: 4vh; height: 4vh" />
 
-                        <small @ref=_kudosSent class="text-muted fw-light"> @UserScoreValue.KudosSent</small>
-                        <small class="text-muted fw-light"> @Localizer["KudosSent"]</small>
-                    </h5>
+                        <small @ref=_kudosSent class="text-muted fw-light"  > @UserScoreValue.KudosSent</small>
+                        <small class="text-muted fw-light" > @Localizer["KudosSent"]</small>
+                    </div>
 
-                    <h5 class="card-title pricing-card-title">
+                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
 
-                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Filled=false  />
+                        <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Filled=false style="width: 4vh; height: 4vh" />
 
                         <small @ref=_kudosReceived class ="text-muted fw-light"> @UserScoreValue.KudosReceived</small>
                         <small class="text-muted fw-light"> @Localizer["KudosReceived"]</small>
-                    </h5>
+                    </div>
 
-                    <h5 class="card-title pricing-card-title">
+                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
 
-                        <FluentIcon Name="@FluentIcons.ThumbLike" Filled=false  />
+                        <FluentIcon Name="@FluentIcons.ThumbLike" Filled=false style="width: 4vh; height: 4vh" />
 
                         <small @ref=_likesSent class="text-muted fw-light"> @UserScoreValue.LikesSent</small>
                         <small class="text-muted fw-light"> @Localizer["LikesSent"]</small>
-                    </h5>
+                    </div>
 
-                    <h5 class="card-title pricing-card-title">
+                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
 
-                        <FluentIcon Name="@FluentIcons.Heart" Filled=false  />
+                        <FluentIcon Name="@FluentIcons.Heart" Filled=false style="width: 4vh; height: 4vh" />
 
                         <small @ref=_likesReceived class ="text-muted fw-light"> @UserScoreValue.LikesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["LikesReceived"]</small>
-                    </h5>
+                    </div>
 
-                     <h5 class="card-title pricing-card-title">
+                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false />
+                        <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false style="width: 4vh; height: 4vh" />
 
                         <small @ref=_commentsSent class="text-muted fw-light"> @UserScoreValue.MessagesSent</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsSent"]</small>
-                    </h5>
+                    </div>
 
-                    <h5 class="card-title pricing-card-title">
+                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
 
-                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false />
+                        <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false style="width: 4vh; height: 4vh" />
 
                         <small @ref=_commentsReceived class="text-muted fw-light"> @UserScoreValue.MessagesReceived</small>
                         <small class="text-muted fw-light"> @Localizer["CommentsReceived"]</small>
-                    </h5>
+                    </div>
 
                 </div>
 
@@ -98,7 +101,7 @@
                             @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
                             <img id=@($"badge_{badge.UserBadgeId}") src=@($"images/badges/{badge.BadgeName}")
-                                 style="height:80px;width:80px;padding:5px" />
+                                 style="height:12vh;width:12vh;padding:5px" />
 
                             <FluentTooltip  Anchor=@($"badge_{badge.UserBadgeId}") 
                                             Position=TooltipPosition.Right>@badge.BadgeDescription</FluentTooltip>

@@ -165,6 +165,9 @@
   <data name="Message" xml:space="preserve">
     <value>Message</value>
   </data>
+  <data name="PleaseInformAllFields" xml:space="preserve">
+    <value>Please inform all fields!</value>
+  </data>
   <data name="Points" xml:space="preserve">
     <value>points</value>
   </data>
@@ -203,5 +206,8 @@
   </data>
   <data name="TopContributors" xml:space="preserve">
     <value>Top Contributors</value>
+  </data>
+  <data name="YouCantSendAKudosToYourself" xml:space="preserve">
+    <value>You can't send a kudos to yourself!</value>
   </data>
 </root>
