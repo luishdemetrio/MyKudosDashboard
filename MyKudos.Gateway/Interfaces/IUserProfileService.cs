@@ -6,4 +6,6 @@ public interface IUserProfileService
 {
 
     Task<List<UserProfile>> GetUsers(string name);
+    
+    Task<string> GetUserPhoto(Guid userid);
 }

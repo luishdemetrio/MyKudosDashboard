@@ -32,6 +32,11 @@ public class UserProfileRepository : IUserProfileRepository
         return _context.UserProfiles.ToList();
     }
 
+    public string? GetUserPhoto(Guid userid)
+    {
+        return _context.UserProfiles.Where(u => u.UserProfileId == userid).Select(s=> s.Photo).First();
+    }
+
     public List<UserProfile> GetUsers(string name)
     {
         return _context.UserProfiles

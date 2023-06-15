@@ -8,12 +8,12 @@ namespace MyKudos.Gateway.Controllers;
 public class PhotoController : Controller
 {
 
-    private IGraphService _graphService;
+    private readonly IUserProfileService _userProfileService;
     private string _defaultProfilePicture;
 
-    public PhotoController(IGraphService graphService, IConfiguration configuration)
+    public PhotoController(IUserProfileService userProfileService, IConfiguration configuration)
     {
-        _graphService = graphService;
+        _userProfileService = userProfileService;
 
         _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
@@ -22,7 +22,7 @@ public class PhotoController : Controller
     public async Task<string> GetUserPhoto(Guid userid)
     {
         
-        string userProfile  = await _graphService.GetUserPhoto(userid);
+        string userProfile  = await _userProfileService.GetUserPhoto(userid);
 
         if (string.IsNullOrEmpty(userProfile))
         {

@@ -4,7 +4,6 @@ using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
-
 namespace MyKudos.Kudos.App.Services;
 
 public class UserProfileService : IUserProfileService
@@ -59,5 +58,10 @@ public class UserProfileService : IUserProfileService
     public List<UserProfile> GetUsers(string name)
     {
         return _userProfileRepository.GetUsers(name);
+    }
+
+    public string? GetUserPhoto(Guid userid)
+    {
+        return _userProfileRepository.GetUserPhoto(userid);
     }
 }

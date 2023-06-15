@@ -12,5 +12,7 @@ public interface IUserProfileRepository
 
     List<UserProfile> GetUsers(string name);
 
+    string? GetUserPhoto(Guid userid);
+
 
 }

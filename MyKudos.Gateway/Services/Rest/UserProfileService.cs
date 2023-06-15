@@ -39,5 +39,21 @@ public class UserProfileService : IUserProfileService
 
     }
 
+    public async Task<string> GetUserPhoto(Guid userid)
+    {
+        string result = string.Empty;
 
+        try
+        {
+            result = await _restClientHelper.GetApiData<string>($"{_kudosServiceUrl}photo/?userid={userid}");
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetUserPhoto: {ex.Message}");
+        }
+
+        return result;
+    }
 }
