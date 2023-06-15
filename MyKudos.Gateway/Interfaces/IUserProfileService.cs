@@ -1,6 +1,9 @@
-﻿namespace MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Kudos.Domain.Models;
+
+namespace MyKudos.Gateway.Interfaces;
 
 public interface IUserProfileService
 {
 
+    Task<List<UserProfile>> GetUsers(string name);
 }

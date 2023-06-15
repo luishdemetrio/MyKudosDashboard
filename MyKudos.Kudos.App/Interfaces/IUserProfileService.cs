@@ -10,4 +10,6 @@ public interface IUserProfileService
     bool AddUser(UserProfile user);
 
     List<UserProfile> GetAllUsers();
+
+    List<UserProfile> GetUsers(string name);
 }

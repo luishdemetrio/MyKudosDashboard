@@ -3,6 +3,7 @@ using MyKudos.Gateway.Interfaces;
 using GatewayDomain = MyKudos.Gateway.Domain.Models;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
+using Microsoft.Graph;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -17,14 +18,19 @@ public class CommentsController : Controller
 
     private readonly IGraphService _graphService;
 
+    private string _defaultProfilePicture;
+
     public CommentsController(ICommentsService commentsService, ICommentsMessageSender commentsMessageSender,
-                              IGraphService graphService)
+                              IGraphService graphService,
+                              IConfiguration configuration)
     {
 
         _commentsService = commentsService;
 
         _commentsMessageSender = commentsMessageSender;
         _graphService = graphService;
+
+        _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
 
     [HttpPost(Name = "SendMessage")]
@@ -60,72 +66,35 @@ public class CommentsController : Controller
         if (comments == null)
             return result;
 
-        //get userId of who commented
-        var peopleIds  = comments
-            .Where(c => c.KudosId == kudosId)
-            .Select(c => c.FromPersonId)
-            .Distinct()
-            .ToList();
-
-
-        //get distinct people who liked
-        List<Guid> likesId = comments
-                    .SelectMany(kl => kl.Likes)
-                    .Select(like => like.FromPersonId)
-                    .Distinct()
-                    .ToList();
-
-        peopleIds.AddRange(likesId.Distinct());
-
-        List<GraphUser> users = await _graphService.GetUserInfo(peopleIds.Distinct().ToArray()).ConfigureAwait(true);
-
-            var photos = await _graphService.GetUserPhotos(peopleIds.Distinct().ToArray()).ConfigureAwait(true);
-
-
-
-            List<LikeMessage> likes = new();
-
-            foreach (var comment in comments)
-            {
-                if (comment.Likes != null)
-                    likes.AddRange(from like in comment.Likes
-                                   join u in users
-                                       on like.FromPersonId equals u.Id
-                                   join photo in photos
-                                       on like.FromPersonId equals photo.id
-                                   select new LikeMessage(
-
-                                       MessageId: comment.CommentsId,
-                                       Person: new GatewayDomain.Person()
-                                       {
-                                           Id = like.FromPersonId,
-                                           Name = u.DisplayName,
-                                           Photo = $"data:image/png;base64,{photo.photo}"
-                                       }
-
-                                   ));
-            }
-
-
-            result = (from comment in comments
-                    join user in users
-                       on comment.FromPersonId equals user.Id
-                    join photo in photos
-                        on user.Id equals photo.id
-                    select new CommentsResponse()
+        foreach (var comment in comments)
+        {
+            result.Add(new CommentsResponse()
                     {
                         Id = comment.CommentsId,
                         KudosId = comment.KudosId,
-                        FromPerson = new GatewayDomain.Person {Id = user.Id, Name = user.DisplayName, Photo = $"data:image/png;base64,{photo.photo}" },
+                        FromPerson = new GatewayDomain.Person
+                        {
+                            Id = comment.UserFrom.UserProfileId,
+                            Name = comment.UserFrom.DisplayName,
+                            Photo = comment.UserFrom.Photo != null ? $"data:image/png;base64,{comment.UserFrom.Photo}" : _defaultProfilePicture
+                        },
                         Message = comment.Message,
                         Date = comment.Date,
-                        Likes =  likes.Where(l => l.MessageId == comment.CommentsId).Select(l => l.Person).ToList()
-                    }).ToList();
-
+                        Likes = comment.Likes.Where(l => l.Person != null).Select(x => new GatewayDomain.Person()
+                        {
+                            Id = x.Person.UserProfileId,
+                            Name = x.Person.DisplayName,
+                            Photo = x.Person.Photo != null ? $"data:image/png;base64,{x.Person.Photo}" : _defaultProfilePicture
+                        }).ToList()
+            }
+            );
+        }
 
 
 
         return result;
+
+      
 
     }
 

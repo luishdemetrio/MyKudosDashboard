@@ -55,4 +55,9 @@ public class UserProfileService : IUserProfileService
         
         return result;
     }
+
+    public List<UserProfile> GetUsers(string name)
+    {
+        return _userProfileRepository.GetUsers(name);
+    }
 }

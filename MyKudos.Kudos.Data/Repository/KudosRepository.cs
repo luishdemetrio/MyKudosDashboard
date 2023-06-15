@@ -69,7 +69,7 @@ public class KudosRepository : IKudosRepository
                     .Take(pageSize)
                     .Include(l => l.Likes)
                     .Include(c => c.Comments)
-                     .Include(u => u.UserFrom)
+                    .Include(u => u.UserFrom)
                     .Include(u => u.UserTo)
                     .Include(u => u.Recognition)
                     .ToListAsync();

@@ -17,20 +17,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IGraphService, GraphServiceRest>();
-builder.Services.AddScoped<IRecognitionService, RecognitionServiceRest>();
-builder.Services.AddScoped<IRecognitionGroupService, RecognitionGroupServiceRest>();
-builder.Services.AddScoped<IKudosService, KudosServiceRest>();
-
-builder.Services.AddScoped<IGamificationService, GamificationService>();
-builder.Services.AddScoped<ICommentsService, CommentsServiceRest>();
-
-builder.Services.AddScoped<IUserPointsService, UserPointsService>();
-
-builder.Services.AddScoped<ICommentsMessageSender, CommentsMessageSender>();
-
-builder.Services.AddScoped<IAgentNotificationService, AgentNotificationService>();
-
 var config = builder.Configuration;
 
 builder.Services.AddScoped<IRestClientHelper>(t =>
@@ -42,6 +28,21 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
                     exposedAPI: config["ExposedApi"]
                 )
                 ));
+
+builder.Services.AddScoped<IGraphService, GraphServiceRest>();
+builder.Services.AddScoped<IRecognitionService, RecognitionServiceRest>();
+builder.Services.AddScoped<IRecognitionGroupService, RecognitionGroupServiceRest>();
+builder.Services.AddScoped<IKudosService, KudosServiceRest>();
+
+builder.Services.AddScoped<IGamificationService, GamificationService>();
+builder.Services.AddScoped<ICommentsService, CommentsServiceRest>();
+
+builder.Services.AddScoped<IUserPointsService, UserPointsService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+
+builder.Services.AddScoped<IAgentNotificationService, AgentNotificationService>();
+
+builder.Services.AddScoped<ICommentsMessageSender, CommentsMessageSender>();
 
 builder.Services.AddScoped<IKudosMessageSender, KudosMessageSender>();
 

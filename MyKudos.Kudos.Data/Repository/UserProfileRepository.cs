@@ -31,4 +31,9 @@ public class UserProfileRepository : IUserProfileRepository
     {
         return _context.UserProfiles.ToList();
     }
+
+    public List<UserProfile> GetUsers(string name)
+    {
+        return _context.UserProfiles.Where(u => u.DisplayName.Contains(name)).ToList();
+    }
 }

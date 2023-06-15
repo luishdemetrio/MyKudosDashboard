@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Api.Controllers;
 
@@ -17,8 +18,8 @@ public class UserProfileController : Controller
     }
 
 
-    [HttpGet(Name = "PopulateUsers")]
-    public bool GetAllUsers()
+    [HttpPost(Name = "PopulateUsers")]
+    public bool PopulateUsers()
     {
 
         var graphUsers = _userProfileService.GetAllUsers();
@@ -26,4 +27,15 @@ public class UserProfileController : Controller
         return true;
 
     }
+
+    [HttpGet(Name = "GetUsers")]
+    public List<UserProfile> GetUsers(string name)
+    {
+
+        return _userProfileService.GetUsers(name);
+
+        
+
+    }
+
 }

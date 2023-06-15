@@ -28,7 +28,8 @@ public class CommentsRepository : ICommentsRepository
     {
         return _context.Comments
                     .Where(c => c.KudosId == kudosId)
-                    .Include(l=> l.Likes);
+                    .Include(l=> l.Likes)
+                    .Include(u => u.UserFrom);
     }
 
     public bool Like(int commentsId, Guid personId)

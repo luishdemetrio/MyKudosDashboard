@@ -9,5 +9,8 @@ public interface IUserProfileRepository
     bool AddRange(List<UserProfile> user);
 
     List<UserProfile> GetAll();
-   
+
+    List<UserProfile> GetUsers(string name);
+
+
 }
