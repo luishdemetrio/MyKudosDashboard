@@ -12,7 +12,7 @@
 
 <FluentDialog @ref=_replyKudosFluentDialog
                 aria-label="Simple dialog" Modal="true"
-               class="both-gradient" style="--dialog-min-height: 640px;--dialog-min-width: 580px;"
+              class="both-gradient" style="--dialog-height: calc(100vh - 100px);--dialog-width: calc(40vw + 180px);"
                 Hidden=@ModalHidden
                 >
 
@@ -47,15 +47,15 @@
 
                                     <li>
                                             <div class="text-wrap small55" style="width: 100%;">
-                                                <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <small style="font-weight: bold">@_item.Title.ToUpper()</small></small>
+                                                <a class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <a style="font-weight: bold">@_item.Title.ToUpper()</a></a>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="small55">
-                                            <small style="margin-right:5px">@Localizer["SentBy"]:</small>
+                                            <a style="margin-right:5px">@Localizer["SentBy"]:</a>
                                             <img src=@_item.From.Photo
                                                  style="height: 26px;width: 26px;border-radius: 50%" />
-                                            <small style="margin-left:5px;font-weight: bold">@_item.From.Name</small>
+                                            <a style="margin-left:5px;font-weight: bold">@_item.From.Name</a>
                                          
                                         </div>
                                  
@@ -63,9 +63,9 @@
                                     </li>
                                         <li>
                                             <div class="small55">
-                                                <small style="margin-right:5px">@Localizer["SentOn"]:</small>
+                                                <a style="margin-right:5px">@Localizer["SentOn"]:</a>
 
-                                                <small style="margin-left:5px">@_item.SendOn</small>
+                                                <a style="margin-left:5px">@_item.SendOn</a>
                                             </div>
 
                                         </li>
@@ -74,7 +74,7 @@
                             </div>
                         </div>
                             <div class="text-wrap small55" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
-                                <small>@_item.Message</small>
+                                <a>@_item.Message</a>
                             </div>
 
                             <div style="float:right">
@@ -122,16 +122,16 @@
            
                     <tr>
 
-                        <td scope="row">
+                        <td scope="row" >
 
 
-                            <div style="display: flex;padding-bottom: 0px;">
+                            <div style="display: flex;padding-bottom: 0px;width:90%">
                                 <div style="width:50px;margin-top:5px;padding-top: 15px">
                                     <img src=@_userPhoto style="height:40px;width:40px;float:left;border-radius: 50%" />
                                 </div>
 
-                                <div class="form-group small55" style="width:520px;">
-                                    <small for="formGroupExampleInput2">@User.DisplayName</small>
+                                <div class="form-group small55" style="width:90%">
+                                    <a for="formGroupExampleInput2">@User.DisplayName</a>
                                     <input type="text" class="form-control" id="formGroupExampleInput2" style="margin-left:1px;margin-top:5px;width:100%" placeholder="Another input" onchange=@PostValueChanged value=@_replyMessage>
                                 </div>
                               

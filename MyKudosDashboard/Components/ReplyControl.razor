@@ -54,21 +54,21 @@
 }
 </style>
 
-<div style="display: flex;padding-bottom: 0px">
+<div style="width:100%;padding-bottom: 0px">
 
-    <div style="height: auto">
+    <div style="height: auto;width:100%">
         <div style="width:50px;margin-top:0px;padding-top: 5px">
             <img src=@Reply.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
         </div>
 
-        <div style="width:460px;display: flex;margin-bottom: 0px;">
+        <div style="width:90%;margin-bottom: 0px;">
 
        
-            <div class="form-group small55" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;">
+            <div class="form-group small55" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;width:100%">
                 <small for="formGroupExampleInput2">@Reply.FromPerson.Name</small>
                 <textarea id=@($"textareareply_{@Reply.Id}") type ="text" class="form-control"
                           Readonly=@_isReplyCommendReadOnly
-                          style="margin-left:1px;margin-top:0px;width:420px;border:none;background-color:#e9ecef; overflow-y:auto"
+                          style="margin-left:1px;margin-top:0px;width:100%;border:none;background-color:#e9ecef; overflow-y:auto"
                           @onchange=PostValueChanged>          
                     @Reply.Message
                 </textarea>
