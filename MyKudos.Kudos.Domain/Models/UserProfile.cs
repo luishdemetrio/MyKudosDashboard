@@ -9,5 +9,6 @@ public class UserProfile
     [MaxLength(60)]
     public string DisplayName { get; set; }
     
+    public string? Photo96x96 { get; set; }
     public string? Photo { get; set; }
 }

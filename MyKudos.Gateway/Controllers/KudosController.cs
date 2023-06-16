@@ -65,7 +65,7 @@ public class KudosController : Controller
                 {
                     Id = kudo.UserTo.UserProfileId,
                     Name = kudo.UserTo.DisplayName,
-                    Photo = kudo.UserTo.Photo != null ? $"data:image/png;base64,{kudo.UserTo.Photo}" : _defaultProfilePicture
+                    Photo = kudo.UserTo.Photo96x96 != null ? $"data:image/png;base64,{kudo.UserTo.Photo96x96}" : _defaultProfilePicture
                 },
                 Likes = kudo.Likes.Where(l=> l.Person != null).Select(x => new GatewayDomain.Person()
                 {
@@ -117,11 +117,16 @@ public class KudosController : Controller
           SendOn: kudos.SendOn
           ));
 
+
+        //we need to use 48x48 to reduce size of the Teams message (28K at total)
+        var fromPhoto48x48 = await _graphService.GetUserPhoto(kudos.From.Id);
+        var toPhoto48x48 = await _graphService.GetUserPhoto(kudos.To.Id);
+
         //send the adaptive card
         await _agentNotificationService.SendNotificationAsync(
             new Kudos.Domain.Models.KudosNotification(
-                  From: new Kudos.Domain.Models.Person() { Id = kudos.From.Id, Name = kudos.From.Name, Photo = kudos.From.Photo},
-                  To: new Kudos.Domain.Models.Person() { Id = kudos.To.Id, Name = kudos.To.Name, Photo = kudos.To.Photo },
+                  From: new Kudos.Domain.Models.Person() { Id = kudos.From.Id, Name = kudos.From.Name, Photo = $"data:image/png;base64,{fromPhoto48x48}" },
+                  To: new Kudos.Domain.Models.Person() { Id = kudos.To.Id, Name = kudos.To.Name, Photo = $"data:image/png;base64,{toPhoto48x48}" },
                   ManagerId: userManagerId,
                   Message: kudos.Message,
                   Reward: new Kudos.Domain.Models.Reward( kudos.Reward.Id, kudos.Reward.Title),

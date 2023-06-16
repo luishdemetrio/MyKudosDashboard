@@ -31,7 +31,6 @@ public class GraphService : IGraphService
 
     private ConcurrentDictionary<string, GraphUserPhoto> _userPhotos;
 
-    private ConcurrentDictionary<string, string> _profilePictures;
 
     private ConcurrentDictionary<string, GraphUser> _userInfo;
 
@@ -52,7 +51,6 @@ public class GraphService : IGraphService
 
         _userPhotos = new();
 
-        _profilePictures = new();
 
         _userInfo = new();
 
@@ -130,7 +128,7 @@ public class GraphService : IGraphService
             foreach (var userId in chunckedUsersIds)
             {
 
-                var missingPhotos = await GetUserPhotosChunckGraph(missingUsers.ToArray());
+                var missingPhotos = await GetUserPhotosChunckGraph(missingUsers.ToArray(), "48x48");
                 photos.AddRange(missingPhotos);
 
                 foreach (var photo in missingPhotos)
@@ -144,7 +142,7 @@ public class GraphService : IGraphService
         return photos;
     }
 
-    private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunckGraph(string[] usersId)
+    private async Task<IEnumerable<GraphUserPhoto>> GetUserPhotosChunckGraph(string[] usersId, string imageSize)
     {
 
         List<GraphUserPhoto> photos = new();
@@ -162,7 +160,7 @@ public class GraphService : IGraphService
 
         foreach (var item in usersId)
         {
-            batch.Add(new GraphBatchRequestDTO(item, "GET", $"users/{item}/photos/64x64/$value"));
+            batch.Add(new GraphBatchRequestDTO(item, "GET", $"users/{item}/photos/{imageSize}/$value"));
         }
 
         var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
@@ -210,9 +208,6 @@ public class GraphService : IGraphService
     {
         string profilePicture ;
 
-        if (!_profilePictures.TryGetValue(userid, out profilePicture))
-        {
-
             System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
             .Request()
             .GetAsync();
@@ -222,8 +217,7 @@ public class GraphService : IGraphService
 
             profilePicture =  Convert.ToBase64String(ms.ToArray());
             
-            _profilePictures.TryAdd(userid, profilePicture);
-        }
+        
 
         return profilePicture;
        
@@ -377,19 +371,34 @@ public class GraphService : IGraphService
                     usersDictionary.Add(userIds[j]);
                 }
 
-                var photos = await GetUserPhotosChunckGraph(usersDictionary.ToArray());
+                var photos96x96 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "96x96");
 
 
-                foreach (var photo in photos)
+                foreach (var photo in photos96x96)
                 {
                     
 
                         if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
                         {
 
-                        user.Photo = photo.photo;
+                        user.Photo96x96 = photo.photo;
 
                         }
+                }
+
+                var photos48x48 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "48x48");
+
+
+                foreach (var photo in photos48x48)
+                {
+
+
+                    if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
+                    {
+
+                        user.Photo = photo.photo;
+
+                    }
                 }
             }
 

@@ -66,7 +66,7 @@ public class KudosToMeController : Controller
                 {
                     Id = kudo.UserTo.UserProfileId,
                     Name = kudo.UserTo.DisplayName,
-                    Photo = kudo.UserTo.Photo != null ? $"data:image/png;base64,{kudo.UserTo.Photo}" : _defaultProfilePicture
+                    Photo = kudo.UserTo.Photo96x96 != null ? $"data:image/png;base64,{kudo.UserTo.Photo96x96}" : _defaultProfilePicture
                 },
                 Likes = kudo.Likes.Where(l => l.Person != null).Select(x => new GatewayDomain.Person()
                 {
