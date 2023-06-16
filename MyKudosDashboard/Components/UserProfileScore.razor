@@ -101,24 +101,18 @@
                             @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
                             <img id=@($"badge_{badge.UserBadgeId}") src=@($"images/badges/{badge.BadgeName}")
-                                 style="height:12vh;width:12vh;padding:5px" />
+                                 style="height:11vh;width:11vh;padding:5px" />
 
                             <FluentTooltip  Anchor=@($"badge_{badge.UserBadgeId}") 
                                             Position=TooltipPosition.Right>@badge.BadgeDescription</FluentTooltip>
                         }
-
-
-                       
-
-                     @*   @if (UserScoreValue.EarnedBagdes.Count == 5) // I need to fix it later
-                        {
-                            <img src="images/badges/all_group.png" style="height:80px;width:80px;padding:5px" />
-                        }*@
-
-
-
                     </div>
                 }
+
+                <button type="button" class="btn btn-primary small60" style="height:7vh;margin-top:3vh;margin-left:1vh;margin-right:1vh ;width:94%;"
+                    @onclick=@(()=>OpenSendKudosPanel() )>
+                    📩 @Localizer["SendKudos"]
+                </button>
             }
             
         </div>
@@ -144,6 +138,9 @@
     [Parameter]
     public UserPointScore UserScoreValue { get; set; }
 
+    [Parameter]
+    public SendKudos SendKudosCallBack { get; set; }
+    public delegate void SendKudos();
 
     private bool _isLoaded = false;
 
@@ -163,7 +160,7 @@
         base.OnInitialized();
 
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
-       
+
 
         UserScoreValue = new();
         UserScoreValue = await UserProfileScoreView.GetUserScore(User.ObjectId);
@@ -171,24 +168,17 @@
 
     }
 
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    await base.OnAfterRenderAsync(firstRender);
-
-    //    if (firstRender)
-    //    {  
-    //    }
-
-
-
-    //    await UpdateScoreValues();
-    //}
+  
 
     protected override bool ShouldRender()
     {
         return _shouldRender;
     }
 
+    private void OpenSendKudosPanel()
+    {
+        SendKudosCallBack?.Invoke();
+    }
 
     public void UpdateScoreCallBack(UserPointScore userScore)
     {

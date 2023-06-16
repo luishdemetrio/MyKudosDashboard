@@ -57,7 +57,6 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
     public void Attach(IObserverEventHub<KudosResponse> observer)
     {
 
-       // Detach(observer);
         _observers.Add(observer);
     }
 

@@ -45,7 +45,7 @@ public class Comments
     public List<CommentsLikes> Likes { get; set; } = new();
 
     [ForeignKey("FromPersonId")]
-    public UserProfile UserFrom { get; set; }
+    public UserProfile? UserFrom { get; set; }
 
 }
 
@@ -56,7 +56,7 @@ public class CommentsLikes
     public Guid FromPersonId { get; set; }
 
     [ForeignKey("FromPersonId")]
-    public UserProfile Person { get; set; }
+    public UserProfile? Person { get; set; }
 }
 
 public class KudosLike
@@ -66,7 +66,7 @@ public class KudosLike
     public Guid PersonId { get; set; }
 
     [ForeignKey("PersonId")]
-    public UserProfile Person { get; set; }
+    public UserProfile? Person { get; set; }
 }
 
 

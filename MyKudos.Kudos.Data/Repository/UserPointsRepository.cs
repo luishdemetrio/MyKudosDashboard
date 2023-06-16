@@ -77,30 +77,7 @@ public class UserPointsRepository : IUserPointsRepository
                        };
         int index= 1;
 
-        var badges = (from k in _context.Kudos
-                     join r in _context.Recognitions on k.RecognitionId equals r.RecognitionId
-                     join rg in _context.RecognitionsGroup on r.RecognitionGroupId equals rg.RecognitionGroupId
-                     join t in subquery on r.RecognitionGroupId equals t.RecognitionGroupId
-                     where k.ToPersonId == pUserId
-                     group k by new { rg.RecognitionGroupId, rg.BadgeName, rg.Description, t.Total } into g
-                     where g.Count() >= g.Key.Total
-                     select g.Key).AsEnumerable()
-                      .Select(g => new UserBadge
-                      {
-                          BadgeName = g.BadgeName,
-                          BadgeDescription = g.Description,
-                          UserBadgeId = index++
-                      });
-
-        if ( subquery.Count() == badges.Count())
-        {
-            result.EarnedBagdes.Add(new UserBadge
-            {
-                BadgeName = _allGroupCompletedImage,
-                BadgeDescription = _allGroupCompletedDescription
-            });
-        }
-
+       
         var kudosSentBadges = (from row in _context.BadgeRules
                                where (row.ActionType == "send_kudos") && (
                                                 (result.KudosSent >= row.Initial && result.KudosSent <= row.Final) ||
@@ -133,9 +110,34 @@ public class UserPointsRepository : IUserPointsRepository
                                  UserBadgeId = index++
                              });
 
-        result.EarnedBagdes.AddRange(badges.ToList());
+        var badges = (from k in _context.Kudos
+                      join r in _context.Recognitions on k.RecognitionId equals r.RecognitionId
+                      join rg in _context.RecognitionsGroup on r.RecognitionGroupId equals rg.RecognitionGroupId
+                      join t in subquery on r.RecognitionGroupId equals t.RecognitionGroupId
+                      where k.ToPersonId == pUserId
+                      group k by new { rg.RecognitionGroupId, rg.BadgeName, rg.Description, t.Total } into g
+                      where g.Count() >= g.Key.Total
+                      select g.Key).AsEnumerable()
+                     .Select(g => new UserBadge
+                     {
+                         BadgeName = g.BadgeName,
+                         BadgeDescription = $"Todos os comportamentos: {g.Description}",
+                         UserBadgeId = index++
+                     });
+
         result.EarnedBagdes.AddRange(kudosSentBadges.ToList());
         result.EarnedBagdes.AddRange(kudosReceivedBadges.ToList());
+        result.EarnedBagdes.AddRange(badges.ToList());
+
+        if (subquery.Count() == badges.Count())
+        {
+            result.EarnedBagdes.Add(new UserBadge
+            {
+                BadgeName = _allGroupCompletedImage,
+                BadgeDescription = _allGroupCompletedDescription
+            });
+        }
+
 
         return result;
 

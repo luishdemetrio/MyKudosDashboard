@@ -49,6 +49,7 @@
         font-size: calc(0.60em + 1vmin)
     }
 
+
     </style>
 
 
@@ -80,7 +81,7 @@ else
         }
     </style>
 
-    <div class="welcome page" style="padding-top:0px;width:100%;margin-left: 5px;">
+    <div class="welcome page" style="padding-top:0px;width:100%;margin-left: 5px;height:90%">
 
          
         <div class="row " style="clear: both;height:100%;width:100%">
@@ -95,14 +96,17 @@ else
                         <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto />
 
-                    <button type="button" class="btn btn-primary small60" style="height:40px;margin:5px;"
-                        @onclick=@(()=>OpenSendKudosPanel() )                         >
+                    <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto SendKudosCallBack=@OpenSendKudosPanel />
+
+                    @*<button type="button" class="btn btn-primary small60" style="height:7vh;margin:10px;position:relative"
+                        @onclick=@(()=>OpenSendKudosPanel() )>
                         📩 @Localizer["SendKudos"]
-                    </button>
+                    </button>*@
+                    
 
-                  @*  <FluentButton class="btn btn-primary" style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel())>
+
+                    @*  <FluentButton class="btn btn-primary" style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel())>
                         <span>@Localizer["SendKudos"]</span>
                         <FluentIcon Name="@FluentIcons.Send" Slot="start" Size="@IconSize.Size24" Filled=true />
                     </FluentButton>*@
@@ -193,8 +197,6 @@ else
                 {
                     _user = await teamsUserCredential.GetUserInfoAsync();
 
-                   
-
                 }
                 catch (Exception ex)
                 {
@@ -218,19 +220,28 @@ else
     }
 
 
-    private async Task OpenSendKudosPanel()
+    private void OpenSendKudosPanel()
     {
         _sendKudosIsHidden = false;
 
-        await _sendKudosPanel.SendKudosModal();
+         var t = InvokeAsync(() =>
+        {
+            _sendKudosPanel.SendKudosModal();
+        });
+
+        t.Wait();
 
     }
 
     private void ReplyCallBack(KudosResponse pKudos)
     {
+        var t = InvokeAsync(() =>
+       {
+           _replyKudos.ShowModal(pKudos, _userPhoto);
+       });
 
-        _replyKudos.ShowModal(pKudos, _userPhoto);
-    }
+       t.Wait();
+}
 
     
 }
