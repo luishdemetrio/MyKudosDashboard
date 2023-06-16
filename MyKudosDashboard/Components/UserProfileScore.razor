@@ -40,7 +40,7 @@
            
                 <div style="margin-left:10px">
 
-                    <div class="card-title pricing-card-title small60" style="margin-bottom: 0px; margin-bottom: 1vh;">
+                    <div class="card-title pricing-card-title small55" style="margin-bottom: 0px; margin-bottom: 1vh;">
                         
                         @*<FluentEmoji Name="@FluentEmojis.UpRightArrow" Size="@EmojiSize.Size32"  />*@
                         <FluentIcon Name="@FluentIcons.ArrowCircleRight" Filled=false style="width: 4vh; height: 4vh" />
@@ -49,7 +49,7 @@
                         <small class="text-muted fw-light" > @Localizer["KudosSent"]</small>
                     </div>
 
-                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
+                    <div class="card-title pricing-card-title small55" style="margin-bottom: 1vh;">
 
                         <FluentIcon Name="@FluentIcons.ArrowCircleLeft" Filled=false style="width: 4vh; height: 4vh" />
 
@@ -57,7 +57,7 @@
                         <small class="text-muted fw-light"> @Localizer["KudosReceived"]</small>
                     </div>
 
-                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
+                    <div class="card-title pricing-card-title small55" style="margin-bottom: 1vh;">
 
                         <FluentIcon Name="@FluentIcons.ThumbLike" Filled=false style="width: 4vh; height: 4vh" />
 
@@ -65,7 +65,7 @@
                         <small class="text-muted fw-light"> @Localizer["LikesSent"]</small>
                     </div>
 
-                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
+                    <div class="card-title pricing-card-title small55" style="margin-bottom: 1vh;">
 
                         <FluentIcon Name="@FluentIcons.Heart" Filled=false style="width: 4vh; height: 4vh" />
 
@@ -73,7 +73,7 @@
                         <small class="text-muted fw-light"> @Localizer["LikesReceived"]</small>
                     </div>
 
-                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
+                    <div class="card-title pricing-card-title small55" style="margin-bottom: 1vh;">
 
                         <FluentIcon Name="@FluentIcons.CommentArrowRight" Filled=false style="width: 4vh; height: 4vh" />
 
@@ -81,7 +81,7 @@
                         <small class="text-muted fw-light"> @Localizer["CommentsSent"]</small>
                     </div>
 
-                    <div class="card-title pricing-card-title small60" style="margin-bottom: 1vh;">
+                    <div class="card-title pricing-card-title small55" style="margin-bottom: 1vh;">
 
                         <FluentIcon Name="@FluentIcons.CommentArrowLeft" Filled=false style="width: 4vh; height: 4vh" />
 
@@ -101,7 +101,7 @@
                             @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
                             <img id=@($"badge_{badge.UserBadgeId}") src=@($"images/badges/{badge.BadgeName}")
-                                 style="height:11vh;width:11vh;padding:5px" />
+                                 style="height:10vh;width:10vh;padding:5px" />
 
                             <FluentTooltip  Anchor=@($"badge_{badge.UserBadgeId}") 
                                             Position=TooltipPosition.Right>@badge.BadgeDescription</FluentTooltip>
@@ -109,7 +109,7 @@
                     </div>
                 }
 
-                <button type="button" class="btn btn-primary small60" style="height:7vh;margin-top:3vh;margin-left:1vh;margin-right:1vh ;width:94%;"
+                <button type="button" class="btn btn-primary small55" style="height:7vh;margin-top:3vh;margin-left:1vh;margin-right:1vh ;width:90%;"
                     @onclick=@(()=>OpenSendKudosPanel() )>
                     📩 @Localizer["SendKudos"]
                 </button>

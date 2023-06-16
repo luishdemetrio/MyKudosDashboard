@@ -8,8 +8,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHubCommentOptions,CommentsRequest>>
 {
-    private ConcurrentQueue<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
-                        = new ConcurrentQueue<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>>();
+    private ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
+                        = new ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>>();
 
     private EventHubConsumerHelper<CommentsRequest> _eventHubScore;
     
@@ -61,19 +61,12 @@ public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHu
     }
     public void Attach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {
-        _observers.Enqueue(observer);
+        _observers.Add(observer);
     }
 
     public void Detach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {
-        IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> removedObserver;
-
-        while (!_observers.IsEmpty)
-        {
-            _observers.TryDequeue(out removedObserver);
-            if (removedObserver != observer)
-                _observers.Enqueue(removedObserver);
-        }
+        _observers.TryTake(out observer);
     }
 
    
