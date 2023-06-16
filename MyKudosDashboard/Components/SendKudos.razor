@@ -42,14 +42,33 @@
         cursor: text;
         display: flex;
         width: 100%;
+        padding:0px;
     }
 
+    .blazored-typeahead__input-mask-wrapper{
+        padding: 0px;
+    }
 
+    .blazored-typeahead__input-mask {
+        padding-left: 5px;
+        padding-top: 5px;
+        padding-bottom: 0px;
+    }
+
+    .carousel-control-next-icon, .carousel-control-prev-icon {
+        display: inline-block;
+        width: 2rem;
+        height: 1rem;
+        background-repeat: no-repeat;
+        background-position: 50%;
+        background-size: 100% 100%;
+    }
+    
 </style>
 
 <FluentDialog @ref=SendKudosFluentDialog
                aria-label="Simple dialog" Modal="true"
-              class="both-gradient" style="--dialog-height: calc(100vh - 80px);--dialog-width: calc(40vw + 180px);"
+              class="both-gradient" style="--dialog-height: 95vh;--dialog-width: calc(40vw + 180px);"
               Hidden=@ModalHidden>
 
     <div style="margin:10px;" >
@@ -74,19 +93,19 @@
                        
                         <BlazoredTypeahead SearchMethod="@SearchEmployees" class="small60"
                                            @bind-Value="@SelectedEmployee"
-                                           Debounce="500" style="width:400px;"
+                                           Debounce="500" style="width:400px;padding:0px"
                                            MinimumLength="3" >
                             <SelectedTemplate>
                                 @if (string.IsNullOrEmpty(context.Photo))
                                 {
-                                    <span style="margin-left:5px;">@context.Name</span>
+                                    <small style="margin-left:5px;padding:0px">@context.Name</small>
                                 }
                                 else
                                 {
-                                    <div style="width:100%;height:40px;">
+                                    <div style="width:100%;height:40px;padding:0px;margin:0px">
                                         <img src=@context.Photo
                                              style="height: 26px;width: 26px;border-radius: 50%" />
-                                        <span style="margin-left:5px">@context.Name</span>
+                                        <small style="margin-left:5px">@context.Name</small>
                                     </div>
                                 }
 
@@ -95,14 +114,14 @@
                             <ResultTemplate>
                                 @if (string.IsNullOrEmpty(context.Photo))
                                 {
-                                    <span style="margin-left:5px">@context.Name</span>
+                                    <small style="margin-left:5px;margin:0px;padding:0px">@context.Name</small>
                                 }
                                 else
                                 {
-                                    <div>
+                                    <div class="small55" style="margin:0px;padding:0px">
                                         <img src=@context.Photo
-                                             style="height: 26px;width: 26px;border-radius: 50%;" />
-                                        <span style="margin-left:5px">@context.Name</span>
+                                             style="height: 26px;width: 26px;border-radius: 50%;margin:0px;padding:0px" />
+                                        <small style="margin-left:5px;margin:0px;padding:0px">@context.Name</small>
                                     </div>
                                 }
                             </ResultTemplate>
@@ -150,7 +169,7 @@
                                                         </small>
 
                                                         <h4  style="float: left;padding-top:1px;padding-left:0px;text-align:center;width:100%;margin-bottom: 1px">
-                                                            @recognitions.ElementAt(i).Title
+                                                            @recognitions.ElementAt(i).Title.ToUpper()
                                                         </h4>
 
                                                         <small class="small40" style="float: left;padding-top:1px;padding-left:0px;text-align:center;overflow-wrap: break-word;">
@@ -173,15 +192,14 @@
                                 </div>
 
                                 <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev"
-                                        style="padding-top: 80px;">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
+                                        style="padding-top: 70px;">
+                                    <small class="carousel-control-prev-icon small40" aria-hidden="true"></small>
+                                    <small class="visually-hidden small40">Previous</small>
                                 </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next"
-                                        style="padding-top: 80px;">
-                                    >
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
+                                <button class="carousel-control-next small55" type="button" data-bs-target="#myCarousel" data-bs-slide="next"
+                                        style="padding-top: 70px;">
+                                    <small class="carousel-control-next-icon " aria-hidden="true"></small>
+                                    <small class="visually-hidden ">Next</small>
                                 </button>
                             </div>
                         }
@@ -212,15 +230,15 @@
 
                         @if (isLoading)
                         {
-                            <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
+                            <button type="button" class="btn btn-primary small50" style="margin-left: 10px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
 
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <small class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></small>
                                 📩 @Localizer["Send"]
                             </button>
                         }
                         else
                         {
-                            <button type="button" class="btn btn-primary" style="margin-left: 20px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
+                            <button type="button" class="btn btn-primary small50" style="margin-left: 10px" @onclick=@(()=>SendKudosClick() ) disabled=@btnSendKudosDisabled>
                                 📩 @Localizer["Send"]
                             </button>
                         }
