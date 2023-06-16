@@ -2,6 +2,7 @@
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
+using System.Xml.Linq;
 
 
 namespace MyKudos.Kudos.Data.Repository;
@@ -26,10 +27,21 @@ public class CommentsRepository : ICommentsRepository
 
     public IEnumerable<Comments> GetComments(int kudosId)
     {
-        return _context.Comments
+        var comments =  _context.Comments
                     .Where(c => c.KudosId == kudosId)
-                    .Include(l=> l.Likes)
-                    .Include(u => u.UserFrom);
+                    .Include(c=> c.Likes)
+                    .Include(c => c.UserFrom)
+        .ToList();
+
+        foreach (var comment in comments)
+        {
+            foreach (var like in comment.Likes)
+            {
+                like.Person = _context.UserProfiles.First(u => u.UserProfileId == like.FromPersonId);
+            }
+        }
+
+        return comments;
     }
 
     public bool Like(int commentsId, Guid personId)

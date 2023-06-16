@@ -1,6 +1,5 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub.Enums;
-using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventHub;

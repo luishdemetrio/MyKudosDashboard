@@ -15,6 +15,11 @@ public class UserProfileRepository : IUserProfileRepository
         _context = kudosLikeDbContext;
     }
 
+    public bool Truncate()
+    {
+        return _context.Database.ExecuteSqlRaw("TRUNCATE TABLE UserProfiles") >0;
+    }
+
     public bool Add(UserProfile user)
     {
         _context.UserProfiles.Add(user);
@@ -25,6 +30,18 @@ public class UserProfileRepository : IUserProfileRepository
     {
         _context.UserProfiles.AddRange(user);
         return _context.SaveChanges() > 0;
+    }
+
+    public bool PopulateUserProfile(List<UserProfile> users)
+    {
+        bool result = false;
+
+        if (Truncate())
+        {
+            result = AddRange(users);
+        }
+
+        return result;
     }
 
     public List<UserProfile> GetAll()

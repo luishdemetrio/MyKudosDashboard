@@ -336,7 +336,7 @@
     {
         string kudosId = string.Empty;
 
-        KudosRequest kudos = null;
+        SendKudosRequest kudos = null;
 
         int slideIndex = await JSRuntime.InvokeAsync<int>("getCarouselActiveSlideIndex");
 
@@ -365,30 +365,14 @@
 
             InvokeAsync(() => StateHasChanged());
 
-            kudos = new(
-                    From: new Person()
-                        {
-                            Id = new Guid(UserProfile.ObjectId),
-                            Name = UserProfile.DisplayName,
-                            Photo = UserPhoto
-                        },
-                    To: new Person()
-                        {
-                            Id = SelectedEmployee.Id,
-                            Name = SelectedEmployee.Name,
-                            Photo = SelectedEmployee.Photo
-                        },
-                    Reward: new Reward(
-                        Id: recognition.RecognitionId,
-                        Title: recognition.Title
-                    ),
-                    Message: KudosMessage,
-                    SendOn: DateTime.Now
-                );
-
-
-
-
+            kudos = new SendKudosRequest
+            {
+                FromPersonId = new Guid(UserProfile.ObjectId),
+                ToPersonId = SelectedEmployee.Id,
+                RecognitionId = recognition.RecognitionId,
+                Message = KudosMessage,
+                Date= DateTime.Now
+            };
 
         });
 

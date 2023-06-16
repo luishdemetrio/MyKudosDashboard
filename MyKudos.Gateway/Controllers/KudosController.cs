@@ -87,17 +87,17 @@ public class KudosController : Controller
 
 
     [HttpPost(Name = "SendKudos")]
-    public async Task<int> PostAsync([FromBody] KudosRequest kudos)
+    public async Task<int> PostAsync([FromBody] SendKudosRequest kudos)
     {
 
 
         var restKudos = new Kudos.Domain.Models.Kudos()
         {
-            FromPersonId = kudos.From.Id,
-            ToPersonId = kudos.To.Id,
-            RecognitionId = kudos.Reward.Id,
+            FromPersonId = kudos.FromPersonId,
+            ToPersonId = kudos.ToPersonId,
+            RecognitionId = kudos.RecognitionId,
             Message = kudos.Message,
-            Date = kudos.SendOn,
+            Date = kudos.Date
             
         };
 
@@ -105,35 +105,57 @@ public class KudosController : Controller
         int kudosId = await _kudosService.SendAsync(restKudos);
 
         //get the manager of the person that received kudos. That will be used later to send the adaptive card to the manager
-        Guid userManagerId = await _graphService.GetUserManagerAsync(kudos.To.Id);
+        Guid userManagerId = await _graphService.GetUserManagerAsync(kudos.ToPersonId);
 
-        //send the kudos notification to the Teams Dashboard
-        var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(
-          From: kudos.From,
-          To: kudos.To,
-          ManagerId: userManagerId,
-          Message: kudos.Message,
-          Reward: kudos.Reward,
-          SendOn: kudos.SendOn
-          ));
+        //get missing information like photos to send the adaptive card and notifications
+
+        var kudosDb = await _kudosService.GetKudosUser(kudosId);
+        
+        if (kudosDb != null)
+        {
+            //send the kudos notification to the Teams Dashboard
+            var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(
+              From: new Person { Id = kudosDb.UserFrom.UserProfileId, Name = kudosDb.UserFrom.DisplayName, Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}" },
+              To: new Person { Id = kudosDb.UserTo.UserProfileId, Name = kudosDb.UserTo.DisplayName, Photo = $"data:image/png;base64,{kudosDb.UserTo.Photo}" },
+              ManagerId: userManagerId,
+              Message: kudosDb.Message,
+              Reward:  new Reward ( Id : kudosDb.Recognition.RecognitionId,Title : kudosDb.Recognition.Title ),
+              SendOn: kudosDb.Date
+              ));
+
+            //send the adaptive card
+            await _agentNotificationService.SendNotificationAsync(
+                new Kudos.Domain.Models.KudosNotification(
+                      From: new Kudos.Domain.Models.Person()
+                      {
+                          Id = kudosDb.UserFrom.UserProfileId,
+                          Name = kudosDb.UserFrom.DisplayName,
+                          Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}"
+                      }
+                      ,
+                      To: new Kudos.Domain.Models.Person()
+                      {
+                          Id = kudosDb.UserTo.UserProfileId,
+                          Name = kudosDb.UserTo.DisplayName,
+                          Photo = $"data:image/png;base64,{kudosDb.UserTo.Photo}"
+                      },
+                      ManagerId: userManagerId,
+                      Message: kudosDb.Message,
+                      Reward: new Kudos.Domain.Models.Reward(kudosDb.Recognition.RecognitionId, kudosDb.Recognition.Title),
+                      SendOn: kudosDb.Date)
+                );
+
+            Task.WaitAll(queue);
+        }
+
+       
 
 
         //we need to use 48x48 to reduce size of the Teams message (28K at total)
-        var fromPhoto48x48 = await _graphService.GetUserPhoto(kudos.From.Id);
-        var toPhoto48x48 = await _graphService.GetUserPhoto(kudos.To.Id);
+        //var fromPhoto48x48 = await _graphService.GetUserPhoto(kudos.From.Id);
+      //  var toPhoto48x48 = await _graphService.GetUserPhoto(kudos.To.Id);
 
-        //send the adaptive card
-        await _agentNotificationService.SendNotificationAsync(
-            new Kudos.Domain.Models.KudosNotification(
-                  From: new Kudos.Domain.Models.Person() { Id = kudos.From.Id, Name = kudos.From.Name, Photo = $"data:image/png;base64,{fromPhoto48x48}" },
-                  To: new Kudos.Domain.Models.Person() { Id = kudos.To.Id, Name = kudos.To.Name, Photo = $"data:image/png;base64,{toPhoto48x48}" },
-                  ManagerId: userManagerId,
-                  Message: kudos.Message,
-                  Reward: new Kudos.Domain.Models.Reward( kudos.Reward.Id, kudos.Reward.Title),
-                  SendOn: kudos.SendOn)
-            );
-
-        Task.WaitAll(queue);
+       
 
         return kudosId;
     }

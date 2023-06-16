@@ -14,5 +14,7 @@ public interface IUserProfileRepository
 
     string? GetUserPhoto(Guid userid);
 
+    bool Truncate();
 
+    bool PopulateUserProfile(List<UserProfile> users);
 }

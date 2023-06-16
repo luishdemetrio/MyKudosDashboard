@@ -15,4 +15,6 @@ public interface IKudosRepository
 
     int Add(Models.Kudos kudos);
 
+    Domain.Models.Kudos? GetKudos(int kudosId);
+
 }

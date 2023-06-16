@@ -321,7 +321,7 @@ public class GraphService : IGraphService
         return result;
     }
 
-    public async Task<bool> GetAllUsers(IUserProfileRepository userProfileRepository, string[] domains)
+    public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains)
     {
 
         var graphUsers = new Dictionary<Guid, MyKudos.Kudos.Domain.Models.UserProfile>();
@@ -414,8 +414,7 @@ public class GraphService : IGraphService
 
         }
 
-
-        userProfileRepository.AddRange(graphUsers.Values.ToList());
+        userProfileRepository.PopulateUserProfile(graphUsers.Values.ToList());
 
 
         return true;

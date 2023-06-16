@@ -26,14 +26,14 @@ public class AllUsersController : Controller
         _userProfileRepository = userProfileRepository;
     }
 
-    [HttpGet(Name = "GetAllUsers")]
-    public async Task<bool> GetAllUsers()
+    [HttpGet(Name = "PopulateUserProfile")]
+    public async Task<bool> PopulateUserProfile()
     {
 
         List<GraphUser> result = new();
 
         
-        await _graphService.GetAllUsers(_userProfileRepository, _emailDomain);
+        await _graphService.PopulateUserProfile(_userProfileRepository, _emailDomain);
         
 
         return true;

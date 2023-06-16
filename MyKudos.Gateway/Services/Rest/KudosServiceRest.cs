@@ -126,4 +126,23 @@ public class KudosServiceRest: IKudosService
 
         return result;
     }
+
+    public async Task<Kudos.Domain.Models.Kudos> GetKudosUser(int kudosId)
+    {
+        Kudos.Domain.Models.Kudos result = new();
+
+        try
+        {
+            result = await _restClientHelper.GetApiData<Kudos.Domain.Models.Kudos>($"{_kudosServiceUrl}kudosid/?kudosid= {kudosId}");
+            
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    
 }

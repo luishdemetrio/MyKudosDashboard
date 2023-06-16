@@ -5,7 +5,7 @@ namespace MyKudos.Kudos.App.Interfaces;
 
 public interface IUserProfileService
 {
-    bool PopulateUserProfile();
+   
 
     bool AddUser(UserProfile user);
 
@@ -14,4 +14,6 @@ public interface IUserProfileService
     List<UserProfile> GetUsers(string name);
 
     string? GetUserPhoto(Guid userid);
+
+    
 }

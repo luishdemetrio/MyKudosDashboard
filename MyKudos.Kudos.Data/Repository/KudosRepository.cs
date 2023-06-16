@@ -31,10 +31,20 @@ public class KudosRepository : IKudosRepository
 		return kudos.KudosId;
 	}
 
+    public Domain.Models.Kudos? GetKudos(int kudosId)
+    {
+
+        return _kudosDbContext.Kudos.Where(k => k.KudosId == kudosId)
+                    .Include(l => l.Likes)
+                    .Include(c => c.Comments)
+                    .Include(u => u.UserFrom)
+                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognition)
+                    .First();
+    }
 
 
-
-	public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
 	{
 
 		if(pageSize > _maxPageSize)

@@ -56,7 +56,7 @@ public class SendKudosView : ISendKudosView
         return await _userGateway.GetUsers(name);              
     }
 
-    public async Task<string> Send(KudosRequest kudos)
+    public async Task<string> Send(SendKudosRequest kudos)
     {
      
         return await _kudosGateway.SendKudos(kudos);

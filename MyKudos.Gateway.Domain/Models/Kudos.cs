@@ -14,7 +14,23 @@
 
 
 
-public record KudosRequest(
+public class SendKudosRequest
+{
+
+    public int KudosId { get; set; }
+
+    public Guid FromPersonId { get; set; }
+
+    public Guid ToPersonId { get; set; }
+
+    public int RecognitionId { get; set; }
+
+    public string? Message { get; set; }
+
+    public DateTime Date { get; set; }
+}
+
+    public record KudosRequest(
     Person From,
     Person To,
     Reward Reward,

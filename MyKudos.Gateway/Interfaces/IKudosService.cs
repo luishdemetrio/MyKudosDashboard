@@ -14,5 +14,5 @@ public interface IKudosService
 
     Task<bool> UndoLikeAsync(Kudos.Domain.Models.SendLike dislike);
 
-
+    Task<Kudos.Domain.Models.Kudos> GetKudosUser(int kudosId);
 }

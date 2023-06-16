@@ -56,7 +56,7 @@ public class CommentsLikes
     public Guid FromPersonId { get; set; }
 
     [ForeignKey("FromPersonId")]
-    public UserProfile? Person { get; set; }
+    public UserProfile Person { get; set; }
 }
 
 public class KudosLike

@@ -95,4 +95,9 @@ public sealed class KudosService : IKudosService
     {
         return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize);
     }
+
+    public Domain.Models.Kudos GetKudos(int kudosId)
+    {
+        return _kudosRepository.GetKudos(kudosId);
+    }
 }

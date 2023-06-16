@@ -43,13 +43,13 @@ public class GatewayService : IKudosGateway
     }
 
 
-    public async Task<string> SendKudos(KudosRequest kudos)
+    public async Task<string> SendKudos(SendKudosRequest kudos)
     {
         string kudosId = string.Empty;
 
         try
         {
-            kudosId = await _restClientHelper.SendApiData<KudosRequest, string>($"{_gatewayServiceUrl}kudos",  HttpMethod.Post,  kudos);
+            kudosId = await _restClientHelper.SendApiData<SendKudosRequest, string>($"{_gatewayServiceUrl}kudos",  HttpMethod.Post,  kudos);
         }
         catch (Exception ex)
         {

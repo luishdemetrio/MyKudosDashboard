@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Localization;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Interfaces;
@@ -7,6 +8,7 @@ using MyKudos.Gateway.Services.Rest;
 using MyKudos.MessageSender.Interfaces;
 using MyKudos.MessageSender.Services;
 using MyKudos.Queue.Services;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +74,19 @@ if (app.Environment.IsDevelopment())
 
 
 }
+
+var selectedCulture = config["SelectedCulture"];
+
+var supportedCultures = new[] { new CultureInfo("pt-BR") };
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(selectedCulture),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+app.UseRequestLocalization(localizationOptions);
 
 app.UseHttpsRedirection();
 

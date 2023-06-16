@@ -35,25 +35,20 @@ public class UserProfileService : IUserProfileService
         return _userProfileRepository.GetAll();
     }
 
-    public bool PopulateUserProfile()
-    {
-        var graphUsers = GetUsersViaGraph();
-
-        return true;
-    }
+  
 
 
-    private async Task<List<UserProfile>> GetUsersViaGraph() 
-    {
+    //private async Task<List<UserProfile>> GetUsersViaGraph() 
+    //{
 
-        List<UserProfile> result = new();
+    //    List<UserProfile> result = new();
 
         
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<UserProfile>>($"{_graphServiceUrl}allusers");
-            result = kudos.ToList();
+    //        var kudos = await _restClientHelper.GetApiData<IEnumerable<UserProfile>>($"{_graphServiceUrl}allusers");
+    //        result = kudos.ToList();
         
-        return result;
-    }
+    //    return result;
+    //}
 
     public List<UserProfile> GetUsers(string name)
     {
