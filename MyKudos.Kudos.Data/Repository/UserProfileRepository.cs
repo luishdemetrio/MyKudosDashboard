@@ -36,11 +36,9 @@ public class UserProfileRepository : IUserProfileRepository
     {
         bool result = false;
 
-        if (Truncate())
-        {
-            result = AddRange(users);
-        }
-
+        Truncate();
+        result = AddRange(users);
+        
         return result;
     }
 
