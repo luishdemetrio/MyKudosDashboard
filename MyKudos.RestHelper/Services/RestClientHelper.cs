@@ -36,15 +36,20 @@ public class RestClientHelper : IRestClientHelper
 
             using var request = new HttpRequestMessage(new HttpMethod("GET"), endpoint);
 
-           // await SetCommonHeaders(request);
-
-   
+            await SetCommonHeaders(request);
+           
             using var response = await httpClient.SendAsync(request);
 
             
             var responseContent = await response.Content.ReadAsStringAsync();
 
-        response.EnsureSuccessStatusCode();
+        // response.EnsureSuccessStatusCode();
+        
+        if ((response != null) && (response.StatusCode != HttpStatusCode.OK))
+        {
+
+            throw new Exception(responseContent);
+        }
 
         var settings = new JsonSerializerSettings
         {
@@ -73,7 +78,7 @@ public class RestClientHelper : IRestClientHelper
 
         using var request = new HttpRequestMessage(new HttpMethod(httpMethod.Method), endpoint);
 
-      //  await SetCommonHeaders(request);
+        await SetCommonHeaders(request);
 
         if (body != null)
         {
@@ -88,7 +93,12 @@ public class RestClientHelper : IRestClientHelper
 
         var responseContent = await response.Content.ReadAsStringAsync();
 
-        response.EnsureSuccessStatusCode();
+        if ((response != null) && (response.StatusCode != HttpStatusCode.OK)) {
+            
+            throw new Exception(responseContent);
+        }
+
+        //response.EnsureSuccessStatusCode();
 
         return JsonConvert.DeserializeObject<TResponse>(responseContent);
 
