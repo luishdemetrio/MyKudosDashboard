@@ -36,7 +36,7 @@ public class RestClientHelper : IRestClientHelper
 
             using var request = new HttpRequestMessage(new HttpMethod("GET"), endpoint);
 
-            await SetCommonHeaders(request);
+           // await SetCommonHeaders(request);
 
    
             using var response = await httpClient.SendAsync(request);
@@ -73,7 +73,7 @@ public class RestClientHelper : IRestClientHelper
 
         using var request = new HttpRequestMessage(new HttpMethod(httpMethod.Method), endpoint);
 
-        await SetCommonHeaders(request);
+      //  await SetCommonHeaders(request);
 
         if (body != null)
         {
