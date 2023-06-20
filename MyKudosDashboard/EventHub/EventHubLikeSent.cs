@@ -8,8 +8,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubLikeSent : IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>>
 {
-    private ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>> _observers
-                        = new ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>>();
+    private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>> _observers
+                        = new ();
 
     private EventHubConsumerHelper<LikeGateway> _eventHubScore;
    
@@ -46,7 +46,7 @@ public class EventHubLikeSent : IEventHubReceived<EventHubResponse<EventHubLikeO
             {
                 if (score != null)
                 {
-                    foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers)
+                    foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers.Values)
                     {
                         
                         observer.NotifyUpdate(new EventHubResponse<EventHubLikeOptions, LikeGateway>
@@ -59,15 +59,17 @@ public class EventHubLikeSent : IEventHubReceived<EventHubResponse<EventHubLikeO
 
         _eventHubScore.Start();
     }
-    public void Attach(IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
+    public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
     {
-        _observers.Add(observer);
+        _observers.AddOrUpdate(userId, observer,
+                    (_, existingObserver) => existingObserver);
     }
 
-    public void Detach(IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
+    public void Detach(string userId)
     {
-        _observers.TryTake(out observer);
+
+        _observers.TryRemove(userId, out _);
     }
 
-   
+
 }

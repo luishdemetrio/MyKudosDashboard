@@ -6,8 +6,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
 {
-    private ConcurrentBag<IObserverEventHub<UserPointScore>> _observers
-                        = new ConcurrentBag<IObserverEventHub<UserPointScore>>();
+    private ConcurrentDictionary<string, IObserverEventHub<UserPointScore>> _observers
+                        = new ();
 
     private EventHubConsumerHelper<UserPointScore> _eventHubScore;
 
@@ -24,7 +24,7 @@ public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
             {
                 if (score != null)
                 {
-                    foreach (IObserverEventHub<UserPointScore> observer in _observers)
+                    foreach (IObserverEventHub<UserPointScore> observer in _observers.Values)
                     {
                         observer.NotifyUpdate(score);
                     }
@@ -33,15 +33,16 @@ public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
 
         _eventHubScore.Start();
     }
-    public void Attach(IObserverEventHub<UserPointScore> observer)
+    public void Attach(string userId, IObserverEventHub<UserPointScore> observer)
     {
-        _observers.Add(observer);
+        _observers.AddOrUpdate(userId, observer,
+                    (_, existingObserver) => existingObserver);
     }
 
-    public void Detach(IObserverEventHub<UserPointScore> observer)
+    public void Detach(string userId)
     {
-        _observers.TryTake(out observer);
+
+        _observers.TryRemove(userId, out _);
     }
 
-   
 }

@@ -116,7 +116,7 @@ public class KudosController : Controller
             //send the kudos notification to the Teams Dashboard
             var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(
               From: new Person { Id = kudosDb.UserFrom.UserProfileId, Name = kudosDb.UserFrom.DisplayName, Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}" },
-              To: new Person { Id = kudosDb.UserTo.UserProfileId, Name = kudosDb.UserTo.DisplayName, Photo = $"data:image/png;base64,{kudosDb.UserTo.Photo}" },
+              To: new Person { Id = kudosDb.UserTo.UserProfileId, Name = kudosDb.UserTo.DisplayName, Photo = $"data:image/png;base64,{kudosDb.UserTo.Photo96x96}" },
               ManagerId: userManagerId,
               Message: kudosDb.Message,
               Reward:  new Reward ( Id : kudosDb.Recognition.RecognitionId,Title : kudosDb.Recognition.Title ),

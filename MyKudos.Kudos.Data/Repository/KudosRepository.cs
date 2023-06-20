@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -52,7 +53,7 @@ public class KudosRepository : IKudosRepository
 			pageSize = _maxPageSize;
 		}
 
-		return await _kudosDbContext.Kudos.OrderByDescending(k => k.Date)
+		var kudos =  await _kudosDbContext.Kudos.OrderByDescending(k => k.Date)
 					.Skip(pageSize * (pageNumber - 1))
 					.Take(pageSize)					
 					.Include(l=> l.Likes)
@@ -60,8 +61,19 @@ public class KudosRepository : IKudosRepository
                     .Include(u => u.UserFrom)
                     .Include(u => u.UserTo)
                     .Include(u => u.Recognition)
-                    .ToListAsync();
-	}
+        .ToListAsync();
+
+
+        foreach (var kudo in kudos)
+        {
+            foreach (var like in kudo.Likes)
+            {
+                like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+            }
+        }
+
+        return kudos;
+    }
 
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
@@ -72,7 +84,7 @@ public class KudosRepository : IKudosRepository
             pageSize = _maxPageSize;
         }
 
-        return await _kudosDbContext.Kudos
+        var kudos =  await _kudosDbContext.Kudos
 					.Where(k => k.FromPersonId == pUserId)
 					.OrderByDescending(k => k.Date)
                     .Skip(pageSize * (pageNumber - 1))
@@ -83,6 +95,16 @@ public class KudosRepository : IKudosRepository
                     .Include(u => u.UserTo)
                     .Include(u => u.Recognition)
                     .ToListAsync();
+
+        foreach (var kudo in kudos)
+        {
+            foreach (var like in kudo.Likes)
+            {
+                like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+            }
+        }
+
+        return kudos;
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
@@ -93,7 +115,7 @@ public class KudosRepository : IKudosRepository
             pageSize = _maxPageSize;
         }
 
-        return await _kudosDbContext.Kudos
+        var kudos =  await _kudosDbContext.Kudos
                     .Where(k => k.ToPersonId == pUserId)
                     .OrderByDescending(k => k.Date)
                     .Skip(pageSize * (pageNumber - 1))
@@ -104,6 +126,16 @@ public class KudosRepository : IKudosRepository
                     .Include(u => u.UserTo)
                     .Include(u => u.Recognition)
                     .ToListAsync();
+
+        foreach (var kudo in kudos)
+        {
+            foreach (var like in kudo.Likes)
+            {
+                like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+            }
+        }
+
+        return kudos;
     }
 
 

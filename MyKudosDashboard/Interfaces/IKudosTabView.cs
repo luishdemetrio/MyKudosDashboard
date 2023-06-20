@@ -4,9 +4,10 @@ namespace MyKudosDashboard.Interfaces;
 
 public interface IKudosTabView
 {
-    //public void RegisterForLiveUpdates(string userId);
 
-    //Task RegisterForUpdates();
+    void RegisterObserver(string userId);
+    void UnregisterObserver(string userId);
+
     public delegate void UpdateLikesCallBack(LikeGateway like);
 
     public UpdateLikesCallBack LikeCallback { get; set; }

@@ -8,8 +8,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCommentOptions,CommentsRequest>>
 {
-    private ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
-                        = new ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>>();
+    private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
+                        = new ();
 
     private EventHubConsumerHelper<CommentsRequest> _eventHubScore;
     
@@ -46,7 +46,7 @@ public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCo
             {
                 if (score != null)
                 {
-                    foreach (IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer in _observers)
+                    foreach (IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer in _observers.Values)
                     {
                         
                         observer.NotifyUpdate(new EventHubResponse<EventHubCommentOptions, CommentsRequest>
@@ -59,15 +59,17 @@ public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCo
 
         _eventHubScore.Start();
     }
-    public void Attach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
+    public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {
-        _observers.Add(observer);
+        _observers.AddOrUpdate(userId, observer,
+                    (_, existingObserver) => existingObserver);
     }
 
-    public void Detach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
+    public void Detach(string userId)
     {
-        _observers.TryTake(out observer);
+
+        _observers.TryRemove(userId, out _);
     }
 
-   
+
 }

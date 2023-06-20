@@ -6,8 +6,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubKudosSent : IEventHubReceived<KudosResponse>
 {
-    private ConcurrentBag<IObserverEventHub<KudosResponse>> _observers
-                        = new ConcurrentBag<IObserverEventHub<KudosResponse>>();
+    private ConcurrentDictionary<string, IObserverEventHub<KudosResponse>> _observers
+                        = new ();
 
     private EventHubConsumerHelper<KudosResponse> _eventHubKudos;
 
@@ -45,7 +45,7 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
             {
                 if (kudos != null)
                 {
-                    foreach (IObserverEventHub<KudosResponse> observer in _observers)
+                    foreach (IObserverEventHub<KudosResponse> observer in _observers.Values)
                     {
                         observer.NotifyUpdate(kudos);
                     }
@@ -54,29 +54,16 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
 
         _eventHubKudos.Start();
     }
-    public void Attach(IObserverEventHub<KudosResponse> observer)
+    public void Attach(string userId, IObserverEventHub<KudosResponse> observer)
     {
-
-        _observers.Add(observer);
+        _observers.AddOrUpdate(userId, observer, 
+                    (_, existingObserver) => existingObserver);
     }
 
-    public void Detach(IObserverEventHub<KudosResponse> observer)
+    public void Detach(string userId)
     {
-
-        _observers.TryTake(out observer);
-        //IObserverEventHub<KudosResponse> removedObserver;
-
-        //var tempQueue = new ConcurrentQueue<IObserverEventHub<KudosResponse>>();
-
-        //while (_observers.TryDequeue(out removedObserver))
-        //{
-        //    if (removedObserver != observer)
-        //    {
-        //        tempQueue.Enqueue(removedObserver);
-        //    }
-        //}
-
-        //_observers = tempQueue;
+        
+        _observers.TryRemove(userId, out _);
     }
 
    

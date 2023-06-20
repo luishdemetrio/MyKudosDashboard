@@ -11,7 +11,7 @@
 <div class="card-body w-auto">
 
     
-    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:82vh;overflow-y:scroll;overflow:auto">
+    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:82vh;overflow-y:scroll;overflow:auto;width:100%">
 
 
          @if (_isLoaded)
@@ -22,11 +22,11 @@
 
                 <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
                     <div class="avatar">
-                        <img src=@item.Photo style="height:10vh;width:10vh;border-radius: 50%" />
+                        <img src=@item.Photo style="height:7vh;width:7vh;border-radius: 50%" />
                     </div>
                     <div class="info">
-                        <h5>@item.Name</h5>
-                        <h2 class="card-title pricing-card-title">
+                        <small class="small60">@item.Name</small>
+                        <h2 class="card-title pricing-card-title" style="padding-bottom:1vh">
                             @item.Score<small class="text-muted fw-light" style="margin-left: 10px;">@Localizer["Points"]</small>
                         </h2>
                     </div>
@@ -40,12 +40,20 @@
 </div>
 
 @code {
+    [Parameter]
+    public UserInfo User { get; set; }
+
     private IEnumerable<MyKudos.Gateway.Domain.Models.TopContributors> _topContributors;
     private bool _isLoaded = false;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+
+        if (User != null)
+        {
+            TopContributorsView.RegisterObserver(User.ObjectId);
+        }
 
         TopContributorsView.GetTopContributors().ContinueWith(t =>
         {

@@ -2,13 +2,14 @@
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
+using Microsoft.Graph.ExternalConnectors;
 
 namespace MyKudosDashboard.Views;
 
 public class KudosTabView : IKudosTabView, 
                             IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>, 
                             IObserverEventHub<KudosResponse>,
-                            IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>
+                            IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>, IDisposable
 { 
   
    
@@ -32,31 +33,39 @@ public class KudosTabView : IKudosTabView,
 
     IEventHubReceived<KudosResponse> _eventHubKudosSent;
 
+    private IConfiguration _configuration;
+    private string _userId;
+
 
     public KudosTabView(IConfiguration configuration,
                         ILogger<KudosTabView> logger)
     {
-        
-      
-        eventHubLikeSent = EventHubLikeSent.GetInstance(configuration);
-        eventHubLikeSent.Attach(this);
 
-        _eventHubUndoLikeSent = EventHubUndoLike.GetInstance(configuration);
-        _eventHubUndoLikeSent.Attach(this);
 
-        _eventHubCommentSent = EventHubCommentSent.GetInstance(configuration);
-        _eventHubCommentSent.Attach(this);
-
-        _eventHubCommentDeleted = EventHubCommentDeleted.GetInstance(configuration);
-        _eventHubCommentDeleted.Attach(this);
-
-        _eventHubKudosSent = EventHubKudosSent.GetInstance(configuration); ;
-        _eventHubKudosSent.Attach(this);
-
-        
+        _configuration = configuration;
 
     }
 
+    public void RegisterObserver(string userId)
+    {
+        //it is used on Dispose
+        _userId = userId;
+
+        eventHubLikeSent = EventHubLikeSent.GetInstance(_configuration);
+        eventHubLikeSent.Attach(userId, this);
+
+        _eventHubUndoLikeSent = EventHubUndoLike.GetInstance(_configuration);
+        _eventHubUndoLikeSent.Attach(userId, this);
+
+        _eventHubCommentSent = EventHubCommentSent.GetInstance(_configuration);
+        _eventHubCommentSent.Attach(userId, this);
+
+        _eventHubCommentDeleted = EventHubCommentDeleted.GetInstance(_configuration);
+        _eventHubCommentDeleted.Attach(userId, this);
+
+        _eventHubKudosSent = EventHubKudosSent.GetInstance(_configuration); ;
+        _eventHubKudosSent.Attach(userId, this);
+    }
 
     public void NotifyUpdate(KudosResponse score)
     {
@@ -99,5 +108,23 @@ public class KudosTabView : IKudosTabView,
             default:
                 break;
         }
+    }
+
+    public void UnregisterObserver(string userId)
+    {
+        eventHubLikeSent.Detach(userId);
+
+        _eventHubUndoLikeSent.Detach(userId);
+
+        _eventHubCommentSent.Detach(userId);
+
+        _eventHubCommentDeleted.Detach(userId);
+
+        _eventHubKudosSent.Detach(userId);
+    }
+
+    public void Dispose()
+    {
+        UnregisterObserver(_userId);
     }
 }
