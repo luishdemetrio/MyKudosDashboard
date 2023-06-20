@@ -4,8 +4,8 @@ namespace MyKudosDashboard.Interfaces;
 
 public interface ITopContributorsView
 {
-    void RegisterObserver(string userId);
-    void UnregisterObserver(string userId);
+    //void RegisterObserver(string userId);
+    //void UnregisterObserver(string userId);
 
     public delegate void UpdateTopContributorsCallBack();
 

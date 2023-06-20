@@ -4,7 +4,7 @@ using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 
-public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserPointScore>, IDisposable
+public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserPointScore>//, IDisposable
 {
 
     private IGamificationGateway _gamificationGateway;
@@ -13,26 +13,26 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     private IEventHubReceived<UserPointScore> _eventHubUserPointsReceived;
 
-    private string _userId;
-
+    
     public TopContributorsView(IGamificationGateway gamificationGateway,
                                IEventHubReceived<UserPointScore> eventHubUserPointsReceived)
     {
         _gamificationGateway = gamificationGateway;
 
         _eventHubUserPointsReceived = eventHubUserPointsReceived;
+
+        RegisterObserver();
     }
 
-    public void RegisterObserver(string userId)
+    public void RegisterObserver()
     {
-        _userId = userId;
-        _eventHubUserPointsReceived.Attach(userId, this);
+        _eventHubUserPointsReceived.Attach(this);
     }
 
-    public void UnregisterObserver(string userId)
-    {
-        _eventHubUserPointsReceived.Detach(userId);
-    }
+    //public void UnregisterObserver(string userId)
+    //{
+    //    _eventHubUserPointsReceived.Detach(userId);
+    //}
 
 
     public async Task<IEnumerable<TopContributors>> GetTopContributors()
@@ -45,8 +45,8 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
         TopContributorsCallBack?.Invoke();
     }
 
-    public void Dispose()
-    {
-        UnregisterObserver(_userId);
-    }
+    //public void Dispose()
+    //{
+    // //   UnregisterObserver(_userId);
+    //}
 }

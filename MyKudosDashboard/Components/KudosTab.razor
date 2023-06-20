@@ -65,7 +65,7 @@
             var subscriptionName = User.ObjectId ;
 
 
-            KudosTabView.RegisterObserver(User.ObjectId);
+            //KudosTabView.RegisterObserver(User.ObjectId);
 
             KudosTabView.LikeCallback = UpdateLikesCallBack;
             KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
@@ -79,6 +79,18 @@
 
         await Task.CompletedTask;
 
+    }
+
+    public void ReloadKudos()
+    {
+        var t = InvokeAsync(() =>
+      {
+          AllKudosTab.LoadKudos();
+      });
+
+        t.Wait();
+
+        
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)

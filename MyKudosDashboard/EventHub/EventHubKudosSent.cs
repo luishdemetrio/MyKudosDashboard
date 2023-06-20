@@ -6,8 +6,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubKudosSent : IEventHubReceived<KudosResponse>
 {
-    private ConcurrentDictionary<string, IObserverEventHub<KudosResponse>> _observers
-                        = new ();
+    private ConcurrentBag<IObserverEventHub<KudosResponse>> _observers
+                        = new ConcurrentBag<IObserverEventHub<KudosResponse>>();
 
     private EventHubConsumerHelper<KudosResponse> _eventHubKudos;
 
@@ -41,30 +41,43 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubKudos.UpdateCallback += (kudos => 
+        _eventHubKudos.UpdateCallback += (kudos =>
+        {
+            if (kudos != null)
             {
-                if (kudos != null)
+                foreach (IObserverEventHub<KudosResponse> observer in _observers)
                 {
-                    foreach (IObserverEventHub<KudosResponse> observer in _observers.Values)
-                    {
-                        observer.NotifyUpdate(kudos);
-                    }
+                    observer.NotifyUpdate(kudos);
                 }
-            });
+            }
+        });
 
         _eventHubKudos.Start();
     }
-    public void Attach(string userId, IObserverEventHub<KudosResponse> observer)
+    public void Attach(IObserverEventHub<KudosResponse> observer)
     {
-        _observers.AddOrUpdate(userId, observer, 
-                    (_, existingObserver) => existingObserver);
+
+        _observers.Add(observer);
     }
 
-    public void Detach(string userId)
+    public void Detach(IObserverEventHub<KudosResponse> observer)
     {
-        
-        _observers.TryRemove(userId, out _);
+
+       // _observers.TryTake(out observer);
+        //IObserverEventHub<KudosResponse> removedObserver;
+
+        //var tempQueue = new ConcurrentQueue<IObserverEventHub<KudosResponse>>();
+
+        //while (_observers.TryDequeue(out removedObserver))
+        //{
+        //    if (removedObserver != observer)
+        //    {
+        //        tempQueue.Enqueue(removedObserver);
+        //    }
+        //}
+
+        //_observers = tempQueue;
     }
 
-   
+
 }

@@ -9,8 +9,8 @@ namespace MyKudosDashboard.EventHub;
 
 public class EventHubUndoLike : IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>>
 {
-    private ConcurrentDictionary<string,IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>> _observers
-                        = new ();
+    private ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>> _observers
+                        = new ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>>();
 
     private EventHubConsumerHelper<LikeGateway> _eventHubScore;
 
@@ -43,33 +43,33 @@ public class EventHubUndoLike : IEventHubReceived<EventHubResponse<EventHubLikeO
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubScore.UpdateCallback += (score => 
+        _eventHubScore.UpdateCallback += (score =>
+        {
+            if (score != null)
             {
-                if (score != null)
+                foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers)
                 {
-                    foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers.Values)
+
+                    observer.NotifyUpdate(new EventHubResponse<EventHubLikeOptions, LikeGateway>
                     {
-                        
-                        observer.NotifyUpdate(new EventHubResponse<EventHubLikeOptions, LikeGateway>
-                        {
-                            Kind = EventHubLikeOptions.UndoLike, Event = score 
-                        });
-                    }
+                        Kind = EventHubLikeOptions.UndoLike,
+                        Event = score
+                    });
                 }
-            });
+            }
+        });
 
         _eventHubScore.Start();
     }
-    public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
+    public void Attach(IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
     {
-        _observers.AddOrUpdate(userId, observer,
-                    (_, existingObserver) => existingObserver);
+        _observers.Add(observer);
     }
 
-    public void Detach(string userId)
+    public void Detach(IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
     {
-
-        _observers.TryRemove(userId, out _);
+      //  _observers.TryTake(out observer);
     }
+
 
 }

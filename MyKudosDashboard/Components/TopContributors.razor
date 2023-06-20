@@ -27,7 +27,7 @@
                     <div class="info">
                         <small class="small60">@item.Name</small>
                         <h2 class="card-title pricing-card-title" style="padding-bottom:1vh">
-                            @item.Score<small class="text-muted fw-light" style="margin-left: 10px;">@Localizer["Points"]</small>
+                            @item.Score<small class="text-muted fw-light" style="margin-left: 3px;">@Localizer["Points"]</small>
                         </h2>
                     </div>
                 </div>
@@ -50,10 +50,10 @@
     {
         base.OnInitialized();
 
-        if (User != null)
-        {
-            TopContributorsView.RegisterObserver(User.ObjectId);
-        }
+        //if (User != null)
+        //{
+        //    TopContributorsView.RegisterObserver(User.ObjectId);
+        //}
 
         TopContributorsView.GetTopContributors().ContinueWith(t =>
         {

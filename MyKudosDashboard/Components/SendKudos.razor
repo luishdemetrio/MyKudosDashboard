@@ -280,7 +280,7 @@
 
     private string KudosMessage;
 
-    public delegate void SendKudosCallBack(KudosResponse pKudos);
+    public delegate void SendKudosCallBack();
 
     [Parameter]
     public SendKudosCallBack sendKudosCallBack { get; set; }
@@ -390,9 +390,10 @@
             await InvokeAsync(() =>
              {
                  BlockSendButton(false);
-                 ClearFields();
                  Hide();
                  StateHasChanged();
+
+                 sendKudosCallBack?.Invoke();
              });
 
 
@@ -400,20 +401,11 @@
 
     }
 
-    private void ClearFields()
-    {
-
-    }
-
-
 
     public void Hide()
     {
         ModalHidden = true;
         SendKudosFluentDialog!.Hide();
-
-
-
     }
 
     private void OnDismiss()

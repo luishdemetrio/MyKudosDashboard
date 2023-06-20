@@ -160,10 +160,10 @@
         base.OnInitialized();
 
 
-        if (User != null)
-        {
-            UserProfileScoreView.RegisterObserver(User.ObjectId);
-        }
+        //if (User != null)
+        //{
+        //    UserProfileScoreView.RegisterObserver(User.ObjectId);
+        //}
 
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
 

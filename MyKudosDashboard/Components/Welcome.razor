@@ -96,21 +96,7 @@ else
                         <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
                     </div>
 
-
                     <UserProfileScore @ref=_userProfileScore User=@_user UserPhoto=@_userPhoto SendKudosCallBack=@OpenSendKudosPanel />
-
-                    @*<button type="button" class="btn btn-primary small60" style="height:7vh;margin:10px;position:relative"
-                        @onclick=@(()=>OpenSendKudosPanel() )>
-                        📩 @Localizer["SendKudos"]
-                    </button>*@
-                    
-
-
-                    @*  <FluentButton class="btn btn-primary" style="height:60px;margin:5px;" @onclick=@(()=>OpenSendKudosPanel())>
-                        <span>@Localizer["SendKudos"]</span>
-                        <FluentIcon Name="@FluentIcons.Send" Slot="start" Size="@IconSize.Size24" Filled=true />
-                    </FluentButton>*@
-
 
                     </div>
             </div>
@@ -123,7 +109,7 @@ else
                         <h4 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"]</h4>
                     </div>
 
-                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack />
+                    <KudosTab @ref=_kudosTab User=@_user UserPhoto=@_userPhoto ReplyCallBack=@ReplyCallBack  />
                     
                 </div>
             </div>
@@ -142,7 +128,7 @@ else
                 </div>
             </div>
 
-            <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto/>
+            <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_user UserPhoto=@_userPhoto sendKudosCallBack=@SendKudosCallBack />
 
         </div>
 
@@ -224,10 +210,10 @@ else
     {
         _sendKudosIsHidden = false;
 
-         var t = InvokeAsync(() =>
-        {
-            _sendKudosPanel.SendKudosModal();
-        });
+        var t = InvokeAsync(() =>
+       {
+           _sendKudosPanel.SendKudosModal();
+       });
 
         t.Wait();
 
@@ -240,8 +226,13 @@ else
            _replyKudos.ShowModal(pKudos, _userPhoto);
        });
 
-       t.Wait();
-}
+        t.Wait();
+    }
+
+    private void SendKudosCallBack()
+    {
+        _kudosTab.ReloadKudos();
+    }
 
     
 }

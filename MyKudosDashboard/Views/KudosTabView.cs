@@ -44,27 +44,26 @@ public class KudosTabView : IKudosTabView,
 
         _configuration = configuration;
 
+        RegisterObserver();
     }
 
-    public void RegisterObserver(string userId)
+    public void RegisterObserver()
     {
-        //it is used on Dispose
-        _userId = userId;
-
+        
         eventHubLikeSent = EventHubLikeSent.GetInstance(_configuration);
-        eventHubLikeSent.Attach(userId, this);
+        eventHubLikeSent.Attach(this);
 
         _eventHubUndoLikeSent = EventHubUndoLike.GetInstance(_configuration);
-        _eventHubUndoLikeSent.Attach(userId, this);
+        _eventHubUndoLikeSent.Attach(this);
 
         _eventHubCommentSent = EventHubCommentSent.GetInstance(_configuration);
-        _eventHubCommentSent.Attach(userId, this);
+        _eventHubCommentSent.Attach(this);
 
         _eventHubCommentDeleted = EventHubCommentDeleted.GetInstance(_configuration);
-        _eventHubCommentDeleted.Attach(userId, this);
+        _eventHubCommentDeleted.Attach(this);
 
         _eventHubKudosSent = EventHubKudosSent.GetInstance(_configuration); ;
-        _eventHubKudosSent.Attach(userId, this);
+        _eventHubKudosSent.Attach(this);
     }
 
     public void NotifyUpdate(KudosResponse score)
@@ -112,15 +111,15 @@ public class KudosTabView : IKudosTabView,
 
     public void UnregisterObserver(string userId)
     {
-        eventHubLikeSent.Detach(userId);
+        //eventHubLikeSent.Detach(userId);
 
-        _eventHubUndoLikeSent.Detach(userId);
+        //_eventHubUndoLikeSent.Detach(userId);
 
-        _eventHubCommentSent.Detach(userId);
+        //_eventHubCommentSent.Detach(userId);
 
-        _eventHubCommentDeleted.Detach(userId);
+        //_eventHubCommentDeleted.Detach(userId);
 
-        _eventHubKudosSent.Detach(userId);
+        //_eventHubKudosSent.Detach(userId);
     }
 
     public void Dispose()

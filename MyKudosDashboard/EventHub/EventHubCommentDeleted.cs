@@ -6,13 +6,13 @@ namespace MyKudosDashboard.EventHub;
 
 
 
-public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHubCommentOptions,CommentsRequest>>
+public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>>
 {
-    private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
-                        = new ();
+    private ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
+                        = new ConcurrentBag<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>>();
 
     private EventHubConsumerHelper<CommentsRequest> _eventHubScore;
-    
+
     private static EventHubCommentDeleted instance;
     private static object lockObject = new object();
 
@@ -42,33 +42,32 @@ public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHu
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubScore.UpdateCallback += (score => 
+        _eventHubScore.UpdateCallback += (score =>
+        {
+            if (score != null)
             {
-                if (score != null)
+                foreach (IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer in _observers)
                 {
-                    foreach (IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer in _observers.Values)
+
+                    observer.NotifyUpdate(new EventHubResponse<EventHubCommentOptions, CommentsRequest>
                     {
-                        
-                        observer.NotifyUpdate(new EventHubResponse<EventHubCommentOptions, CommentsRequest>
-                        {
-                            Kind = EventHubCommentOptions.CommentDeleted, Event = score 
-                        });
-                    }
+                        Kind = EventHubCommentOptions.CommentDeleted,
+                        Event = score
+                    });
                 }
-            });
+            }
+        });
 
         _eventHubScore.Start();
     }
-    public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
+    public void Attach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {
-        _observers.AddOrUpdate(userId, observer,
-                    (_, existingObserver) => existingObserver);
+        _observers.Add(observer);
     }
 
-    public void Detach(string userId)
+    public void Detach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {
-
-        _observers.TryRemove(userId, out _);
+       // _observers.TryTake(out observer);
     }
 
 
