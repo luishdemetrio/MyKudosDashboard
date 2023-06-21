@@ -4,11 +4,8 @@ namespace MyKudosDashboard.EventHub;
 
 public interface IEventHubReceived<T>
 {
-    void Attach(IObserverEventHub<T> observer);
-    void Detach(IObserverEventHub<T> observer);
-
-    //void Attach(string user, IObserverEventHub<T> observer);
-    //void Detach(string user);
+    void Attach(string user, IObserverEventHub<T> observer);
+    void Detach(string user);
 
     //void Detach(IObserverEventHub<T> observer);
     // void NotifyUserPointsUpdate(string json);

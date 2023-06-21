@@ -6,13 +6,13 @@ namespace MyKudosDashboard.EventHub;
 
 
 
-public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>>
+public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCommentOptions,CommentsRequest>>
 {
-    private ConcurrentQueue<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
-                        = new ConcurrentQueue<IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>>();
+    private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
+                        = new ();
 
     private EventHubConsumerHelper<CommentsRequest> _eventHubScore;
-
+    
     private static EventHubCommentSent instance;
     private static object lockObject = new object();
 
@@ -42,41 +42,33 @@ public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCo
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubScore.UpdateCallback += (score =>
-        {
-            if (score != null)
+        _eventHubScore.UpdateCallback += (score => 
             {
-                foreach (IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer in _observers)
+                if (score != null)
                 {
-
-                    observer.NotifyUpdate(new EventHubResponse<EventHubCommentOptions, CommentsRequest>
+                    foreach (IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer in _observers.Values)
                     {
-                        Kind = EventHubCommentOptions.CommentSent,
-                        Event = score
-                    });
+                        
+                        observer.NotifyUpdate(new EventHubResponse<EventHubCommentOptions, CommentsRequest>
+                        {
+                            Kind = EventHubCommentOptions.CommentSent, Event = score 
+                        });
+                    }
                 }
-            }
-        });
+            });
 
         _eventHubScore.Start();
     }
-
-    public void Attach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
+    public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {
-        _observers.Enqueue(observer);
+        _observers.AddOrUpdate(userId, observer,
+                    (_, existingObserver) => existingObserver);
     }
 
-    public void Detach(IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
+    public void Detach(string userId)
     {
-        //IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> removedObserver;
 
-        //while (!_observers.IsEmpty)
-        //{
-        //    _observers.TryDequeue(out removedObserver);
-
-        //    if (removedObserver != observer)
-        //        _observers.Enqueue(removedObserver);
-        //}
+        _observers.TryRemove(userId, out _);
     }
 
 

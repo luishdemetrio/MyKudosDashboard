@@ -36,6 +36,8 @@ public class KudosTabView : IKudosTabView,
     private IConfiguration _configuration;
     private string _userId;
 
+    private ILogger<KudosTabView> _logger;
+
 
     public KudosTabView(IConfiguration configuration,
                         ILogger<KudosTabView> logger)
@@ -43,27 +45,28 @@ public class KudosTabView : IKudosTabView,
 
 
         _configuration = configuration;
-
-        RegisterObserver();
+        _logger = logger;
     }
 
-    public void RegisterObserver()
+    public void RegisterObserver(string userId)
     {
-        
+        //it is used on Dispose
+        _userId = userId;
+
         eventHubLikeSent = EventHubLikeSent.GetInstance(_configuration);
-        eventHubLikeSent.Attach(this);
+        eventHubLikeSent.Attach(userId, this);
 
         _eventHubUndoLikeSent = EventHubUndoLike.GetInstance(_configuration);
-        _eventHubUndoLikeSent.Attach(this);
+        _eventHubUndoLikeSent.Attach(userId, this);
 
         _eventHubCommentSent = EventHubCommentSent.GetInstance(_configuration);
-        _eventHubCommentSent.Attach(this);
+        _eventHubCommentSent.Attach(userId, this);
 
         _eventHubCommentDeleted = EventHubCommentDeleted.GetInstance(_configuration);
-        _eventHubCommentDeleted.Attach(this);
+        _eventHubCommentDeleted.Attach(userId, this);
 
         _eventHubKudosSent = EventHubKudosSent.GetInstance(_configuration); ;
-        _eventHubKudosSent.Attach(this);
+        _eventHubKudosSent.Attach(userId, this);
     }
 
     public void NotifyUpdate(KudosResponse score)
@@ -91,6 +94,10 @@ public class KudosTabView : IKudosTabView,
 
     public void NotifyUpdate(EventHubResponse<EventHubCommentOptions, CommentsRequest> score)
     {
+
+        _logger.LogInformation($"KudosTab EventHubCommentOptions: \n {score.Kind}");
+        _logger.LogInformation($"KudosTab received: \n {System.Text.Json.JsonSerializer.Serialize<CommentsRequest>(score.Event)}");
+
         switch (score.Kind)
         {
 
@@ -111,15 +118,20 @@ public class KudosTabView : IKudosTabView,
 
     public void UnregisterObserver(string userId)
     {
-        //eventHubLikeSent.Detach(userId);
+        if (eventHubLikeSent != null)
+            eventHubLikeSent.Detach(userId);
 
-        //_eventHubUndoLikeSent.Detach(userId);
+        if (_eventHubUndoLikeSent != null)
+            _eventHubUndoLikeSent.Detach(userId);
 
-        //_eventHubCommentSent.Detach(userId);
+        if (_eventHubCommentSent != null)
+            _eventHubCommentSent.Detach(userId);
 
-        //_eventHubCommentDeleted.Detach(userId);
+        if (_eventHubCommentDeleted != null)
+            _eventHubCommentDeleted.Detach(userId);
 
-        //_eventHubKudosSent.Detach(userId);
+        if (_eventHubKudosSent != null)
+            _eventHubKudosSent.Detach(userId);
     }
 
     public void Dispose()

@@ -4,7 +4,7 @@ using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 
-public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserPointScore>//, IDisposable
+public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserPointScore>, IDisposable
 {
 
     private IGamificationGateway _gamificationGateway;
@@ -13,26 +13,31 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     private IEventHubReceived<UserPointScore> _eventHubUserPointsReceived;
 
-    
+    private ILogger<TopContributorsView> _logger;
+
+    private string _userId;
+
     public TopContributorsView(IGamificationGateway gamificationGateway,
+                              ILogger<TopContributorsView> logger,
                                IEventHubReceived<UserPointScore> eventHubUserPointsReceived)
     {
         _gamificationGateway = gamificationGateway;
 
         _eventHubUserPointsReceived = eventHubUserPointsReceived;
 
-        RegisterObserver();
+        _logger = logger;
     }
 
-    public void RegisterObserver()
+    public void RegisterObserver(string userId)
     {
-        _eventHubUserPointsReceived.Attach(this);
+        _userId = userId;
+        _eventHubUserPointsReceived.Attach($"top_{userId}", this);
     }
 
-    //public void UnregisterObserver(string userId)
-    //{
-    //    _eventHubUserPointsReceived.Detach(userId);
-    //}
+    public void UnregisterObserver(string userId)
+    {
+        _eventHubUserPointsReceived.Detach($"top_{userId}");
+    }
 
 
     public async Task<IEnumerable<TopContributors>> GetTopContributors()
@@ -42,11 +47,13 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     public void NotifyUpdate(UserPointScore score)
     {
+        _logger.LogInformation($"Top Contributors received: \n {System.Text.Json.JsonSerializer.Serialize<UserPointScore>(score)}");
+
         TopContributorsCallBack?.Invoke();
     }
 
-    //public void Dispose()
-    //{
-    // //   UnregisterObserver(_userId);
-    //}
+    public void Dispose()
+    {
+        UnregisterObserver(_userId);
+    }
 }

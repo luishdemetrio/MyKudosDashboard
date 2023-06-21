@@ -4,7 +4,7 @@ using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Views;
 
-public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<UserPointScore>
+public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<UserPointScore>, IDisposable
 {
 
     private IGamificationGateway _gamificationGateway;
@@ -15,7 +15,8 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
 
     private IEventHubReceived<UserPointScore> _eventHubUserPointsReceived;
 
-    
+    private string _userId;
+
     public UserProfileScoreView(IGamificationGateway gamificationGateway, 
                                 ILogger<UserProfileScoreView> logger,
                                 IEventHubReceived<UserPointScore> eventHubUserPointsReceived
@@ -28,19 +29,19 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
        
         _eventHubUserPointsReceived = eventHubUserPointsReceived;
 
-        RegisterObserver();
 
     }
 
-    public void RegisterObserver()
+    public void RegisterObserver(string userId)
     {
-        _eventHubUserPointsReceived.Attach(this);
+        _userId = userId;
+        _eventHubUserPointsReceived.Attach(userId, this);
     }
 
-    //public void UnregisterObserver(string userId)
-    //{
-    //    _eventHubUserPointsReceived.Detach(userId);
-    //}
+    public void UnregisterObserver(string userId)
+    {
+        _eventHubUserPointsReceived.Detach(userId);
+    }
 
     public async Task<UserPointScore> GetUserScore(string userId)
     {
@@ -50,13 +51,13 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
    
     public void NotifyUpdate(UserPointScore score)
     {
-        _logger.LogInformation($"Score received: \nScore: {score.Score}\nKudos sent: {score.KudosSent}\nLikes Received: {score.LikesReceived}");
+        _logger.LogInformation($"Top Contributors received: \n {System.Text.Json.JsonSerializer.Serialize<UserPointScore>(score)}");
 
         UserScoreCallback?.Invoke(score);
     }
 
-    //public void Dispose()
-    //{
-    //    UnregisterObserver(_userId);
-    //}
+    public void Dispose()
+    {
+        UnregisterObserver(_userId);
+    }
 }

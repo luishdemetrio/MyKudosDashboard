@@ -50,10 +50,10 @@
     {
         base.OnInitialized();
 
-        //if (User != null)
-        //{
-        //    TopContributorsView.RegisterObserver(User.ObjectId);
-        //}
+        if (User != null)
+        {
+            TopContributorsView.RegisterObserver(User.ObjectId);
+        }
 
         TopContributorsView.GetTopContributors().ContinueWith(t =>
         {

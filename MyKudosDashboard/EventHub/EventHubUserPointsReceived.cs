@@ -1,12 +1,13 @@
 ﻿using MyKudos.Gateway.Domain.Models;
+using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventHub;
 
 public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
 {
-    private ConcurrentBag<IObserverEventHub<UserPointScore>> _observers
-                        = new ConcurrentBag<IObserverEventHub<UserPointScore>>();
+    private ConcurrentDictionary<string, IObserverEventHub<UserPointScore>> _observers
+                        = new ();
 
     private EventHubConsumerHelper<UserPointScore> _eventHubScore;
 
@@ -19,28 +20,29 @@ public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubScore.UpdateCallback += (score =>
-        {
-            if (score != null)
+        _eventHubScore.UpdateCallback += (score => 
             {
-                foreach (IObserverEventHub<UserPointScore> observer in _observers)
+                if (score != null)
                 {
-                    observer.NotifyUpdate(score);
+                    foreach (IObserverEventHub<UserPointScore> observer in _observers.Values)
+                    {
+                        observer.NotifyUpdate(score);
+                    }
                 }
-            }
-        });
+            });
 
         _eventHubScore.Start();
     }
-    public void Attach(IObserverEventHub<UserPointScore> observer)
+    public void Attach(string userId, IObserverEventHub<UserPointScore> observer)
     {
-        _observers.Add(observer);
+        _observers.AddOrUpdate(userId, observer,
+                    (_, existingObserver) => existingObserver);
     }
 
-    public void Detach(IObserverEventHub<UserPointScore> observer)
+    public void Detach(string userId)
     {
-       // _observers.TryTake(out observer);
-    }
 
+        _observers.TryRemove(userId, out _);
+    }
 
 }
