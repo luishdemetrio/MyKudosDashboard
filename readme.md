@@ -20,7 +20,7 @@ The App sends out notification cards to the employee who received the "Kudos" re
 
 Users to comment on the "Kudos" recognition that was received by an employee. This feature allows for further engagement and interaction between users, and allows for a more detailed and specific recognition of the employee's achievements. The ability to comment on a recognition also allows for more context to be added to the recognition, which can help the employee and others understand the impact of their achievements.
 
-![](images/replies2.png)
+![](images/replies3.png)
 
 ## Legal notice
 
