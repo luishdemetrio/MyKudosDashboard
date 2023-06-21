@@ -160,17 +160,24 @@
         base.OnInitialized();
 
 
-        if (User != null)
-        {
-            UserProfileScoreView.RegisterObserver(User.ObjectId);
-        }
-
-        UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
-
         UserScoreValue = new();
         UserScoreValue = await UserProfileScoreView.GetUserScore(User.ObjectId);
         _isLoaded = true;
 
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+       
+            if (User != null)
+            {
+                UserProfileScoreView.RegisterObserver(User.ObjectId);
+            }
+
+            UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
+       
     }
 
     protected override bool ShouldRender()

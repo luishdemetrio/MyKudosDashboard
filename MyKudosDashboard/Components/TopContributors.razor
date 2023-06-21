@@ -50,10 +50,7 @@
     {
         base.OnInitialized();
 
-        if (User != null)
-        {
-            TopContributorsView.RegisterObserver(User.ObjectId);
-        }
+      
 
         TopContributorsView.GetTopContributors().ContinueWith(t =>
         {
@@ -63,6 +60,19 @@
         });
 
         TopContributorsView.TopContributorsCallBack = UpdateTopContributorsCallBack;
+    }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+      
+            if (User != null)
+            {
+                TopContributorsView.RegisterObserver(User.ObjectId);
+            }
+      
     }
 
     private void UpdateTopContributorsCallBack()

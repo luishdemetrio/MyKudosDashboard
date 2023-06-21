@@ -1,4 +1,5 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Microsoft.Extensions.Logging.ApplicationInsights;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 
@@ -51,7 +52,7 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
    
     public void NotifyUpdate(UserPointScore score)
     {
-        _logger.LogInformation($"Top Contributors received: \n {System.Text.Json.JsonSerializer.Serialize<UserPointScore>(score)}");
+        _logger.LogInformation($"Userscore received: \n {System.Text.Json.JsonSerializer.Serialize<UserPointScore>(score)}");
 
         UserScoreCallback?.Invoke(score);
     }

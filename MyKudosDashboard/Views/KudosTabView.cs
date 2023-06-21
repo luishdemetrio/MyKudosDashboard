@@ -3,6 +3,7 @@ using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
 using Microsoft.Graph.ExternalConnectors;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 
 namespace MyKudosDashboard.Views;
 
@@ -79,6 +80,9 @@ public class KudosTabView : IKudosTabView,
 
     public void NotifyUpdate(EventHubResponse<EventHubLikeOptions, LikeGateway> score)
     {
+        _logger.LogInformation($"KudosTab Like/Undo EventHubCommentOptions: \n {score.Kind}");
+        _logger.LogInformation($"KudosTab Like/Undo received: \n {System.Text.Json.JsonSerializer.Serialize<LikeGateway>(score.Event)}");
+
         switch (score.Kind)
         {
             case EventHubLikeOptions.LikeSent:

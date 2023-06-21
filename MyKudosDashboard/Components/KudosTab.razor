@@ -55,30 +55,30 @@
     private KudosList ToMeKudosTab;
     private KudosList FromMeKudosTab;
 
-    protected override async Task OnInitializedAsync()
+
+
+    protected override void OnAfterRender(bool firstRender)
     {
-        base.OnInitialized();
+        base.OnAfterRender(firstRender);
+
+       
+            if (User != null)
+            {
+                var subscriptionName = User.ObjectId;
 
 
-        if (User != null)
-        {
-            var subscriptionName = User.ObjectId ;
+                KudosTabView.RegisterObserver(User.ObjectId);
 
+                KudosTabView.LikeCallback = UpdateLikesCallBack;
+                KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
 
-            KudosTabView.RegisterObserver(User.ObjectId);
+                KudosTabView.KudosCallback = UpdateKudosCallback;
 
-            KudosTabView.LikeCallback = UpdateLikesCallBack;
-            KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
+                KudosTabView.CommentsDeletedCallback = CommentsDeleted;
+                KudosTabView.CommentsSentCallback = CommentsSent;
 
-            KudosTabView.KudosCallback = UpdateKudosCallback;
-
-            KudosTabView.CommentsDeletedCallback = CommentsDeleted;
-            KudosTabView.CommentsSentCallback = CommentsSent;
-
-        }
-
-        await Task.CompletedTask;
-
+            }
+       
     }
 
     public void ReloadKudos()

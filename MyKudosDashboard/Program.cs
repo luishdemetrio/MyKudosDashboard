@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
@@ -74,9 +75,17 @@ builder.Services.AddFluentUIComponents();
 //LibraryConfiguration configUI = new(Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetIconConfiguration(), Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetEmojiConfiguration());
 //builder.Services.AddFluentUIComponents(configUI);
 
+if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING")))
+{
+    builder.Logging.AddApplicationInsights(
+            configureTelemetryConfiguration: (config) =>
+                config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+                configureApplicationInsightsLoggerOptions: (options) => { }
+        );
 
+}
 
-
+//builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("superkudos", LogLevel.Trace);
 
 
 var app = builder.Build();

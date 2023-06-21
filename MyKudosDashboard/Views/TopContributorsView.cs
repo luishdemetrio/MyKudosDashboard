@@ -1,4 +1,5 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Microsoft.Extensions.Logging.ApplicationInsights;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 
