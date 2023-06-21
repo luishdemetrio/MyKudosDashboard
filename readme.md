@@ -7,20 +7,20 @@ Kudos, also known as *"virtual high-fives"*, are a way for employees to recogniz
 
 The Dashboard UI allows users to visualize the "kudos" that were sent to employees, as well as the ability to send "kudos", "likes" and write supportive messages. This type of system is often used in employee recognition and engagement programs to encourage positive behavior and acknowledge the achievements of employees.
 
-![](images/dashboard.png)
+![](images/dashboard2.png)
 
 The "Send Kudos to people" UI allows users to select an individual to recognize with a "Kudos", choose a category for the recognition, and write a supportive message. The category selection feature allows for more specific recognition and tracking of employee achievements, and the option to include a message allows for personalized and meaningful recognition.
 
-![](images/sendkudos.png)
+![](images/sendkudos2.png)
 
 The App sends out notification cards to the employee who received the "Kudos" recognition, as well as to the employee's manager, and the person who sent the recognition. This type of notification ensures that all parties involved are aware of the recognition and its details. It allows the employee to feel acknowledged and appreciated, the manager to be aware of their employees achievements, and the sender to feel good about recognizing the employee. It also allows for transparency and accountability in the recognition process.
 
-![](images/kudosnotification.png)
+![](images/kudosnotification2.png)
 
 
 Users to comment on the "Kudos" recognition that was received by an employee. This feature allows for further engagement and interaction between users, and allows for a more detailed and specific recognition of the employee's achievements. The ability to comment on a recognition also allows for more context to be added to the recognition, which can help the employee and others understand the impact of their achievements.
 
-![](images/replies.png)
+![](images/replies2.png)
 
 ## Legal notice
 
