@@ -85,7 +85,7 @@ if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("APPLICATION
 
 }
 
-//builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("superkudos", LogLevel.Trace);
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("superkudos", LogLevel.Trace);
 
 
 var app = builder.Build();
