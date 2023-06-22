@@ -1,39 +1,23 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventHub;
 
-public class EventHubKudosSent : IEventHubReceived<KudosResponse>
+public class EventHubKudosSent : IEventHubKudosSent
 {
     private ConcurrentDictionary<string, IObserverEventHub<KudosResponse>> _observers
                         = new ();
 
     private EventHubConsumerHelper<KudosResponse> _eventHubKudos;
 
-    private static EventHubKudosSent instance;
-    private static object lockObject = new object();
+    private ILogger<EventHubKudosSent> _logger;
 
-    // Private constructor to prevent instantiation
-    private EventHubKudosSent()
+    public EventHubKudosSent(IConfiguration configuration, 
+                             ILogger<EventHubKudosSent> logger )
     {
-    }
 
-    public static EventHubKudosSent GetInstance(IConfiguration configuration)
-    {
-        lock (lockObject)
-        {
-            if (instance == null)
-            {
-                instance = new EventHubKudosSent(configuration);
-            }
-        }
-        return instance;
-    }
-
-
-    private EventHubKudosSent(IConfiguration configuration)
-    {
+        _logger = logger;
+        
         _eventHubKudos = new EventHubConsumerHelper<KudosResponse>(
                                configuration["EventHub_KudosSentConnectionString"],
                                configuration["EventHub_KudosSentName"],
@@ -41,7 +25,7 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubKudos.UpdateCallback += (kudos => 
+        _eventHubKudos.UpdateCallback += (kudos =>
             {
                 if (kudos != null)
                 {
@@ -52,7 +36,16 @@ public class EventHubKudosSent : IEventHubReceived<KudosResponse>
                 }
             });
 
-        _eventHubKudos.Start();
+        _eventHubKudos.Start().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the exception here
+                _logger.LogError(task.Exception.ToString());
+                throw task.Exception;
+            }
+        });
+
     }
     public void Attach(string userId, IObserverEventHub<KudosResponse> observer)
     {

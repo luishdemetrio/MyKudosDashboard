@@ -55,17 +55,10 @@ public class EventHubConsumerHelper<T>
     }
 
    
-    public async Task Start()
+    public Task Start()
     {
 
-        try
-        {
-            await processor.StartProcessingAsync();
-
-        }catch(Exception ex)
-        {
-
-        }
+        return processor.StartProcessingAsync();;
 
     }
 

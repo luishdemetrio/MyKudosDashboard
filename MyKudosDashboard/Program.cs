@@ -51,7 +51,16 @@ builder.Services.AddScoped<IUserGateway, UserGateway>();
 //builder.Services.AddSingleton<IEventGridKudosReceived, EventGridKudosReceived>();
 //builder.Services.AddSingleton<IEventGridUserPointsReceived, EventGridUserPointsReceived>();
 
+//Event Hub
 builder.Services.AddSingleton<IEventHubReceived<UserPointScore>, EventHubUserPointsReceived>();
+
+builder.Services.AddSingleton<IEventHubCommentDeleted, EventHubCommentDeleted>();
+builder.Services.AddSingleton<IEventHubCommentSent, EventHubCommentSent>();
+builder.Services.AddSingleton<IEventHubKudosSent, EventHubKudosSent>();
+builder.Services.AddSingleton<IEventHubLikeSent, EventHubLikeSent>();
+builder.Services.AddSingleton<IEventHubUndoLike, EventHubUndoLike>();
+builder.Services.AddSingleton<IEventHubUserPointsReceived, EventHubUserPointsReceived>();
+
 
 var config = builder.Configuration;
 

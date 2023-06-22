@@ -1,49 +1,34 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Blazorise.Licensing;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub.Enums;
-using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventHub;
 
 
 
-public class EventHubUndoLike : IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>>
+public class EventHubUndoLike : IEventHubUndoLike
 {
     private ConcurrentDictionary<string,IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>> _observers
                         = new ();
 
-    private EventHubConsumerHelper<LikeGateway> _eventHubScore;
+    private EventHubConsumerHelper<LikeGateway> _eventHub;
 
-    private static EventHubUndoLike instance;
-    private static object lockObject = new object();
+    private ILogger<EventHubUndoLike> _logger;  
 
-    // Private constructor to prevent instantiation
-    private EventHubUndoLike()
+    public EventHubUndoLike(IConfiguration configuration,
+                            ILogger<EventHubUndoLike> logger)
     {
-    }
+        _logger = logger;
 
-    public static EventHubUndoLike GetInstance(IConfiguration configuration)
-    {
-        lock (lockObject)
-        {
-            if (instance == null)
-            {
-                instance = new EventHubUndoLike(configuration);
-            }
-        }
-        return instance;
-    }
-
-    private EventHubUndoLike(IConfiguration configuration)
-    {
-        _eventHubScore = new EventHubConsumerHelper<LikeGateway>(
+        _eventHub = new EventHubConsumerHelper<LikeGateway>(
                                configuration["EventHub_UndoLikeSentConnectionString"],
                                configuration["EventHub_UndoLikeSentName"],
                                configuration["EventHub_blobStorageConnectionString"],
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubScore.UpdateCallback += (score => 
+        _eventHub.UpdateCallback += (score => 
             {
                 if (score != null)
                 {
@@ -58,7 +43,16 @@ public class EventHubUndoLike : IEventHubReceived<EventHubResponse<EventHubLikeO
                 }
             });
 
-        _eventHubScore.Start();
+
+        _eventHub.Start().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the exception here
+                _logger.LogError(task.Exception.ToString());
+                throw task.Exception;
+            }
+        });
     }
     public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
     {

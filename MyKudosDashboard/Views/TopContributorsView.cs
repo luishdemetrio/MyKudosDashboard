@@ -12,7 +12,7 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     public ITopContributorsView.UpdateTopContributorsCallBack TopContributorsCallBack { get ; set ; }
 
-    private IEventHubReceived<UserPointScore> _eventHubUserPointsReceived;
+    private IEventHubUserPointsReceived _eventHubUserPointsReceived;
 
     private ILogger<TopContributorsView> _logger;
 
@@ -20,7 +20,7 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     public TopContributorsView(IGamificationGateway gamificationGateway,
                               ILogger<TopContributorsView> logger,
-                               IEventHubReceived<UserPointScore> eventHubUserPointsReceived)
+                               IEventHubUserPointsReceived eventHubUserPointsReceived)
     {
         _gamificationGateway = gamificationGateway;
 

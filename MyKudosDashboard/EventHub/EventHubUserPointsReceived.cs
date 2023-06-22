@@ -4,23 +4,28 @@ using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventHub;
 
-public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
+public class EventHubUserPointsReceived : IEventHubUserPointsReceived
 {
     private ConcurrentDictionary<string, IObserverEventHub<UserPointScore>> _observers
                         = new ();
 
-    private EventHubConsumerHelper<UserPointScore> _eventHubScore;
+    private EventHubConsumerHelper<UserPointScore> _eventHub;
 
-    public EventHubUserPointsReceived(IConfiguration configuration)
+    private ILogger<EventHubUserPointsReceived> _logger;
+
+    public EventHubUserPointsReceived(IConfiguration configuration, ILogger<EventHubUserPointsReceived> logger)
     {
-        _eventHubScore = new EventHubConsumerHelper<UserPointScore>(
+
+        _logger = logger;
+
+        _eventHub = new EventHubConsumerHelper<UserPointScore>(
                                configuration["EventHub_ScoreConnectionString"],
                                configuration["EventHub_ScoreName"],
                                configuration["EventHub_blobStorageConnectionString"],
                                configuration["EventHub_blobContainerName"]
                                );
 
-        _eventHubScore.UpdateCallback += (score => 
+        _eventHub.UpdateCallback += (score => 
             {
                 if (score != null)
                 {
@@ -31,8 +36,18 @@ public class EventHubUserPointsReceived : IEventHubReceived<UserPointScore>
                 }
             });
 
-        _eventHubScore.Start();
+        _eventHub.Start().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the exception here
+                _logger.LogError(task.Exception.ToString());
+                throw task.Exception;
+            }
+        });
     }
+
+   
     public void Attach(string userId, IObserverEventHub<UserPointScore> observer)
     {
         _observers.AddOrUpdate(userId, observer,

@@ -4,37 +4,22 @@ using System.Collections.Concurrent;
 
 namespace MyKudosDashboard.EventHub;
 
-
-
-public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCommentOptions,CommentsRequest>>
+public class EventHubCommentSent : IEventHubCommentSent
 {
     private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
                         = new ();
 
     private EventHubConsumerHelper<CommentsRequest> _eventHubScore;
     
-    private static EventHubCommentSent instance;
-    private static object lockObject = new object();
+    private ILogger<EventHubCommentSent> _logger;
 
-    // Private constructor to prevent instantiation
-    private EventHubCommentSent()
-    {
-    }
 
-    public static EventHubCommentSent GetInstance(IConfiguration configuration)
+    public EventHubCommentSent(IConfiguration configuration, 
+                               ILogger<EventHubCommentSent> logger)
     {
-        lock (lockObject)
-        {
-            if (instance == null)
-            {
-                instance = new EventHubCommentSent(configuration);
-            }
-        }
-        return instance;
-    }
 
-    private EventHubCommentSent(IConfiguration configuration)
-    {
+        _logger = logger;
+        
         _eventHubScore = new EventHubConsumerHelper<CommentsRequest>(
                                configuration["EventHub_CommentSentConnectionString"],
                                configuration["EventHub_CommentSentName"],
@@ -57,7 +42,15 @@ public class EventHubCommentSent : IEventHubReceived<EventHubResponse<EventHubCo
                 }
             });
 
-        _eventHubScore.Start();
+        _eventHubScore.Start().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the exception here
+                _logger.LogError(task.Exception.ToString());
+                throw task.Exception;
+            }
+        });
     }
     public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {

@@ -6,35 +6,21 @@ namespace MyKudosDashboard.EventHub;
 
 
 
-public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHubCommentOptions,CommentsRequest>>
+public class EventHubCommentDeleted : IEventHubCommentDeleted
 {
     private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>> _observers
                         = new ();
 
     private EventHubConsumerHelper<CommentsRequest> _eventHubScore;
-    
-    private static EventHubCommentDeleted instance;
-    private static object lockObject = new object();
 
-    // Private constructor to prevent instantiation
-    private EventHubCommentDeleted()
-    {
-    }
+    private ILogger<EventHubCommentDeleted> _logger;
 
-    public static EventHubCommentDeleted GetInstance(IConfiguration configuration)
-    {
-        lock (lockObject)
-        {
-            if (instance == null)
-            {
-                instance = new EventHubCommentDeleted(configuration);
-            }
-        }
-        return instance;
-    }
 
-    private EventHubCommentDeleted(IConfiguration configuration)
-    {
+    public EventHubCommentDeleted(IConfiguration configuration,
+                                  ILogger<EventHubCommentDeleted> logger)
+    {   
+        _logger = logger;
+
         _eventHubScore = new EventHubConsumerHelper<CommentsRequest>(
                                configuration["EventHub_CommentDeletedConnectionString"],
                                configuration["EventHub_CommentDeletedName"],
@@ -57,7 +43,15 @@ public class EventHubCommentDeleted : IEventHubReceived<EventHubResponse<EventHu
                 }
             });
 
-        _eventHubScore.Start();
+        _eventHubScore.Start().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the exception here
+                _logger.LogError(task.Exception.ToString());
+                throw task.Exception;
+            }
+        });
     }
     public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>> observer)
     {

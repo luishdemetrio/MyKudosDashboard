@@ -14,13 +14,13 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
 
     private ILogger<UserProfileScoreView> _logger;
 
-    private IEventHubReceived<UserPointScore> _eventHubUserPointsReceived;
+    private IEventHubUserPointsReceived _eventHubUserPointsReceived;
 
     private string _userId;
 
     public UserProfileScoreView(IGamificationGateway gamificationGateway, 
                                 ILogger<UserProfileScoreView> logger,
-                                IEventHubReceived<UserPointScore> eventHubUserPointsReceived
+                                IEventHubUserPointsReceived eventHubUserPointsReceived
                                 )
     {
         _logger = logger;

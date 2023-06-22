@@ -4,6 +4,7 @@ using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
 using Microsoft.Graph.ExternalConnectors;
 using Microsoft.Extensions.Logging.ApplicationInsights;
+using System.Diagnostics.Eventing.Reader;
 
 namespace MyKudosDashboard.Views;
 
@@ -24,15 +25,15 @@ public class KudosTabView : IKudosTabView,
     public IKudosTabView.CommentsCallBack CommentsUpdatedCallback { get; set; }
     public IKudosTabView.CommentsCallBack CommentsDeletedCallback { get; set; }
 
-   
-    IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>> _eventHubUndoLikeSent;
-    IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>> eventHubLikeSent;
 
-    IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>> _eventHubCommentSent;
-    IEventHubReceived<EventHubResponse<EventHubCommentOptions, CommentsRequest>> _eventHubCommentDeleted;
+    IEventHubUndoLike _eventHubUndoLikeSent;
+    IEventHubLikeSent _eventHubLikeSent;
+
+    IEventHubCommentSent _eventHubCommentSent;
+    IEventHubCommentDeleted _eventHubCommentDeleted;
 
 
-    IEventHubReceived<KudosResponse> _eventHubKudosSent;
+    IEventHubKudosSent _eventHubKudosSent;
 
     private IConfiguration _configuration;
     private string _userId;
@@ -41,34 +42,45 @@ public class KudosTabView : IKudosTabView,
 
 
     public KudosTabView(IConfiguration configuration,
-                        ILogger<KudosTabView> logger)
+                        ILogger<KudosTabView> logger,
+                        IEventHubLikeSent eventHubLikeSent,
+                        IEventHubUndoLike eventHubUndoLike,
+                        IEventHubCommentSent eventHubCommentsSent,
+                        IEventHubCommentDeleted eventHubCommentDeleted,
+                        IEventHubKudosSent eventHubKudosSent)
     {
 
 
         _configuration = configuration;
         _logger = logger;
+
+        _eventHubLikeSent = eventHubLikeSent;
+        _eventHubUndoLikeSent = eventHubUndoLike;
+
+        _eventHubCommentSent = eventHubCommentsSent;
+
+        _eventHubCommentDeleted = eventHubCommentDeleted;
+
+        _eventHubKudosSent = eventHubKudosSent;
     }
 
     public void RegisterObserver(string userId)
     {
         //it is used on Dispose
         _userId = userId;
+        
+        _eventHubLikeSent.Attach(userId, this);
 
-        eventHubLikeSent = EventHubLikeSent.GetInstance(_configuration);
-        eventHubLikeSent.Attach(userId, this);
-
-        _eventHubUndoLikeSent = EventHubUndoLike.GetInstance(_configuration);
         _eventHubUndoLikeSent.Attach(userId, this);
 
-        _eventHubCommentSent = EventHubCommentSent.GetInstance(_configuration);
         _eventHubCommentSent.Attach(userId, this);
 
-        _eventHubCommentDeleted = EventHubCommentDeleted.GetInstance(_configuration);
         _eventHubCommentDeleted.Attach(userId, this);
 
-        _eventHubKudosSent = EventHubKudosSent.GetInstance(_configuration); ;
         _eventHubKudosSent.Attach(userId, this);
+        
     }
+    
 
     public void NotifyUpdate(KudosResponse score)
     {
@@ -122,8 +134,8 @@ public class KudosTabView : IKudosTabView,
 
     public void UnregisterObserver(string userId)
     {
-        if (eventHubLikeSent != null)
-            eventHubLikeSent.Detach(userId);
+        if (_eventHubLikeSent != null)
+            _eventHubLikeSent.Detach(userId);
 
         if (_eventHubUndoLikeSent != null)
             _eventHubUndoLikeSent.Detach(userId);

@@ -1,4 +1,5 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Microsoft.Bot.Connector.Authentication;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub.Enums;
 using System.Collections.Concurrent;
 
@@ -6,59 +7,101 @@ namespace MyKudosDashboard.EventHub;
 
 
 
-public class EventHubLikeSent : IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>>
+public class EventHubLikeSent : IEventHubLikeSent//IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>>
 {
     private ConcurrentDictionary<string, IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>> _observers
                         = new ();
 
     private EventHubConsumerHelper<LikeGateway> _eventHubScore;
    
-    private static EventHubLikeSent instance;
-    private static object lockObject = new object();
+    private ILogger<EventHubLikeSent> _logger;
 
-    // Private constructor to prevent instantiation
-    private EventHubLikeSent()
+    public EventHubLikeSent(IConfiguration configuration, ILogger<EventHubLikeSent> logger)
     {
-    }
+        _logger = logger;
 
-    public static EventHubLikeSent GetInstance(IConfiguration configuration)
-    {
-        lock (lockObject)
-        {
-            if (instance == null)
-            {
-                instance = new EventHubLikeSent(configuration);
-            }
-        }
-        return instance;
-    }
-
-    private EventHubLikeSent(IConfiguration configuration)
-    {
         _eventHubScore = new EventHubConsumerHelper<LikeGateway>(
-                               configuration["EventHub_LikeSentConnectionString"],
-                               configuration["EventHub_LikeSentName"],
-                               configuration["EventHub_blobStorageConnectionString"],
-                               configuration["EventHub_blobContainerName"]
-                               );
+                              configuration["EventHub_LikeSentConnectionString"],
+                              configuration["EventHub_LikeSentName"],
+                              configuration["EventHub_blobStorageConnectionString"],
+                              configuration["EventHub_blobContainerName"]
+                              );
 
-        _eventHubScore.UpdateCallback += (score => 
+        _eventHubScore.UpdateCallback += (score =>
+        {
+            if (score != null)
             {
-                if (score != null)
+                foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers.Values)
                 {
-                    foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers.Values)
-                    {
-                        
-                        observer.NotifyUpdate(new EventHubResponse<EventHubLikeOptions, LikeGateway>
-                        {
-                            Kind = EventHubLikeOptions.LikeSent, Event = score 
-                        });
-                    }
-                }
-            });
 
-        _eventHubScore.Start();
+                    observer.NotifyUpdate(new EventHubResponse<EventHubLikeOptions, LikeGateway>
+                    {
+                        Kind = EventHubLikeOptions.LikeSent,
+                        Event = score
+                    });
+                }
+            }
+        });
+
+
+        _eventHubScore.Start().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the exception here
+                _logger.LogError(task.Exception.ToString());
+                throw task.Exception;
+            }
+        });
+
     }
+
+    //public static EventHubLikeSent GetInstance(IConfiguration configuration)
+    //{
+    //    lock (lockObject)
+    //    {
+    //        if (instance == null)
+    //        {
+    //            instance = new EventHubLikeSent(configuration);
+    //        }
+    //    }
+    //    return instance;
+    //}
+
+    //private EventHubLikeSent(IConfiguration configuration)
+    //{
+    //    _eventHubScore = new EventHubConsumerHelper<LikeGateway>(
+    //                           configuration["EventHub_LikeSentConnectionString"],
+    //                           configuration["EventHub_LikeSentName"],
+    //                           configuration["EventHub_blobStorageConnectionString"],
+    //                           configuration["EventHub_blobContainerName"]
+    //                           );
+
+    //    _eventHubScore.UpdateCallback += (score => 
+    //        {
+    //            if (score != null)
+    //            {
+    //                foreach (IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer in _observers.Values)
+    //                {
+                        
+    //                    observer.NotifyUpdate(new EventHubResponse<EventHubLikeOptions, LikeGateway>
+    //                    {
+    //                        Kind = EventHubLikeOptions.LikeSent, Event = score 
+    //                    });
+    //                }
+    //            }
+    //        });
+
+
+    //    _eventHubScore.Start().ContinueWith(task =>
+    //    {
+    //        if (task.IsFaulted)
+    //        {
+    //            // Handle the exception here
+    //            MessageCallback?.Invoke(task.Exception.ToString());
+    //        }
+    //    });
+    //}
     public void Attach(string userId, IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>> observer)
     {
         _observers.AddOrUpdate(userId, observer,
