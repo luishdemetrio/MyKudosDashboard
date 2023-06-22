@@ -8,6 +8,7 @@
 @using Microsoft.Extensions.Localization
 @using System.Globalization
 @inject IStringLocalizer<App> Localizer
+@inject IConfiguration Configuration
 
 <style>
 
@@ -365,13 +366,28 @@
 
             InvokeAsync(() => StateHasChanged());
 
+            DateTime now;
+
+            var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Configuration["WEBSITE_TIME_ZONE"]);
+            if (timeZone != null)
+            {
+                TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+
+                now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+            }
+            else
+            {
+                now = DateTime.Now;
+            }
+            
+
             kudos = new SendKudosRequest
             {
                 FromPersonId = new Guid(UserProfile.ObjectId),
                 ToPersonId = SelectedEmployee.Id,
                 RecognitionId = recognition.RecognitionId,
                 Message = KudosMessage,
-                Date= DateTime.Now
+                Date= now //DateTime.Now
             };
 
         });

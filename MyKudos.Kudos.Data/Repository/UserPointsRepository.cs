@@ -110,11 +110,16 @@ public class UserPointsRepository : IUserPointsRepository
                                  UserBadgeId = index++
                              });
 
-        var badges = (from k in _context.Kudos
-                      join r in _context.Recognitions on k.RecognitionId equals r.RecognitionId
+
+        var distinctRecognitionIds = _context.Kudos
+                                        .Where(k => k.ToPersonId == Guid.Parse("17afd395-3455-4810-bc72-58eb7eed4c42"))
+                                        .Select(k => k.RecognitionId)
+                                        .Distinct();
+
+        var badges = (from k in distinctRecognitionIds
+                      join r in _context.Recognitions on k equals r.RecognitionId
                       join rg in _context.RecognitionsGroup on r.RecognitionGroupId equals rg.RecognitionGroupId
                       join t in subquery on r.RecognitionGroupId equals t.RecognitionGroupId
-                      where k.ToPersonId == pUserId
                       group k by new { rg.RecognitionGroupId, rg.BadgeName, rg.Description, t.Total } into g
                       where g.Count() >= g.Key.Total
                       select g.Key).AsEnumerable()

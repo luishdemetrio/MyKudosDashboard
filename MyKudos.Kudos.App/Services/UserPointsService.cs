@@ -18,7 +18,7 @@ public class UserPointsService : IUserPointsService
 
     public List<UserPoint> GetTopUserScores(int top)
     {
-        return _repository.GetTopUserScores(top);
+        return _repository.GetTopUserScores(top).Where(t => t.TotalPoints >0).ToList();
     }
 
     public UserPointScore GetUserScore(Guid pUserId)
