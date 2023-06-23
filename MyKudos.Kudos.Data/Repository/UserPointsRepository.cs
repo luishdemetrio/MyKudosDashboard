@@ -112,7 +112,7 @@ public class UserPointsRepository : IUserPointsRepository
 
 
         var distinctRecognitionIds = _context.Kudos
-                                        .Where(k => k.ToPersonId == Guid.Parse("17afd395-3455-4810-bc72-58eb7eed4c42"))
+                                        .Where(k => k.FromPersonId == Guid.Parse("17afd395-3455-4810-bc72-58eb7eed4c42"))
                                         .Select(k => k.RecognitionId)
                                         .Distinct();
 
