@@ -21,6 +21,7 @@ builder.Services.AddSwaggerGen();
 
 var config = builder.Configuration;
 
+
 builder.Services.AddScoped<IRestClientHelper>(t =>
                 new RestClientHelper(
                    new RestServiceToken(
@@ -48,6 +49,8 @@ builder.Services.AddScoped<ICommentsMessageSender, CommentsMessageSender>();
 
 builder.Services.AddScoped<IKudosMessageSender, KudosMessageSender>();
 
+
+
 builder.Services.AddSwaggerGen(c =>
 {
    
@@ -61,7 +64,9 @@ builder.Services.AddSingleton<IMessageSender>(t =>
                 ));
 
 
-
+//I need to sync the users from MS Graph to database.
+//as alternative you can use Azure functions, web jobs, etc;
+builder.Services.AddHostedService<UserProfileTableCacheBackgroundTask>();
 
 
 var app = builder.Build();
@@ -85,6 +90,11 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
+
+
+
+
+
 
 app.UseRequestLocalization(localizationOptions);
 
