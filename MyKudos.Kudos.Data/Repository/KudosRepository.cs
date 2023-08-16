@@ -120,7 +120,7 @@ public class KudosRepository : IKudosRepository
 
             foreach (var receiver in kudo.Recognized)
             {
-                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.Person.UserProfileId);
+                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
             }
         }
 
@@ -156,7 +156,7 @@ public class KudosRepository : IKudosRepository
 
             foreach (var receiver in kudo.Recognized)
             {
-                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.Person.UserProfileId);
+                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
             }
         }
 

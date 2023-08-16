@@ -401,7 +401,7 @@ public class GraphService : IGraphService
         var usersPage = await _appClient.Users
           .Request()
           .Header("ConsistencyLevel", "eventual")
-          .Select("id,displayName,userPrincipalName")
+          .Select("id,displayName,UserPrincipalName,givenName, mail")
           .GetAsync();
 
         while (usersPage != null)
@@ -418,7 +418,10 @@ public class GraphService : IGraphService
                     var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
                         UserProfileId = new Guid(user.Id),
-                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName  
+                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName ,
+                        GivenName = user.GivenName,
+                        Mail = user.Mail
+                        
                     };
 
                     if (!graphUsers.ContainsKey(employee.UserProfileId))

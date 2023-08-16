@@ -40,7 +40,8 @@ public class KudosHelper
                 {
                     Id = receiver.Person.UserProfileId,
                     Name = receiver.Person.DisplayName,
-                    Photo = receiver.Person.Photo96x96 != null ? $"data:image/png;base64,{receiver.Person.Photo96x96}" : defaultProfilePicture
+                    Photo = receiver.Person.Photo96x96 != null ? $"data:image/png;base64,{receiver.Person.Photo96x96}" : defaultProfilePicture,
+                    GivenName = receiver.Person.GivenName
                 });
             }
 
