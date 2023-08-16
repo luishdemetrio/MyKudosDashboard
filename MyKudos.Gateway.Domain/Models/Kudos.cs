@@ -21,7 +21,7 @@ public class SendKudosRequest
 
     public Guid FromPersonId { get; set; }
 
-    public Guid ToPersonId { get; set; }
+    public List<Guid> ToPersonId { get; set; }
 
     public int RecognitionId { get; set; }
 
@@ -41,7 +41,7 @@ public class SendKudosRequest
 public record KudosNotification 
 (
     Person From,
-    Person To,
+    List<Person> Receivers ,
     Reward Reward,
     string Message,
     DateTime SendOn,
@@ -55,13 +55,13 @@ public class KudosResponse
 {
     public int Id { get; set; }
     public Person From { get; set; }
-    public Person To { get; set; }
     public string Title { get; set; }
     public string Message { get; set; }
     public DateTime SendOn { get; set; }
     public List<Person> Likes { get; set; } = new();
-    public List<int> Comments { get; set; } 
-
+    public List<int> Comments { get; set; }
+    
+    public List<Person> Receivers { get; set; } = new();
 
 
 }

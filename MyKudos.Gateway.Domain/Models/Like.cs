@@ -1,7 +1,7 @@
 ﻿namespace MyKudos.Gateway.Domain.Models;
 
 
-public record LikeGateway(int KudosId, Person FromPerson, Guid ToPersonId);
+public record LikeGateway(int KudosId, Person FromPerson);
 
 
 public record LikeCommentGateway(int KudosId, Person FromPerson);

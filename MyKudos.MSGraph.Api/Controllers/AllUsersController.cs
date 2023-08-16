@@ -16,6 +16,8 @@ public class AllUsersController : Controller
 
     private readonly IUserProfileRepository _userProfileRepository;
 
+    
+
     public AllUsersController(IGraphService graphService, IConfiguration configuration,
                               IUserProfileRepository userProfileRepository)
     {
@@ -24,15 +26,16 @@ public class AllUsersController : Controller
         _emailDomain = configuration["EmailDomain"].ToString().Split(",");
 
         _userProfileRepository = userProfileRepository;
+
+        
     }
 
-    [HttpGet(Name = "PopulateUserProfile")]
+    [HttpPost(Name = "PopulateUserProfile")]
     public async Task<bool> PopulateUserProfile()
     {
 
         List<GraphUser> result = new();
 
-        
         await _graphService.PopulateUserProfile(_userProfileRepository, _emailDomain);
         
 

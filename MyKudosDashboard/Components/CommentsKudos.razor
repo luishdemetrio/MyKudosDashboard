@@ -34,16 +34,37 @@
 
                             <div class="profile" data-is-focusable="true" style="width:90%">
 
-                                <div class="avatar">
-                                        <img src=@_item.To.Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
-                                </div>
+
+                                @*In case of an individual kudos, the image size is bigger*@
+                                @if (_item.Receivers.Count == 1)
+                                {
+                                    <div class="avatar">
+                                        <img src=@_item.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%;" />
+                                    </div>
+                                }
+
+                               
 
                                 <div class="info" style="width:70%">
 
                                     <ul class="list-unstyled " style="padding-top: 0px;padding-bottom: 0px;width:98%;float:left">
-                                    <li>
-                                        <h5>@_item.To.Name</h5>
-                                    </li>
+
+                                        @*In case of an individual kudos, the name is displayed*@
+                                        @if (_item.Receivers.Count == 1)
+                                        {
+                                            <li>
+                                                <h5>@_item.Receivers[0].Name</h5>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            @*for multiple kudos, it's shown just the pictures*@
+                                            foreach (var receiver in _item.Receivers)
+                                            {
+                                                <img src=@receiver.Photo
+                                                     style="height: 6vh;width: 6vh;border-radius: 50%;margin-right:1vw" />
+                                            }
+                                        }
 
                                     <li>
                                             <div class="text-wrap small55" style="width: 100%;">
@@ -167,12 +188,7 @@
                                                 <ReplyControl Reply=@comment ReplyUser=@User ReplyUserPhoto=@_userPhoto 
                                                   replyDeleteCommentCallBack=@DeleteComment
                                                   replyUpdateCommentCallBack=@UpdateCommentCallBack />
-
-                                                @*<div style="float:left;margin-left:37px">
-
-                                                <ReplyControl Comment=@comment User=User UserPhoto=UserPhoto />
-
-                                            </div>*@
+                                               
 
                                             </li>
                                         }
@@ -184,14 +200,7 @@
                         </tr>
                     }
 
-                   @*  <tr>
-
-                        <td scope="row">
-
-                            <button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>CloseClick() )>✖️ Close</button>
-                        </td>
-
-                    </tr>*@
+                 
                 </tbody>
             </table>
 
@@ -223,7 +232,6 @@
 
     private string _replyMessage;
 
-
     private List<CommentsResponse> _comments = new();
 
     private bool _showReply;
@@ -234,7 +242,6 @@
     private bool btnSendKudosDisabled = false;
 
     private bool _isLikeButtonDisabled = false;
-
 
 
     public void ShowModal(KudosResponse kudos, string userPhoto)
@@ -263,12 +270,6 @@
         _replyKudosFluentDialog!.Hide();
 
     }
-
-    private bool LikeDisabled(KudosResponse item)
-    {
-        return item.To.Id.ToString() == User.ObjectId;
-    }
-
 
     private void OnDismiss(EventArgs args)
     {
@@ -320,8 +321,7 @@
                                   Id = new Guid(User.ObjectId),
                                   Name = User.DisplayName,
                                   Photo = _userPhoto
-                              },
-                           ToPersonId: kudos.To.Id
+                              }
                        )
                    );
                    });
@@ -343,8 +343,7 @@
                                  Id = new Guid(User.ObjectId),
                                  Name = User.DisplayName,
                                  Photo = _userPhoto
-                             },
-                             ToPersonId: kudos.To.Id
+                             }
                             ));
                    });
 
@@ -434,7 +433,6 @@
                              {
                                  KudosId = _item.Id,
                                  FromPersonId = new Guid(User.ObjectId),
-                                 ToPersonId = _item.To.Id,
                                  Message = _replyMessage,
                                  Date = DateTime.Now
                              }
@@ -493,7 +491,7 @@
 
         var t = InvokeAsync(() =>
                      {
-                         CommentsView.DeleteComments(pComments, _item.To.Id);
+                         CommentsView.DeleteComments(pComments);
 
                      });
 
@@ -518,7 +516,7 @@
 
     public void UpdateCommentCallBack(CommentsResponse comments)
     {
-        CommentsView.UpdateComments(comments, _item.To.Id);
+        CommentsView.UpdateComments(comments);
 
        
     }

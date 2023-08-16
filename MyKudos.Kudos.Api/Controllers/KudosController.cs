@@ -27,8 +27,6 @@ public class KudosController : ControllerBase
     public int Post([FromBody] Domain.Models.Kudos kudos)
     {
         return _kudosService.Send(kudos);
-
-        
     }
 
     [HttpGet(Name = "GetKudos")]

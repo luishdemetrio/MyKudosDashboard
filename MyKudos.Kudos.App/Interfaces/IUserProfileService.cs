@@ -15,5 +15,7 @@ public interface IUserProfileService
 
     string? GetUserPhoto(Guid userid);
 
-    
+    List<UserProfile> GetUsers(Guid[] ids);
+
+
 }

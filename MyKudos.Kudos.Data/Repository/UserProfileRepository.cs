@@ -17,7 +17,8 @@ public class UserProfileRepository : IUserProfileRepository
 
     public bool Truncate()
     {
-        return _context.Database.ExecuteSqlRaw("TRUNCATE TABLE UserProfiles") >0;
+         return _context.Database.ExecuteSqlRaw("TRUNCATE TABLE UserProfiles") >0;
+
     }
 
     public bool Add(UserProfile user)
@@ -36,7 +37,8 @@ public class UserProfileRepository : IUserProfileRepository
     {
         bool result = false;
 
-        Truncate();
+        //        Truncate();
+        _context.UserProfiles.ExecuteDelete();
         result = AddRange(users);
         
         return result;
@@ -56,6 +58,12 @@ public class UserProfileRepository : IUserProfileRepository
     {
         return _context.UserProfiles
             .Where(u => EF.Functions.Like(u.DisplayName, $"%{name}%"))
+            .ToList();
+    }
+
+    public List<UserProfile> GetUsers(Guid[] ids)
+    {
+        return _context.UserProfiles.Where(user => ids.Contains(user.UserProfileId))
             .ToList();
     }
 }

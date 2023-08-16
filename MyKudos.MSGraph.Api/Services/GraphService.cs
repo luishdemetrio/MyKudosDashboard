@@ -2,6 +2,7 @@
 using Azure.Identity;
 using Microsoft.Graph;
 using MyKudos.Kudos.Domain.Interfaces;
+
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Models;
 using Newtonsoft.Json;
@@ -20,8 +21,6 @@ public class Settings
 
 public class GraphService : IGraphService
 {
-
-    
 
     // App-ony auth token credential
     private ClientSecretCredential _clientSecretCredential;
@@ -43,7 +42,7 @@ public class GraphService : IGraphService
             _clientSecretCredential = new ClientSecretCredential(
                 settings.TenantId, settings.ClientId, settings.ClientSecret);
         }
-        
+
         _appClient = new GraphServiceClient(_clientSecretCredential,
             // Use the default scope, which will request the scopes
             // configured on the app registration
@@ -64,11 +63,11 @@ public class GraphService : IGraphService
 
         // Request token with given scopes
         var context = new TokenRequestContext(new[] { "https://graph.microsoft.com/.default" });
-        var response =  _clientSecretCredential.GetToken(context);
+        var response = _clientSecretCredential.GetToken(context);
         return response.Token;
     }
 
-    public  IEnumerable<GraphUser> GetUsers(string name, string emailDomain)
+    public IEnumerable<GraphUser> GetUsers(string name, string emailDomain)
     {
 
         List<GraphUser> result = new();
@@ -81,7 +80,7 @@ public class GraphService : IGraphService
 
         request.Method = Method.Get;
         request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer { GetAppOnlyTokenAsync()}");
+        request.AddHeader("Authorization", $"Bearer {GetAppOnlyTokenAsync()}");
 
         RestResponse response = client.Execute(request);
 
@@ -188,16 +187,21 @@ public class GraphService : IGraphService
 
         string result = string.Empty;
 
-        var directoryObject = await _appClient.Users[userid].Manager
+        try
+        {
+            var directoryObject = await _appClient.Users[userid].Manager
                       .Request()
                       .Header("ConsistencyLevel", "eventual")
                       .Select("id")
                       .GetAsync();
 
-        if (directoryObject != null)
-        {
-            result = directoryObject.Id;
+            if (directoryObject != null)
+            {
+                result = directoryObject.Id;
+            }
         }
+        catch { }
+
 
         return result;
 
@@ -206,27 +210,27 @@ public class GraphService : IGraphService
 
     public async Task<string> GetUserPhoto(string userid)
     {
-        string profilePicture ;
+        string profilePicture;
 
-            System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
-            .Request()
-            .GetAsync();
+        System.IO.Stream photo = await _appClient.Users[userid].Photos["48x48"].Content
+        .Request()
+        .GetAsync();
 
-            using MemoryStream ms = new MemoryStream();
-            photo.CopyTo(ms);
+        using MemoryStream ms = new MemoryStream();
+        photo.CopyTo(ms);
 
-            profilePicture =  Convert.ToBase64String(ms.ToArray());
-            
-        
+        profilePicture = Convert.ToBase64String(ms.ToArray());
+
+
 
         return profilePicture;
-       
+
     }
 
 
     public async Task<List<GraphUser>> GetUserInfo(string[] users)
     {
-   
+
         var result = new List<GraphUser>();
 
         List<string> missingUsers = new();
@@ -262,7 +266,7 @@ public class GraphService : IGraphService
 
             }
 
-            
+
         }
 
         return result;
@@ -278,7 +282,7 @@ public class GraphService : IGraphService
 
         request.Method = Method.Post;
         request.AddHeader("ConsistencyLevel", "eventual");
-        request.AddHeader("Authorization", $"Bearer { GetAppOnlyTokenAsync()}");
+        request.AddHeader("Authorization", $"Bearer {GetAppOnlyTokenAsync()}");
 
 
         List<GraphBatchRequestDTO> batch = new();
@@ -311,7 +315,7 @@ public class GraphService : IGraphService
                         });
                     }
                     catch { }
-                    
+
                 }
 
             }
@@ -320,6 +324,74 @@ public class GraphService : IGraphService
 
         return result;
     }
+
+
+    private async Task<List<GraphUserManager>> GetUserManagerChunkGraph(string[] users)
+    {
+        var result = new List<GraphUserManager>();
+
+        var client = new RestClient("https://graph.microsoft.com/v1.0/$batch");
+
+        var request = new RestRequest();
+
+        request.Method = Method.Post;
+        request.AddHeader("ConsistencyLevel", "eventual");
+        request.AddHeader("Authorization", $"Bearer {GetAppOnlyTokenAsync()}");
+
+
+        List<GraphBatchRequestDTO> batch = new();
+
+        foreach (var item in users)
+        {
+            batch.Add(new GraphBatchRequestDTO(item, "GET", $"users/{item}/?$expand=manager($select=id,displayName)&$select=id,displayName"));
+        }
+
+        var body = "{requests:" + JsonConvert.SerializeObject(batch) + "}";
+        request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+        RestResponse response = client.Execute(request);
+
+        if (response != null && response.Content != null && response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            using var items = JsonDocument.Parse(response.Content);
+
+
+            foreach (var item in items.RootElement.EnumerateObject())
+            {
+                foreach (var user in item.Value.EnumerateArray())
+                {
+                    try
+                    {
+                        var graphUser = new GraphUserManager()
+                        {
+                            Id = user.GetProperty("body").GetProperty("id").ToString(),
+                            DisplayName = user.GetProperty("body").GetProperty("displayName").ToString()
+                        };
+
+                        JsonElement manager;
+                        if (user.GetProperty("body").TryGetProperty("manager", out manager))
+                        {
+                            // The manager property has a value
+
+                            graphUser.ManagerId = new Guid(manager.GetProperty("id").ToString());   
+                        }
+                       
+
+                        result.Add(graphUser);
+
+                        
+                    }
+                    catch { }
+
+                }
+
+            }
+
+        }
+
+        return result;
+    }
+
 
     public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains)
     {
@@ -338,13 +410,15 @@ public class GraphService : IGraphService
 
             foreach (var user in usersPage)
             {
+
                 // Check if the user belongs to any of the specified domains
                 if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}")))
                 {
+
                     var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
                         UserProfileId = new Guid(user.Id),
-                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60): user.DisplayName  
+                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName  
                     };
 
                     if (!graphUsers.ContainsKey(employee.UserProfileId))
@@ -352,18 +426,15 @@ public class GraphService : IGraphService
                         graphUsers.Add(employee.UserProfileId, employee);
                         userIds.Add(user.Id);
                     }
-                    
+
                 }
             }
 
             // Get user photos in batches
             var batchSize = 20;
 
-           
-
             for (int i = 0; i < userIds.Count; i += batchSize)
             {
-                var batch = new BatchRequestContent();
                 List<string> usersDictionary = new();
 
                 for (int j = i; j < i + batchSize && j < userIds.Count; j++)
@@ -376,14 +447,14 @@ public class GraphService : IGraphService
 
                 foreach (var photo in photos96x96)
                 {
-                    
 
-                        if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
-                        {
+
+                    if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
+                    {
 
                         user.Photo96x96 = photo.photo;
 
-                        }
+                    }
                 }
 
                 var photos48x48 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "48x48");
@@ -400,6 +471,21 @@ public class GraphService : IGraphService
 
                     }
                 }
+
+
+                var managers = await GetUserManagerChunkGraph(usersDictionary.ToArray());
+
+                foreach (var manager in managers)
+                {
+
+
+                    if ((manager.ManagerId != null) && graphUsers.TryGetValue(new Guid(manager.Id), out var user))
+                    {
+
+                        user.ManagerId = manager.ManagerId;
+
+                    }
+                }
             }
 
             if (usersPage.NextPageRequest != null)
@@ -410,15 +496,14 @@ public class GraphService : IGraphService
             {
                 usersPage = null;
             }
-
-
         }
 
         userProfileRepository.PopulateUserProfile(graphUsers.Values.ToList());
 
 
         return true;
-            
+
 
     }
+
 }

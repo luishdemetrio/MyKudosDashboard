@@ -100,13 +100,13 @@ public class GraphServiceRest : IGraphService
        
     }
 
-    public async Task<Guid> GetUserManagerAsync(Guid userid)
+    public async Task<Guid[]?> GetUserManagerAsync(Guid[] userids)
     {
-        var result = Guid.Empty;
+        Guid[]? result = null;
 
         try
         {
-            result = await _restClientHelper.GetApiData<Guid>($"{_graphServiceUrl}manager/?userid={userid}");
+            result = await _restClientHelper.GetApiData<Guid[]>($"{_graphServiceUrl}manager/?userids={userids}");
 
         }
         catch (Exception ex)

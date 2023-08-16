@@ -17,4 +17,6 @@ public interface IUserProfileRepository
     bool Truncate();
 
     bool PopulateUserProfile(List<UserProfile> users);
+
+    List<UserProfile> GetUsers(Guid[] ids);
 }

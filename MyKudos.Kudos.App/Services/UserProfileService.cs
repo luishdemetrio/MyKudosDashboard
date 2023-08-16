@@ -35,21 +35,6 @@ public class UserProfileService : IUserProfileService
         return _userProfileRepository.GetAll();
     }
 
-  
-
-
-    //private async Task<List<UserProfile>> GetUsersViaGraph() 
-    //{
-
-    //    List<UserProfile> result = new();
-
-        
-    //        var kudos = await _restClientHelper.GetApiData<IEnumerable<UserProfile>>($"{_graphServiceUrl}allusers");
-    //        result = kudos.ToList();
-        
-    //    return result;
-    //}
-
     public List<UserProfile> GetUsers(string name)
     {
         return _userProfileRepository.GetUsers(name);
@@ -58,5 +43,10 @@ public class UserProfileService : IUserProfileService
     public string? GetUserPhoto(Guid userid)
     {
         return _userProfileRepository.GetUserPhoto(userid);
+    }
+
+    public List<UserProfile> GetUsers(Guid[] ids)
+    {
+        return _userProfileRepository.GetUsers(ids);
     }
 }

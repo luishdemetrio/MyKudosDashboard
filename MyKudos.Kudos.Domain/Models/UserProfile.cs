@@ -11,4 +11,6 @@ public class UserProfile
     
     public string? Photo96x96 { get; set; }
     public string? Photo { get; set; }
+
+    public Guid? ManagerId { get; set; }
 }

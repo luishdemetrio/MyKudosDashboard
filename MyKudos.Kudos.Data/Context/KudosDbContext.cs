@@ -16,7 +16,35 @@ public class KudosDbContext : DbContext
     {
         //used by the top contributors procedure
         modelBuilder.Entity<UserPoint>().HasNoKey().ToView(null); ;
+
+        modelBuilder.Entity<Comments>()
+                  .HasOne<UserProfile>(c => c.UserFrom)
+                  .WithMany()
+                  .HasForeignKey(c => c.FromPersonId)
+                  .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<KudosLike>()
+            .HasOne<UserProfile>(k => k.Person)
+            .WithMany()
+            .HasForeignKey(k => k.PersonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<CommentsLikes>()
+            .HasOne<UserProfile>(k => k.Person)
+            .WithMany()
+            .HasForeignKey(k => k.FromPersonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<KudosReceiver>()
+            .HasOne<UserProfile>(k => k.Person)
+            .WithMany()
+            .HasForeignKey(k => k.ToPersonId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+
     }
+
+
 
     public DbSet<Domain.Models.Kudos> Kudos { get; set; }
 

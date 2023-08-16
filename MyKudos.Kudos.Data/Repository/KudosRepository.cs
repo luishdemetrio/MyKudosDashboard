@@ -35,13 +35,23 @@ public class KudosRepository : IKudosRepository
     public Domain.Models.Kudos? GetKudos(int kudosId)
     {
 
-        return _kudosDbContext.Kudos.Where(k => k.KudosId == kudosId)
+        var kudos =  _kudosDbContext.Kudos.Where(k => k.KudosId == kudosId)
                     .Include(l => l.Likes)
                     .Include(c => c.Comments)
                     .Include(u => u.UserFrom)
-                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognized)
                     .Include(u => u.Recognition)
                     .First();
+
+
+
+        foreach (var receiver in kudos.Recognized)
+        {
+            receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
+        }
+
+        return kudos;
+        
     }
 
 
@@ -59,7 +69,7 @@ public class KudosRepository : IKudosRepository
 					.Include(l=> l.Likes)
 					.Include(c=> c.Comments)
                     .Include(u => u.UserFrom)
-                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognized)
                     .Include(u => u.Recognition)
         .ToListAsync();
 
@@ -69,6 +79,11 @@ public class KudosRepository : IKudosRepository
             foreach (var like in kudo.Likes)
             {
                 like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+            }
+
+            foreach (var receiver in kudo.Recognized)
+            {
+                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
             }
         }
 
@@ -92,7 +107,7 @@ public class KudosRepository : IKudosRepository
                     .Include(l => l.Likes)
                     .Include(c => c.Comments)
                     .Include(u => u.UserFrom)
-                    .Include(u => u.UserTo)
+                    .Include(u => u.Recognized)
                     .Include(u => u.Recognition)
                     .ToListAsync();
 
@@ -101,6 +116,11 @@ public class KudosRepository : IKudosRepository
             foreach (var like in kudo.Likes)
             {
                 like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+            }
+
+            foreach (var receiver in kudo.Recognized)
+            {
+                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.Person.UserProfileId);
             }
         }
 
@@ -116,14 +136,14 @@ public class KudosRepository : IKudosRepository
         }
 
         var kudos =  await _kudosDbContext.Kudos
-                    .Where(k => k.ToPersonId == pUserId)
+                    .Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId))
                     .OrderByDescending(k => k.Date)
                     .Skip(pageSize * (pageNumber - 1))
                     .Take(pageSize)
                     .Include(l => l.Likes)
                     .Include(c => c.Comments)
-                     .Include(u => u.UserFrom)
-                    .Include(u => u.UserTo)
+                    .Include(u => u.UserFrom)
+                    .Include(u => u.Recognized)
                     .Include(u => u.Recognition)
                     .ToListAsync();
 
@@ -132,6 +152,11 @@ public class KudosRepository : IKudosRepository
             foreach (var like in kudo.Likes)
             {
                 like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+            }
+
+            foreach (var receiver in kudo.Recognized)
+            {
+                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.Person.UserProfileId);
             }
         }
 
@@ -143,7 +168,7 @@ public class KudosRepository : IKudosRepository
     public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
     {
 
-        return _kudosDbContext.Kudos.Where(k => k.ToPersonId == pUserId);
+        return _kudosDbContext.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
 
     }
 
@@ -152,3 +177,5 @@ public class KudosRepository : IKudosRepository
 
 
 }
+
+

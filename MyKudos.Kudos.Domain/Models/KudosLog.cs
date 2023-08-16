@@ -11,7 +11,7 @@ public class Kudos
 
     public Guid FromPersonId { get; set; }
     
-    public Guid ToPersonId { get; set; }
+    //public Guid ToPersonId { get; set; }
 
     public int RecognitionId { get; set; }
 
@@ -26,16 +26,30 @@ public class Kudos
     [ForeignKey("FromPersonId")]
     public UserProfile? UserFrom { get; set; } 
 
-    [ForeignKey("ToPersonId")]
-    public UserProfile? UserTo { get; set; } 
+    //[ForeignKey("ToPersonId")]
+    //public UserProfile? UserTo { get; set; } 
 
     [ForeignKey("RecognitionId")]
-    public Recognition? Recognition { get; set; } 
+    public Recognition? Recognition { get; set; }
+
+    [ForeignKey("KudosId")]
+    public List<KudosReceiver> Recognized { get; set; } = new();
 
 }
 
+public class KudosReceiver
+{
+    public int KudosReceiverId { get; set; }
 
-public class Comments
+    public int KudosId { get; set; }
+
+    public Guid ToPersonId { get; set; }
+
+    [ForeignKey("ToPersonId")]
+    public UserProfile? Person { get; set; }
+}
+
+    public class Comments
 {
     public int CommentsId { get; set; } 
     public int KudosId { get; set; }
@@ -72,7 +86,7 @@ public class KudosLike
 
 public record KudosNotification(
     Person From,
-    Person To,
+    List<Person> Receivers,
     Reward Reward,
     string Message,
     DateTime SendOn,

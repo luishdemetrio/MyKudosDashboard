@@ -38,7 +38,7 @@ public class CommentsView : ICommentsView
         return _commentsGateway.SendCommentsAsync(comment); 
     }
 
-    public Task<bool> UpdateComments(CommentsResponse comment, Guid toPersonId)
+    public Task<bool> UpdateComments(CommentsResponse comment)
     {
         return _commentsGateway.UpdateComments(new CommentsRequest()
         {
@@ -46,12 +46,11 @@ public class CommentsView : ICommentsView
             Date = comment.Date,
             Message = comment.Message,
             KudosId = comment.KudosId,
-            FromPersonId = comment.FromPerson.Id,
-            ToPersonId = toPersonId
+            FromPersonId = comment.FromPerson.Id
         });
     }
 
-    public  Task<bool> DeleteComments(CommentsResponse comment, Guid toPersonId)
+    public  Task<bool> DeleteComments(CommentsResponse comment)
     {
         return _commentsGateway.DeleteComments(new CommentsRequest()
         {
@@ -59,8 +58,7 @@ public class CommentsView : ICommentsView
             Date = comment.Date,
             Message = comment.Message,
             KudosId = comment.KudosId,
-            FromPersonId = comment.FromPerson.Id,
-            ToPersonId = toPersonId
+            FromPersonId = comment.FromPerson.Id
         });
     }
 }

@@ -50,7 +50,7 @@ public sealed class KudosService : IKudosService
             {
                 KudosId = k.KudosId,
                 RecognitionId = k.RecognitionId,
-                ToPersonId = k.ToPersonId
+                Recognized = k.Recognized
             }
             ).ToList();
 
