@@ -5,6 +5,10 @@ using GatewayDomain = MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gateway.Helpers;
 
+using System;
+using System.Drawing;
+using System.IO;
+
 namespace MyKudos.Gateway.Controllers;
 
 [ApiController]
@@ -86,68 +90,69 @@ public class KudosController : Controller
             var managers = await _userProfileService.GetManagers(restKudos.Recognized.Select(u=> u.ToPersonId).ToArray());
 
 
-            if (managers == null)
+            
+
+            var notification = new GatewayDomain.KudosNotification
+                (
+                    From: new GatewayDomain.Person
+                    {
+                            Id = kudosDb.FromPersonId,
+                            Name = kudosDb.UserFrom.DisplayName,
+                            Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}",
+                    },
+                    Receivers: kudosDb.Recognized.Select(r =>
+                                new GatewayDomain.Person
+                                {
+                                    Id = r.ToPersonId,
+                                    Name = r.Person.DisplayName,
+                                    Photo = $"data:image/png;base64,{r.Person.Photo96x96}",
+                                    GivenName = r.Person.GivenName
+                                }).ToList(),
+                    Reward: new GatewayDomain.Reward(Id: kudosDb.Recognition.RecognitionId, Title: kudosDb.Recognition.Title),
+                    Message: kudosDb.Message,                
+                    SendOn: kudosDb.Date,
+                    Recipients: managers.Where(m=> m.ManagerId !=null).Select(m => m.ManagerId.Value).Distinct().ToList()
+                );
+            
+            //the person who sent the kudos must receive it
+            notification.Recipients.Add(kudosDb.FromPersonId);
+
+            //the receivers must be notified too
+            notification.Recipients.AddRange(kudosDb.Recognized.Select(r => r.ToPersonId));
+
+            //send the kudos notification to the Teams Dashboard app
+            var queue = _kudosQueue.SendKudosAsync(kudosId, notification);
+
+
+            notification.From.Photo = ResizeBase64Image(kudosDb.UserFrom.Photo, 24, 24);
+            foreach (var item in notification.Receivers)
             {
-                return kudosId;
+                item.Photo = $"data:image/png;base64,{ResizeBase64Image(item.Photo.Replace("data:image/png;base64,", ""), 24, 24)}";
             }
 
-            foreach (var userManagerId in managers)
-            {
+            //send the adaptive card
+            await _agentNotificationService.SendNotificationAsync(notification);
 
-                //send the kudos notification to the Teams Dashboard app
-                var queue = _kudosQueue.SendKudosAsync(kudosId, new GatewayDomain.KudosNotification(
-                  From: new GatewayDomain.Person
-                  {
-                      Id = kudosDb.FromPersonId,
-                      Name = kudosDb.UserFrom.DisplayName,
-                      Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}"
-                  },
-                  Receivers: kudosDb.Recognized.Select(r => 
-                                              new GatewayDomain.Person
-                                              {
-                                                  Id = r.ToPersonId,
-                                                  Name = r.Person.DisplayName,
-                                                  Photo = $"data:image/png;base64,{r.Person.Photo96x96}"
-                                              }
-                                          ).ToList(),
-                  ManagerId: userManagerId.ManagerId.Value,
-                  Message: kudosDb.Message,
-                  Reward: new GatewayDomain.Reward(Id: kudosDb.Recognition.RecognitionId, Title: kudosDb.Recognition.Title),
-                  SendOn: kudosDb.Date
-                  ));
-
-                //send the adaptive card
-                await _agentNotificationService.SendNotificationAsync(
-                    new Kudos.Domain.Models.KudosNotification(
-                          From: new Kudos.Domain.Models.Person()
-                          {
-                              Id = kudosDb.UserFrom.UserProfileId,
-                              Name = kudosDb.UserFrom.DisplayName,
-                              Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}"
-                          }
-                          ,
-                          Receivers: kudosDb.Recognized.Select(r =>
-                                              new Kudos.Domain.Models.Person
-                                              {
-                                                  Id = r.ToPersonId,
-                                                  Name = r.Person.DisplayName,
-                                                  Photo = $"data:image/png;base64,{r.Person.Photo96x96}"
-                                              }
-                                          ).ToList(),
-                  ManagerId: userManagerId.ManagerId.Value,
-                          Message: kudosDb.Message,
-                          Reward: new Kudos.Domain.Models.Reward(kudosDb.Recognition.RecognitionId, kudosDb.Recognition.Title),
-                          SendOn: kudosDb.Date)
-                    );
-
-                Task.WaitAll(queue);
-            }
+            Task.WaitAll(queue);
+           
         }
 
         return kudosId;
     }
 
-    
+    public string ResizeBase64Image(string base64Image, int newWidth, int newHeight)
+    {
+        byte[] imageBytes = Convert.FromBase64String(base64Image);
 
+        using MemoryStream inputStream = new MemoryStream(imageBytes);
+        using Image originalImage = Image.FromStream(inputStream);
+        using Image resizedImage = originalImage.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
+        using MemoryStream outputStream = new MemoryStream();
+
+        resizedImage.Save(outputStream, originalImage.RawFormat);
+        byte[] resizedImageBytes = outputStream.ToArray();
+
+        return Convert.ToBase64String(resizedImageBytes);
+    }
 
 }

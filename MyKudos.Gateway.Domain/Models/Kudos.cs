@@ -45,7 +45,7 @@ public record KudosNotification
     Reward Reward,
     string Message,
     DateTime SendOn,
-    Guid ManagerId
+    List<Guid> Recipients
     
 );
 
