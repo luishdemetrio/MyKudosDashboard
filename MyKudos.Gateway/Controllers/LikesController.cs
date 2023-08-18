@@ -22,38 +22,37 @@ public class LikesController : Controller
     }
 
     [HttpPost(Name = "SendLike")]
-    public  async Task<bool> SendLikeAsync([FromBody] LikeGateway like)
+    public async Task<bool> SendLikeAsync([FromBody] LikeGateway like)
     {
-        bool result = false;
-        
-        result = await _kudosService.LikeAsync(new Kudos.Domain.Models.SendLike
-        (
-            KudosId : like.KudosId,
-            FromPersonId : like.FromPerson.Id
-        ));
-
-        await _kudosQueue.SendLikeAsync(like);
-
-        return result;
-
+        return await ProcessLikeAsync(like, _kudosService.LikeAsync);
     }
 
     [HttpDelete(Name = "Undolike")]
     public async Task<bool> Delete([FromBody] LikeGateway unlike)
     {
-        
+        return await ProcessLikeAsync(unlike, _kudosService.UndoLikeAsync);
+    }
 
+
+    private async Task<bool> ProcessLikeAsync([FromBody] LikeGateway like, Func<Kudos.Domain.Models.SendLike, Task<bool>> likeAction)
+    {
         bool result = false;
 
-        result = await _kudosService.UndoLikeAsync(new Kudos.Domain.Models.SendLike
+        result = await likeAction(new Kudos.Domain.Models.SendLike
         (
-            KudosId: unlike.KudosId,
-            FromPersonId: unlike.FromPerson.Id
+            KudosId: like.KudosId,
+            FromPersonId: like.FromPerson.Id
         ));
 
-        await _kudosQueue.SendUndoLikeAsync(unlike);
+        //we need to get who is receiving the kudos to update their score on the dashboard 
+        var kudos = await _kudosService.GetKudosUser(like.KudosId);
+
+        if (kudos != null)
+        {
+            await _kudosQueue.SendLikeAsync(like, kudos.Recognized);
+        }
 
         return result;
-
     }
+
 }

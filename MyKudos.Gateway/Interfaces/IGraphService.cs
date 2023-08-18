@@ -14,7 +14,7 @@ public interface IGraphService
 
     Task<List<GraphUser>> GetUserInfo(Guid[] users);
 
-    Task<Guid> GetUserManagerAsync(Guid userid);
+    Task<Guid[]?> GetUserManagerAsync(Guid[] userids);
 }
 
 public class GraphUsers

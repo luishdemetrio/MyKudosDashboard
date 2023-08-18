@@ -64,6 +64,10 @@
         background-position: 50%;
         background-size: 100% 100%;
     }
+
+    .blazored-typeahead__multi-value {
+        background-color: #ffffff;
+    }
     
 </style>
 
@@ -93,9 +97,11 @@
 
                        
                         <BlazoredTypeahead SearchMethod="@SearchEmployees" class="small60"
-                                           @bind-Value="@SelectedEmployee"
+                                           
                                            Debounce="500" style="width:400px;padding:0px"
-                                           MinimumLength="3" >
+                                           MinimumLength="3"
+                                           @bind-Values="@SelectedEmployees"
+                                           >
                             <SelectedTemplate>
                                 @if (string.IsNullOrEmpty(context.Photo))
                                 {
@@ -263,21 +269,23 @@
 
 @code {
 
-    [Parameter]
-    public bool ModalHidden { get; set; } = true;
+        [Parameter]
+        public bool ModalHidden { get; set; } = true;
 
-    [Parameter]
-    public UserInfo UserProfile { get; set; }
+        [Parameter]
+        public UserInfo UserProfile { get; set; }
 
-    [Parameter]
-    public string UserPhoto { get; set; }
+        [Parameter]
+        public string UserPhoto { get; set; }
 
     private bool isLoading = false;
     private bool btnSendKudosDisabled = false;
 
     private IEnumerable<RecognitionViewModel> recognitions;
 
-    private UserViewModel SelectedEmployee { get; set; }
+    //private UserViewModel SelectedEmployee { get; set; }
+
+    private IList<UserViewModel> SelectedEmployees { get; set; }
 
     private string KudosMessage;
 
@@ -303,7 +311,8 @@
 
         KudosMessage = string.Empty;
 
-        SelectedEmployee = null;
+        //SelectedEmployee = null;
+        SelectedEmployees = new List<UserViewModel>();
 
         ModalHidden = false;
         KudosMessage = string.Empty;
@@ -347,16 +356,17 @@
             var recognition = recognitions.ElementAt(slideIndex);
 
 
-            if ( SelectedEmployee == null || string.IsNullOrEmpty(KudosMessage))
+            if (SelectedEmployees.Count == 0|| string.IsNullOrEmpty(KudosMessage))
             {
                 JSRuntime.InvokeVoidAsync("alert", (string)Localizer["PleaseInformAllFields"]);
 
                 return;
             }
+            var lst = SelectedEmployees as List<UserViewModel>;
 
-
-            if (UserProfile.DisplayName == SelectedEmployee.Name)
+            if (lst.Exists(u => u.Name == UserProfile.DisplayName))
             {
+                
                 JSRuntime.InvokeVoidAsync("alert", (string)Localizer["YouCantSendAKudosToYourself"]);
 
                 return;
@@ -384,7 +394,7 @@
             kudos = new SendKudosRequest
             {
                 FromPersonId = new Guid(UserProfile.ObjectId),
-                ToPersonId = SelectedEmployee.Id,
+                ToPersonId = SelectedEmployees.Select(user => user.Id).ToList(),
                 RecognitionId = recognition.RecognitionId,
                 Message = KudosMessage,
                 Date= now //DateTime.Now

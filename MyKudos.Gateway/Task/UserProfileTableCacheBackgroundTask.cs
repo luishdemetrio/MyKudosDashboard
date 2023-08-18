@@ -9,6 +9,8 @@ public class UserProfileTableCacheBackgroundTask : IHostedService, IDisposable
 
         private IRestClientHelper _restClientHelper;
 
+    private readonly int _timeoutInSeconds;
+
     private int _intervalInMinutes;
 
     public UserProfileTableCacheBackgroundTask(IConfiguration configuration)
@@ -25,6 +27,8 @@ public class UserProfileTableCacheBackgroundTask : IHostedService, IDisposable
                     exposedAPI: configuration["ExposedApi"]
                 )
                 );
+
+        _timeoutInSeconds = int.Parse(configuration["PolulateProfilestimeoutInSeconds"]);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -36,7 +40,7 @@ public class UserProfileTableCacheBackgroundTask : IHostedService, IDisposable
     private async void DoWork(object state)
     {
         // Update the user profile table on database
-        await _restClientHelper.GetApiData<bool>($"{_graphServiceUrl}AllUsers");
+        await _restClientHelper.SendApiData<string, bool>($"{_graphServiceUrl}AllUsers", HttpMethod.Post, string.Empty, _timeoutInSeconds);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

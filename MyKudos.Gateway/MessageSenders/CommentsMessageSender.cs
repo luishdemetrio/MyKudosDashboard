@@ -1,8 +1,8 @@
 ﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
-using MyKudos.MessageSender.Interfaces;
 using MyKudos.MessageSender.Services;
 using MyKudos.Kudos.Domain.Models;
+using System.Reflection;
 
 namespace MyKudos.Gateway.Queues;
 
@@ -51,37 +51,44 @@ public class CommentsMessageSender : ICommentsMessageSender
         await _eventHubScore.PublishAsync<Kudos.Domain.Models.UserPointScore>(userPointScore);
     }
 
-    private async Task NotifyUserScore(CommentsRequest comments)
+    private async Task NotifyUserScore(CommentsRequest comments, List<KudosReceiver> recognized)
     {
         //get the user points of who sent to update the Teams Dashboard
         var userPointsSender = await _userPointsService.GetUserScoreAsync(comments.FromPersonId);
         await UpdateUserScore(userPointsSender);
 
-        if (comments.ToPersonId != comments.FromPersonId)
+        //need to update the points of who won recognition
+        foreach (var winner in recognized)
         {
             //the equality can happens when the person who received the kudos comments on his/her kudos to thanks
             //in this case we dont need to notify it again
 
-            //get the user points of who received to update the Teams Dashboard
-            var userPointsReceiver = await _userPointsService.GetUserScoreAsync(comments.ToPersonId);
-            await UpdateUserScore(userPointsReceiver);            
+            if (winner.ToPersonId != comments.FromPersonId)
+            {
+
+                //get the user points of who received to update the Teams Dashboard
+                var userPointsReceiver = await _userPointsService.GetUserScoreAsync(winner.ToPersonId);
+                await UpdateUserScore(userPointsReceiver);
+            }
+
         }
+       
 
     }
-    public async Task MessageSent(CommentsRequest comments)
+    public async Task MessageSent(CommentsRequest comments, List<KudosReceiver> recognized)
     {
         //notify User Points
-        await NotifyUserScore(comments);
+        await NotifyUserScore(comments, recognized);
 
         //notification to update the Teams Apps
         await _eventHubCommentSent.PublishAsync<CommentsRequest>(comments);
      
     }
 
-    public async Task MessageDeleted(CommentsRequest comments)
+    public async Task MessageDeleted(CommentsRequest comments, List<KudosReceiver> recognized)
     {
         //notify User Points
-        await NotifyUserScore(comments);
+        await NotifyUserScore(comments, recognized);
 
         //notification to update the Teams Apps
         await _eventHubCommentDeleted.PublishAsync<CommentsRequest>(comments);

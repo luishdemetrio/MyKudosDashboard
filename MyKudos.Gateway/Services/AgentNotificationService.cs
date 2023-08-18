@@ -1,6 +1,5 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Interfaces;
-using MyKudos.Kudos.Domain.Models;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -21,7 +20,7 @@ public class AgentNotificationService : IAgentNotificationService
         _logger = logger;
     }
 
-    public async Task<bool> SendNotificationAsync(KudosNotification kudos)
+    public async Task<bool> SendNotificationAsync(Gateway.Domain.Models.KudosNotification kudos)
     {
 
         bool result = false;

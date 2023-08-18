@@ -53,7 +53,7 @@ public class KudosMessageSender : IKudosMessageSender
             new KudosResponse
             {
                 Id = kudosId,
-                To = kudos.To,
+                Receivers = kudos.Receivers,
                 From = kudos.From,
                 Message = kudos.Message,
                 Title = kudos.Reward.Title,
@@ -67,8 +67,12 @@ public class KudosMessageSender : IKudosMessageSender
         await UpdateUserScore(userPointsSender);
 
         //get the user points of who received to update the Teams Dashboard
-        var userPointsReceiver = await _userPointsService.GetUserScoreAsync(kudos.To.Id);
-        await UpdateUserScore(userPointsReceiver);
+
+        foreach (var receiver in kudos.Receivers)
+        {
+            var userPointsReceiver = await _userPointsService.GetUserScoreAsync(receiver.Id);
+            await UpdateUserScore(userPointsReceiver);
+        }
 
         
     }
@@ -82,43 +86,36 @@ public class KudosMessageSender : IKudosMessageSender
     }
 
 
-    public async Task SendLikeAsync(LikeGateway like)
+    public async Task SendLikeAsync(LikeGateway like, List<KudosReceiver> recognized)
     {
-      //notification to update the Teams Apps
-        await _eventHubLikeSent.PublishAsync<LikeGateway>(like);
-
-        //get the user points of who sent to update the Teams Dashboard
-        var userPointsSender = await _userPointsService.GetUserScoreAsync(like.FromPerson.Id);
-        await UpdateUserScore(userPointsSender);
-
-        if (like.FromPerson.Id != like.ToPersonId)
-        {
-            //the equality can happens when the person who received the kudos comments on his/her kudos to thanks
-            //in this case we dont need to notify it again
-
-            //get the user points of who received to update the Teams Dashboard
-            var userPointsReceiver = await _userPointsService.GetUserScoreAsync(like.ToPersonId);
-            await UpdateUserScore(userPointsReceiver);
-        }
+        await ProcessLikeAsync(like, recognized, _eventHubLikeSent.PublishAsync);
     }
 
-    public async Task SendUndoLikeAsync(LikeGateway like)
+    public async Task SendUndoLikeAsync(LikeGateway like, List<KudosReceiver> recognized)
     {
+        await ProcessLikeAsync(like, recognized, _eventHubUndoLikeSent.PublishAsync);
+    }
 
+    private async Task ProcessLikeAsync(LikeGateway like, List<KudosReceiver> recognized, Func<LikeGateway, Task> publishAsync)
+    {
         //notification to update the Teams Apps
-        await _eventHubUndoLikeSent.PublishAsync<LikeGateway>(like);
+        await publishAsync(like);
 
         //get the user points of who sent to update the Teams Dashboard
         var userPointsSender = await _userPointsService.GetUserScoreAsync(like.FromPerson.Id);
         await UpdateUserScore(userPointsSender);
 
-        if (like.FromPerson.Id != like.ToPersonId)
+        //need to update the points of who won recognition
+        foreach (var winner in recognized)
         {
             //the equality can happens when the person who received the kudos comments on his/her kudos to thanks
             //in this case we dont need to notify it again
-            //get the user points of who received to update the Teams Dashboard
-            var userPointsReceiver = await _userPointsService.GetUserScoreAsync(like.ToPersonId);
-            await UpdateUserScore(userPointsReceiver);
+            if (like.FromPerson.Id != winner.ToPersonId)
+            {
+                //get the user points of who received to update the Teams Dashboard
+                var userPointsReceiver = await _userPointsService.GetUserScoreAsync(winner.ToPersonId);
+                await UpdateUserScore(userPointsReceiver);
+            }
         }
     }
 

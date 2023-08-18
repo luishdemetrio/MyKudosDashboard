@@ -43,6 +43,12 @@ public class GatewayService : IKudosGateway
     }
 
 
+
+    /// <summary>
+    /// Sends Kudos to the Gateway service
+    /// </summary>
+    /// <param name="kudos"></param>
+    /// <returns></returns>
     public async Task<string> SendKudos(SendKudosRequest kudos)
     {
         string kudosId = string.Empty;

@@ -1,27 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
-using MyKudos.Gateway.Helpers;
+using MyKudos.Kudos.Domain.Models;
 using GatewayDomain = MyKudos.Gateway.Domain.Models;
+using Microsoft.Graph;
+using MyKudos.Gateway.Helpers;
 
 namespace MyKudos.Gateway.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class KudosFromMeController : Controller
+public class KudosToMeController : Controller
 {
     
     private readonly IGraphService _graphService;
     private readonly IRecognitionService _recognitionService;
     private readonly IKudosService _kudosService;
-
-    private string _defaultProfilePicture;
+   
 
     private IEnumerable<GatewayDomain.Recognition> _recognitions;
 
-    
-    public KudosFromMeController(IGraphService graphService, IRecognitionService recognitionService, 
-                                 IKudosService kudosService, IConfiguration configuration)
+    private string _defaultProfilePicture;
+
+    public KudosToMeController(IGraphService graphService, IRecognitionService recognitionService, 
+                               IKudosService kudosService, IConfiguration configuration)
     {
         
         _graphService = graphService;
@@ -40,15 +42,15 @@ public class KudosFromMeController : Controller
     }
 
 
-    [HttpGet(Name = "GetKudosFromMe")]
+    [HttpGet(Name = "GetKudosToMe")]
     public async Task<IEnumerable<KudosResponse>> Get(string userId, int pageNumber = 1)
     {
         //get kudos
-        var kudos = await _kudosService.GetKudosFromMeAsync(userId, pageNumber);
+        var kudos = await _kudosService.GetKudosToMeAsync(userId, pageNumber);
 
         return KudosHelper.GetKudos(kudos, _defaultProfilePicture);
 
     }
 
-   
+
 }

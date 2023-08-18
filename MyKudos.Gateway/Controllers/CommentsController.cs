@@ -3,7 +3,7 @@ using MyKudos.Gateway.Interfaces;
 using GatewayDomain = MyKudos.Gateway.Domain.Models;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
-using Microsoft.Graph;
+
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -11,6 +11,9 @@ namespace MyKudos.Gateway.Controllers;
 [Route("[controller]")]
 public class CommentsController : Controller
 {
+
+
+    private readonly IKudosService _kudosService;
 
     private readonly ICommentsService _commentsService;
 
@@ -21,7 +24,7 @@ public class CommentsController : Controller
     private string _defaultProfilePicture;
 
     public CommentsController(ICommentsService commentsService, ICommentsMessageSender commentsMessageSender,
-                              IGraphService graphService,
+                              IGraphService graphService, IKudosService kudosService,
                               IConfiguration configuration)
     {
 
@@ -29,6 +32,7 @@ public class CommentsController : Controller
 
         _commentsMessageSender = commentsMessageSender;
         _graphService = graphService;
+        _kudosService = kudosService;
 
         _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
@@ -49,7 +53,14 @@ public class CommentsController : Controller
         if (commentId != 0)
         {
             comments.Id = commentId;
-            await _commentsMessageSender.MessageSent(comments);
+
+            //we need to get who is receiving the kudos to update their score on the dashboard 
+            var kudos = await _kudosService.GetKudosUser(comments.KudosId);
+
+            if (kudos != null)
+            {
+                await _commentsMessageSender.MessageSent(comments, kudos.Recognized);
+            }
         }
 
         return commentId;
@@ -130,8 +141,15 @@ public class CommentsController : Controller
         succeed = await _commentsService.DeleteComments(comments.KudosId, comments.Id);
 
         if (succeed)
-        {   
-            await _commentsMessageSender.MessageDeleted(comments);
+        {
+            //we need to get who is receiving the kudos to update their score on the dashboard 
+            var kudos = await _kudosService.GetKudosUser(comments.KudosId);
+
+            if (kudos != null)
+            {
+                await _commentsMessageSender.MessageDeleted(comments, kudos.Recognized);
+            }
+
         }
         
 

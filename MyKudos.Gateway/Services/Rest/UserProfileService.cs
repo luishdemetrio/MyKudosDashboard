@@ -1,6 +1,7 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Kudos.Domain.Models;
+using System.Collections.Generic;
 
 namespace MyKudos.Gateway.Services.Rest;
 
@@ -52,6 +53,25 @@ public class UserProfileService : IUserProfileService
         {
 
             _logger.LogError($"Error processing GetUserPhoto: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<List<UserProfile>> GetManagers(Guid[] ids)
+    {
+        List<UserProfile> result = new();
+
+        try
+        {
+            result = await _restClientHelper.SendApiData< Guid[], List<UserProfile>>($"{_kudosServiceUrl}manager", HttpMethod.Post, ids);
+
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetTopUserScoresAsync: {ex.Message}");
         }
 
         return result;

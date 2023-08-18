@@ -55,29 +55,63 @@
      style="z-index: auto ;height:76vh;overflow-y:scroll;width:100%;overflow:auto"
      class="infinite-scroll-container" @ref="scrollContainer">
 
-    <div class="list-item" >
-
-        
+    <div class="list-item" >        
 
         @foreach (var item in _kudosList.Values.OrderByDescending(k => k.SendOn))
         {
 
             <div class="profile" data-is-focusable="true">
 
-                <div class="avatar">
-                    <img src=@item.To.Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
-                </div>
+                @*In case of an individual kudos, the image size is bigger*@
+                @if(item.Receivers.Count == 1)
+                {
+                    <div class="avatar">
+                        <img src=@item.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
+                    </div>
+                }
 
                 <div class="info">
 
                     <ul class="list-unstyled ">
-                        <li>
-                            <h5>@item.To.Name</h5>
-                        </li>
 
+                        @*In case of an individual kudos, the name is displayed*@
+                        @if (item.Receivers.Count == 1)
+                        {
+                            <li>
+                                <h5>@item.Receivers[0].Name</h5>
+                            </li>
+                        }
+                        else
+                        {
+                            @*for multiple kudos, it's shown just the pictures*@
+                            foreach (var receiver in item.Receivers)
+                            {
+                                <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
+                                    <img src=@receiver.Photo
+                                         style="height: 5vh;width: 5vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
+                                    <small style="display:block; text-align:center">@receiver.GivenName</small>
+                                 </div>
+
+                                <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
+
+                                    <span style="margin-left:5px">@receiver.Name</span>
+                                    
+
+                                </FluentTooltip>
+                            }
+                        }
+                        
                         <li>
-                            <div class="text-wrap small55" style="width: 100%;">
-                                <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </small>
+                            <div class="text-wrap small55" style="width: 100%;margin-top:1vh">
+                                @if (item.Receivers.Count == 1)
+                                {
+                                    <small class="card-title pricing-card-title" >@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </small>
+                                }
+                                else
+                                {
+                                    <small class="card-title pricing-card-title">@Localizer["Received_Plural"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </small>
+                                }
+                                
                             </div>
                         </li>
                         <li>
@@ -103,7 +137,7 @@
 
                 <div class="card-body small55" style="width:100%;padding: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);">
 
-                    <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;">
+                    <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;margin-right:3vw;margin-top:1vh">
                         <small>@item.Message</small>
 
                     </div>
@@ -132,11 +166,7 @@
                         </FluentButton>
 
                         <FluentTooltip Anchor=@item.Id.ToString() Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
-
-                            @* <div @ref=tooltipLikes[item.Id]>
-
-                        </div>*@
-
+                                                     
                             @if (item.Likes.Count() > 0)
                             {
                                 <ul class="list-unstyled ">
@@ -239,13 +269,6 @@
             await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
         }
     }
-
-    //private DateTime GetCurrentDateTime(DateTime datetime)
-    //{
-    //    var selectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById(SelectedTimeZoneId);
-    //    var currentDateTime = TimeZoneInfo.ConvertTimeFromUtc(datetime, selectedTimeZone);
-    //    return currentDateTime;
-    //}
 
     [JSInvokable]
     public async Task OnScrollAsync()
@@ -693,8 +716,7 @@
                                                     Id = new Guid(User.ObjectId),
                                                     Name = User.DisplayName,
                                                     Photo = UserPhoto
-                                                },
-                                            ToPersonId: item.To.Id);
+                                                });
 
 
                 // I am sending all the information as it will update via Event Hub the others users

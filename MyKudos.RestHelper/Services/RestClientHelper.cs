@@ -1,9 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 
 namespace MyKudos.Communication.Helper.Services;
@@ -71,7 +68,7 @@ public class RestClientHelper : IRestClientHelper
 
 
 
-    public async Task<TResponse> SendApiData<TRequestBody, TResponse>(string endpoint, HttpMethod httpMethod, TRequestBody body)
+    public async Task<TResponse> SendApiData<TRequestBody, TResponse>(string endpoint, HttpMethod httpMethod, TRequestBody body, int timeoutInSeconds = 100 )
     {
 
         using var httpClient = new HttpClient();
@@ -88,6 +85,9 @@ public class RestClientHelper : IRestClientHelper
 
             request.Content = content;
         }
+
+
+        httpClient.Timeout = TimeSpan.FromSeconds( timeoutInSeconds);
 
         using var response = await httpClient.SendAsync(request);
 
