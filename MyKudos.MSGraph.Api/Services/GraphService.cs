@@ -21,8 +21,6 @@ public class Settings
 public class GraphService : IGraphService
 {
 
-    
-
     // App-ony auth token credential
     private ClientSecretCredential _clientSecretCredential;
 
@@ -321,7 +319,7 @@ public class GraphService : IGraphService
         return result;
     }
 
-    public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains)
+    public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains, string emailPrefixExclusion)
     {
 
         var graphUsers = new Dictionary<Guid, MyKudos.Kudos.Domain.Models.UserProfile>();
@@ -339,7 +337,7 @@ public class GraphService : IGraphService
             foreach (var user in usersPage)
             {
                 // Check if the user belongs to any of the specified domains
-                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}")))
+                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && !user.UserPrincipalName.StartsWith(emailPrefixExclusion)))
                 {
                     var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {

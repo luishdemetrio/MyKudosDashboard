@@ -14,6 +14,8 @@ public class AllUsersController : Controller
 
     private readonly string[] _emailDomain;
 
+    private readonly string _emailPrefixExclusion;
+
     private readonly IUserProfileRepository _userProfileRepository;
 
     public AllUsersController(IGraphService graphService, IConfiguration configuration,
@@ -24,6 +26,8 @@ public class AllUsersController : Controller
         _emailDomain = configuration["EmailDomain"].ToString().Split(",");
 
         _userProfileRepository = userProfileRepository;
+
+        _emailPrefixExclusion = configuration["EmailPrefixExclusion"];
     }
 
     [HttpGet(Name = "PopulateUserProfile")]
@@ -33,7 +37,7 @@ public class AllUsersController : Controller
         List<GraphUser> result = new();
 
         
-        await _graphService.PopulateUserProfile(_userProfileRepository, _emailDomain);
+        await _graphService.PopulateUserProfile(_userProfileRepository, _emailDomain, _emailPrefixExclusion);
         
 
         return true;
