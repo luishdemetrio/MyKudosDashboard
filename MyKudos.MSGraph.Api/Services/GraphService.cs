@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
 using MyKudos.Kudos.Domain.Interfaces;
@@ -393,7 +393,7 @@ public class GraphService : IGraphService
     }
 
 
-    public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains)
+    public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains, string emailPrefixExclusion)
     {
 
         var graphUsers = new Dictionary<Guid, MyKudos.Kudos.Domain.Models.UserProfile>();
@@ -412,10 +412,12 @@ public class GraphService : IGraphService
             {
 
                 // Check if the user belongs to any of the specified domains
-                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}")))
+                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && !user.UserPrincipalName.StartsWith(emailPrefixExclusion)))
                 {
 
-                    var employee = new MyKudos.Kudos.Domain.Models.UserProfile
+                    {
+
+                        var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
                         UserProfileId = new Guid(user.Id),
                         DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName ,

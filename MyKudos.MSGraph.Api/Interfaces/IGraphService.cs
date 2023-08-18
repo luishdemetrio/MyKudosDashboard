@@ -17,7 +17,7 @@ public interface IGraphService
     Task<string> GetUserManager(string userid);
 
 
-    Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains);
+    Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains, string emailPrefixExclusion);
 
 }
 
