@@ -1,4 +1,5 @@
-﻿using MyKudos.Communication.Helper.Interfaces;
+﻿using Dapr.Client;
+using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 
@@ -7,14 +8,18 @@ namespace MyKudosDashboard.Services;
 public class GamificationGateway : IGamificationGateway
 {
 
+    private readonly DaprClient _daprClient;
+
     private readonly string _gatewayServiceUrl;
 
     private IRestClientHelper _restClientHelper;
 
     private readonly ILogger<GamificationGateway> _logger;
 
-    public GamificationGateway(IConfiguration config, ILogger<GamificationGateway> log, IRestClientHelper clientHelper)
+    public GamificationGateway(IConfiguration config, ILogger<GamificationGateway> log, IRestClientHelper clientHelper, DaprClient daprClient)
     {
+        _daprClient = daprClient;
+
         _gatewayServiceUrl = config["GatewayServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
@@ -26,8 +31,13 @@ public class GamificationGateway : IGamificationGateway
 
         try
         {
+            result = await _daprClient.InvokeMethodAsync<UserPointScore>(
+                            HttpMethod.Get,
+                            $"{_gatewayServiceUrl}userpoints?userid={pUserId}",
+                            "getuserscore"
+                            );
 
-            result = await _restClientHelper.GetApiData<UserPointScore>($"{_gatewayServiceUrl}userpoints?userid={pUserId}");
+            //result = await _restClientHelper.GetApiData<UserPointScore>($"{_gatewayServiceUrl}userpoints?userid={pUserId}");
             
         }
         catch (Exception ex)

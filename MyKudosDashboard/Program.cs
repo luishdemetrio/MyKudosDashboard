@@ -13,6 +13,8 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDaprClient();
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddServerSideBlazor();

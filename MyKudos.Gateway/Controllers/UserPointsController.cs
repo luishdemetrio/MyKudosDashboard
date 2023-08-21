@@ -16,7 +16,7 @@ public class UserPointsController : Controller
         _userPointsService = userPointsService;
     }
 
-    [HttpGet(Name = "GetUserPoints")]
+    [HttpGet(Name = "getuserscore")]
     public async Task<UserPointScore> Get(Guid userId)
     {
 
