@@ -373,13 +373,13 @@ public class GraphService : IGraphService
                         {
                             // The manager property has a value
 
-                            graphUser.ManagerId = new Guid(manager.GetProperty("id").ToString());   
+                            graphUser.ManagerId = new Guid(manager.GetProperty("id").ToString());
                         }
-                       
+
 
                         result.Add(graphUser);
 
-                        
+
                     }
                     catch { }
 
@@ -418,96 +418,98 @@ public class GraphService : IGraphService
                     {
 
                         var employee = new MyKudos.Kudos.Domain.Models.UserProfile
-                    {
-                        UserProfileId = new Guid(user.Id),
-                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName ,
-                        GivenName = user.GivenName,
-                        Mail = user.Mail
-                        
-                    };
+                        {
+                            UserProfileId = new Guid(user.Id),
+                            DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName,
+                            GivenName = user.GivenName,
+                            Mail = user.Mail
 
-                    if (!graphUsers.ContainsKey(employee.UserProfileId))
-                    {
-                        graphUsers.Add(employee.UserProfileId, employee);
-                        userIds.Add(user.Id);
-                    }
+                        };
 
-                }
-            }
-
-            // Get user photos in batches
-            var batchSize = 20;
-
-            for (int i = 0; i < userIds.Count; i += batchSize)
-            {
-                List<string> usersDictionary = new();
-
-                for (int j = i; j < i + batchSize && j < userIds.Count; j++)
-                {
-                    usersDictionary.Add(userIds[j]);
-                }
-
-                var photos96x96 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "96x96");
-
-
-                foreach (var photo in photos96x96)
-                {
-
-
-                    if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
-                    {
-
-                        user.Photo96x96 = photo.photo;
+                        if (!graphUsers.ContainsKey(employee.UserProfileId))
+                        {
+                            graphUsers.Add(employee.UserProfileId, employee);
+                            userIds.Add(user.Id);
+                        }
 
                     }
                 }
 
-                var photos48x48 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "48x48");
+                // Get user photos in batches
+                var batchSize = 20;
 
-
-                foreach (var photo in photos48x48)
+                for (int i = 0; i < userIds.Count; i += batchSize)
                 {
+                    List<string> usersDictionary = new();
+
+                    for (int j = i; j < i + batchSize && j < userIds.Count; j++)
+                    {
+                        usersDictionary.Add(userIds[j]);
+                    }
+
+                    var photos96x96 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "96x96");
 
 
-                    if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
+                    foreach (var photo in photos96x96)
                     {
 
-                        user.Photo = photo.photo;
 
+                        if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
+                        {
+
+                            user.Photo96x96 = photo.photo;
+
+                        }
+                    }
+
+                    var photos48x48 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "48x48");
+
+
+                    foreach (var photo in photos48x48)
+                    {
+
+
+                        if (graphUsers.TryGetValue(new Guid(photo.id), out var user))
+                        {
+
+                            user.Photo = photo.photo;
+
+                        }
+                    }
+
+
+                    var managers = await GetUserManagerChunkGraph(usersDictionary.ToArray());
+
+                    foreach (var manager in managers)
+                    {
+
+
+                        if ((manager.ManagerId != null) && graphUsers.TryGetValue(new Guid(manager.Id), out var user))
+                        {
+
+                            user.ManagerId = manager.ManagerId;
+
+                        }
                     }
                 }
 
-
-                var managers = await GetUserManagerChunkGraph(usersDictionary.ToArray());
-
-                foreach (var manager in managers)
+                if (usersPage.NextPageRequest != null)
                 {
-
-
-                    if ((manager.ManagerId != null) && graphUsers.TryGetValue(new Guid(manager.Id), out var user))
-                    {
-
-                        user.ManagerId = manager.ManagerId;
-
-                    }
+                    usersPage = await usersPage.NextPageRequest.GetAsync();
+                }
+                else
+                {
+                    usersPage = null;
                 }
             }
 
-            if (usersPage.NextPageRequest != null)
-            {
-                usersPage = await usersPage.NextPageRequest.GetAsync();
-            }
-            else
-            {
-                usersPage = null;
-            }
+            userProfileRepository.PopulateUserProfile(graphUsers.Values.ToList());
+
+
+            return true;
+
+
         }
-
-        userProfileRepository.PopulateUserProfile(graphUsers.Values.ToList());
-
-
-        return true;
-
 
     }
 
