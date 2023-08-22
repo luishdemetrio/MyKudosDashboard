@@ -31,13 +31,9 @@ public class GamificationGateway : IGamificationGateway
 
         try
         {
-            result = await _daprClient.InvokeMethodAsync<UserPointScore>(
-                            HttpMethod.Get,
-                            $"{_gatewayServiceUrl}userpoints?userid={pUserId}",
-                            "getuserscore"
-                            );
+      
 
-            //result = await _restClientHelper.GetApiData<UserPointScore>($"{_gatewayServiceUrl}userpoints?userid={pUserId}");
+            result = await _restClientHelper.GetApiData<UserPointScore>($"{_gatewayServiceUrl}userpoints?userid={pUserId}");
             
         }
         catch (Exception ex)

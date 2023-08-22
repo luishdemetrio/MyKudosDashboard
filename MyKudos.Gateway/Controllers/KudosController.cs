@@ -140,7 +140,7 @@ public class KudosController : Controller
         return kudosId;
     }
 
-    public string ResizeBase64Image(string base64Image, int newWidth, int newHeight)
+    private string ResizeBase64Image(string base64Image, int newWidth, int newHeight)
     {
         byte[] imageBytes = Convert.FromBase64String(base64Image);
 

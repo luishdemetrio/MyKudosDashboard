@@ -415,26 +415,25 @@ public class GraphService : IGraphService
                 if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && !user.UserPrincipalName.StartsWith(emailPrefixExclusion)))
                 {
 
+                    var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
+                        UserProfileId = new Guid(user.Id),
+                        DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName,
+                        GivenName = user.GivenName,
+                        Mail = user.Mail
 
-                        var employee = new MyKudos.Kudos.Domain.Models.UserProfile
-                        {
-                            UserProfileId = new Guid(user.Id),
-                            DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName,
-                            GivenName = user.GivenName,
-                            Mail = user.Mail
+                    };
 
-                        };
-
-                        if (!graphUsers.ContainsKey(employee.UserProfileId))
-                        {
-                            graphUsers.Add(employee.UserProfileId, employee);
-                            userIds.Add(user.Id);
-                        }
-
+                    if (!graphUsers.ContainsKey(employee.UserProfileId))
+                    {
+                        graphUsers.Add(employee.UserProfileId, employee);
+                        userIds.Add(user.Id);
                     }
+
                 }
 
+
+            }
                 // Get user photos in batches
                 var batchSize = 20;
 
@@ -493,6 +492,8 @@ public class GraphService : IGraphService
                     }
                 }
 
+            
+
                 if (usersPage.NextPageRequest != null)
                 {
                     usersPage = await usersPage.NextPageRequest.GetAsync();
@@ -513,4 +514,3 @@ public class GraphService : IGraphService
 
     }
 
-}
