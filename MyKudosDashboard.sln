@@ -5,11 +5,11 @@ VisualStudioVersion = 17.4.32804.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudosDashboard", "MyKudosDashboard\MyKudosDashboard.csproj", "{A8A35840-E19E-4E19-9FBA-2E4E9FA6AEE6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microservices", "Microservices", "{48B2AD56-595E-4519-AD18-616A721CD82A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{48B2AD56-595E-4519-AD18-616A721CD82A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{8F3B1B63-87E1-4799-A9E1-B48E073428C1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{8F3B1B63-87E1-4799-A9E1-B48E073428C1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudos", "Kudos", "{304F2498-4826-4DAC-B2A9-A12BB960889B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KudosCatalog", "KudosCatalog", "{304F2498-4826-4DAC-B2A9-A12BB960889B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{DAE9BC9E-E750-4908-9DC8-529695DA3DFB}"
 EndProject
@@ -19,19 +19,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{EDC8426F-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{2A077BED-C841-433F-BBDB-E64B3931FEFE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Api", "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj", "{F20983EF-9AD8-4BB8-B455-1F8C75E7E90B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperKudos.KudosCatalog.webapi", "SuperKudos.KudosCatalog.webapi\SuperKudos.KudosCatalog.webapi.csproj", "{F20983EF-9AD8-4BB8-B455-1F8C75E7E90B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.App", "MyKudos.Kudos.App\MyKudos.Kudos.App.csproj", "{53A19812-9E8F-4C4E-8BF2-462D8B563406}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperKudos.KudosCatalog.App", "SuperKudos.KudosCatalog.App\SuperKudos.KudosCatalog.App.csproj", "{53A19812-9E8F-4C4E-8BF2-462D8B563406}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Data", "MyKudos.Kudos.Data\MyKudos.Kudos.Data.csproj", "{54C5E7BE-8690-40D6-A053-296B642EF98E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperKudos.KudosCatalog.Data", "SuperKudos.KudosCatalog.Data\SuperKudos.KudosCatalog.Data.csproj", "{54C5E7BE-8690-40D6-A053-296B642EF98E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Kudos.Domain", "MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj", "{B8950AEC-6BA2-48EB-9392-91C7B7723979}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperKudos.KudosCatalog.Domain", "SuperKudos.KudosCatalog.Domain\SuperKudos.KudosCatalog.Domain.csproj", "{B8950AEC-6BA2-48EB-9392-91C7B7723979}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{5064F191-2C6D-45B5-A6FB-FD0D80DD271D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aggregator", "Aggregator", "{5064F191-2C6D-45B5-A6FB-FD0D80DD271D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Gateway", "MyKudos.Gateway\MyKudos.Gateway.csproj", "{783C6345-2433-439E-B5FB-C7F841980818}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperKudos.Aggregator", "SuperKudos.Aggregator\SuperKudos.Aggregator.csproj", "{783C6345-2433-439E-B5FB-C7F841980818}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSGraph", "MSGraph", "{34354A9E-3991-46CD-90E0-151414332950}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KudosProfile", "KudosProfile", "{34354A9E-3991-46CD-90E0-151414332950}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{DCE38E39-4AB4-498C-B876-30C65DB397DD}"
 EndProject
@@ -50,7 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.MessageSender", "My
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Communication.Helper", "MyKudos.RestHelper\MyKudos.Communication.Helper.csproj", "{3C77CA74-F45D-45EF-BA3D-40519899E1D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyKudos.Gateway.Domain", "MyKudos.Gateway.Domain\MyKudos.Gateway.Domain.csproj", "{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperKudos.Aggregator.Domain", "SuperKudos.Aggregator.Domain\SuperKudos.Aggregator.Domain.csproj", "{EBDF6F1A-89A0-4903-9262-CB8E7AEDD53C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

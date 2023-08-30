@@ -10,13 +10,20 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5066" //https://localhost:7203;
     },
-  
+
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "dapr-self-hosted": {
+      "commandName": "Executable",
+      "executablePath": "c:\\dapr\\dapr.exe",
+      "commandLineArgs": "run --app-id kudosgraph --app-port 7203 --dapr-http-port 3503 dotnet run",
+      "workingDirectory": "C:\\github\\MyKudosDashboard\\MyKudos.MSGraph.Api",
+      "nativeDebugging": true
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"

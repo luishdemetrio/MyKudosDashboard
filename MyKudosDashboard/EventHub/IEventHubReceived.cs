@@ -1,4 +1,4 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using SuperKudos.Aggregator.Domain.Models;
 using MyKudosDashboard.EventHub.Enums;
 
 namespace MyKudosDashboard.EventHub;

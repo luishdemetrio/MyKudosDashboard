@@ -1,5 +1,5 @@
 ﻿@using MyKudosDashboard.Interfaces;
-@using MyKudos.Gateway.Domain.Models;
+@using SuperKudos.Aggregator.Domain.Models;
 
 @inject ITopContributorsView TopContributorsView;
 
@@ -43,7 +43,7 @@
     [Parameter]
     public UserInfo User { get; set; }
 
-    private IEnumerable<MyKudos.Gateway.Domain.Models.TopContributors> _topContributors;
+    private IEnumerable<SuperKudos.Aggregator.Domain.Models.TopContributors> _topContributors;
     private bool _isLoaded = false;
 
     protected override void OnInitialized()

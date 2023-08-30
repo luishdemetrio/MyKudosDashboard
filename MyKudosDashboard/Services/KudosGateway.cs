@@ -1,7 +1,9 @@
-﻿using MyKudos.Communication.Helper.Interfaces;
-using MyKudos.Gateway.Domain.Models;
+﻿using Dapr.Client;
+using MyKudos.Communication.Helper.Interfaces;
+using SuperKudos.Aggregator.Domain.Models;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
+using SuperKudos.Aggregator.Protos;
+using Grpc.Net.Client;
 
 namespace MyKudosDashboard.Services;
 
@@ -14,11 +16,15 @@ public class GatewayService : IKudosGateway
 
     private readonly ILogger<GatewayService> _logger;
 
-    public GatewayService(IConfiguration config, IRestClientHelper restClientHelper, ILogger<GatewayService> log)
+    private readonly DaprClient _daprClient;
+
+    public GatewayService(IConfiguration config, IRestClientHelper restClientHelper, ILogger<GatewayService> log,
+                            DaprClient daprClient)
     {
         _gatewayServiceUrl = config["GatewayServiceUrl"];
         _restClientHelper = restClientHelper;
         _logger = log;
+        _daprClient = daprClient;
         
     }
 
@@ -26,11 +32,70 @@ public class GatewayService : IKudosGateway
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
 
-        IEnumerable<KudosResponse> kudos = null;
+        List<KudosResponse> kudos = null;
 
         try
         {
-            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudos/?pageNumber={pageNumber}");
+
+            using var channel = GrpcChannel.ForAddress(_gatewayServiceUrl);
+
+            var client = new KudosService.KudosServiceClient(channel);
+
+            var reply = await client.GetKudosAsync(new GetKudosRequest() { PageNumber = pageNumber });
+
+            //var request = new GetKudosRequest { PageNumber = 1 };
+            //var response = await _daprClient.InvokeMethodGrpcAsync<GetKudosRequest, PaginatedGetKudosResponse>("kudosaggregator", "GetKudos", request);
+
+            if (reply != null)
+            {
+                kudos = new List<KudosResponse>();
+
+                foreach (var response in reply.Data)
+                {
+                    var kr = new KudosResponse()
+                    {
+                        Id = response.Id,
+                        From = new SuperKudos.Aggregator.Domain.Models.Person()
+                        {
+                            Id = new Guid(response.From.Id),
+                            GivenName = response.From.GivenName,
+                            Name = response.From.Name,
+                            Photo = response.From.Photo
+                        },
+                        Message = response.Message,
+                        SendOn = response.SendOn.ToDateTime(),
+                        Title = response.Title,
+                        Comments = response.Comments.ToList()
+
+                    };
+
+                    foreach(var like in response.Likes)
+                    {
+                        kr.Likes.Add(new SuperKudos.Aggregator.Domain.Models.Person()
+                        {
+                            Id = new Guid(like.Id),
+                            GivenName = like.GivenName,
+                            Name = like.Name,
+                            Photo = like.Photo
+                        });
+                    }
+
+                    foreach (var receiver in response.Receivers)
+                    {
+                        kr.Receivers.Add(new SuperKudos.Aggregator.Domain.Models.Person()
+                        {
+                            Id = new Guid(receiver.Id),
+                            GivenName = receiver.GivenName,
+                            Name = receiver.Name,
+                            Photo = receiver.Photo
+                        });
+                    }
+
+                    kudos.Add(kr);
+                }
+            }
+
+           // kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudos/?pageNumber={pageNumber}");
         }
         catch (Exception ex)
         {

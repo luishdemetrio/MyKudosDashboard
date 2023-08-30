@@ -1,0 +1,45 @@
+{
+  "profiles": {
+    "MyKudos.Gateway": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7172;http://localhost:5156"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "publishAllPorts": true,
+      "useSSL": true
+    },
+    "dapr-self-hosted": {
+      "commandName": "Executable",
+      "executablePath": "c:\\dapr\\dapr.exe",
+      "commandLineArgs": "run --app-id kudosaggregator --app-port 3000 --app-protocol grpc --dapr-grpc-port 50025  -- dotnet run --urls='http://+:3000'",
+      "workingDirectory": "C:\\github\\MyKudosDashboard\\SuperKudos.Aggregator",
+      "nativeDebugging": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:49285",
+      "sslPort": 49285
+    }
+  }
+}

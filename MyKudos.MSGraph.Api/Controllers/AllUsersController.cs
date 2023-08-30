@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MyKudos.Kudos.Domain.Interfaces;
+using SuperKudos.KudosCatalog.Domain.Interfaces;
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Models;
 

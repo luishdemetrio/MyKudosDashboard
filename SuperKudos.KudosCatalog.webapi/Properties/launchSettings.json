@@ -1,0 +1,45 @@
+{
+  "profiles": {
+    "SuperKudos.KudosCatalog.webapi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7176;http://localhost:5063"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "publishAllPorts": true,
+      "useSSL": true
+    },
+    "dapr-self-hosted": {
+      "commandName": "Executable",
+      "executablePath": "c:\\dapr\\dapr.exe",
+      "commandLineArgs": "run --app-id kudoscatalog --app-port 5063 --dapr-http-port 3502 dotnet run",
+      "workingDirectory": "C:\\github\\MyKudosDashboard\\SuperKudos.KudosCatalog.webapi",
+      "nativeDebugging": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:2560",
+      "sslPort": 44327
+    }
+  }
+}

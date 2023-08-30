@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MyKudos.Kudos.Data.Context;
-using MyKudos.Kudos.Data.Repository;
-using MyKudos.Kudos.Domain.Interfaces;
+using SuperKudos.KudosCatalog.Data.Context;
+using SuperKudos.KudosCatalog.Data.Repository;
+using SuperKudos.KudosCatalog.Domain.Interfaces;
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Services;
 

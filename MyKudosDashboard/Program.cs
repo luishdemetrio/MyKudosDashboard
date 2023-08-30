@@ -1,23 +1,40 @@
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
-using MyKudos.Gateway.Domain.Models;
+using SuperKudos.Aggregator.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
 using System.Globalization;
+using Dapr.Client;
+using Dapr.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var daprClient = new DaprClientBuilder().Build();
+
+//builder.WebHost.ConfigureAppConfiguration(config =>
+//{
+
+//    config.AddDaprSecretStore("secretstore-superkudos", daprClient);
+
+//});
+
+Console.WriteLine($"mandalorian: {builder.Configuration["ClientId"]}");
+
+
+
 builder.Services.AddDaprClient();
+
+
 
 builder.Services.AddRazorPages();
 
 builder.Services.AddServerSideBlazor();
+
 
 builder.Services.AddTeamsFx(builder.Configuration.GetSection("TeamsFx"));
 builder.Services.AddScoped<MicrosoftTeams>();
@@ -86,17 +103,17 @@ builder.Services.AddFluentUIComponents();
 //LibraryConfiguration configUI = new(Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetIconConfiguration(), Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetEmojiConfiguration());
 //builder.Services.AddFluentUIComponents(configUI);
 
-if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING")))
-{
-    builder.Logging.AddApplicationInsights(
-            configureTelemetryConfiguration: (config) =>
-                config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
-                configureApplicationInsightsLoggerOptions: (options) => { }
-        );
+//if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING")))
+//{
+//    builder.Logging.AddApplicationInsights(
+//            configureTelemetryConfiguration: (config) =>
+//                config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+//                configureApplicationInsightsLoggerOptions: (options) => { }
+//        );
 
-}
+//}
 
-builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("superkudos", LogLevel.Trace);
+//builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("superkudos", LogLevel.Trace);
 
 
 var app = builder.Build();

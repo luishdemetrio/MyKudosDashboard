@@ -1,4 +1,4 @@
-﻿using MyKudos.Kudos.Domain.Interfaces;
+﻿using SuperKudos.KudosCatalog.Domain.Interfaces;
 using MyKudos.MSGraph.Api.Models;
 
 namespace MyKudos.MSGraph.Api.Interfaces;

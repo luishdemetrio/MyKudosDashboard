@@ -27,6 +27,13 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/l/app/2e107f9b-9f21-4a26-9e21-642b4f592cc6?installAppPackage=true&webjoin=true&appTenantId=935d1d6d-2c54-492a-996e-8366e1d992dd&login_hint=admin@MngEnvMCAP728187.onmicrosoft.com",
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "dapr-self-hosted": {
+      "commandName": "Executable",
+      "executablePath": "c:\\dapr\\dapr.exe",
+      "commandLineArgs": "run --app-id kudosdashboard --app-port 44302 --app-protocol https --dapr-http-port 3014 -- dotnet run",
+      "workingDirectory": "C:\\github\\MyKudosDashboard\\MyKudosDashboard",
+      "nativeDebugging": true
     }
   }
 }

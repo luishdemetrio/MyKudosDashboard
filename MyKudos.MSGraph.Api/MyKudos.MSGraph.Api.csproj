@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyKudos.Kudos.Data\MyKudos.Kudos.Data.csproj" />
-    <ProjectReference Include="..\MyKudos.Kudos.Domain\MyKudos.Kudos.Domain.csproj" />
+    <ProjectReference Include="..\SuperKudos.KudosCatalog.Data\SuperKudos.KudosCatalog.Data.csproj" />
+    <ProjectReference Include="..\SuperKudos.KudosCatalog.Domain\SuperKudos.KudosCatalog.Domain.csproj" />
   </ItemGroup>
 
   <!--<ItemGroup>

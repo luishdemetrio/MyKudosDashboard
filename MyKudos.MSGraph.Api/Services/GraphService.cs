@@ -1,7 +1,7 @@
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Graph;
-using MyKudos.Kudos.Domain.Interfaces;
+using SuperKudos.KudosCatalog.Domain.Interfaces;
 
 using MyKudos.MSGraph.Api.Interfaces;
 using MyKudos.MSGraph.Api.Models;
@@ -396,7 +396,7 @@ public class GraphService : IGraphService
     public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains, string emailPrefixExclusion)
     {
 
-        var graphUsers = new Dictionary<Guid, MyKudos.Kudos.Domain.Models.UserProfile>();
+        var graphUsers = new Dictionary<Guid, SuperKudos.KudosCatalog.Domain.Models.UserProfile>();
 
         var usersPage = await _appClient.Users
           .Request()
@@ -415,7 +415,7 @@ public class GraphService : IGraphService
                 if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && !user.UserPrincipalName.StartsWith(emailPrefixExclusion)))
                 {
 
-                    var employee = new MyKudos.Kudos.Domain.Models.UserProfile
+                    var employee = new SuperKudos.KudosCatalog.Domain.Models.UserProfile
                     {
                         UserProfileId = new Guid(user.Id),
                         DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName,

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option csharp_namespace = "SuperKudos.Aggregator.Protos";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package Kudos;
+
+service KudosService{
+    rpc GetKudos (GetKudosRequest) returns (PaginatedGetKudosResponse);
+}
+
+message GetKudosRequest {
+    int32 pageNumber = 1;    
+}
+
+message GetKudosResponse {
+    int32 id = 1;
+    Person from = 2;
+    string title = 3;
+    string message = 4;
+    google.protobuf.Timestamp  send_on = 5;
+    repeated Person likes = 6;
+    repeated int32 comments = 7;
+    repeated Person receivers = 8;
+}
+
+message PaginatedGetKudosResponse{
+	repeated GetKudosResponse data = 1;
+}
+
+message Person {
+    string id = 1;
+    string name = 2;
+    string photo = 3;
+    string given_name = 4;
+}
+

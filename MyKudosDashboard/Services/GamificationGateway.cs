@@ -1,6 +1,6 @@
 ﻿using Dapr.Client;
 using MyKudos.Communication.Helper.Interfaces;
-using MyKudos.Gateway.Domain.Models;
+using SuperKudos.Aggregator.Domain.Models;
 using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Services;
