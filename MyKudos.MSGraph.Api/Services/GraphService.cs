@@ -415,7 +415,7 @@ public class GraphService : IGraphService
                 if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && !user.UserPrincipalName.StartsWith(emailPrefixExclusion)))
                 {
 
-                    {
+                    
 
                         var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
