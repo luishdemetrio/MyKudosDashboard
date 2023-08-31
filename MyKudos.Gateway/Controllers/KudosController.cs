@@ -5,9 +5,6 @@ using GatewayDomain = MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gateway.Helpers;
 
-using System;
-using System.Drawing;
-using System.IO;
 
 namespace MyKudos.Gateway.Controllers;
 
@@ -121,38 +118,18 @@ public class KudosController : Controller
             notification.Recipients.AddRange(kudosDb.Recognized.Select(r => r.ToPersonId));
 
             //send the kudos notification to the Teams Dashboard app
-            var queue = _kudosQueue.SendKudosAsync(kudosId, notification);
-
-
-            notification.From.Photo = ResizeBase64Image(kudosDb.UserFrom.Photo, 24, 24);
-            foreach (var item in notification.Receivers)
-            {
-                item.Photo = $"data:image/png;base64,{ResizeBase64Image(item.Photo.Replace("data:image/png;base64,", ""), 24, 24)}";
-            }
+            await _kudosQueue.SendKudosAsync(kudosId, notification);
 
             //send the adaptive card
             await _agentNotificationService.SendNotificationAsync(notification);
 
-            Task.WaitAll(queue);
+            
            
         }
 
         return kudosId;
     }
 
-    private string ResizeBase64Image(string base64Image, int newWidth, int newHeight)
-    {
-        byte[] imageBytes = Convert.FromBase64String(base64Image);
-
-        using MemoryStream inputStream = new MemoryStream(imageBytes);
-        using Image originalImage = Image.FromStream(inputStream);
-        using Image resizedImage = originalImage.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
-        using MemoryStream outputStream = new MemoryStream();
-
-        resizedImage.Save(outputStream, originalImage.RawFormat);
-        byte[] resizedImageBytes = outputStream.ToArray();
-
-        return Convert.ToBase64String(resizedImageBytes);
-    }
+ 
 
 }

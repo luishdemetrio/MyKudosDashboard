@@ -1,7 +1,13 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 using MyKudos.Gateway.Interfaces;
 using Newtonsoft.Json;
 using RestSharp;
+
+using System;
+using System.Drawing;
+using System.IO;
+
 
 namespace MyKudos.Gateway.Services;
 
@@ -20,6 +26,21 @@ public class AgentNotificationService : IAgentNotificationService
         _logger = logger;
     }
 
+    private string ResizeBase64Image(string base64Image, int newWidth, int newHeight)
+    {
+        byte[] imageBytes = Convert.FromBase64String(base64Image);
+
+        using MemoryStream inputStream = new MemoryStream(imageBytes);
+        using Image originalImage = Image.FromStream(inputStream);
+        using Image resizedImage = originalImage.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
+        using MemoryStream outputStream = new MemoryStream();
+
+        resizedImage.Save(outputStream, originalImage.RawFormat);
+        byte[] resizedImageBytes = outputStream.ToArray();
+
+        return Convert.ToBase64String(resizedImageBytes);
+    }
+
     public async Task<bool> SendNotificationAsync(Gateway.Domain.Models.KudosNotification kudos)
     {
 
@@ -27,6 +48,15 @@ public class AgentNotificationService : IAgentNotificationService
 
         try
         {
+
+
+            kudos.From.Photo = $"data:image/png;base64,{ResizeBase64Image(kudos.From.Photo.Replace("data:image/png;base64,", ""), 26, 26)}";
+
+            foreach (var item in kudos.Receivers)
+            {
+                item.Photo = $"data:image/png;base64,{ResizeBase64Image(item.Photo.Replace("data:image/png;base64,", ""), 26, 26)}";
+            }
+
 
             var uri = $"{_agentServiceUrl}";
 
