@@ -412,7 +412,8 @@ public class GraphService : IGraphService
             {
 
                 // Check if the user belongs to any of the specified domains
-                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && !user.UserPrincipalName.StartsWith(emailPrefixExclusion)))
+                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && (string.IsNullOrEmpty(emailPrefixExclusion) || 
+                                                                           !user.UserPrincipalName.StartsWith(emailPrefixExclusion))))
                 {
 
                     
