@@ -1,4 +1,6 @@
-﻿namespace MyKudos.Gateway.Domain.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MyKudos.Gateway.Domain.Models;
 
 public class UserScore
 {
@@ -19,6 +21,22 @@ public class UserScore
     public int? GroupFive { get; set; } = 0;
 
     public int? GroupAll { get; set; } = 0;
+}
+
+public class UserProfile
+{
+    public Guid UserProfileId { get; set; }
+    [MaxLength(60)]
+    public string DisplayName { get; set; }
+    public string? GivenName { get; set; }
+    public string? Mail { get; set; }
+
+    public string? Photo96x96 { get; set; }
+    public string? Photo { get; set; }
+
+    public Guid? ManagerId { get; set; }
+
+    public bool HasDirectReports { get; set; }
 }
 
 public class UserPointScore

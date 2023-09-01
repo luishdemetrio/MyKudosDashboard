@@ -49,4 +49,9 @@ public class UserProfileService : IUserProfileService
     {
         return _userProfileRepository.GetUsers(ids);
     }
+
+    public UserProfile? GetUser(Guid userId)
+    {
+        return _userProfileRepository.GetUser(userId);
+    }
 }

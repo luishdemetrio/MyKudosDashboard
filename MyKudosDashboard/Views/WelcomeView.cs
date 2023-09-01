@@ -1,20 +1,12 @@
-﻿using Azure.Messaging.ServiceBus;
-using Azure.Messaging.ServiceBus.Administration;
-using Microsoft.Extensions.Logging;
+﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.MessageSender;
-using MyKudosDashboard.Models;
-using Newtonsoft.Json;
 
 namespace MyKudosDashboard.Views;
 
 public class WelcomeView : IWelcomeView
 {
 
-    
-
     private IUserGateway _userGateway;
-
     
     private static string _kudosSentDashboard = string.Empty;
 
@@ -24,24 +16,16 @@ public class WelcomeView : IWelcomeView
     private static string _commentSentDashboard = string.Empty;
     private static string _commentDeletedDashboard = string.Empty;
 
-   
-
     public WelcomeView(IUserGateway userGateway)
     {
 
         _userGateway = userGateway;
-
-      
     }
 
-
-
-    
-
-    public async Task<string> GetUserPhoto(string userId)
+    public async Task<UserProfile> GetUserInfo(string userId)
     {
 
-        return await _userGateway.GetUserPhoto(userId);
+        return await _userGateway.GetUserInfo(userId);
     }
 
     

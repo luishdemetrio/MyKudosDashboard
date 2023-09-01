@@ -1,4 +1,5 @@
-﻿using MyKudosDashboard.Models;
+﻿using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
@@ -8,5 +9,5 @@ public interface IUserGateway
 
     Task<string> GetUserPhoto(string userid);
 
-  
+    Task<UserProfile> GetUserInfo(string userid);
 }

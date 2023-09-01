@@ -10,4 +10,6 @@ public interface IUserProfileService
     Task<string> GetUserPhoto(Guid userid);
 
     Task<List<UserProfile>> GetManagers(Guid[] ids);
+
+    Task<UserProfile?> GetUser(Guid userId);
 }

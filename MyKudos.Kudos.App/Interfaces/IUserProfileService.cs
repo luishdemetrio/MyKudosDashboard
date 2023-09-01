@@ -17,5 +17,7 @@ public interface IUserProfileService
 
     List<UserProfile> GetUsers(Guid[] ids);
 
+    UserProfile? GetUser(Guid userId);
+
 
 }

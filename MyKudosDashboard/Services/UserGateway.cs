@@ -1,4 +1,5 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Models;
 
@@ -6,7 +7,6 @@ namespace MyKudosDashboard.Services;
 
 public class UserGateway : IUserGateway
 {
-
 
     private readonly string _gatewayServiceUrl;
     private IRestClientHelper _restClientHelper;
@@ -56,5 +56,23 @@ public class UserGateway : IUserGateway
 
         return result;
 
+    }
+
+    public async Task<UserProfile> GetUserInfo(string userId)
+    {
+        UserProfile result = null;
+
+        try
+        {
+            result = await _restClientHelper.GetApiData<UserProfile>($"{_gatewayServiceUrl}userinfo/?userid={userId}");
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetUserPhoto: {ex.Message}");
+        }
+
+        return result;
     }
 }

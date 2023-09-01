@@ -19,18 +19,28 @@
         <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
         <FluentTab Text=@Localizer["KudosToMe"] style="z-index:auto" @onclick=OnTabToMeClick />
         <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
-
+         @if (User.HasDirectReports)
+         {
+            <FluentTab Text=@Localizer["KudosToMyDirectReports"] style="z-index:auto" @onclick=OnTabToMyDirectReportsClick />
+         }
             <FluentTabPanel   >
-                <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos   />
+                <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
             
             <FluentTabPanel >
-            <KudosList @ref=ToMeKudosTab TypeTab =KudosList.KudosTypeTab.ToMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
+            <KudosList @ref=ToMeKudosTab TypeTab =KudosList.KudosTypeTab.ToMe User=@User ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
             
             <FluentTabPanel >
-                <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User UserPhoto=@UserPhoto ReplyCallBack=@ReplyKudos />
-            </FluentTabPanel>      
+                <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
+            </FluentTabPanel>   
+            
+            @if (User.HasDirectReports)
+            {
+                <FluentTabPanel>
+                    <KudosList @ref=ToMyDirectReports TypeTab=KudosList.KudosTypeTab.ToMyDirectReports User=@User  ReplyCallBack=@ReplyKudos />
+                </FluentTabPanel>
+            }
 
     </FluentTabs>
 
@@ -39,10 +49,7 @@
 @code {
 
     [Parameter]
-    public string UserPhoto { get; set; }
-
-    [Parameter]
-    public UserInfo User { get; set; }
+    public UserProfile User { get; set; }
 
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
@@ -54,6 +61,7 @@
     private KudosList AllKudosTab;
     private KudosList ToMeKudosTab;
     private KudosList FromMeKudosTab;
+    private KudosList ToMyDirectReports;
 
 
 
@@ -61,24 +69,24 @@
     {
         base.OnAfterRender(firstRender);
 
-       
-            if (User != null)
-            {
-                var subscriptionName = User.ObjectId;
+
+        if (User != null)
+        {
+            var subscriptionName = User.UserProfileId;
 
 
-                KudosTabView.RegisterObserver(User.ObjectId);
+            KudosTabView.RegisterObserver(User.UserProfileId.ToString());
 
-                KudosTabView.LikeCallback = UpdateLikesCallBack;
-                KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
+            KudosTabView.LikeCallback = UpdateLikesCallBack;
+            KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
 
-                KudosTabView.KudosCallback = UpdateKudosCallback;
+            KudosTabView.KudosCallback = UpdateKudosCallback;
 
-                KudosTabView.CommentsDeletedCallback = CommentsDeleted;
-                KudosTabView.CommentsSentCallback = CommentsSent;
+            KudosTabView.CommentsDeletedCallback = CommentsDeleted;
+            KudosTabView.CommentsSentCallback = CommentsSent;
 
-            }
-       
+        }
+
     }
 
     public void ReloadKudos()
@@ -90,7 +98,7 @@
 
         t.Wait();
 
-        
+
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)
@@ -106,6 +114,14 @@
     private async Task OnTabFromMeClick(MouseEventArgs args)
     {
         await FromMeKudosTab.LoadKudos();
+    }
+
+    private async Task OnTabToMyDirectReportsClick(MouseEventArgs args)
+    {
+        if (User.HasDirectReports)
+        {
+            await ToMyDirectReports.LoadKudos();
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

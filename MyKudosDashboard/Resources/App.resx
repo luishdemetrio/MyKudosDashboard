@@ -153,6 +153,9 @@
   <data name="KudosToMe" xml:space="preserve">
     <value>Kudos to me</value>
   </data>
+  <data name="KudosToMyDirectReports" xml:space="preserve">
+    <value>Kudos to my direct reports</value>
+  </data>
   <data name="LikesReceived" xml:space="preserve">
     <value>Likes Received</value>
   </data>

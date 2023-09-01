@@ -19,4 +19,6 @@ public interface IUserProfileRepository
     bool PopulateUserProfile(List<UserProfile> users);
 
     List<UserProfile> GetUsers(Guid[] ids);
+
+    UserProfile? GetUser(Guid userId);
 }

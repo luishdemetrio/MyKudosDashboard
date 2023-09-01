@@ -32,7 +32,7 @@
                         <td scope="row" style="padding-top: 0px;padding-bottom: 0px;width:98%;">
 
 
-                            <div class="profile" data-is-focusable="true" style="">
+                            <div class="profile" data-is-focusable="true" style="width:90%">
 
 
                                 @*In case of an individual kudos, the image size is bigger*@
@@ -168,7 +168,7 @@
 
                             <div style="display: flex;padding-bottom: 0px;width:90%">
                                 <div style="width:50px;margin-top:5px;padding-top: 15px">
-                                    <img src=@_userPhoto style="height:40px;width:40px;float:left;border-radius: 50%" />
+                                    <img src=@((User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image /png;base64,{User.Photo96x96}") style="height:40px;width:40px;float:left;border-radius: 50%" />
                                 </div>
 
                                 <div class="form-group small55" style="width:90%">
@@ -205,7 +205,7 @@
 
                                             <li>
 
-                                                <ReplyControl Reply=@comment ReplyUser=@User ReplyUserPhoto=@_userPhoto 
+                                                <ReplyControl Reply=@comment ReplyUser=@User 
                                                   replyDeleteCommentCallBack=@DeleteComment
                                                   replyUpdateCommentCallBack=@UpdateCommentCallBack />
                                                
@@ -239,11 +239,8 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
-
-    private string _userPhoto { get; set; }
-
     [Parameter]
-    public UserInfo User { get; set; }
+    public UserProfile User { get; set; }
 
 
     private KudosResponse _item { get; set; }
@@ -264,12 +261,11 @@
     private bool _isLikeButtonDisabled = false;
 
 
-    public void ShowModal(KudosResponse kudos, string userPhoto)
+    public void ShowModal(KudosResponse kudos)
     {
 
         _item = kudos;
-        _userPhoto = userPhoto;
-
+        
         ModalHidden = false;
         _comments = new();
 
@@ -309,7 +305,7 @@
 
         @if (User != null)
         {
-            filled = item.Likes.Any(l => l.Id.ToString() == User.ObjectId);
+            filled = item.Likes.Any(l => l.Id== User.UserProfileId);
         }
 
         return filled;
@@ -329,7 +325,7 @@
             _isLikeButtonDisabled = true;
 
 
-            if (kudos.Likes.Any(l => l.Id.ToString() == User.ObjectId))
+            if (kudos.Likes.Any(l => l.Id == User.UserProfileId))
             {
                 var t = InvokeAsync(() =>
                    {
@@ -338,9 +334,9 @@
                            KudosId: kudos.Id,
                            FromPerson: new Person
                               {
-                                  Id = new Guid(User.ObjectId),
+                                  Id = User.UserProfileId,
                                   Name = User.DisplayName,
-                                  Photo = _userPhoto
+                                  Photo = User.Photo96x96
                               }
                        )
                    );
@@ -360,9 +356,9 @@
                              KudosId: kudos.Id,
                              FromPerson: new Person
                              {
-                                 Id = new Guid(User.ObjectId),
+                                 Id = User.UserProfileId,
                                  Name = User.DisplayName,
-                                 Photo = _userPhoto
+                                 Photo = User.Photo96x96
                              }
                             ));
                    });
@@ -371,7 +367,7 @@
 
             }
 
-            UpdateLikesKudos(kudos.Id, new Guid(User.ObjectId));
+            UpdateLikesKudos(kudos.Id, User.UserProfileId);
 
         }
         finally { 
@@ -391,7 +387,7 @@
     private void UpdateLikeCallback(LikeGateway like)
     {
         // The person who sent already has the like updated
-        if (like.FromPerson.Id.ToString() == User.ObjectId)
+        if (like.FromPerson.Id == User.UserProfileId)
             return;
 
         UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
@@ -412,7 +408,7 @@
                     {
                         Id = personId,
                         Name = User.DisplayName,
-                        Photo = (_userPhoto.Contains("data")) ? _userPhoto: $"data:image/png;base64,{_userPhoto}"
+                        Photo = (User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image/png;base64,{User.Photo96x96}"
                     });
             }
             else
@@ -452,7 +448,7 @@
                          new CommentsRequest()
                              {
                                  KudosId = _item.Id,
-                                 FromPersonId = new Guid(User.ObjectId),
+                                 FromPersonId = User.UserProfileId,
                                  Message = _replyMessage,
                                  Date = DateTime.Now
                              }
@@ -465,8 +461,8 @@
                 KudosId = _item.Id,
                 FromPerson = new Person()
                 {
-                    Id = new Guid(User.ObjectId),
-                    Photo = _userPhoto,
+                    Id = User.UserProfileId,
+                    Photo = User.Photo96x96,
                     Name = User.DisplayName
                 },
                 Message = _replyMessage,

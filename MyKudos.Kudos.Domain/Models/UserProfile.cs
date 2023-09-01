@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyKudos.Kudos.Domain.Models;
 
@@ -15,4 +16,7 @@ public class UserProfile
     public string? Photo { get; set; }
 
     public Guid? ManagerId { get; set; }
+
+    [NotMapped]
+    public bool HasDirectReports { get; set; }
 }

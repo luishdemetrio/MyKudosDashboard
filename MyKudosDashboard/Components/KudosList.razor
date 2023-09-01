@@ -174,7 +174,7 @@
                                     {
                                         <li>
                                             <div>
-                                                <img src=@like.Photo
+                                                <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
                                                      style="height: 26px;width: 26px;border-radius: 50%;" />
                                                 <span style="margin-left:5px">@like.Name</span>
                                             </div>
@@ -211,16 +211,15 @@
     {
         All,
         ToMe,
-        FromMe
+        FromMe,
+        ToMyDirectReports
     }
 
     private ConcurrentDictionary<int, KudosResponse> _kudosList;
 
+   
     [Parameter]
-    public string UserPhoto { get; set; }
-
-    [Parameter]
-    public UserInfo User { get; set; }
+    public UserProfile User { get; set; }
 
     [Parameter]
     public KudosTypeTab TypeTab { get; set; }
@@ -244,7 +243,7 @@
     private int _pageNumber;
 
     private ElementReference scrollContainer;
-    private ElementReference contentContainer;
+   
     private bool isLoading = false;
 
     private string SelectedTimeZoneId { get; set; } = "America/Sao_Paulo";
@@ -311,12 +310,17 @@
 
             case KudosTypeTab.FromMe:
 
-                kudos = await KudosListView.GetKudosFromMe(User.ObjectId, pageNumber).ConfigureAwait(true);
+                kudos = await KudosListView.GetKudosFromMe(User.UserProfileId.ToString(), pageNumber).ConfigureAwait(true);
                 break;
 
             case KudosTypeTab.ToMe:
 
-                kudos = await KudosListView.GetKudosToMe(User.ObjectId, pageNumber).ConfigureAwait(true);
+                kudos = await KudosListView.GetKudosToMe(User.UserProfileId.ToString(), pageNumber).ConfigureAwait(true);
+                break;
+
+            case KudosTypeTab.ToMyDirectReports:
+
+                kudos = await KudosListView.GetKudosToMyDirectReports(User.UserProfileId.ToString(), pageNumber).ConfigureAwait(true);
                 break;
 
         }
@@ -662,7 +666,7 @@
 
         @if (User != null)
         {
-            filled = item.Likes.Any(l => l.Id.ToString() == User.ObjectId);
+            filled = item.Likes.Any(l => l.Id == User.UserProfileId);
         }
 
         return filled;
@@ -713,14 +717,14 @@
                 var requestLike = new LikeGateway(KudosId: item.Id,
                                             FromPerson: new Person
                                                 {
-                                                    Id = new Guid(User.ObjectId),
+                                                    Id = User.UserProfileId,
                                                     Name = User.DisplayName,
-                                                    Photo = UserPhoto
+                                                    Photo = User.Photo96x96
                                                 });
 
 
                 // I am sending all the information as it will update via Event Hub the others users
-                if (kudo.Likes.Any(l => l.Id.ToString() == User.ObjectId))
+                if (kudo.Likes.Any(l => l.Id == User.UserProfileId))
                 {
                     KudosListView.SendUndoLikeAsync(requestLike);
 

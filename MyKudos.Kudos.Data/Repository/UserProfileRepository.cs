@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
@@ -66,5 +65,22 @@ public class UserProfileRepository : IUserProfileRepository
     {
         return _context.UserProfiles.Where(user => ids.Contains(user.UserProfileId))
             .ToList();
+    }
+
+    /// <summary>
+    /// Returns the user info and if the user has direct reports
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public UserProfile? GetUser(Guid userId)
+    {
+        var user =  _context.UserProfiles.Where(user => user.UserProfileId == userId).FirstOrDefault();
+
+        if (user != null)
+        {
+            user.HasDirectReports = _context.UserProfiles.Any(up => up.ManagerId == userId);
+        }
+
+        return user;
     }
 }

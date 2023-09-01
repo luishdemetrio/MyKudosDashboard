@@ -1,5 +1,4 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces;
 
@@ -13,6 +12,7 @@ public interface IKudosListView
     Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
     Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber);
     Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber);
+    Task<IEnumerable<KudosResponse>> GetKudosToMyDirectReports(string userId, int pageNumber);
 
 
 

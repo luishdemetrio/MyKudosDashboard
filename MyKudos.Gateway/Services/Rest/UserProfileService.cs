@@ -1,7 +1,7 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-using System.Collections.Generic;
+
 
 namespace MyKudos.Gateway.Services.Rest;
 
@@ -12,6 +12,7 @@ public class UserProfileService : IUserProfileService
     private IRestClientHelper _restClientHelper;
 
     private readonly ILogger<UserProfileService> _logger;
+    private readonly object userid;
 
     public UserProfileService(IConfiguration config, ILogger<UserProfileService> log, IRestClientHelper clientHelper)
     {
@@ -72,6 +73,24 @@ public class UserProfileService : IUserProfileService
         {
 
             _logger.LogError($"Error processing GetTopUserScoresAsync: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<UserProfile?> GetUser(Guid userId)
+    {
+        UserProfile result = null;
+
+        try
+        {
+            result = await _restClientHelper.GetApiData<UserProfile>($"{_kudosServiceUrl}userinfo/?userid={userId}");
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetUserPhoto: {ex.Message}");
         }
 
         return result;

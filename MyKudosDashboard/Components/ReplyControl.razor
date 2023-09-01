@@ -58,7 +58,7 @@
 
     <div style="height: auto;width:100%">
         <div style="width:50px;margin-top:0px;padding-top: 5px">
-            <img src=@Reply.FromPerson.Photo style="height:40px;width:40px;float:left;border-radius: 50%" />
+            <img src=@((Reply.FromPerson.Photo.Contains("data")) ? Reply.FromPerson.Photo : $"data:image /png;base64,{Reply.FromPerson.Photo}") style="height:40px;width:40px;float:left;border-radius: 50%" />
         </div>
 
         <div style="width:90%;margin-bottom: 0px;">
@@ -155,14 +155,12 @@
 
 @code {
 
-    [Parameter]
-    public string ReplyUserPhoto { get; set; }
-
+    
     [Parameter]
     public CommentsResponse Reply { get; set; }
 
     [Parameter]
-    public UserInfo ReplyUser { get; set; }
+    public UserProfile ReplyUser { get; set; }
 
     public delegate void DeleteCommentCallBack(CommentsResponse comments);
 
@@ -191,19 +189,19 @@
 
         @if (ReplyUser != null)
         {
-            filled = item.Likes.Any(l => l.Id.ToString() == ReplyUser.ObjectId);
+            filled = item.Likes.Any(l => l.Id== ReplyUser.UserProfileId);
         }
 
         return filled;
     }
     private bool LikeDisabled(CommentsResponse item)
     {
-        return item.FromPerson.Id.ToString() == ReplyUser.ObjectId;
+        return item.FromPerson.Id == ReplyUser.UserProfileId;
     }
 
     private bool CanEditOrDeleteComment()
     {
-        return (Reply.FromPerson.Id.ToString() == ReplyUser.ObjectId);
+        return (Reply.FromPerson.Id == ReplyUser.UserProfileId);
     }
 
     private bool FilledLikeComments(CommentsResponse item)
@@ -212,7 +210,7 @@
 
         @if (ReplyUser != null)
         {
-            filled = item.Likes.Any(l => l.Id.ToString() == ReplyUser.ObjectId);
+            filled = item.Likes.Any(l => l.Id == ReplyUser.UserProfileId);
         }
 
         return filled;
@@ -228,7 +226,7 @@
         try
         {
 
-            if (item.Likes.Any(l => l.Id.ToString() == ReplyUser.ObjectId))
+            if (item.Likes.Any(l => l.Id == ReplyUser.UserProfileId))
             {
                 var t = InvokeAsync(() =>
                   {
@@ -237,9 +235,9 @@
                                  KudosId: item.Id,
                                  FromPerson: new Person
                                   {
-                                      Id = new Guid(ReplyUser.ObjectId),
+                                      Id = ReplyUser.UserProfileId,
                                       Name = ReplyUser.DisplayName,
-                                      Photo = ReplyUserPhoto
+                                      Photo = ReplyUser.Photo96x96
                                   }));
                   });
                 t.Wait();
@@ -255,15 +253,15 @@
                                 KudosId: item.Id,
                                 FromPerson: new Person
                                 {
-                                    Id = new Guid(ReplyUser.ObjectId),
+                                    Id = ReplyUser.UserProfileId,
                                     Name = ReplyUser.DisplayName,
-                                    Photo = ReplyUserPhoto
+                                    Photo = ReplyUser.Photo96x96
                                 }));
                   });
                 t.Wait();
             }
 
-            UpdateLikes(item.Id, new Guid(ReplyUser.ObjectId));
+            UpdateLikes(item.Id, ReplyUser.UserProfileId);
 
         }
         finally
@@ -295,7 +293,7 @@
                     {
                         Id = personId,
                         Name = ReplyUser.DisplayName,
-                        Photo = ReplyUserPhoto
+                        Photo = ReplyUser.Photo96x96
                     });
             }
             else

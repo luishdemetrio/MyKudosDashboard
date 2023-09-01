@@ -19,7 +19,7 @@
 
         <div class="avatar" style="float:none;width:100%;text-align: center">
 
-            <img src=@UserPhoto style="height:10vh;width:10vh;border-radius: 50%;" />
+            <img src=@((User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image /png;base64,{User.Photo96x96}") style="height:10vh;width:10vh;border-radius: 50%;" />
 
             
         </div>
@@ -128,12 +128,9 @@
 
 @code {
 
+   
     [Parameter]
-    public string UserPhoto { get; set; }
-
-
-    [Parameter]
-    public UserInfo User { get; set; }
+    public UserProfile User { get; set; }
 
     [Parameter]
     public UserPointScore UserScoreValue { get; set; }
@@ -161,19 +158,20 @@
 
 
         UserScoreValue = new();
-        UserScoreValue = await UserProfileScoreView.GetUserScore(User.ObjectId);
+        
         _isLoaded = true;
 
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         base.OnAfterRender(firstRender);
 
        
             if (User != null)
             {
-                UserProfileScoreView.RegisterObserver(User.ObjectId);
+                UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString());
+                UserProfileScoreView.RegisterObserver(User.UserProfileId.ToString());
             }
 
             UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
@@ -193,7 +191,7 @@
     public void UpdateScoreCallBack(UserPointScore userScore)
     {
 
-        if (userScore.UserId.ToString() != User.ObjectId)
+        if (userScore.UserId != User.UserProfileId.ToString())
             return;
 
          UserScoreValue = userScore;

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
-using MyKudos.Kudos.Domain.Models;
+
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -54,113 +54,83 @@ public class KudosRepository : IKudosRepository
         
     }
 
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetAllKudosAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5, bool fromMe = true, bool directReports = false)
+    {
+        if (pageSize > _maxPageSize)
+        {
+            pageSize = _maxPageSize;
+        }
+
+        IQueryable<Domain.Models.Kudos> kudosQuery = _kudosDbContext.Kudos
+
+            .Include(c => c.Comments)
+            .Include(u => u.UserFrom)
+            .Include(u => u.Recognition);
+        // .Include(l => l.Likes)
+        //.Include(u => u.Recognized);
+
+        kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
+        kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
+
+        if (directReports)
+        {
+           
+
+            kudosQuery = kudosQuery.Where(k => (k.UserFrom.ManagerId == pUserId) || (k.Recognized.Any(u=> u.Person.ManagerId == pUserId)));
+        }
+        else if (pUserId != Guid.Empty)
+        {
+            kudosQuery = kudosQuery.Where(k => fromMe ? k.FromPersonId == pUserId : k.Recognized.Any(u => u.ToPersonId == pUserId));
+        }
+
+        var kudos = await kudosQuery
+            .OrderByDescending(k => k.Date)
+            .Skip(pageSize * (pageNumber - 1))
+            .Take(pageSize)
+            .ToListAsync();
+
+        //foreach (var kudo in kudos)
+        //{
+        //    foreach (var like in kudo.Likes)
+        //    {
+        //        like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
+        //    }
+
+        //    foreach (var receiver in kudo.Recognized)
+        //    {
+        //        receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
+        //    }
+        //}
+
+        return kudos;
+    }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
 	{
 
-		if(pageSize > _maxPageSize)
-		{
-			pageSize = _maxPageSize;
-		}
 
-		var kudos =  await _kudosDbContext.Kudos.OrderByDescending(k => k.Date)
-					.Skip(pageSize * (pageNumber - 1))
-					.Take(pageSize)					
-					.Include(l=> l.Likes)
-					.Include(c=> c.Comments)
-                    .Include(u => u.UserFrom)
-                    .Include(u => u.Recognized)
-                    .Include(u => u.Recognition)
-        .ToListAsync();
+        return await GetAllKudosAsync(Guid.Empty, pageNumber, pageSize, directReports: false);
 
-
-        foreach (var kudo in kudos)
-        {
-            foreach (var like in kudo.Likes)
-            {
-                like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
-            }
-
-            foreach (var receiver in kudo.Recognized)
-            {
-                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
-            }
-        }
-
-        return kudos;
     }
 
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
     {
 
-        if (pageSize > _maxPageSize)
-        {
-            pageSize = _maxPageSize;
-        }
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: true, directReports: false);
 
-        var kudos =  await _kudosDbContext.Kudos
-					.Where(k => k.FromPersonId == pUserId)
-					.OrderByDescending(k => k.Date)
-                    .Skip(pageSize * (pageNumber - 1))
-                    .Take(pageSize)
-                    .Include(l => l.Likes)
-                    .Include(c => c.Comments)
-                    .Include(u => u.UserFrom)
-                    .Include(u => u.Recognized)
-                    .Include(u => u.Recognition)
-                    .ToListAsync();
-
-        foreach (var kudo in kudos)
-        {
-            foreach (var like in kudo.Likes)
-            {
-                like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
-            }
-
-            foreach (var receiver in kudo.Recognized)
-            {
-                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
-            }
-        }
-
-        return kudos;
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
     {
 
-        if (pageSize > _maxPageSize)
-        {
-            pageSize = _maxPageSize;
-        }
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, directReports: false);
+    }
 
-        var kudos =  await _kudosDbContext.Kudos
-                    .Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId))
-                    .OrderByDescending(k => k.Date)
-                    .Skip(pageSize * (pageNumber - 1))
-                    .Take(pageSize)
-                    .Include(l => l.Likes)
-                    .Include(c => c.Comments)
-                    .Include(u => u.UserFrom)
-                    .Include(u => u.Recognized)
-                    .Include(u => u.Recognition)
-                    .ToListAsync();
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMyDirectsAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
+    {
 
-        foreach (var kudo in kudos)
-        {
-            foreach (var like in kudo.Likes)
-            {
-                like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
-            }
-
-            foreach (var receiver in kudo.Recognized)
-            {
-                receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
-            }
-        }
-
-        return kudos;
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, directReports: true);
     }
 
 

@@ -144,5 +144,20 @@ public class KudosServiceRest: IKudosService
         return result;
     }
 
-    
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMyDirectsAsync(string userId, int pageNumber)
+    {
+        List<Kudos.Domain.Models.Kudos> result = new();
+
+        try
+        {
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudostomydirects/?userid={userId}&pageNumber= {pageNumber}");
+            result = kudos.ToList();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return result;
+    }
 }

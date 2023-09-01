@@ -2,9 +2,7 @@
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
-using Microsoft.Graph.ExternalConnectors;
-using Microsoft.Extensions.Logging.ApplicationInsights;
-using System.Diagnostics.Eventing.Reader;
+
 
 namespace MyKudosDashboard.Views;
 

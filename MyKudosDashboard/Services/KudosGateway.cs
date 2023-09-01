@@ -1,7 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Services;
 
@@ -126,6 +125,23 @@ public class GatewayService : IKudosGateway
         try
         {
             kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosTome/?userid={userId}&pageNumber={pageNumber}");
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+        }
+
+        return kudos;
+    }
+
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMyDirects(string userId, int pageNumber)
+    {
+        IEnumerable<KudosResponse> kudos = null;
+
+        try
+        {
+            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosTomydirects/?userid={userId}&pageNumber={pageNumber}");
         }
         catch (Exception ex)
         {

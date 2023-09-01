@@ -34,8 +34,8 @@ public class UserProfileController : Controller
 
         return _userProfileService.GetUsers(name);
 
-        
-
     }
+
+
 
 }

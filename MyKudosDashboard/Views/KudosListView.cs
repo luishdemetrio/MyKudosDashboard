@@ -44,4 +44,10 @@ public class KudosListView : IKudosListView
     {
         return await _gatewayService.GetKudosFromMe(userId, pageNumber);
     }
+
+
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMyDirectReports(string userId, int pageNumber)
+    {
+        return await _gatewayService.GetKudosToMyDirects(userId, pageNumber);
+    }
 }

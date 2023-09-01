@@ -100,4 +100,9 @@ public sealed class KudosService : IKudosService
     {
         return _kudosRepository.GetKudos(kudosId);
     }
+
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMyDirectsAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
+    {
+        return _kudosRepository.GetKudosToMyDirectsAsync(pUserId, pageNumber, pageSize);
+    }
 }

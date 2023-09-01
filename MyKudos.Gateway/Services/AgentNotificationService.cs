@@ -49,15 +49,17 @@ public class AgentNotificationService : IAgentNotificationService
         try
         {
 
-
-            kudos.From.Photo = $"data:image/png;base64,{ResizeBase64Image(kudos.From.Photo.Replace("data:image/png;base64,", ""), 26, 26)}";
-
-            foreach (var item in kudos.Receivers)
+            //we need to reduce the image size in case there is more than one receiver, since the Teams' adaptive card message limit is 28Kb
+            if (kudos.Receivers.Count > 1)
             {
-                item.Photo = $"data:image/png;base64,{ResizeBase64Image(item.Photo.Replace("data:image/png;base64,", ""), 26, 26)}";
+                kudos.From.Photo = $"data:image/png;base64,{ResizeBase64Image(kudos.From.Photo.Replace("data:image/png;base64,", ""), 26, 26)}";
+
+                foreach (var item in kudos.Receivers)
+                {
+                    item.Photo = $"data:image/png;base64,{ResizeBase64Image(item.Photo.Replace("data:image/png;base64,", ""), 26, 26)}";
+                }
+
             }
-
-
             var uri = $"{_agentServiceUrl}";
 
             var client = new RestClient(uri);
