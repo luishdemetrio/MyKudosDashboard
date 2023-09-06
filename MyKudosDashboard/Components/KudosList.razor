@@ -120,11 +120,11 @@
                                 <span style="font-stretch:extra-expanded;font-weight: bold;font-size:x-large">...</span>
                             </button>
                             <div class="dropdown-content">
-                                <a href="#">
+                                <a href="#" @onclick=EditReplyOnClick>
                                     <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
 
                                 </a>
-                                <a href="#">
+                                <a href="#" @onclick=DeleteReplyOnClick>
                                     <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
 
                                 </a>
@@ -305,6 +305,8 @@
     [Parameter]
     public LoadMoreKudosCallback MoreKudosCallback { get; set; }
     public delegate Task LoadMoreKudosCallback();
+
+    
 
     private Dictionary<int, bool> _disabledButtons;
 
@@ -840,6 +842,17 @@
         await LoadKudos(_pageNumber);
     }
 
+    private void EditReplyOnClick()
+    {
+
+        
+
+    }
+
+    private void DeleteReplyOnClick()
+    {
+        
+    }
 
 
 }
