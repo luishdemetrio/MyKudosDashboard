@@ -69,168 +69,29 @@
                     UpdateKudosSentCallBack=@SaveKudos
                     DeleteKudosSentCallBack=@DeleteKudos/>
 
-               /*  <div class="profile" data-is-focusable="true" style="width:100%">
-
-                    @if (item.From.Id == User.UserProfileId)
-                    {
-                    <div style="float:right">
-
-                        <div class="dropdown" style="margin-top: 5px;padding: 0px;width:100%;align-content:end">
-                            <button class="dropbtn" style="margin-top: 0px;background:white;align-content:end">
-                                <span style="font-stretch:extra-expanded;font-weight: bold;font-size:x-large">...</span>
-                            </button>
-                            <div class="dropdown-content">
-                                <a href="#" @onclick=EditReplyOnClick>
-                                    <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
-
-                                </a>
-                                <a href="#" @onclick=DeleteReplyOnClick>
-                                    <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
-
-                                </a>
-
-                            </div>
-                        </div>
-                    </div>
-                    }
-
-                @*In case of an individual kudos, the image size is bigger*@
-                @if(item.Receivers.Count == 1)
-                {
-                    <div class="avatar">
-                        <img src=@item.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
-                    </div>
-                }
-
-                <div class="info">
-
-                    <ul class="list-unstyled ">
-
-                        @*In case of an individual kudos, the name is displayed*@
-                        @if (item.Receivers.Count == 1)
-                        {
-                            <li>
-                                <h5>@item.Receivers[0].Name</h5>
-                            </li>
-                        }
-                        else
-                        {
-                            @*for multiple kudos, it's shown just the pictures*@
-                            foreach (var receiver in item.Receivers)
-                            {
-                                <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
-                                    <img src=@receiver.Photo
-                                         style="height: 5vh;width: 5vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
-                                    <small style="display:block; text-align:center">@receiver.GivenName</small>
-                                 </div>
-
-                                <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
-
-                                    <span style="margin-left:5px">@receiver.Name</span>
-                                    
-
-                                </FluentTooltip>
-                            }
-                        }
-                        
-                        <li>
-                            <div class="text-wrap small55" style="width: 100%;margin-top:1vh">
-                                @if (item.Receivers.Count == 1)
-                                {
-                                    <small class="card-title pricing-card-title" >@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </small>
-                                }
-                                else
-                                {
-                                    <small class="card-title pricing-card-title">@Localizer["Received_Plural"] @Localizer["A"] <spam style="font-weight: bold">@item.Title.ToUpper()</spam> </small>
-                                }
-                                
-                            </div>
-                        </li>
-                        <li>
-                            <div class="small55">
-                                <small style="margin-right:5px;">@Localizer["SentBy"]:</small>
-                                <img src=@item.From.Photo
-                                     style="height: 26px;width: 26px;border-radius: 50%" />
-                                <small style="margin-left:5px;font-weight: bold">@item.From.Name</small>
-
-                            </div>
-
-                        </li>
-                        <li>
-                            <div class="small55" >
-                                <small style="margin-right:5px">@Localizer["SentOn"]:</small>
-
-                                <small style="margin-left:5px">@item.SendOn</small>
-                            </div>
-
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="card-body small55" style="width:100%;padding: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);">
-
-                    <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;margin-right:3vw;margin-top:1vh">
-                        <small>@item.Message</small>
-
-                    </div>
-
-                    <div style="float:right">
-
-                        <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(item))>
-                            <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-
-                            <div>
-                                @item.Comments.Count()
-                            </div>
-
-                        </FluentButton>
-
-
-                        <FluentButton id=@item.Id.ToString() style="margin-left:20px;" @onclick=@(()=>LikeKudosClick(item))
-                                  Disabled=@LikeDisabled(item.Id)>
-                            <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                    Filled=@Filled(item) />
-
-                            <div @ref=numberOfLikes[item.Id] id=@($"likevalue_{item.Id}")>
-                                @item.Likes.Count()
-                            </div>
-
-                        </FluentButton>
-
-                        <FluentTooltip Anchor=@item.Id.ToString() Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
-                                                     
-                            @if (item.Likes.Count() > 0)
-                            {
-                                <ul class="list-unstyled ">
-                                    @foreach (var like in item.Likes)
-                                    {
-                                        <li>
-                                            <div>
-                                                <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
-                                                     style="height: 26px;width: 26px;border-radius: 50%;" />
-                                                <span style="margin-left:5px">@like.Name</span>
-                                            </div>
-                                        </li>
-                                    }
-                                </ul>
-                            }
-
-                        </FluentTooltip>
-
-                    </div>
-
-                </div>
-            </div> */
+             
            
 
             
         }
+
+        <FluentDialog @ref="_confirmKudosDeleteDialog" Hidden=@_hidden style="--dialog-width: 30vw;--dialog-height:30vh">
+            <div style="margin:10px;vertical-align:central;height:100%">
+                <h3>@Localizer["ConfirmDelete"]</h3>
+                <p class="small60">@Localizer["ThisActionWillDeleteKudos"]</p>
+                <p class="small60">@Localizer["KudosCommentsAndLikesWillBeDeleted"]</p>
+                <FluentButton Appearance="Appearance.Accent" Autofocus="true" @onclick="CancelDeleteOnClick">@Localizer["Cancel"]</FluentButton>
+                <FluentButton @onclick="ConfirmDeleteOnClick">@Localizer["Confirm"]</FluentButton>
+            </div>
+        </FluentDialog>
     </div>
 
     @if (isLoading)
     {
         <div class="loading-indicator">@Localizer["LoadingMoreItems"]</div>
     }
+
+ 
 
 </div>
 
@@ -283,6 +144,9 @@
 
     private string SelectedTimeZoneId { get; set; } = "America/Sao_Paulo";
 
+    private FluentDialog? _confirmKudosDeleteDialog;
+    private bool _hidden = true;
+
     protected override void OnInitialized()
     {
         _kudosList = new();
@@ -296,6 +160,8 @@
     {
         if (firstRender)
         {
+            _confirmKudosDeleteDialog!.Hide();
+
             await LoadMoreItems();
             await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
         }
@@ -408,14 +274,42 @@
         return disabled;
     }
 
-    private async Task DeleteKudos(int kudosId)
+
+
+    private void CancelDeleteOnClick()
     {
-        bool result = await KudosListView.DeleteKudos(kudosId);
+        _confirmKudosDeleteDialog!.Hide();
+        _hidden = true;
+
+    }
+
+    private async Task ConfirmDeleteOnClick()
+    {
+        bool result = await KudosListView.DeleteKudos(_kudosToBeDeleted);
 
         if (result)
         {
-            KudosDeleted(kudosId);
+            KudosDeleted(_kudosToBeDeleted);
         }
+
+        _hidden = true;
+    }
+
+    private int _kudosToBeDeleted;
+
+    private void DeleteKudos(int kudosId)
+    {
+        _kudosToBeDeleted = kudosId;
+
+        _hidden = false;
+        _confirmKudosDeleteDialog!.Show();
+
+        var t = InvokeAsync(() =>
+           {
+               StateHasChanged();
+           });
+
+        t.Wait();
     }
 
     // call back from EventHub

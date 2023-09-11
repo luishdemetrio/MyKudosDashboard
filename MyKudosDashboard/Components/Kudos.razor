@@ -12,6 +12,8 @@
         font-size: 16px;
         border: none;
         cursor: pointer;
+       
+        
     }
 
     /* The container Div - needed to position the dropdown content */
@@ -27,7 +29,7 @@
         background-color: #f9f9f9;
         min-width: 16px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
+       
     }
 
         /* Links inside the dropdown */
@@ -53,15 +55,17 @@
     }
 </style>
 
- <div class="profile" data-is-focusable="true" style="width:100%">
+
+
+<div class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
 
      @* if the kudos was sent by the current user, the user can edit or delete it *@
 
     @if (KudosItem.From.Id == User.UserProfileId)
     {
-        <div style="float:right">
+        <div style="float:right;">
 
-            <div class="dropdown" style="margin-top: 5px;padding: 0px;width:100%;align-content:end">
+            <div class="dropdown" style="margin-top: 5px;padding: 0px;width:100%;">
                 <button class="dropbtn" style="margin-top: 0px;background:white;align-content:end">
                     <span style="font-stretch:extra-expanded;font-weight: bold;font-size:x-large">...</span>
                 </button>
@@ -226,21 +230,12 @@
 
     </div>
 
-    <div>
-        <FluentDialog @ref="_confirmKudosDeleteDialog" Hidden="@_hidden" aria-label="Simple dialog" style="-dialog-width: 200px; --dialog-height: 250px">
-            <div style="margin:10px">
-                <h2>@Localizer["ConfirmDelete"]</h2>
-                <p>@Localizer["ThisActionWillDeleteKudos"]</p>
-                <p>@Localizer["KudosCommentsAndLikesWillBeDeleted"]</p>
-                <FluentButton Appearance="Appearance.Accent" Autofocus="true" @onclick="CancelDeleteOnClick">@Localizer["Cancel"]</FluentButton>
-                <FluentButton @onclick="ConfirmDeleteOnClick">@Localizer["Confirm"]</FluentButton>
-            </div>
-            
-            
-            
-        </FluentDialog>
-    </div>
+    
  </div>
+
+
+
+    
 
 @code {
 
@@ -272,7 +267,7 @@
     [Parameter]
     public DeleteKudosCallBack DeleteKudosSentCallBack { get; set; }
 
-    public delegate Task DeleteKudosCallBack(int KudosId);
+    public delegate void DeleteKudosCallBack(int KudosId);
 
 
     private bool _isLikeButtonDisabled;
@@ -285,14 +280,6 @@
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
 
-    private FluentDialog? _confirmKudosDeleteDialog;
-    private bool _hidden = true;
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-            _confirmKudosDeleteDialog!.Hide();
-    }
 
     private void EditKudosOnClick()
     {
@@ -303,23 +290,9 @@
 
     private void DeleteKudosOnClick()
     {
-        _hidden = false;
-        _confirmKudosDeleteDialog!.Show();
-        
-    }
-
-    private void CancelDeleteOnClick()
-    {
-        _confirmKudosDeleteDialog!.Hide();
-        _hidden = true;
-       
-    }
-
-    private void ConfirmDeleteOnClick()
-    {
         DeleteKudosSentCallBack?.Invoke(KudosItem.Id);
-        _hidden = true;
     }
+   
    
 
     private void KudosValueChanged(ChangeEventArgs args)
