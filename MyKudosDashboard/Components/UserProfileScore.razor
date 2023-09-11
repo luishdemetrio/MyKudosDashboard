@@ -158,6 +158,14 @@
 
 
         UserScoreValue = new();
+
+        if (User != null)
+        {
+            UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString());
+            UserProfileScoreView.RegisterObserver(User.UserProfileId.ToString());
+        }
+
+        UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
         
         _isLoaded = true;
 
@@ -168,13 +176,7 @@
         base.OnAfterRender(firstRender);
 
        
-            if (User != null)
-            {
-                UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString());
-                UserProfileScoreView.RegisterObserver(User.UserProfileId.ToString());
-            }
-
-            UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
+           
        
     }
 

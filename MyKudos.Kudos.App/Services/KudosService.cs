@@ -105,4 +105,14 @@ public sealed class KudosService : IKudosService
     {
         return _kudosRepository.GetKudosToMyDirectsAsync(pUserId, pageNumber, pageSize);
     }
+
+    public bool UpdateKudos(int kudosId, string? message)
+    {
+        return _kudosRepository.UpdateMessage(kudosId, message);
+    }
+
+    public bool DeleteKudos(int kudosId)
+    {
+        return _kudosRepository.Delete(kudosId);
+    }
 }

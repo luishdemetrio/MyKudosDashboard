@@ -145,7 +145,7 @@
                                             {
                                                 <li>
                                                     <div>
-                                                        <img src=@like.Photo
+                                                        <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
                                                              style="height: 26px;width: 26px;border-radius: 50%;" />
                                                         <span style="margin-left:5px">@like.Name</span>
                                                     </div>
@@ -462,7 +462,7 @@
                 FromPerson = new Person()
                 {
                     Id = User.UserProfileId,
-                    Photo = User.Photo96x96,
+                    Photo = (User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image/png;base64,{User.Photo96x96}",
                     Name = User.DisplayName
                 },
                 Message = _replyMessage,

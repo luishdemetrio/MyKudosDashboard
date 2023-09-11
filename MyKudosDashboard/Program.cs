@@ -60,6 +60,8 @@ builder.Services.AddSingleton<IEventHubKudosSent, EventHubKudosSent>();
 builder.Services.AddSingleton<IEventHubLikeSent, EventHubLikeSent>();
 builder.Services.AddSingleton<IEventHubUndoLike, EventHubUndoLike>();
 builder.Services.AddSingleton<IEventHubUserPointsReceived, EventHubUserPointsReceived>();
+builder.Services.AddSingleton<IEventHubKudosDeleted, EventHubKudosDeleted>();
+builder.Services.AddSingleton<IEventHubKudosUpdated, EventHubKudosUpdated>();
 
 
 var config = builder.Configuration;

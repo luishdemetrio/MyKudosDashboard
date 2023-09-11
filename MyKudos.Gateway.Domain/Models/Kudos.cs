@@ -14,6 +14,9 @@
 
 
 
+
+public record KudosMessage (int KudosId, string Message);
+
 public class SendKudosRequest
 {
 

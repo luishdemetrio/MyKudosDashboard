@@ -126,6 +126,9 @@
   <data name="All" xml:space="preserve">
     <value>All</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
   <data name="Category" xml:space="preserve">
     <value>Category</value>
   </data>
@@ -135,8 +138,17 @@
   <data name="CommentsSent" xml:space="preserve">
     <value>comments sent</value>
   </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Please confirm the deletion of kudos.</value>
+  </data>
   <data name="Kudos" xml:space="preserve">
     <value>kudos</value>
+  </data>
+  <data name="KudosCommentsAndLikesWillBeDeleted" xml:space="preserve">
+    <value>After deleting the kudos, all associated comments, likes, and scores will be removed.</value>
   </data>
   <data name="KudosFromMe" xml:space="preserve">
     <value>Kudos from me</value>
@@ -209,6 +221,9 @@
   </data>
   <data name="SorryNoResultsFound" xml:space="preserve">
     <value>Sorry, there weren't any search results</value>
+  </data>
+  <data name="ThisActionWillDeleteKudos" xml:space="preserve">
+    <value>This action will result in the deletion of kudos.</value>
   </data>
   <data name="TopContributors" xml:space="preserve">
     <value>Top Contributors</value>

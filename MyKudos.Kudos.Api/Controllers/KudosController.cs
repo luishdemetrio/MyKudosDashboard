@@ -40,4 +40,17 @@ public class KudosController : ControllerBase
 
         return _kudosService.GetKudos(pageNumber, pageSize);
     }
+
+    [HttpPut(Name = "UpdateKudos")]
+    public  bool UpdateKudos([FromBody] Domain.Models.KudosMessage     kudos)
+    {
+        return  _kudosService.UpdateKudos(kudos.KudosId, kudos.Message);
+    }
+
+    [HttpDelete(Name = "DeleteKudos")]
+    public  bool DeleteKudos([FromBody] int kudosId)
+    {
+        return  _kudosService.DeleteKudos(kudosId);
+    }
+
 }

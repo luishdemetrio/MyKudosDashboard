@@ -66,13 +66,13 @@ public class GatewayService : IKudosGateway
 
     }
 
-    public async Task<bool> Like(LikeGateway like)
+    public async Task<bool> Like(SendLikeGateway like)
     {
         bool result = false;
 
         try
         {
-            result = await _restClientHelper.SendApiData<LikeGateway, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Post, like);
+            result = await _restClientHelper.SendApiData<SendLikeGateway, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Post, like);
         }
         catch (Exception ex)
         {
@@ -83,13 +83,13 @@ public class GatewayService : IKudosGateway
         return result;
     }
 
-    public async Task<bool> UndoLike(LikeGateway like)
+    public async Task<bool> UndoLike(SendLikeGateway like)
     {
         bool result = false;
 
         try
         {
-            result = await _restClientHelper.SendApiData<LikeGateway, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Delete, like);
+            result = await _restClientHelper.SendApiData<SendLikeGateway, bool>($"{_gatewayServiceUrl}likes", HttpMethod.Delete, like);
         }
         catch (Exception ex)
         {
@@ -150,5 +150,39 @@ public class GatewayService : IKudosGateway
         }
 
         return kudos;
+    }
+
+    public async Task<bool> UpdateKudos(KudosMessage kudos)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<KudosMessage, bool>($"{_gatewayServiceUrl}kudos", HttpMethod.Put,kudos);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing UndoLike: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> DeleteKudos(int kudosId)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<int, bool>($"{_gatewayServiceUrl}kudos", HttpMethod.Delete, kudosId);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing UndoLike: {ex.Message}");
+        }
+
+        return result;
     }
 }

@@ -22,26 +22,26 @@ public class LikesController : Controller
     }
 
     [HttpPost(Name = "SendLike")]
-    public async Task<bool> SendLikeAsync([FromBody] LikeGateway like)
+    public async Task<bool> SendLikeAsync([FromBody] SendLikeGateway like)
     {
         return await ProcessLikeAsync(like, _kudosService.LikeAsync);
     }
 
     [HttpDelete(Name = "Undolike")]
-    public async Task<bool> Delete([FromBody] LikeGateway unlike)
+    public async Task<bool> Delete([FromBody] SendLikeGateway unlike)
     {
         return await ProcessLikeAsync(unlike, _kudosService.UndoLikeAsync);
     }
 
 
-    private async Task<bool> ProcessLikeAsync([FromBody] LikeGateway like, Func<Kudos.Domain.Models.SendLike, Task<bool>> likeAction)
+    private async Task<bool> ProcessLikeAsync([FromBody] SendLikeGateway like, Func<Kudos.Domain.Models.SendLike, Task<bool>> likeAction)
     {
         bool result = false;
 
         result = await likeAction(new Kudos.Domain.Models.SendLike
         (
             KudosId: like.KudosId,
-            FromPersonId: like.FromPerson.Id
+            FromPersonId: like.UserProfileId
         ));
 
         //we need to get who is receiving the kudos to update their score on the dashboard 
@@ -49,7 +49,24 @@ public class LikesController : Controller
 
         if (kudos != null)
         {
-            await _kudosQueue.SendLikeAsync(like, kudos.Recognized);
+            var whoLiked = kudos.Likes.Where(p=> p.PersonId == like.UserProfileId).First();
+
+            if (whoLiked != null)
+            {
+                await _kudosQueue.SendLikeAsync(
+                    new LikeGateway(
+                        KudosId: whoLiked.KudosId,
+                        FromPerson: new Person()
+                        {
+                            Id = whoLiked.Person.UserProfileId,
+                            Name = whoLiked.Person.DisplayName,
+                            GivenName = whoLiked.Person.GivenName,
+                            Photo = whoLiked.Person.Photo
+                        }
+                    ),
+                    kudos.Recognized);
+            }
+            
         }
 
         return result;

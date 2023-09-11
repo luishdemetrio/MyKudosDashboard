@@ -14,6 +14,8 @@ public class KudosMessageSender : IKudosMessageSender
     private EventHubMessageSender _eventHubLikeSent;
     private EventHubMessageSender _eventHubUndoLikeSent;
     private EventHubMessageSender _eventHubKudosSent;
+    private EventHubMessageSender _eventHubKudosDeleted;
+    private EventHubMessageSender _eventHubKudosUpdated;
 
     private readonly IUserPointsService _userPointsService;
 
@@ -39,6 +41,12 @@ public class KudosMessageSender : IKudosMessageSender
 
         _eventHubKudosSent = new EventHubMessageSender(configuration["EventHub_KudosSentConnectionString"],
                                                     configuration["EventHub_KudosSentName"]);
+
+        _eventHubKudosDeleted = new EventHubMessageSender(configuration["EventHub_KudosDeletedConnectionString"],
+                                                  configuration["EventHub_KudosDeletedName"]);
+
+        _eventHubKudosUpdated = new EventHubMessageSender(configuration["EventHub_KudosUpdatedConnectionString"],
+                                                 configuration["EventHub_KudosUpdatedName"]);
     }
 
  
@@ -119,5 +127,32 @@ public class KudosMessageSender : IKudosMessageSender
         }
     }
 
+    public async Task KudosDeleted(int kudosId, Kudos.Domain.Models.Kudos kudos)
+    {
 
+        //notification to update the Teams Apps
+
+        await _eventHubKudosDeleted.PublishAsync<int>(kudosId);
+
+        //get the user points of who sent to update the Teams Dashboard
+        var userPointsSender = await _userPointsService.GetUserScoreAsync(kudos.UserFrom.UserProfileId);
+        await UpdateUserScore(userPointsSender);
+
+        //get the user points of who received to update the Teams Dashboard
+
+        foreach (var receiver in kudos.Recognized)
+        {
+            var userPointsReceiver = await _userPointsService.GetUserScoreAsync(receiver.ToPersonId);
+            await UpdateUserScore(userPointsReceiver);
+        }
+
+
+    }
+
+    public async Task KudosUpdated(Domain.Models.KudosMessage kudos)
+    {
+        //notification to update the Teams Apps
+
+        await _eventHubKudosUpdated.PublishAsync<Domain.Models.KudosMessage>(kudos);
+    }
 }

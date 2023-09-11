@@ -18,5 +18,6 @@ public interface IKudosRepository
     int Add(Models.Kudos kudos);
 
     Domain.Models.Kudos? GetKudos(int kudosId);
-
+    bool UpdateMessage(int kudosId, string? message);
+    bool Delete(int kudosId);
 }

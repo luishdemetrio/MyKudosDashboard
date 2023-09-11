@@ -27,6 +27,14 @@ public interface IEventHubKudosSent : IEventHubReceived<KudosResponse>
 {
 }
 
+public interface IEventHubKudosDeleted : IEventHubReceived<int>
+{
+}
+
+public interface IEventHubKudosUpdated : IEventHubReceived<KudosMessage>
+{
+}
+
 public interface IEventHubUndoLike : IEventHubReceived<EventHubResponse<EventHubLikeOptions, LikeGateway>>
 {
 }

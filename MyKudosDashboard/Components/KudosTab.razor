@@ -85,6 +85,8 @@
             KudosTabView.CommentsDeletedCallback = CommentsDeleted;
             KudosTabView.CommentsSentCallback = CommentsSent;
 
+            KudosTabView.KudosDeletedCallback = KudosDeleted;
+            KudosTabView.KudosMessageUpdatedCallBack = KudosMessageUpdated;
         }
 
     }
@@ -145,7 +147,19 @@
 
     }
 
+    public void KudosDeleted(int kudosId)
+    {
 
+        AllKudosTab.KudosDeleted(kudosId);
+
+    }
+
+    public void KudosMessageUpdated(KudosMessage message)
+    {
+
+        AllKudosTab.KudosMessageUpdated(message);
+
+    }
 
     private void ReplyKudos(KudosResponse kudos)
     {

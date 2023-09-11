@@ -35,22 +35,35 @@ public class KudosRepository : IKudosRepository
     public Domain.Models.Kudos? GetKudos(int kudosId)
     {
 
-        var kudos =  _kudosDbContext.Kudos.Where(k => k.KudosId == kudosId)
-                    .Include(l => l.Likes)
-                    .Include(c => c.Comments)
-                    .Include(u => u.UserFrom)
-                    .Include(u => u.Recognized)
-                    .Include(u => u.Recognition)
-                    .First();
+        IQueryable<Domain.Models.Kudos> kudosQuery = _kudosDbContext.Kudos
+
+           .Include(c => c.Comments)
+           .Include(u => u.UserFrom)
+           .Include(u => u.Recognition);
+
+        kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
+        kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
+
+        kudosQuery = kudosQuery.Where(k => k.KudosId == kudosId);
+
+        return  kudosQuery.First();
+
+        //var kudos =  _kudosDbContext.Kudos.Where(k => k.KudosId == kudosId)
+        //            .Include(l => l.Likes)
+        //            .Include(c => c.Comments)
+        //            .Include(u => u.UserFrom)
+        //            .Include(u => u.Recognized)
+        //            .Include(u => u.Recognition)
+        //            .First();
 
 
 
-        foreach (var receiver in kudos.Recognized)
-        {
-            receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
-        }
+        //foreach (var receiver in kudos.Recognized)
+        //{
+        //    receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
+        //}
 
-        return kudos;
+      //  return kudos;
         
     }
 
@@ -135,17 +148,59 @@ public class KudosRepository : IKudosRepository
 
 
     //this method is used to calculate the badge
-    public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
+    public  IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
     {
 
-        return _kudosDbContext.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
+        IQueryable<Domain.Models.Kudos> kudosQuery = _kudosDbContext.Kudos
+
+           .Include(c => c.Comments)
+           .Include(u => u.UserFrom)
+           .Include(u => u.Recognition);
+       
+
+        kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
+        kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
+
+        kudosQuery = kudosQuery.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
+        
+        return kudosQuery.ToList();
+
+
+       // return _kudosDbContext.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
 
     }
 
+    public bool UpdateMessage(int kudosId, string? message)
+    {
+        bool result = false;
 
+        var kudos = _kudosDbContext.Kudos.FirstOrDefault(k => k.KudosId == kudosId);
 
+        if (kudos != null)
+        {
+            kudos.Message = message;
+            
+            result = _kudosDbContext.SaveChanges() > 0;
+        }
 
+        return result;
+    }
 
+    public bool Delete(int kudosId)
+    {
+
+        bool result = false;
+
+        var kudos = _kudosDbContext.Kudos.FirstOrDefault(k=> k.KudosId == kudosId);
+
+        if (kudos != null)
+        {
+            _kudosDbContext.Kudos.Remove(kudos);
+            result = _kudosDbContext.SaveChanges() > 0 ;
+        }
+
+        return result;
+    }
 }
 
 

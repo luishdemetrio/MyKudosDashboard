@@ -160,4 +160,38 @@ public class KudosServiceRest: IKudosService
 
         return result;
     }
+
+    public async Task<bool> UpdateKudos(Kudos.Domain.Models.KudosMessage kudos)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<Kudos.Domain.Models.KudosMessage, bool>($"{_kudosServiceUrl}kudos", HttpMethod.Put, kudos);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing UndoLike: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> DeleteKudos(int kudosId)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<int, bool>($"{_kudosServiceUrl}kudos", HttpMethod.Delete, kudosId);
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing UndoLike: {ex.Message}");
+        }
+
+        return result;
+    }
 }
