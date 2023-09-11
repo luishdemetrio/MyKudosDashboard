@@ -3,10 +3,60 @@
 @using MyKudos.Gateway.Domain.Models;
 
 @inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+
+<style>
+    /* Style The Dropdown Button */
+    .dropbtn {
+        margin-top: 20px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* The container Div - needed to position the dropdown content */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 16px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+        /* Links inside the dropdown */
+        .dropdown-content a {
+            color: black;
+            padding: 5px 10px;
+            text-decoration: none;
+            display: block;
+        }
+
+            /* Change color of dropdown links on hover */
+            .dropdown-content a:hover {
+                background-color: #f1f1f1
+            }
+
+    /* Show the dropdown menu on hover */
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    /* Change the background color of the dropdown button when the dropdown content is shown */
+    .dropdown:hover .dropbtn {
+    }
+</style>
 
  <div class="profile" data-is-focusable="true" style="width:100%">
 
      @* if the kudos was sent by the current user, the user can edit or delete it *@
+
     @if (KudosItem.From.Id == User.UserProfileId)
     {
         <div style="float:right">
@@ -15,12 +65,12 @@
                 <button class="dropbtn" style="margin-top: 0px;background:white;align-content:end">
                     <span style="font-stretch:extra-expanded;font-weight: bold;font-size:x-large">...</span>
                 </button>
-                <div class="dropdown-content">
-                    <a href="#" @onclick=EditReplyOnClick>
+                <div class="dropdown-content" >
+                    <a href="#" @onclick=EditKudosOnClick>
                         <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
 
                     </a>
-                    <a href="#" @onclick=DeleteReplyOnClick>
+                    <a href="#" @onclick=DeleteKudosOnClick>
                         <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
 
                     </a>
@@ -38,7 +88,7 @@
         </div>
     }
 
-    <div class="info">
+    <div class="info" style="width:100%">
 
         <ul class="list-unstyled ">
 
@@ -105,8 +155,30 @@
 
     <div class="card-body small55" style="width:100%;padding: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);">
 
-        <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;min-width:200px;min-height:40px;margin-right:3vw;margin-top:1vh">
-            <small>@KudosItem.Message</small>
+        <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:100%;min-height:40px;margin-right:3vw;margin-top:1vh">
+            @if (_isKudosReadOnly)
+            {
+                <small>@KudosItem.Message</small>
+            }
+            else
+            {
+
+                <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
+                            @onchange=KudosValueChanged>          
+                    @KudosItem.Message
+                </textarea>
+
+                <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditKudosClick())>
+                    <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
+                    Save Changes
+                </FluentButton>
+
+                <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditKudosClick())>
+                    <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=true />
+                    Cancel
+                </FluentButton>
+            }
+            
         </div>
 
         <div style="float:right">
@@ -119,7 +191,7 @@
             </FluentButton>
 
             <FluentButton id=@KudosItem.Id.ToString() style="margin-left:20px;" @onclick=@(()=>LikeKudosClick(KudosItem))
-                          Disabled=@LikeDisabled(KudosItem.Id)>
+                          Disabled=@_isLikeButtonDisabled>
              
                 <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                             Filled=@Filled(KudosItem) />
@@ -133,31 +205,46 @@
             <FluentTooltip Anchor=@KudosItem.Id.ToString() Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
 
                 @if (KudosItem.Likes.Count() > 0)
-                            {
-                                <ul class="list-unstyled ">
+                {
+                    <ul class="list-unstyled ">
                         @foreach (var like in KudosItem.Likes)
-                                    {
-                                        <li>
-                                            <div>
-                                                <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
-                                                     style="height: 26px;width: 26px;border-radius: 50%;" />
-                                                <span style="margin-left:5px">@like.Name</span>
-                                            </div>
-                                        </li>
-                                    }
-                                </ul>
-                            }
+                        {
+                            <li>
+                                <div>
+                                    <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
+                                            style="height: 26px;width: 26px;border-radius: 50%;" />
+                                    <span style="margin-left:5px">@like.Name</span>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
 
-                        </FluentTooltip>
+             </FluentTooltip>
 
-                    </div>
+        </div>
 
-                </div>
+    </div>
+
+    <div>
+        <FluentDialog @ref="_confirmKudosDeleteDialog" Hidden="@_hidden" aria-label="Simple dialog" style="-dialog-width: 200px; --dialog-height: 250px">
+            <div style="margin:10px">
+                <h2>@Localizer["ConfirmDelete"]</h2>
+                <p>@Localizer["ThisActionWillDeleteKudos"]</p>
+                <p>@Localizer["KudosCommentsAndLikesWillBeDeleted"]</p>
+                <FluentButton Appearance="Appearance.Accent" Autofocus="true" @onclick="CancelDeleteOnClick">@Localizer["Cancel"]</FluentButton>
+                <FluentButton @onclick="ConfirmDeleteOnClick">@Localizer["Confirm"]</FluentButton>
             </div>
+            
+            
+            
+        </FluentDialog>
+    </div>
+ </div>
 
 @code {
 
-    
+
     [Parameter]
     public UserProfile User { get; set; }
 
@@ -169,36 +256,108 @@
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
     [Parameter]
-    public SendKudosCallBack SendLikeCallBack { get; set; }
+    public SendLikeOrUndoCallBack SendLikeCallBack { get; set; }
 
     [Parameter]
-    public SendKudosCallBack SendUndoLikeCallBack { get; set; }
+    public SendLikeOrUndoCallBack SendUndoLikeCallBack { get; set; }
 
-    public delegate void SendKudosCallBack(int pKudosId, Guid pFromPersonId);
+    public delegate void SendLikeOrUndoCallBack(int pKudosId, Guid pFromPersonId);
 
-    private Dictionary<int, bool> _disabledButtons;
+
+    [Parameter]
+    public UpdateKudosCallBack UpdateKudosSentCallBack { get; set; }
+
+    public delegate void UpdateKudosCallBack(KudosResponse Kudos);
+
+    [Parameter]
+    public DeleteKudosCallBack DeleteKudosSentCallBack { get; set; }
+
+    public delegate Task DeleteKudosCallBack(int KudosId);
+
+
+    private bool _isLikeButtonDisabled;
+    private bool _isKudosReadOnly = true;
 
     private readonly object _lock = new object();
 
+    private string _newKudosMessage;
+    private string _originalMessage;
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
 
+    private FluentDialog? _confirmKudosDeleteDialog;
+    private bool _hidden = true;
 
-    private void EditReplyOnClick()
+    protected override void OnAfterRender(bool firstRender)
     {
+        if (firstRender)
+            _confirmKudosDeleteDialog!.Hide();
+    }
+
+    private void EditKudosOnClick()
+    {
+        _isKudosReadOnly = false;
+        _originalMessage = KudosItem.Message;
 
     }
 
-    private void DeleteReplyOnClick()
+    private void DeleteKudosOnClick()
     {
+        _hidden = false;
+        _confirmKudosDeleteDialog!.Show();
+        
+    }
 
+    private void CancelDeleteOnClick()
+    {
+        _confirmKudosDeleteDialog!.Hide();
+        _hidden = true;
+       
+    }
+
+    private void ConfirmDeleteOnClick()
+    {
+        DeleteKudosSentCallBack?.Invoke(KudosItem.Id);
+        _hidden = true;
+    }
+   
+
+    private void KudosValueChanged(ChangeEventArgs args)
+    {
+        _newKudosMessage = args.Value.ToString();
+    }
+
+    private void CancelEditKudosClick()
+    {
+        var t = InvokeAsync(() =>
+                  {
+
+                      JSRuntime.InvokeVoidAsync("updateReplyMessage", $"textareareply_{@KudosItem.Id}", _originalMessage);
+
+                      KudosItem.Message = _originalMessage;
+                      _isKudosReadOnly = true;
+
+                      StateHasChanged();
+                  });
+
+        t.Wait();
+    }
+
+
+    private void SaveEditKudosClick()
+    {
+        _isKudosReadOnly = true;
+
+        KudosItem.Message = _newKudosMessage;
+
+        UpdateKudosSentCallBack?.Invoke(KudosItem);
     }
 
     private bool Filled(KudosResponse item)
     {
         bool filled = false;
 
-        @if (User != null)
+        if (User != null)
         {
             filled = item.Likes.Any(l => l.Id == User.UserProfileId);
         }
@@ -213,56 +372,21 @@
         await Task.CompletedTask;
     }
 
-    private bool LikeDisabled(int kudosId)
-    {
-        bool disabled = false;
 
-        if (_disabledButtons.ContainsKey(kudosId))
-        {
-            disabled = _disabledButtons[kudosId];
-        }
-        else
-        {
-            _disabledButtons.Add(kudosId, false);
-        }
-
-
-        return disabled;
-    }
-
-    private void UpdateDisabledLike(int kudosId, bool disabled)
-    {
-        var t = InvokeAsync(() =>
-        {
-            if (_disabledButtons.ContainsKey(kudosId))
-            {
-                _disabledButtons[kudosId] = disabled;
-            }
-            else
-            {
-                _disabledButtons.Add(kudosId, disabled);
-            }
-
-
-        });
-
-        t.Wait();
-
-    }
 
     private void LikeKudosClick(KudosResponse item)
     {
 
         lock (_lock)
         {
-            if (LikeDisabled(item.Id))
+            if (_isLikeButtonDisabled)
                 return;
 
             //disable button to avoid user click twice
-            UpdateDisabledLike(item.Id, true);
+            _isLikeButtonDisabled = true;
         }
 
-        var t = InvokeAsync(() =>
+        var t = InvokeAsync((Action)(() =>
         {
             // I am populating the object LikeGateway to add the Like locally for the current user,
             // for better performance.
@@ -292,12 +416,12 @@
             else
             {
 
-                SendLikeCallBack?.Invoke(item.Id, User.UserProfileId);
+                this.SendLikeCallBack?.Invoke(item.Id, User.UserProfileId);
 
                 UpdateLikesAsync(requestLike, true); // To add a like
             }
 
-        });
+        }));
 
         t.Wait();
 
@@ -306,7 +430,7 @@
     public void UpdateLikesAsync(LikeGateway pLike, bool addLike)
     {
         // Enable like button
-        UpdateDisabledLike(pLike.KudosId, false);
+        _isLikeButtonDisabled = false;
 
         var like = KudosItem.Likes.FirstOrDefault(l => l.Id == pLike.FromPerson.Id);
 
@@ -337,54 +461,6 @@
 
     }
 
-    // public void UpdateUndoLikesCountAndToolTip(LikeGateway pLike)
-    // {
-    //     // enable like button
-    //     UpdateDisabledLike(pLike.KudosId, false);
-
-    //     var like = KudosItem.Likes.Where(l => l.Id == pLike.FromPerson.Id).FirstOrDefault();
-
-    //     //remove the like in case it doesn't exist
-    //     var t = InvokeAsync(() =>{
-
-    //         if (KudosItem.Likes.Contains(like))
-    //         {
-    //             KudosItem.Likes.Remove(like);
-
-    //             StateHasChanged();
-    //         }
-    //    });
-
-    //     t.Wait();
-
-
-    // }
-    // public void UpdateLikesCountAndToolTip(LikeGateway pLike)
-    // {
-    //     // enable like button
-    //     UpdateDisabledLike(pLike.KudosId, false);
-
-    //     var t = InvokeAsync(() =>
-    //     {
-
-    //         //add the like in case it doesn't exist
-    //         if (!KudosItem.Likes.Where(l => l.Id == pLike.FromPerson.Id).Any())
-    //         {
-
-    //             KudosItem.Likes.Add(new Person()
-    //             {
-    //                 Id = pLike.FromPerson.Id,
-    //                 Name = pLike.FromPerson.Name,
-    //                 Photo = pLike.FromPerson.Photo
-    //             });
-
-    //             StateHasChanged();
-    //         }
-
-    //     });
-
-    //     t.Wait();
-
-    // }
+   
 
 }

@@ -20,12 +20,12 @@ public class CommentsView : ICommentsView
 
     public Task<bool> LikeKudosAsync(LikeGateway like)
     {
-        return _kudosGateway.Like(like);
+        return _kudosGateway.Like(new SendLikeGateway(like.KudosId, like.FromPerson.Id));
     }
 
     public async Task<bool> UndoLikeKudosAsync(LikeGateway like)
     {
-        return await _kudosGateway.UndoLike(like);
+        return await _kudosGateway.UndoLike(new SendLikeGateway(like.KudosId, like.FromPerson.Id));
     }
 
     public Task<IEnumerable<CommentsResponse>> GetComments(int kudosId)

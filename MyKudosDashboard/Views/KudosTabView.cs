@@ -2,14 +2,15 @@
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
-
-
 namespace MyKudosDashboard.Views;
 
 public class KudosTabView : IKudosTabView, 
                             IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>, 
                             IObserverEventHub<KudosResponse>,
-                            IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>, IDisposable
+                            IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>,
+                            IObserverEventHub<int>,
+                            IObserverEventHub<KudosMessage>,
+                            IDisposable
 { 
   
    
@@ -23,6 +24,9 @@ public class KudosTabView : IKudosTabView,
     public IKudosTabView.CommentsCallBack CommentsUpdatedCallback { get; set; }
     public IKudosTabView.CommentsCallBack CommentsDeletedCallback { get; set; }
 
+    public IKudosTabView.KudosDeletedCallBack KudosDeletedCallback { get; set;}
+    public IKudosTabView.KudosUpdatedCallBack KudosMessageUpdatedCallBack { get; set; }
+
 
     IEventHubUndoLike _eventHubUndoLikeSent;
     IEventHubLikeSent _eventHubLikeSent;
@@ -30,6 +34,8 @@ public class KudosTabView : IKudosTabView,
     IEventHubCommentSent _eventHubCommentSent;
     IEventHubCommentDeleted _eventHubCommentDeleted;
 
+    IEventHubKudosDeleted _eventHubKudosDeleted;
+    IEventHubKudosUpdated _eventHubKudosUpdated;
 
     IEventHubKudosSent _eventHubKudosSent;
 
@@ -45,7 +51,9 @@ public class KudosTabView : IKudosTabView,
                         IEventHubUndoLike eventHubUndoLike,
                         IEventHubCommentSent eventHubCommentsSent,
                         IEventHubCommentDeleted eventHubCommentDeleted,
-                        IEventHubKudosSent eventHubKudosSent)
+                        IEventHubKudosSent eventHubKudosSent,
+                        IEventHubKudosDeleted eventHubKudosDeleted,
+                        IEventHubKudosUpdated eventHubKudosUpdated)
     {
 
 
@@ -60,6 +68,9 @@ public class KudosTabView : IKudosTabView,
         _eventHubCommentDeleted = eventHubCommentDeleted;
 
         _eventHubKudosSent = eventHubKudosSent;
+
+        _eventHubKudosDeleted = eventHubKudosDeleted;
+        _eventHubKudosUpdated = eventHubKudosUpdated;
     }
 
     public void RegisterObserver(string userId)
@@ -76,6 +87,10 @@ public class KudosTabView : IKudosTabView,
         _eventHubCommentDeleted.Attach(userId, this);
 
         _eventHubKudosSent.Attach(userId, this);
+
+        _eventHubKudosDeleted.Attach(userId, this);
+
+        _eventHubKudosUpdated.Attach(userId, this);
         
     }
     
@@ -146,10 +161,26 @@ public class KudosTabView : IKudosTabView,
 
         if (_eventHubKudosSent != null)
             _eventHubKudosSent.Detach(userId);
+
+        if (_eventHubKudosDeleted != null)
+            _eventHubKudosDeleted.Detach(userId);
+
+        if (_eventHubKudosUpdated!= null)
+            _eventHubKudosUpdated.Detach(userId);
     }
 
     public void Dispose()
     {
         UnregisterObserver(_userId);
+    }
+
+    public void NotifyUpdate(int kudosId)
+    {
+        KudosDeletedCallback?.Invoke(kudosId);
+    }
+
+    public void NotifyUpdate(KudosMessage message)
+    {
+        KudosMessageUpdatedCallBack?.Invoke(message);
     }
 }

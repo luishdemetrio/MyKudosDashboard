@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyKudos.Kudos.Domain.Models;
 
+public record KudosMessage(int KudosId, string Message);
+
 public class Kudos
 {
     

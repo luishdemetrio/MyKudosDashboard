@@ -50,53 +50,6 @@
         font-size: 2vmin;
     }
 
-    /* Style The Dropdown Button */
-    .dropbtn {
-        margin-top: 20px;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-        float: right
-    }
-
-    /* The container Div - needed to position the dropdown content */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-        background-color:white ;
-
-    }
-
-    /* Dropdown Content (Hidden by Default) */
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 16px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-    }
-
-        /* Links inside the dropdown */
-        .dropdown-content a {
-            color: black;
-            padding: 5px 10px;
-            text-decoration: none;
-            display: block;
-        }
-
-            /* Change color of dropdown links on hover */
-            .dropdown-content a:hover {
-                background-color: #f1f1f1
-            }
-
-    /* Show the dropdown menu on hover */
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    /* Change the background color of the dropdown button when the dropdown content is shown */
-    .dropdown:hover .dropbtn {
 </style>
 <div 
      style="z-index: auto ;height:76vh;overflow-y:scroll;width:100%;overflow:auto"
@@ -107,9 +60,16 @@
 
         @foreach (var item in _kudosList.Values.OrderByDescending(k => k.SendOn))
         {
-        
 
-                <div class="profile" data-is-focusable="true" style="width:100%">
+            <Kudos  KudosItem=@item 
+                    User=@User 
+                    SendLikeCallBack=@SendLikesCallBack 
+                    SendUndoLikeCallBack=@SendUndoLikesCallBack 
+                    ReplyCallBack=@ReplyKudos 
+                    UpdateKudosSentCallBack=@SaveKudos
+                    DeleteKudosSentCallBack=@DeleteKudos/>
+
+               /*  <div class="profile" data-is-focusable="true" style="width:100%">
 
                     @if (item.From.Id == User.UserProfileId)
                     {
@@ -260,7 +220,7 @@
                     </div>
 
                 </div>
-            </div>
+            </div> */
            
 
             
@@ -290,7 +250,7 @@
 
     private ConcurrentDictionary<int, KudosResponse> _kudosList;
 
-   
+
     [Parameter]
     public UserProfile User { get; set; }
 
@@ -306,7 +266,7 @@
     public LoadMoreKudosCallback MoreKudosCallback { get; set; }
     public delegate Task LoadMoreKudosCallback();
 
-    
+
 
     private Dictionary<int, bool> _disabledButtons;
 
@@ -318,7 +278,7 @@
     private int _pageNumber;
 
     private ElementReference scrollContainer;
-   
+
     private bool isLoading = false;
 
     private string SelectedTimeZoneId { get; set; } = "America/Sao_Paulo";
@@ -329,9 +289,6 @@
         _disabledButtons = new();
 
         _pageNumber = 0;
-
-
-
     }
 
 
@@ -375,7 +332,7 @@
 
         IEnumerable<KudosResponse> kudos = null; 
 
-        
+
 
         switch (TypeTab)
         {
@@ -419,6 +376,20 @@
 
     }
 
+    private void SendLikesCallBack(int pKudosId, Guid pFromPersonId)
+    {
+        KudosListView.SendLikeAsync(pKudosId, pFromPersonId);
+    }
+
+    private void SendUndoLikesCallBack(int pKudosId, Guid pFromPersonId)
+    {
+        KudosListView.SendUndoLikeAsync(pKudosId, pFromPersonId);
+    }
+
+    private void SaveKudos(KudosResponse kudos)
+    {
+        KudosListView.UpdateKudos(new KudosMessage(kudos.Id, kudos.Message));
+    }
 
     private bool LikeDisabled(int kudosId)
     {
@@ -437,48 +408,48 @@
         return disabled;
     }
 
-
-    private void UpdateHtmlBlock(object obj, object value)
+    private async Task DeleteKudos(int kudosId)
     {
+        bool result = await KudosListView.DeleteKudos(kudosId);
 
-        UpdateHTMLValue("updateInnerHTML", obj, value);
-
-
-    }
-    private void UpdateCount(object obj, object value)
-    {
-
-
-        UpdateHTMLValue("updateCount", obj, value);
-
+        if (result)
+        {
+            KudosDeleted(kudosId);
+        }
     }
 
-    private void UpdateHTMLValue(string javascriptMethod, object obj, object value)
+    // call back from EventHub
+    public void KudosDeleted(int kudosId)
     {
+        if (_kudosList.ContainsKey(kudosId))
+        {
+            _kudosList.TryRemove(kudosId, out KudosResponse kudos);
 
-        InvokeAsync(() =>
-      {
-          for (int attempts = 0; attempts < 3; attempts++)
-          {
-              try
-              {
-                  JSRuntime.InvokeVoidAsync(javascriptMethod, obj, value);
+            var t = InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
 
-
-                  break;
-              }
-              catch (JSDisconnectedException)
-              {
-                  StateHasChanged();
-              }
-
-          }
-      });
-
-
-
+            t.Wait();
+        }
     }
 
+    public void KudosMessageUpdated(KudosMessage message)
+    {
+        if (_kudosList.ContainsKey(message.KudosId))
+        {
+            _kudosList.TryGetValue(message.KudosId, out KudosResponse kudos);
+
+            kudos.Message = message.Message;
+
+            var t = InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+
+            t.Wait();
+        }
+    }
 
     public void UpdateLikesCountAndToolTip(LikeGateway pLike)
     {
@@ -769,68 +740,68 @@
 
 
 
-    private void LikeKudosClick(KudosResponse item)
-    {
+    // private void LikeKudosClick(KudosResponse item)
+    // {
 
 
-        lock (_lock)
-        {
-            if (LikeDisabled(item.Id))
-                return;
+    //     lock (_lock)
+    //     {
+    //         if (LikeDisabled(item.Id))
+    //             return;
 
-            //disable button to avoid user click twice
-            UpdateDisabledLike(item.Id, true);
-        }
+    //         //disable button to avoid user click twice
+    //         UpdateDisabledLike(item.Id, true);
+    //     }
 
-        var t = InvokeAsync(() =>
-        {
-            if (_kudosList.ContainsKey(item.Id))
-            {
-                var kudo = _kudosList[item.Id];
-
-
-                var requestLike = new LikeGateway(KudosId: item.Id,
-                                            FromPerson: new Person
-                                                {
-                                                    Id = User.UserProfileId,
-                                                    Name = User.DisplayName,
-                                                    Photo = User.Photo96x96
-                                                });
+    //     var t = InvokeAsync(() =>
+    //     {
+    //         if (_kudosList.ContainsKey(item.Id))
+    //         {
+    //             var kudo = _kudosList[item.Id];
 
 
-                // I am sending all the information as it will update via Event Hub the others users
-                if (kudo.Likes.Any(l => l.Id == User.UserProfileId))
-                {
-                    KudosListView.SendUndoLikeAsync(requestLike);
-
-                    UpdateUndoLikesCountAndToolTip(requestLike);
-
-                }
-                else
-                {
-
-                    KudosListView.SendLikeAsync(requestLike);
-
-                    UpdateLikesCountAndToolTip(requestLike);
-                }
+    //             var requestLike = new LikeGateway(KudosId: item.Id,
+    //                                         FromPerson: new Person
+    //                                             {
+    //                                                 Id = User.UserProfileId,
+    //                                                 Name = User.DisplayName,
+    //                                                 Photo = User.Photo96x96
+    //                                             });
 
 
-            }
+    //             // I am sending all the information as it will update via Event Hub the others users
+    //             if (kudo.Likes.Any(l => l.Id == User.UserProfileId))
+    //             {
+    //                 KudosListView.SendUndoLikeAsync(requestLike);
 
-        });
+    //                 UpdateUndoLikesCountAndToolTip(requestLike);
 
-        t.Wait();
+    //             }
+    //             else
+    //             {
 
-    }
+    //                 KudosListView.SendLikeAsync(requestLike);
+
+    //                 UpdateLikesCountAndToolTip(requestLike);
+    //             }
+
+
+    //         }
+
+    //     });
+
+    //     t.Wait();
+
+    // }
      
         
     
 
-    private async Task ReplyKudos(KudosResponse kudos)
+    private void ReplyKudos(KudosResponse kudos)
     {
 
         ReplyCallBack?.Invoke(kudos);
-        await Task.CompletedTask;
+        //await Task.CompletedTask;
     }
 
 
@@ -842,17 +813,6 @@
         await LoadKudos(_pageNumber);
     }
 
-    private void EditReplyOnClick()
-    {
-
-        
-
-    }
-
-    private void DeleteReplyOnClick()
-    {
-        
-    }
 
 
 }

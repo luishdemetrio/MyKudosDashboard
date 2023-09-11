@@ -1,5 +1,4 @@
-﻿using MyKudos.Kudos.Domain.Models;
-
+﻿
 namespace MyKudos.Gateway.Interfaces;
 
 public interface IKudosService
@@ -16,4 +15,8 @@ public interface IKudosService
     Task<bool> UndoLikeAsync(Kudos.Domain.Models.SendLike dislike);
 
     Task<Kudos.Domain.Models.Kudos> GetKudosUser(int kudosId);
+
+    Task<bool> UpdateKudos(Kudos.Domain.Models.KudosMessage kudos);
+
+    Task<bool> DeleteKudos(int kudosId);
 }

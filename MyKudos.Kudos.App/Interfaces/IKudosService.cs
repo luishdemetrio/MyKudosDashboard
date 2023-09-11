@@ -22,4 +22,6 @@ public interface IKudosService
     public bool UndoLike(int kudosId, Guid personId);
 
     Domain.Models.Kudos GetKudos(int kudosId);
+    bool UpdateKudos(int kudosId, string? message);
+    bool DeleteKudos(int kudosId);
 }

@@ -16,14 +16,14 @@ public class KudosListView : IKudosListView
 
     }
 
-    public async Task<bool> SendLikeAsync(LikeGateway like)
+    public async Task<bool> SendLikeAsync(int pKudosId, Guid pFromPersonId)
     {
-        return await _gatewayService.Like(like);
+        return await _gatewayService.Like(new SendLikeGateway(pKudosId, pFromPersonId));
     }
 
-    public async Task<bool> SendUndoLikeAsync(LikeGateway like)
+    public async Task<bool> SendUndoLikeAsync(int pKudosId, Guid pFromPersonId)
     {
-        return await _gatewayService.UndoLike(like);
+        return await _gatewayService.UndoLike(new SendLikeGateway(pKudosId, pFromPersonId));
     }
 
    
@@ -49,5 +49,15 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudosToMyDirectReports(string userId, int pageNumber)
     {
         return await _gatewayService.GetKudosToMyDirects(userId, pageNumber);
+    }
+
+    public async Task<bool> UpdateKudos(KudosMessage kudos)
+    {
+       return await _gatewayService.UpdateKudos(kudos);
+    }
+
+    public async Task<bool> DeleteKudos(int kudosId)
+    {
+        return await _gatewayService.DeleteKudos(kudosId);
     }
 }

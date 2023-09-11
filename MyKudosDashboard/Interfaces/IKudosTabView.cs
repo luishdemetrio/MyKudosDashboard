@@ -24,4 +24,13 @@ public interface IKudosTabView
     public CommentsCallBack CommentsSentCallback { get; set; }
     public CommentsCallBack CommentsUpdatedCallback { get; set; }
     public CommentsCallBack CommentsDeletedCallback { get; set; }
+
+
+    public delegate void KudosDeletedCallBack(int kudosId);
+    public KudosDeletedCallBack KudosDeletedCallback { get; set; }
+
+
+    public delegate void KudosUpdatedCallBack(KudosMessage message);
+    public KudosUpdatedCallBack KudosMessageUpdatedCallBack { get; set; }
+
 }

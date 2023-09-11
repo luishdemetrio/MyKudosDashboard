@@ -126,6 +126,9 @@
   <data name="All" xml:space="preserve">
     <value>Todos</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
   <data name="Category" xml:space="preserve">
     <value>Escolha o comportamento</value>
   </data>
@@ -135,8 +138,17 @@
   <data name="CommentsSent" xml:space="preserve">
     <value>Comentário(s) enviado(s)</value>
   </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>Por favor, confirme a exclusão do reconhecimento.</value>
+  </data>
   <data name="Kudos" xml:space="preserve">
     <value>reconhecimento</value>
+  </data>
+  <data name="KudosCommentsAndLikesWillBeDeleted" xml:space="preserve">
+    <value>Após excluir os kudos, todos os comentários, curtidas e pontuações associadas serão removidos.</value>
   </data>
   <data name="KudosFromMe" xml:space="preserve">
     <value>Reconhecimento(s) enviado(s)</value>
@@ -209,6 +221,9 @@
   </data>
   <data name="SorryNoResultsFound" xml:space="preserve">
     <value>Nenhum resultado encontrado</value>
+  </data>
+  <data name="ThisActionWillDeleteKudos" xml:space="preserve">
+    <value>Esta ação excluirá o reconhecimento.</value>
   </data>
   <data name="TopContributors" xml:space="preserve">
     <value>Top Contribuidores(as)</value>

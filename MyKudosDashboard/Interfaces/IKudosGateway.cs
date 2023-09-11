@@ -14,9 +14,13 @@ public interface IKudosGateway
     Task<IEnumerable<KudosResponse>> GetKudosToMyDirects(string userId, int pageNumber);
 
 
-    Task<bool> Like(LikeGateway like);
+    Task<bool> Like(SendLikeGateway like);
 
-    Task<bool> UndoLike(LikeGateway like);
+    Task<bool> UndoLike(SendLikeGateway like);
+
+    Task<bool> UpdateKudos(KudosMessage kudos);
+
+    Task<bool> DeleteKudos(int kudosId);
 
 
 }
