@@ -118,7 +118,7 @@ app.UseRouting();
 
 var selectedCulture = config["SelectedCulture"];
 
-var supportedCultures = new[] { new CultureInfo("pt-BR") };
+var supportedCultures = new[] { new CultureInfo("pt-br"), new CultureInfo("en-us") };
 
 var localizationOptions = new RequestLocalizationOptions
 {
