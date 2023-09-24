@@ -86,9 +86,6 @@ public class KudosController : Controller
             //get the manager of the person/people that received kudos.            
             var managers = await _userProfileService.GetManagers(restKudos.Recognized.Select(u => u.ToPersonId).ToArray());
 
-
-
-
             var notification = new GatewayDomain.KudosNotification
                 (
                     From: new GatewayDomain.Person

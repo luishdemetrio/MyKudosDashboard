@@ -1,12 +1,8 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
-using MyKudos.Gateway.Domain.Models;
 using MyKudos.Gateway.Interfaces;
 using Newtonsoft.Json;
 using RestSharp;
-
-using System;
 using System.Drawing;
-using System.IO;
 
 
 namespace MyKudos.Gateway.Services;

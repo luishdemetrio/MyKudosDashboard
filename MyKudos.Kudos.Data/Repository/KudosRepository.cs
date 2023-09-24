@@ -18,8 +18,6 @@ public class KudosRepository : IKudosRepository
 	{
 		_kudosDbContext = kudosDbContext;
 
-		
-
 		_maxPageSize = int.Parse(configuration["KudosMaxPageSize"]);
 
 	}
@@ -35,36 +33,17 @@ public class KudosRepository : IKudosRepository
     public Domain.Models.Kudos? GetKudos(int kudosId)
     {
 
-        IQueryable<Domain.Models.Kudos> kudosQuery = _kudosDbContext.Kudos
-
-           .Include(c => c.Comments)
-           .Include(u => u.UserFrom)
-           .Include(u => u.Recognition);
-
-        kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
-        kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
+        IQueryable<Domain.Models.Kudos> kudosQuery = 
+            _kudosDbContext.Kudos
+               .Include(c => c.Comments)
+               .Include(u => u.UserFrom)
+               .Include(u => u.Recognition)
+               .Include(r => r.Recognized).ThenInclude(p => p.Person)
+               .Include(r => r.Likes).ThenInclude(p => p.Person);
 
         kudosQuery = kudosQuery.Where(k => k.KudosId == kudosId);
 
         return  kudosQuery.First();
-
-        //var kudos =  _kudosDbContext.Kudos.Where(k => k.KudosId == kudosId)
-        //            .Include(l => l.Likes)
-        //            .Include(c => c.Comments)
-        //            .Include(u => u.UserFrom)
-        //            .Include(u => u.Recognized)
-        //            .Include(u => u.Recognition)
-        //            .First();
-
-
-
-        //foreach (var receiver in kudos.Recognized)
-        //{
-        //    receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
-        //}
-
-      //  return kudos;
-        
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetAllKudosAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5, bool fromMe = true, bool directReports = false)
@@ -75,12 +54,10 @@ public class KudosRepository : IKudosRepository
         }
 
         IQueryable<Domain.Models.Kudos> kudosQuery = _kudosDbContext.Kudos
-
             .Include(c => c.Comments)
             .Include(u => u.UserFrom)
             .Include(u => u.Recognition);
-        // .Include(l => l.Likes)
-        //.Include(u => u.Recognized);
+        
 
         kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
         kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
