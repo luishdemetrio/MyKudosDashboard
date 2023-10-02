@@ -8,6 +8,10 @@ public interface IRecognitionGroupService
 
     public Task<IEnumerable<RecognitionGroup>> GetRecognitionGroups();
 
-    public bool SetRecognitionGroups(RecognitionGroup group);
+    public Task<bool> AddNewRecognitionGroup(RecognitionGroup group);
+
+    Task<bool> DeleteRecognitionGroup(int recognitionGroupId);
+
+    Task<bool> UpdateRecognitionGroup(RecognitionGroup group);
 
 }

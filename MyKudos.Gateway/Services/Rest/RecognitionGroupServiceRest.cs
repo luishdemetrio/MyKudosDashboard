@@ -41,8 +41,66 @@ public class RecognitionGroupServiceRest : IRecognitionGroupService
     }
 
 
-    public bool SetRecognitionGroups(RecognitionGroup group)
+    public async Task<bool> AddNewRecognitionGroup(RecognitionGroup group)
     {
-        throw new NotImplementedException();
+        var result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData< RecognitionGroup, bool>(
+                                    $"{_recognitionServiceUrl}recognitiongroup",
+                                    HttpMethod.Post
+                                    ,group);
+           
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing AddNewRecognitionGroup: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> DeleteRecognitionGroup(int recognitionGroupId)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<int, bool>(
+                                    $"{_recognitionServiceUrl}recognitiongroup/{recognitionGroupId}",
+                                    HttpMethod.Delete
+                                    , recognitionGroupId);
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing AddNewRecognitionGroup: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> UpdateRecognitionGroup(RecognitionGroup group)
+    {
+        bool result = false;
+
+        try
+        {
+            result = await _restClientHelper.SendApiData<RecognitionGroup, bool>(
+                                    $"{_recognitionServiceUrl}recognitiongroup/{group.RecognitionGroupId}",
+                                    HttpMethod.Put,
+                                    group);
+
+        }
+        catch (Exception ex)
+        {
+
+            _logger.LogError($"Error processing AddNewRecognitionGroup: {ex.Message}");
+        }
+
+        return result;
     }
 }

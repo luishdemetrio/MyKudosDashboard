@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddTransient<IKudosService, KudosService>();
 builder.Services.AddTransient<ICommentsService, CommentsService>();
 builder.Services.AddTransient<IRecognitionService, RecognitionService>();
-builder.Services.AddTransient<IRecognitionGroupService, RecognitionGroupService>();
+//builder.Services.AddTransient<IRecognitionGroupService, RecognitionGroupService>();
 
 builder.Services.AddTransient<IUserPointsService, UserPointsService>();
 builder.Services.AddTransient<IUserProfileService, UserProfileService>();

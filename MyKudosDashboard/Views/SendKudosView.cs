@@ -39,7 +39,7 @@ public class SendKudosView : ISendKudosView
                                       {
                                           Description = r.Description,
                                           DisplayOrder = r.DisplayOrder,
-                                          Emoji = r.Emoji,
+                                          Emoji = g.Emoji,
                                           GroupName = g.Description,
                                           RecognitionId = r.RecognitionId,
                                           Title = r.Title

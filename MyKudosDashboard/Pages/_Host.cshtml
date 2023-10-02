@@ -67,6 +67,51 @@
     window.UpdateUI = function () {
         blazorComponent.invokeMethodAsync("ExecuteUpdateUI");
     }
+
+    // window.attachTextareaListener = (textareaId, dotnetReference) => {
+    //    // const textarea = document.getElementById(textareaId);
+    //     console.log("Congrats");
+    //     dotnetReference.invokeMethodAsync('PlayConfettiAnimation');
+
+    //     // textarea.addEventListener("input", () => {
+    //     //     console.log("Textarea input event detected.");
+
+    //     //     const content = textarea.value.toLowerCase();
+    //     //     console.log("content:" & content);
+
+    //     //     if (content.includes("congrats")) {
+    //     //         // Call the .NET method to trigger the animation
+    //     //         dotnetReference.invokeMethodAsync("PlayConfettiAnimation");
+    //     //     }
+    //     //     dotnetReference.invokeMethodAsync("PlayConfettiAnimation");
+    //     // });
+    // };
+
+    // window.triggerConfettiExplosion = () => {
+    //     particlesJS("confetti-container", {
+    //         particles: {
+    //             number: {
+    //                 value: 150,
+    //             },
+    //             size: {
+    //                 value: 3,
+    //             },
+    //             shape: {
+    //                 type: "circle",
+    //             },
+    //             opacity: {
+    //                 value: 0.8,
+    //                 random: true,
+    //             },
+    //         },
+    //         interactivity: {
+    //             detectsOn: "window",
+    //             events: {
+    //                 resize: true,
+    //             },
+    //         },
+    //     });
+    // };
   
 </script>
 
@@ -87,6 +132,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
 </head>
 
 <body>

@@ -392,6 +392,18 @@ public class GraphService : IGraphService
         return result;
     }
 
+    public string GetGivenNameOrDisplayName(User user)
+    {
+        if (!string.IsNullOrEmpty(user.GivenName))
+        {
+            return user.GivenName;
+        }
+        else
+        {
+            int spaceIndex = user.DisplayName.IndexOf(' ');
+            return spaceIndex > 0 ? user.DisplayName.Substring(0, spaceIndex) : user.DisplayName;
+        }
+    }
 
     public async Task<bool> PopulateUserProfile(IUserProfileRepository userProfileRepository, string[] domains, string emailPrefixExclusion)
     {
@@ -422,7 +434,7 @@ public class GraphService : IGraphService
                     {
                         UserProfileId = new Guid(user.Id),
                         DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName ,
-                        GivenName = user.GivenName,
+                        GivenName = GetGivenNameOrDisplayName(user),
                         Mail = user.Mail
                         
                     };

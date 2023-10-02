@@ -1,0 +1,98 @@
+﻿@using MyKudos.Gateway.Domain.Models;
+
+@inject IJSRuntime JSRuntime
+
+<h1>Recognition Groups</h1>
+
+<div class="container">
+    <!-- Display a list of recognition groups -->
+    <table class="table">
+        <!-- Table headers -->
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Badge Name</th>
+                <th>Emoji</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <!-- Table data -->
+        <tbody>
+            @foreach (var group in recognitionGroups)
+            {
+                <tr>
+                    <td>@group.Description</td>
+                    <td>@group.BadgeName</td>
+                    <td>@group.Emoji</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick=@(()=>EditGroup(group))>Edit</button>
+                        <button class="btn btn-danger" @onclick=@(()=>DeleteGroup(group))>Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Display a form for adding/editing recognition groups -->
+    <form @onsubmit="SaveGroup">
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input class="form-control" id="description" @bind="currentGroup.Description" />
+        </div>
+        <div class="form-group">
+            <label for="badgeName">Badge Name:</label>
+            <input class="form-control" id="badgeName" @bind="currentGroup.BadgeName" />
+        </div>
+        <div class="form-group">
+            <label for="emoji">Emoji:</label>
+            <input class="form-control" id="emoji" @bind="currentGroup.Emoji" />
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+</div>
+
+@code {
+    private List<MyKudos.Gateway.Domain.Models.RecognitionGroup> recognitionGroups = new();
+    private RecognitionGroup currentGroup = new RecognitionGroup();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load recognitionGroups from the database or your data source
+      //  recognitionGroups = await dbContext.RecognitionGroups.ToListAsync();
+    }
+
+    private void EditGroup(RecognitionGroup group)
+    {
+        // Populate the form with the selected group for editing
+        currentGroup = group;
+    }
+
+    private void SaveGroup()
+    {
+        if (currentGroup.RecognitionGroupId == 0)
+        {
+            // Add new group
+          //  dbContext.RecognitionGroups.Add(currentGroup);
+        }
+        else
+        {
+            // Update existing group
+          //  dbContext.RecognitionGroups.Update(currentGroup);
+        }
+
+     //   await dbContext.SaveChangesAsync();
+        ClearForm();
+    }
+
+    private void DeleteGroup(RecognitionGroup group)
+    {
+       // dbContext.RecognitionGroups.Remove(group);
+      //  await dbContext.SaveChangesAsync();
+        recognitionGroups.Remove(group);
+    }
+
+    private void ClearForm()
+    {
+        currentGroup = new RecognitionGroup();
+    }
+}

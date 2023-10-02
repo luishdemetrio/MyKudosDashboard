@@ -56,8 +56,8 @@
 </style>
 
 
-
-<div class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
+@* <div id="confetti-container" ></div> *@
+<div  class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
 
      @* if the kudos was sent by the current user, the user can edit or delete it *@
 
@@ -162,15 +162,18 @@
         <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:100%;min-height:40px;margin-right:3vw;margin-top:1vh">
             @if (_isKudosReadOnly)
             {
-                <small>@KudosItem.Message</small>
+                
+                    <small id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
+                
             }
             else
             {
-
-                <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
-                            @onchange=KudosValueChanged>          
-                    @KudosItem.Message
-                </textarea>
+                
+                    <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
+                                @onchange=KudosValueChanged>          
+                        @KudosItem.Message
+                    </textarea>
+                
 
                 <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditKudosClick())>
                     <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
@@ -280,6 +283,22 @@
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
 
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // Attach a listener to the textarea for input changes
+    //         await JSRuntime.InvokeVoidAsync("attachTextareaListener", $"textareareply_{@KudosItem.Id}",
+    //                                         DotNetObjectReference.Create(this));
+    //     }
+    // }
+
+    // [JSInvokable]
+    // public async Task PlayConfettiAnimation()
+    // {
+    //     // Trigger the JavaScript function to create the explosion-like confetti
+    //     await JSRuntime.InvokeVoidAsync("triggerConfettiExplosion");
+    // }
 
     private void EditKudosOnClick()
     {
