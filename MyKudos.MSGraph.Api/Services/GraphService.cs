@@ -394,7 +394,8 @@ public class GraphService : IGraphService
 
     public string GetGivenNameOrDisplayName(User user)
     {
-        if (!string.IsNullOrEmpty(user.GivenName))
+        if (!string.IsNullOrEmpty(user.GivenName) && user.GivenName.Length <= 20)
+
         {
             return user.GivenName;
         }
