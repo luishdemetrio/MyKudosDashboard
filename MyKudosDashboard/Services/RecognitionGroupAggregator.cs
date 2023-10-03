@@ -46,7 +46,7 @@ public class RecognitionGroupAggregator : IRecognitionGroupAggregator
         try
         {
             result = await _restClientHelper.SendApiData<int, bool>(
-                            $"{_gatewayServiceUrl}recognitiongroup", HttpMethod.Delete,
+                            $"{_gatewayServiceUrl}recognitiongroup/{recognitionGroupId}", HttpMethod.Delete,
                             recognitionGroupId);
         }
         catch (Exception ex)

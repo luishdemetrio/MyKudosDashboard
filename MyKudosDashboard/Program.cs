@@ -4,6 +4,7 @@ using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Common;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interfaces.Aggregator;
@@ -30,6 +31,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IImageHelper, ImageHelper>();
 
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();

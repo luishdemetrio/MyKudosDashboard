@@ -87,12 +87,12 @@
     @*In case of an individual kudos, the image size is bigger*@
     @if (KudosItem.Receivers.Count == 1)
     {
-        <div class="avatar">
+        <div class="info" style="float:left">
             <img src=@KudosItem.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
         </div>
     }
 
-    <div class="info" style="width:100%">
+    <div class="info" style="float:left">
 
         <ul class="list-unstyled ">
 
@@ -111,7 +111,7 @@
                     <li>
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
                             <img src=@receiver.Photo
-                                    style="height: 5vh;width: 5vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
+                                    style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
                             </div>
 
@@ -163,7 +163,7 @@
             @if (_isKudosReadOnly)
             {
                 
-                    <small id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
+                    <small  id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
                 
             }
             else
@@ -188,7 +188,7 @@
             
         </div>
 
-        <div style="float:right">
+        <div style="float:right;margin:2vh">
 
             <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(KudosItem))>
                 <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />

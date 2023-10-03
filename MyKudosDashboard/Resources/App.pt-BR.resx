@@ -202,7 +202,7 @@
     <value>Receberam</value>
   </data>
   <data name="SelectColleague" xml:space="preserve">
-    <value>Selecionar pessoa</value>
+    <value>Selecionar uma ou mais pessoas</value>
   </data>
   <data name="Send" xml:space="preserve">
     <value>Enviar</value>
