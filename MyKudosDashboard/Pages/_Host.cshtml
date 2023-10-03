@@ -68,51 +68,19 @@
         blazorComponent.invokeMethodAsync("ExecuteUpdateUI");
     }
 
-    // window.attachTextareaListener = (textareaId, dotnetReference) => {
-    //    // const textarea = document.getElementById(textareaId);
-    //     console.log("Congrats");
-    //     dotnetReference.invokeMethodAsync('PlayConfettiAnimation');
 
-    //     // textarea.addEventListener("input", () => {
-    //     //     console.log("Textarea input event detected.");
+    window.readURL = (imageElement, input) => {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
 
-    //     //     const content = textarea.value.toLowerCase();
-    //     //     console.log("content:" & content);
+            reader.onload = function (e) {
+                imageElement.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    };
 
-    //     //     if (content.includes("congrats")) {
-    //     //         // Call the .NET method to trigger the animation
-    //     //         dotnetReference.invokeMethodAsync("PlayConfettiAnimation");
-    //     //     }
-    //     //     dotnetReference.invokeMethodAsync("PlayConfettiAnimation");
-    //     // });
-    // };
 
-    // window.triggerConfettiExplosion = () => {
-    //     particlesJS("confetti-container", {
-    //         particles: {
-    //             number: {
-    //                 value: 150,
-    //             },
-    //             size: {
-    //                 value: 3,
-    //             },
-    //             shape: {
-    //                 type: "circle",
-    //             },
-    //             opacity: {
-    //                 value: 0.8,
-    //                 random: true,
-    //             },
-    //         },
-    //         interactivity: {
-    //             detectsOn: "window",
-    //             events: {
-    //                 resize: true,
-    //             },
-    //         },
-    //     });
-    // };
-  
 </script>
 
 <!DOCTYPE html>

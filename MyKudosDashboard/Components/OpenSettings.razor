@@ -1,0 +1,87 @@
+﻿@using Microsoft.Extensions.Options
+@inject NavigationManager NavigationManager
+
+
+
+
+
+<div style="margin:10px">
+
+    <h5>Settings</h5>
+
+    <FluentTabs Orientation="Orientation.Vertical" style="width:80%">
+
+        <FluentTab>Recognition Group</FluentTab>
+        <FluentTab>Recognition</FluentTab>
+        <FluentTab>Administrators</FluentTab>
+        <FluentTab>Badges</FluentTab>
+
+        <FluentTabPanel style="margin-left:50px; margin-top:10px">
+
+            <RecognitionGroupAdmin/>
+
+          
+        </FluentTabPanel>
+
+        <FluentTabPanel style="margin-left:50px; margin-top:10px">
+
+            <p><FluentCheckbox Checked="false" Disabled=true>Use SAP Concur </FluentCheckbox></p>
+
+            <p>SAP Concur is not implemented yet.</p>
+
+        </FluentTabPanel>
+
+        <FluentTabPanel style="margin-left:50px; margin-top:10px">
+            <p><FluentCheckbox Checked="false" Disabled=true>Use Oracle People Soft </FluentCheckbox></p>
+
+            <p>Oracle People Soft is not implemented yet.</p>
+        </FluentTabPanel>
+
+        <FluentTabPanel style="margin-left:50px; margin-top:10px">
+            <p><FluentCheckbox Checked="false" Disabled=true>Use UKG </FluentCheckbox></p>
+
+            <p>UKG is not implemented yet.</p>
+        </FluentTabPanel>
+
+    </FluentTabs>
+</div>
+
+
+@* <p style="margin-top:50px">
+    <FluentButton @onclick=@(()=>SaveSettings()) Appearance="Appearance.Accent">
+        Save
+        <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=false UseAccentColor="false" />
+    </FluentButton>
+
+    <FluentButton @onclick=@(()=>Close()) Appearance="Appearance.Outline">
+        Cancel
+        <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=false UseAccentColor="true" />
+    </FluentButton>
+</p> *@
+
+
+
+
+@code {
+
+
+    private FluentTextField txtBaseUrl;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+
+    }
+
+    private void Close()
+    {
+        NavigationManager.NavigateTo("/tab", true);
+    }
+
+    private void SaveSettings()
+    {
+
+    }
+
+}

@@ -1,10 +1,43 @@
 ﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces.Aggregator;
+@using Microsoft.AspNetCore.Hosting
 
 @inject IJSRuntime JSRuntime
+@inject IRecognitionGroupAggregator _recognitionGroupAggregator;
+@inject IWebHostEnvironment Environment
 
 <h1>Recognition Groups</h1>
 
 <div class="container">
+    <!-- Display a form for adding/editing recognition groups -->
+    <form @onsubmit="SaveGroup">
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input class="form-control" id="description" @bind="currentGroup.Description" />
+        </div>
+        <div class="form-group">
+            <label for="badgeName" >Badge Name:</label>
+
+            
+            <input @ref=fileInput
+                class="form-control" id="badgeName" type="file" 
+                   bind=GetImagePath(currentGroup.BadgeName)
+                   @onchange=PreviewImage />
+
+            @if (!string.IsNullOrEmpty(currentGroup.BadgeName))
+            {
+                <img @ref=previewImage src=@GetImagePath(currentGroup.BadgeName) alt=@currentGroup.BadgeName
+                     style="height:60px;width:60px;margin-top:10px" />
+            }
+            
+        </div>
+        <div class="form-group">
+            <label for="emoji">Emoji:</label>
+            <input class="form-control" id="emoji" @bind="currentGroup.Emoji" />
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+    </form>
+
     <!-- Display a list of recognition groups -->
     <table class="table">
         <!-- Table headers -->
@@ -22,7 +55,9 @@
             {
                 <tr>
                     <td>@group.Description</td>
-                    <td>@group.BadgeName</td>
+                    <td>
+                        <img src=@GetImagePath(group.BadgeName) style="height:40px;width:40px" alt=@group.BadgeName />
+                    </td>
                     <td>@group.Emoji</td>
                     <td>
                         <button class="btn btn-primary" @onclick=@(()=>EditGroup(group))>Edit</button>
@@ -33,32 +68,26 @@
         </tbody>
     </table>
 
-    <!-- Display a form for adding/editing recognition groups -->
-    <form @onsubmit="SaveGroup">
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <input class="form-control" id="description" @bind="currentGroup.Description" />
-        </div>
-        <div class="form-group">
-            <label for="badgeName">Badge Name:</label>
-            <input class="form-control" id="badgeName" @bind="currentGroup.BadgeName" />
-        </div>
-        <div class="form-group">
-            <label for="emoji">Emoji:</label>
-            <input class="form-control" id="emoji" @bind="currentGroup.Emoji" />
-        </div>
-        <button type="submit" class="btn btn-success">Save</button>
-    </form>
+    
 </div>
 
 @code {
-    private List<MyKudos.Gateway.Domain.Models.RecognitionGroup> recognitionGroups = new();
+
+    private List<RecognitionGroup> recognitionGroups = new();
     private RecognitionGroup currentGroup = new RecognitionGroup();
+
+    private ElementReference fileInput;
+    private ElementReference previewImage;
+
+    private string newImagePath;
+
 
     protected override async Task OnInitializedAsync()
     {
-        // Load recognitionGroups from the database or your data source
-      //  recognitionGroups = await dbContext.RecognitionGroups.ToListAsync();
+        
+        var result = await _recognitionGroupAggregator.GetRecognitionGroups();
+
+        recognitionGroups = result.ToList();
     }
 
     private void EditGroup(RecognitionGroup group)
@@ -67,28 +96,60 @@
         currentGroup = group;
     }
 
-    private void SaveGroup()
+    private async Task SaveGroup()
     {
+        
+        currentGroup.BadgeName = System.IO.Path.GetFileName(newImagePath); 
+
         if (currentGroup.RecognitionGroupId == 0)
-        {
+        {   
             // Add new group
-          //  dbContext.RecognitionGroups.Add(currentGroup);
+            await _recognitionGroupAggregator.AddNewRecognitionGroup(currentGroup);
         }
         else
         {
             // Update existing group
-          //  dbContext.RecognitionGroups.Update(currentGroup);
+            await _recognitionGroupAggregator.UpdateRecognitionGroup(currentGroup);
         }
 
-     //   await dbContext.SaveChangesAsync();
+        await UploadImage();
+
         ClearForm();
     }
 
-    private void DeleteGroup(RecognitionGroup group)
+    private async Task DeleteGroup(RecognitionGroup group)
     {
-       // dbContext.RecognitionGroups.Remove(group);
-      //  await dbContext.SaveChangesAsync();
+        await _recognitionGroupAggregator.DeleteRecognitionGroup(group.RecognitionGroupId);
         recognitionGroups.Remove(group);
+    }
+
+
+
+    private async Task UploadImage()
+    {
+        //no change was made
+        if (string.IsNullOrEmpty(newImagePath))
+            return;
+
+        
+    }
+
+
+
+    private async Task PreviewImage(ChangeEventArgs e)
+    {
+        //I will just upload the image after saving it
+        //but I need to keep it
+        newImagePath = e.Value as string;
+
+       
+
+        await JSRuntime.InvokeVoidAsync("readURL", previewImage, fileInput);
+    }
+
+    private string GetImagePath(string badgeName)
+    {
+        return $"/images/badges/{badgeName}";
     }
 
     private void ClearForm()

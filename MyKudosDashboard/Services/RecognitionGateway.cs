@@ -40,21 +40,4 @@ public class RecognitionGateway : IRecognitionGateway
 
     }
 
-    public async Task<IEnumerable<RecognitionGroup>> GetRecognitionGroups()
-    {
-        var result = new List<RecognitionGroup>();
-
-        try
-        {
-            var recognitions = await _restClientHelper.GetApiData<IEnumerable<RecognitionGroup>>($"{_gatewayServiceUrl}recognitiongroup");
-            result = recognitions.ToList();
-        }
-        catch (Exception ex)
-        {
-
-            _logger.LogError($"Error processing GetRecognitionsAsync: {ex.Message}");
-        }
-
-        return result;
-    }
 }

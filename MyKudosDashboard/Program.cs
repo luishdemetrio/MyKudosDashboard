@@ -6,6 +6,7 @@ using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
+using MyKudosDashboard.Interfaces.Aggregator;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
@@ -47,6 +48,8 @@ builder.Services.AddScoped<IGamificationGateway, GamificationGateway>();
 builder.Services.AddScoped<IKudosGateway, GatewayService>();
 builder.Services.AddScoped<IRecognitionGateway, RecognitionGateway>();
 builder.Services.AddScoped<IUserGateway, UserGateway>();
+
+builder.Services.AddScoped<IRecognitionGroupAggregator, RecognitionGroupAggregator>();
 
 //builder.Services.AddSingleton<IEventGridKudosReceived, EventGridKudosReceived>();
 //builder.Services.AddSingleton<IEventGridUserPointsReceived, EventGridUserPointsReceived>();

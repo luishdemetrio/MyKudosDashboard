@@ -1,5 +1,6 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
+using MyKudosDashboard.Interfaces.Aggregator;
 using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Views;
@@ -10,17 +11,22 @@ public class SendKudosView : ISendKudosView
 
     private IRecognitionGateway _recognitionGateway;
 
+    private IRecognitionGroupAggregator _recognitionGroupAggregator;
+
     private IUserGateway _userGateway;
 
     
-    public SendKudosView(IKudosGateway dashboardService, IRecognitionGateway recognitionGateway, IUserGateway userGateway)
+    public SendKudosView(IKudosGateway dashboardService, IRecognitionGateway recognitionGateway, 
+                         IRecognitionGroupAggregator recognitionGroup,
+                         IUserGateway userGateway)
     {
         _kudosGateway = dashboardService;
         _recognitionGateway = recognitionGateway;
         _userGateway = userGateway;
 
+        _recognitionGroupAggregator = recognitionGroup;
 
-        
+
     }
 
     public async Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync()
@@ -28,7 +34,7 @@ public class SendKudosView : ISendKudosView
 
         var recognitions = _recognitionGateway.GetRecognitionsAsync();
 
-        var recognitionsGroup = _recognitionGateway.GetRecognitionGroups();
+        var recognitionsGroup = _recognitionGroupAggregator.GetRecognitionGroups();
 
         await Task.WhenAll(recognitions, recognitionsGroup);
 
