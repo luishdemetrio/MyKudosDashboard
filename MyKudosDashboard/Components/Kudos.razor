@@ -12,8 +12,6 @@
         font-size: 16px;
         border: none;
         cursor: pointer;
-       
-        
     }
 
     /* The container Div - needed to position the dropdown content */
@@ -29,7 +27,6 @@
         background-color: #f9f9f9;
         min-width: 16px;
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-       
     }
 
         /* Links inside the dropdown */
@@ -56,10 +53,10 @@
 </style>
 
 
-
+@* <div id="confetti-container" ></div> *@
 <div class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
 
-     @* if the kudos was sent by the current user, the user can edit or delete it *@
+    @* if the kudos was sent by the current user, the user can edit or delete it *@
 
     @if (KudosItem.From.Id == User.UserProfileId)
     {
@@ -69,7 +66,7 @@
                 <button class="dropbtn" style="margin-top: 0px;background:white;align-content:end">
                     <span style="font-stretch:extra-expanded;font-weight: bold;font-size:x-large">...</span>
                 </button>
-                <div class="dropdown-content" >
+                <div class="dropdown-content">
                     <a href="#" @onclick=EditKudosOnClick>
                         <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
 
@@ -87,12 +84,12 @@
     @*In case of an individual kudos, the image size is bigger*@
     @if (KudosItem.Receivers.Count == 1)
     {
-        <div class="avatar">
+        <div class="info" style="float:left">
             <img src=@KudosItem.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
         </div>
     }
 
-    <div class="info" style="width:100%">
+    <div class="info" style="float:left">
 
         <ul class="list-unstyled ">
 
@@ -111,31 +108,31 @@
                     <li>
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
                             <img src=@receiver.Photo
-                                    style="height: 5vh;width: 5vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
+                                 style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
-                            </div>
+                        </div>
 
                         <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
-                            <span style="margin-left:5px">@receiver.Name</span>                                    
+                            <span style="margin-left:5px">@receiver.Name</span>
                         </FluentTooltip>
                     </li>
                 }
             }
-                        
+
             <li>
                 <div class="text-wrap small55" style="width: 100%;margin-top:1vh">
                     @if (KudosItem.Receivers.Count == 1)
                     {
-                    <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@KudosItem.Title.ToUpper()</spam> </small>
+                        <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@KudosItem.Title.ToUpper()</spam> </small>
                     }
                     else
                     {
                         <small class="card-title pricing-card-title">@Localizer["Received_Plural"] @Localizer["A"] <spam style="font-weight: bold">@KudosItem.Title.ToUpper()</spam> </small>
                     }
-                                
+
                 </div>
             </li>
-            
+
             <li>
                 <div class="small55">
                     <small style="margin-right:5px;">@Localizer["SentBy"]:</small>
@@ -145,9 +142,9 @@
                 </div>
 
             </li>
-        
+
             <li>
-                <div class="small55" >
+                <div class="small55">
                     <small style="margin-right:5px">@Localizer["SentOn"]:</small>
 
                     <small style="margin-left:5px">@KudosItem.SendOn</small>
@@ -162,15 +159,18 @@
         <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:100%;min-height:40px;margin-right:3vw;margin-top:1vh">
             @if (_isKudosReadOnly)
             {
-                <small>@KudosItem.Message</small>
+
+                <small id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
+
             }
             else
             {
 
-                <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
-                            @onchange=KudosValueChanged>          
+                <textarea id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
+                @onchange=KudosValueChanged>          
                     @KudosItem.Message
-                </textarea>
+                        </textarea>
+
 
                 <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditKudosClick())>
                     <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
@@ -182,10 +182,10 @@
                     Cancel
                 </FluentButton>
             }
-            
+
         </div>
 
-        <div style="float:right">
+        <div style="float:right;margin:2vh">
 
             <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(KudosItem))>
                 <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
@@ -196,7 +196,7 @@
 
             <FluentButton id=@KudosItem.Id.ToString() style="margin-left:20px;" @onclick=@(()=>LikeKudosClick(KudosItem))
                           Disabled=@_isLikeButtonDisabled>
-             
+
                 <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
                             Filled=@Filled(KudosItem) />
 
@@ -216,7 +216,7 @@
                             <li>
                                 <div>
                                     <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
-                                            style="height: 26px;width: 26px;border-radius: 50%;" />
+                                         style="height: 26px;width: 26px;border-radius: 50%;" />
                                     <span style="margin-left:5px">@like.Name</span>
                                 </div>
                             </li>
@@ -224,18 +224,18 @@
                     </ul>
                 }
 
-             </FluentTooltip>
+            </FluentTooltip>
 
         </div>
 
     </div>
 
-    
- </div>
+
+</div>
 
 
 
-    
+
 
 @code {
 
@@ -280,6 +280,22 @@
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
 
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // Attach a listener to the textarea for input changes
+    //         await JSRuntime.InvokeVoidAsync("attachTextareaListener", $"textareareply_{@KudosItem.Id}",
+    //                                         DotNetObjectReference.Create(this));
+    //     }
+    // }
+
+    // [JSInvokable]
+    // public async Task PlayConfettiAnimation()
+    // {
+    //     // Trigger the JavaScript function to create the explosion-like confetti
+    //     await JSRuntime.InvokeVoidAsync("triggerConfettiExplosion");
+    // }
 
     private void EditKudosOnClick()
     {
@@ -292,8 +308,8 @@
     {
         DeleteKudosSentCallBack?.Invoke(KudosItem.Id);
     }
-   
-   
+
+
 
     private void KudosValueChanged(ChangeEventArgs args)
     {
@@ -369,11 +385,11 @@
                                 (
                                     KudosId: item.Id,
                                     FromPerson: new Person
-                                    {
-                                        Id = User.UserProfileId,
-                                        Name = User.DisplayName,
-                                        Photo = User.Photo96x96
-                                    }
+                                        {
+                                            Id = User.UserProfileId,
+                                            Name = User.DisplayName,
+                                            Photo = User.Photo96x96
+                                        }
                                 );
 
 
@@ -421,19 +437,19 @@
             KudosItem.Likes.Remove(like);
         }
 
-       // await InvokeAsync(StateHasChanged);
+        // await InvokeAsync(StateHasChanged);
 
-      var t = InvokeAsync(() =>
-      {
-          StateHasChanged();
+        var t = InvokeAsync(() =>
+        {
+            StateHasChanged();
 
 
-      });
+        });
 
-      t.Wait();
+        t.Wait();
 
     }
 
-   
+
 
 }
