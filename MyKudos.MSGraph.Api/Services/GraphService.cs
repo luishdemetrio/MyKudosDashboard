@@ -373,13 +373,13 @@ public class GraphService : IGraphService
                         {
                             // The manager property has a value
 
-                            graphUser.ManagerId = new Guid(manager.GetProperty("id").ToString());   
+                            graphUser.ManagerId = new Guid(manager.GetProperty("id").ToString());
                         }
-                       
+
 
                         result.Add(graphUser);
 
-                        
+
                     }
                     catch { }
 
@@ -394,7 +394,9 @@ public class GraphService : IGraphService
 
     public string GetGivenNameOrDisplayName(User user)
     {
-        if (!string.IsNullOrEmpty(user.GivenName))
+
+        if (!string.IsNullOrEmpty(user.GivenName) && user.GivenName.Length <= 20)
+
         {
             return user.GivenName;
         }
@@ -424,19 +426,19 @@ public class GraphService : IGraphService
             {
 
                 // Check if the user belongs to any of the specified domains
-                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && (string.IsNullOrEmpty(emailPrefixExclusion) || 
+                if (domains.Any(domain => user.UserPrincipalName.EndsWith($"@{domain}") && (string.IsNullOrEmpty(emailPrefixExclusion) ||
                                                                            !user.UserPrincipalName.StartsWith(emailPrefixExclusion))))
                 {
 
-                    
 
-                        var employee = new MyKudos.Kudos.Domain.Models.UserProfile
+
+                    var employee = new MyKudos.Kudos.Domain.Models.UserProfile
                     {
                         UserProfileId = new Guid(user.Id),
                         DisplayName = user.DisplayName.Length >= 60 ? user.DisplayName.Substring(0, 60) : user.DisplayName ,
                         GivenName = GetGivenNameOrDisplayName(user),
                         Mail = user.Mail
-                        
+
                     };
 
                     if (!graphUsers.ContainsKey(employee.UserProfileId))
