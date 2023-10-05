@@ -6,8 +6,12 @@ namespace MyKudos.Kudos.Domain.Interfaces;
 public interface IRecognitionGroupRepository
 {
 
-    IEnumerable<RecognitionGroup> GetRecognitionGroups();
+    IEnumerable<RecognitionGroup> GetRecognitionsGroup();
 
-    bool SetRecognitionGroups(RecognitionGroup group);
+    bool AddNewRecognitionGroup(RecognitionGroup group);
+
+    bool DeleteRecognitionGroup(int recognitionGroupId);
+
+    bool UpdateRecognitionGroup(RecognitionGroup group);
 
 }

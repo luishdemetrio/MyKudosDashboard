@@ -38,14 +38,14 @@
                                 @*In case of an individual kudos, the image size is bigger*@
                                 @if (_item.Receivers.Count == 1)
                                 {
-                                    <div class="avatar">
+                                    <div class="avatar" >
                                         <img src=@_item.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%;" />
                                     </div>
                                 }
 
-                               
 
-                                <div class="info" style="width:98%">
+                                <div class="info" style="width:@(_item.Receivers.Count == 1 ? "70%" : "98%");padding-left:1vw">
+
 
                                     <ul class="list-unstyled " style="padding-top: 0px;padding-bottom: 0px;float:left">
 

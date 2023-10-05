@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Api.Controllers;
@@ -9,24 +10,53 @@ namespace MyKudos.Kudos.Api.Controllers;
 public class RecognitionGroupController : Controller
 {
 
-    private readonly IRecognitionGroupService _recognitionGroupService;
+    private readonly IRecognitionGroupRepository _recognitionRepository;
 
 
-    public RecognitionGroupController(IRecognitionGroupService recognitionGroupService)
+    public RecognitionGroupController(IRecognitionGroupRepository recognitionRepository)
     {
-        _recognitionGroupService = recognitionGroupService;
+        _recognitionRepository = recognitionRepository;
     }
 
     [HttpGet(Name = "GetRecognitionsGroup")]
     public IEnumerable<Domain.Models.RecognitionGroup> Get()
     {
-        return _recognitionGroupService.GetRecognitionGroups();
+        return _recognitionRepository.GetRecognitionsGroup();
     }
 
     [HttpPost(Name = "SetRecognitionGroup")]
     public bool SetRecognitionGroup([FromBody] RecognitionGroup recognitionGroup)
     {
-        return _recognitionGroupService.SetRecognitionGroups(recognitionGroup);
+        return _recognitionRepository.AddNewRecognitionGroup(recognitionGroup);
 
+    }
+
+    // PUT: api/RecognitionsGroup/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateRecognitionsGroup(int id, RecognitionGroup group)
+    {
+        if (id != group.RecognitionGroupId)
+        {
+            return BadRequest();
+        }
+
+        if (_recognitionRepository.UpdateRecognitionGroup(group))
+        {
+            return Ok();
+        }
+        else
+        {
+            return BadRequest();
+        }
+
+        
+    }
+
+    // DELETE: api/RecognitionsGroup/5
+    [HttpDelete("{id}")]
+    public async Task<bool> DeleteRecognitionsGroup(int id)
+    {
+
+        return _recognitionRepository.DeleteRecognitionGroup(id);
     }
 }

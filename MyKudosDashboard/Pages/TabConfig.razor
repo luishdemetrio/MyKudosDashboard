@@ -2,32 +2,28 @@
 @inject MicrosoftTeams MicrosoftTeams;
 @inject NavigationManager NavigationManager;
 
-<div class="config page" id ="tab config">
-        <h1>Tab Configuration</h1>
-        <p>
-            This is where you will add your tab configuration options the user 
-            can choose when the tab is added to your team/group chat.
-        </p>
+<div class="config page" id="tab config">
+    <OpenSettings/>
 </div>
 
 @code {
 
-    private Guid _entityId = Guid.NewGuid();
+    // private Guid _entityId = Guid.NewGuid();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            var settings = new TeamsInstanceSettings
-            {
-                SuggestedDisplayName = "My Tab",
-                EntityId = _entityId.ToString(),
-                ContentUrl = $"{NavigationManager.BaseUri}/tab",
-                WebsiteUrl = $"{NavigationManager.BaseUri}/tab"
-            };
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // var settings = new TeamsInstanceSettings
+    //         //     {
+    //         //         SuggestedDisplayName = "My Tab",
+    //         //         EntityId = _entityId.ToString(),
+    //         //         ContentUrl = $"{NavigationManager.BaseUri}/tab",
+    //         //         WebsiteUrl = $"{NavigationManager.BaseUri}/tab"
+    //         //     };
 
-            await MicrosoftTeams.InitializeAsync();
-            await MicrosoftTeams.RegisterOnSaveHandlerAsync(settings);
-        }
-    }
+    //         // await MicrosoftTeams.InitializeAsync();
+    //         // await MicrosoftTeams.RegisterOnSaveHandlerAsync(settings);
+    //     }
+    // }
 }
