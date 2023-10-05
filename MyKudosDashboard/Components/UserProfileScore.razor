@@ -2,15 +2,14 @@
 @using MyKudos.Gateway.Domain.Models;
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
-
-@inject IUserProfileScoreView UserProfileScoreView;
-
 @using Microsoft.Extensions.Localization
 @using System.Globalization
+
+
+@inject IUserProfileScoreView UserProfileScoreView;
 @inject IStringLocalizer<App> Localizer
-
 @inject IJSRuntime JSRuntime
-
+@inject NavigationManager Navigator
 
 @if (User!=null)
 {
@@ -18,7 +17,19 @@
 
 <div class="card-body" style="padding:2px">
 
+           @if (User.IsAdmin)
+            {
+                <div style="">
+                    <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SettingsClick())>
+                        <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
+
+                    </FluentButton>
+                </div>
+
+            }
+
     <div class="profile" style="width:100%">
+     
 
         <div class="avatar" style="float:none;width:100%;text-align: center">
 
@@ -178,9 +189,10 @@
     {
         base.OnAfterRender(firstRender);
 
-       
-           
-       
+    }
+       private void SettingsClick()
+    {
+        Navigator.NavigateTo("/config");
     }
 
     protected override bool ShouldRender()

@@ -20,14 +20,13 @@ builder.Services.AddSwaggerGen(c =>
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
 
-//builder.Services.AddMediatR(typeof(Program));
 
 //builder.Services.AddGrpc(c => c.EnableDetailedErrors = true);
 
 builder.Services.AddTransient<IKudosService, KudosService>();
 builder.Services.AddTransient<ICommentsService, CommentsService>();
 builder.Services.AddTransient<IRecognitionService, RecognitionService>();
-//builder.Services.AddTransient<IRecognitionGroupService, RecognitionGroupService>();
+builder.Services.AddTransient<IAdminUserService, AdminUserService>();
 
 builder.Services.AddTransient<IUserPointsService, UserPointsService>();
 builder.Services.AddTransient<IUserProfileService, UserProfileService>();
@@ -39,6 +38,7 @@ builder.Services.AddTransient<IRecognitionRepository, RecognitionRepository>();
 builder.Services.AddTransient<IRecognitionGroupRepository, RecognitionGroupRepository>();
 builder.Services.AddTransient<IUserPointsRepository, UserPointsRepository>();
 builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddTransient<IAdminUserRepository, AdminUserRepository>();
 
 var config = builder.Configuration;
 

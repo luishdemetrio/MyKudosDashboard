@@ -7,6 +7,10 @@
 
 @using Microsoft.Fast.Components.FluentUI
 
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using System.Text.RegularExpressions;
+
 @inject NavigationManager Navigator
 
 @inject TeamsFx teamsfx
@@ -15,9 +19,6 @@
 
 @inject IWelcomeView WelcomeView;
 
-@using Microsoft.Extensions.Localization
-@using System.Globalization
-@using System.Text.RegularExpressions;
 
 @inject IStringLocalizer<App> Localizer;
 
@@ -90,11 +91,15 @@ else
             <div class="column" style="height:100%;min-width:200px;padding:2px">
 
                
-                <div class="card  rounded-3 shadow-sm small60" style="padding: 0px;;height:94vh">
+                <div class="card  rounded-3 shadow-sm small60" style="padding: 0px;height:94vh">
 
-                    <div class="card-header py-3;padding:4px">
-                        <h4 class="my-0 fw-normal">🚀 @Localizer["Profile"]</h4>
+                    <div class="card-header py-3;padding:4px;">
+                        <h4 class="my-0 fw-normal" style="width:100%">🚀 @Localizer["Profile"]</h4>
+                      
+                        
                     </div>
+
+                   
 
                     <UserProfileScore @ref=_userProfileScore User=@_userApp  SendKudosCallBack=@OpenSendKudosPanel />
 
@@ -204,6 +209,8 @@ else
         }
 
     }
+
+ 
 
 
     private void OpenSendKudosPanel()

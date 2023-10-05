@@ -11,9 +11,12 @@ public class UserInfoController : Controller
 {
     private readonly IUserProfileService _userProfileService;
 
-    public UserInfoController(IUserProfileService userProfileService)
+    private readonly IAdminUserService _adminUserService;
+
+    public UserInfoController(IUserProfileService userProfileService, IAdminUserService adminUserService)
     {
         _userProfileService = userProfileService;
+        _adminUserService = adminUserService;
     }
 
     [HttpGet(Name = "GetUser")]
@@ -21,20 +24,28 @@ public class UserInfoController : Controller
     {
         UserProfile result = null;
 
-        var r =  await _userProfileService.GetUser(userId);
+        var userInfoTask =  _userProfileService.GetUser(userId);
 
-        if (r != null)
+        var adminInfoTask = _adminUserService.IsAdminUser(userId);
+
+        await Task.WhenAll(userInfoTask, adminInfoTask);
+
+        var userInfo = await userInfoTask;
+        var isAdminUser = await adminInfoTask;
+
+        if (userInfo != null)
         {
             result = new UserProfile()
             {
-                UserProfileId = r.UserProfileId,
-                DisplayName = r.DisplayName,
-                GivenName = r.GivenName,
-                Mail = r.Mail,
-                ManagerId = r.ManagerId,
-                Photo = r.Photo,    
-                Photo96x96 = r.Photo96x96,
-                HasDirectReports = r.HasDirectReports
+                UserProfileId = userInfo.UserProfileId,
+                DisplayName = userInfo.DisplayName,
+                GivenName = userInfo.GivenName,
+                Mail = userInfo.Mail,
+                ManagerId = userInfo.ManagerId,
+                Photo = userInfo.Photo,    
+                Photo96x96 = userInfo.Photo96x96,
+                HasDirectReports = userInfo.HasDirectReports,
+                IsAdmin = isAdminUser
             };
         }
 

@@ -12,8 +12,6 @@
         font-size: 16px;
         border: none;
         cursor: pointer;
-       
-        
     }
 
     /* The container Div - needed to position the dropdown content */
@@ -52,6 +50,13 @@
 
     /* Change the background color of the dropdown button when the dropdown content is shown */
     .dropdown:hover .dropbtn {
+    }
+
+    .horizontal-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px; /* Adjust the margin as needed */
     }
 </style>
 
@@ -92,9 +97,9 @@
         </div>
     }
 
-    <div class="info" style="float:left">
+    <div class="info" style="width:80%;padding-left:1vw">
 
-        <ul class="list-unstyled ">
+        <ul class="list-unstyled" >
 
             @*In case of an individual kudos, the name is also displayed*@
             @if (KudosItem.Receivers.Count == 1)
@@ -108,16 +113,17 @@
                 @*for multiple kudos, it's shown just the pictures for better visualization*@
                 foreach (var receiver in KudosItem.Receivers)
                 {
-                    <li>
+                    <li >
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
                             <img src=@receiver.Photo
                                     style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
+                            <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
+                                <span style="margin-left:5px">@receiver.Name</span>
+                            </FluentTooltip>
                             </div>
 
-                        <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
-                            <span style="margin-left:5px">@receiver.Name</span>                                    
-                        </FluentTooltip>
+                       
                     </li>
                 }
             }
@@ -137,7 +143,7 @@
             </li>
             
             <li>
-                <div class="small55">
+                <div class="small55" style="width: 100%;margin-top:0.5vh">
                     <small style="margin-right:5px;">@Localizer["SentBy"]:</small>
                     <img src=@KudosItem.From.Photo
                          style="height: 26px;width: 26px;border-radius: 50%" />
