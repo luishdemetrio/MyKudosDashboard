@@ -64,5 +64,6 @@ public class KudosDbContext : DbContext
 
     public DbSet<UserProfile> UserProfiles { get; set; }
 
+    public DbSet<AdminUser> AdminUsers { get; set; }
 
 }

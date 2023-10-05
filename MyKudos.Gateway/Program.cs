@@ -49,7 +49,7 @@ builder.Services.AddScoped<ICommentsMessageSender, CommentsMessageSender>();
 
 builder.Services.AddScoped<IKudosMessageSender, KudosMessageSender>();
 
-
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 
 builder.Services.AddSwaggerGen(c =>
 {

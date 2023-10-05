@@ -37,6 +37,8 @@ public class UserProfile
     public Guid? ManagerId { get; set; }
 
     public bool HasDirectReports { get; set; }
+
+    public bool IsAdmin { get; set; }
 }
 
 public class UserPointScore

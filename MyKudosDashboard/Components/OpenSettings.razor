@@ -7,7 +7,19 @@
 
 <div style="margin:10px">
 
-    <h5>Settings</h5>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width:70%">
+            <h5>Settings</h5>
+        </div>
+
+        <div style="width:30%">
+            <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>NavigateBackClick())>
+                <FluentIcon Name="@FluentIcons.GroupReturn" Slot="start" Size="@IconSize.Size16" Filled=true />
+            </FluentButton>
+        </div>
+    </div>
+
+    
 
     <FluentTabs Orientation="Orientation.Vertical" style="width:80%">
 
@@ -82,6 +94,11 @@
     private void SaveSettings()
     {
 
+    }
+
+    private void NavigateBackClick()
+    {
+        NavigationManager.NavigateTo("/tab");
     }
 
 }
