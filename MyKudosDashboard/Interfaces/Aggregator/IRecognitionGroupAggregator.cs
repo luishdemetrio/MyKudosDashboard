@@ -1,11 +1,9 @@
-﻿
-using MyKudos.Gateway.Domain.Models;
+﻿using MyKudos.Gateway.Domain.Models;
 
-namespace MyKudos.Gateway.Interfaces;
+namespace MyKudosDashboard.Interfaces.Aggregator;
 
-public interface IRecognitionGroupService
+public interface IRecognitionGroupAggregator
 {
-
     public Task<IEnumerable<RecognitionGroup>> GetRecognitionGroups();
 
     public Task<bool> AddNewRecognitionGroup(RecognitionGroup group);
@@ -13,5 +11,4 @@ public interface IRecognitionGroupService
     Task<bool> DeleteRecognitionGroup(int recognitionGroupId);
 
     Task<bool> UpdateRecognitionGroup(RecognitionGroup group);
-
 }

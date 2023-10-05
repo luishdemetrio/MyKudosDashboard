@@ -4,8 +4,10 @@ using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Common;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
+using MyKudosDashboard.Interfaces.Aggregator;
 using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
@@ -30,6 +32,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddScoped<IImageHelper, ImageHelper>();
+
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
 builder.Services.AddScoped<IWelcomeView, WelcomeView>();
@@ -47,6 +51,8 @@ builder.Services.AddScoped<IGamificationGateway, GamificationGateway>();
 builder.Services.AddScoped<IKudosGateway, GatewayService>();
 builder.Services.AddScoped<IRecognitionGateway, RecognitionGateway>();
 builder.Services.AddScoped<IUserGateway, UserGateway>();
+
+builder.Services.AddScoped<IRecognitionGroupAggregator, RecognitionGroupAggregator>();
 
 //builder.Services.AddSingleton<IEventGridKudosReceived, EventGridKudosReceived>();
 //builder.Services.AddSingleton<IEventGridUserPointsReceived, EventGridUserPointsReceived>();

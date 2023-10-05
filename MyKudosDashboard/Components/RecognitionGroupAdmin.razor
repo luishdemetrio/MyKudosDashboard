@@ -1,0 +1,182 @@
+﻿@using Azure.Storage.Blobs;
+@using Azure.Storage.Sas;
+@using Azure.Storage;
+@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common;
+@using MyKudosDashboard.Interfaces.Aggregator;
+@using Microsoft.AspNetCore.Hosting
+
+
+@inject IJSRuntime JSRuntime
+@inject IRecognitionGroupAggregator _recognitionGroupAggregator;
+@inject IWebHostEnvironment Environment
+@inject IImageHelper ImageHelper
+
+<h1>Recognition Groups</h1>
+
+<div class="container">
+    <!-- Display a form for adding/editing recognition groups -->
+    <form @onsubmit="SaveGroup">
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input class="form-control" id="description" @bind="currentGroup.Description" />
+        </div>
+        <div class="form-group">
+            <label for="badgeName" >Badge Name:</label>
+
+            <InputFile OnChange="@PreviewImage" />
+       
+
+            @if (!string.IsNullOrEmpty(currentGroup.BadgeName))
+            {
+                <img src=@ImageHelper.GetImageUrl(currentGroup.BadgeName) alt=@currentGroup.BadgeName
+                     style="height:60px;width:60px;margin-top:10px" /> 
+
+            }
+
+            @if (!string.IsNullOrEmpty(_base64Image))
+            {
+                
+                <img src="@($"data:image/png;base64,{_base64Image}")" alt="Uploaded image"
+                     style="height:60px;width:60px;margin-top:10px" />
+            }
+            
+        </div>
+        <div class="form-group">
+            <label for="emoji">Emoji:</label>
+            <input class="form-control" id="emoji" @bind="currentGroup.Emoji" />
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick=ClearForm>Cancel</button>
+    </form>
+
+    <!-- Display a list of recognition groups -->
+    <table class="table">
+        <!-- Table headers -->
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Badge Name</th>
+                <th>Emoji</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <!-- Table data -->
+        <tbody>
+            @foreach (var group in recognitionGroups)
+            {
+                <tr>
+                    <td>@group.Description</td>
+                    <td>
+                        <img src=@ImageHelper.GetImageUrl(group.BadgeName) style="height:40px;width:40px" alt=@group.BadgeName />
+                    </td>
+                    <td>@group.Emoji</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick=@(()=>EditGroup(group))>Edit</button>
+                        <button class="btn btn-danger" @onclick=@(()=>DeleteGroup(group))>Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    
+</div>
+
+@code {
+
+    private List<RecognitionGroup> recognitionGroups = new();
+    private RecognitionGroup currentGroup = new RecognitionGroup();
+
+    private string _base64Image;
+    private IBrowserFile _file;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var result = await _recognitionGroupAggregator.GetRecognitionGroups();
+
+        recognitionGroups = result.ToList();
+
+    }
+
+    private void EditGroup(RecognitionGroup group)
+    {
+        _base64Image = string.Empty;
+        // Populate the form with the selected group for editing
+        currentGroup = group;
+    }
+
+    private async Task SaveGroup()
+    {
+        if (_file != null)
+            currentGroup.BadgeName = System.IO.Path.GetFileName(_file.Name); 
+
+        if (currentGroup.RecognitionGroupId == 0)
+        {   
+            // Add new group
+            await _recognitionGroupAggregator.AddNewRecognitionGroup(currentGroup);
+        }
+        else
+        {
+            // Update existing group
+            await _recognitionGroupAggregator.UpdateRecognitionGroup(currentGroup);
+        }
+
+        await UploadImage();
+
+        ClearForm();
+    }
+
+    private async Task DeleteGroup(RecognitionGroup group)
+    {
+        await _recognitionGroupAggregator.DeleteRecognitionGroup(group.RecognitionGroupId);
+        recognitionGroups.Remove(group);
+    }
+
+
+
+    private async Task UploadImage()
+    {
+
+        await ImageHelper.UploadImage(_file.Name, _file.OpenReadStream());
+
+      
+    }
+
+
+
+    private async Task PreviewImage(InputFileChangeEventArgs e)
+    {
+        // I will need it later to upload the image
+        _file = e.File;
+
+        if (_file != null)
+        {
+            // Read the image file into a byte array
+            using var memoryStream = new MemoryStream();
+            await _file.OpenReadStream().CopyToAsync(memoryStream);
+            byte[] imageBytes = memoryStream.ToArray();
+
+            // Convert the image bytes to a Base64 string
+            _base64Image = Convert.ToBase64String(imageBytes);
+
+            // Trigger a UI update
+            StateHasChanged();
+        }
+
+        //  await JSRuntime.InvokeVoidAsync("readURL", previewImage, fileInput);
+    }
+
+
+
+    private void ClearForm()
+    {
+        currentGroup = new RecognitionGroup();
+        _file = null;
+    }
+
+   
+}

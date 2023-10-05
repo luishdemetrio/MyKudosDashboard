@@ -56,8 +56,8 @@
 </style>
 
 
-
-<div class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
+@* <div id="confetti-container" ></div> *@
+<div  class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
 
      @* if the kudos was sent by the current user, the user can edit or delete it *@
 
@@ -87,12 +87,12 @@
     @*In case of an individual kudos, the image size is bigger*@
     @if (KudosItem.Receivers.Count == 1)
     {
-        <div class="avatar">
+        <div class="info" style="float:left">
             <img src=@KudosItem.Receivers[0].Photo style="height:10vh;width:10vh;float:left;border-radius: 50%" />
         </div>
     }
 
-    <div class="info" style="width:100%">
+    <div class="info" style="float:left">
 
         <ul class="list-unstyled ">
 
@@ -111,7 +111,7 @@
                     <li>
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
                             <img src=@receiver.Photo
-                                    style="height: 5vh;width: 5vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
+                                    style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
                             </div>
 
@@ -162,15 +162,18 @@
         <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:100%;min-height:40px;margin-right:3vw;margin-top:1vh">
             @if (_isKudosReadOnly)
             {
-                <small>@KudosItem.Message</small>
+                
+                    <small  id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
+                
             }
             else
             {
-
-                <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
-                            @onchange=KudosValueChanged>          
-                    @KudosItem.Message
-                </textarea>
+                
+                    <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
+                                @onchange=KudosValueChanged>          
+                        @KudosItem.Message
+                    </textarea>
+                
 
                 <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditKudosClick())>
                     <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
@@ -185,7 +188,7 @@
             
         </div>
 
-        <div style="float:right">
+        <div style="float:right;margin:2vh">
 
             <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(KudosItem))>
                 <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
@@ -280,6 +283,22 @@
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
 
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         // Attach a listener to the textarea for input changes
+    //         await JSRuntime.InvokeVoidAsync("attachTextareaListener", $"textareareply_{@KudosItem.Id}",
+    //                                         DotNetObjectReference.Create(this));
+    //     }
+    // }
+
+    // [JSInvokable]
+    // public async Task PlayConfettiAnimation()
+    // {
+    //     // Trigger the JavaScript function to create the explosion-like confetti
+    //     await JSRuntime.InvokeVoidAsync("triggerConfettiExplosion");
+    // }
 
     private void EditKudosOnClick()
     {

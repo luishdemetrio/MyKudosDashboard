@@ -5,7 +5,6 @@ namespace MyKudosDashboard.Interfaces;
 public interface IRecognitionGateway
 {
 
-    Task<IEnumerable<RecognitionGroup>> GetRecognitionGroups();
-
+    
     Task<IEnumerable<Recognition>> GetRecognitionsAsync();
 }
