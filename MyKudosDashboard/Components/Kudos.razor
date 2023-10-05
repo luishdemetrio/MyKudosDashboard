@@ -67,7 +67,7 @@
 
     @* if the kudos was sent by the current user, the user can edit or delete it *@
 
-    @if (KudosItem.From.Id == User.UserProfileId)
+    @if (CanEditOrDelete())
     {
         <div style="float:right;">
 
@@ -322,7 +322,11 @@
         DeleteKudosSentCallBack?.Invoke(KudosItem.Id);
     }
 
+    private bool CanEditOrDelete()
+    {
+        return (KudosItem.From.Id == User.UserProfileId) || (User.IsAdmin);
 
+    }
 
     private void KudosValueChanged(ChangeEventArgs args)
     {
