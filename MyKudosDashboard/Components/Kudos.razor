@@ -61,9 +61,11 @@
 
 
 @* <div id="confetti-container" ></div> *@
+
 <div  class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
 
-     @* if the kudos was sent by the current user, the user can edit or delete it *@
+
+    @* if the kudos was sent by the current user, the user can edit or delete it *@
 
     @if (KudosItem.From.Id == User.UserProfileId)
     {
@@ -96,6 +98,7 @@
         </div>
     }
 
+
     <div class="info" style="width:80%;padding-left:1vw">
 
         <ul class="list-unstyled" >
@@ -115,13 +118,13 @@
                     <li >
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
                             <img src=@receiver.Photo
+
                                     style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
                             <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
                                 <span style="margin-left:5px">@receiver.Name</span>
                             </FluentTooltip>
                             </div>
-
                        
                     </li>
                 }
@@ -167,18 +170,20 @@
         <div class="text-wrap" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:100%;min-height:40px;margin-right:3vw;margin-top:1vh">
             @if (_isKudosReadOnly)
             {
-                
-                    <small  id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
-                
+
+
+                <small id=@($"textareareply_{@KudosItem.Id}")>@KudosItem.Message</small>
+
             }
             else
             {
-                
-                    <textarea   id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
-                                @onchange=KudosValueChanged>          
-                        @KudosItem.Message
-                    </textarea>
-                
+
+                <textarea id=@($"textareareply_{@KudosItem.Id}") type="text" class="form-control"
+                @onchange=KudosValueChanged>          
+                    @KudosItem.Message
+                        </textarea>
+
+
 
                 <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditKudosClick())>
                     <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
