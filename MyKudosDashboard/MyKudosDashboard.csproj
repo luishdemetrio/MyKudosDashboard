@@ -16,18 +16,14 @@
     <None Include=".fx/**/*" />
     <Compile Remove="EventGrid\**" />
     <Compile Remove="MessageSender\**" />
-    <Compile Remove="wwwroot\images\**" />
     <None Remove="build/**/*" />
     <None Remove="EventGrid\**" />
     <None Remove="MessageSender\**" />
-    <None Remove="wwwroot\images\**" />
     <Content Remove="build/**/*" />
     <Content Remove="EventGrid\**" />
     <Content Remove="MessageSender\**" />
-    <Content Remove="wwwroot\images\**" />
     <EmbeddedResource Remove="EventGrid\**" />
     <EmbeddedResource Remove="MessageSender\**" />
-    <EmbeddedResource Remove="wwwroot\images\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,8 +33,8 @@
   
   
   <ItemGroup>
-    <PackageReference Include="Azure.Messaging.EventHubs" Version="5.9.1" />
-    <PackageReference Include="Azure.Messaging.EventHubs.Processor" Version="5.9.1" />
+    <PackageReference Include="Azure.Messaging.EventHubs" Version="5.9.3" />
+    <PackageReference Include="Azure.Messaging.EventHubs.Processor" Version="5.9.3" />
     <PackageReference Include="Blazorise" Version="1.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
     
