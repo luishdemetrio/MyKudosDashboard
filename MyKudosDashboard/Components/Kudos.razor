@@ -282,6 +282,8 @@
 
     public delegate void DeleteKudosCallBack(int KudosId);
 
+    [Parameter]
+    public int CanEditOrDeleteKudosInDays { get; set; }
 
     private bool _isLikeButtonDisabled;
     private bool _isKudosReadOnly = true;
@@ -324,7 +326,9 @@
 
     private bool CanEditOrDelete()
     {
-        return (KudosItem.From.Id == User.UserProfileId) || (User.IsAdmin);
+        return ( (KudosItem.From.Id == User.UserProfileId) &&
+                  DateTime.Now.Subtract(KudosItem.SendOn).Days <= CanEditOrDeleteKudosInDays ) 
+                 || (User.IsAdmin);
 
     }
 

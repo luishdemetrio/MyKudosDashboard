@@ -9,9 +9,10 @@
 @using System.Globalization
 @using System.Text;
 @using System.Collections.Concurrent;
-@inject IStringLocalizer<App> Localizer
 
+@inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
+@inject IConfiguration Config
 
 <style>
     .infinite-scroll-container {
@@ -67,11 +68,8 @@
                     SendUndoLikeCallBack=@SendUndoLikesCallBack 
                     ReplyCallBack=@ReplyKudos 
                     UpdateKudosSentCallBack=@SaveKudos
-                    DeleteKudosSentCallBack=@DeleteKudos/>
-
-             
-           
-
+                    DeleteKudosSentCallBack=@DeleteKudos 
+                    CanEditOrDeleteKudosInDays = "@CanEditKudosInDays"/>
             
         }
 
@@ -91,15 +89,25 @@
         <div class="loading-indicator">@Localizer["LoadingMoreItems"]</div>
     }
 
- 
-
 </div>
-
-
-
-
                          
 @code {
+
+
+
+    [Parameter]
+    public UserProfile User { get; set; }
+
+    [Parameter]
+    public KudosTypeTab TypeTab { get; set; }
+
+    [Parameter]
+    public ReplyKudosCallBack ReplyCallBack { get; set; }
+    public delegate void ReplyKudosCallBack(KudosResponse pKudos);
+
+    [Parameter]
+    public LoadMoreKudosCallback MoreKudosCallback { get; set; }
+    public delegate Task LoadMoreKudosCallback();
 
     public enum KudosTypeTab
     {
@@ -111,23 +119,7 @@
 
     private ConcurrentDictionary<int, KudosResponse> _kudosList;
 
-
-    [Parameter]
-    public UserProfile User { get; set; }
-
-    [Parameter]
-    public KudosTypeTab TypeTab { get; set; }
-
-
-    [Parameter]
-    public ReplyKudosCallBack ReplyCallBack { get; set; }
-    public delegate void ReplyKudosCallBack(KudosResponse pKudos);
-
-    [Parameter]
-    public LoadMoreKudosCallback MoreKudosCallback { get; set; }
-    public delegate Task LoadMoreKudosCallback();
-
-
+    private int CanEditKudosInDays;
 
     private Dictionary<int, bool> _disabledButtons;
 
@@ -153,6 +145,8 @@
         _disabledButtons = new();
 
         _pageNumber = 0;
+
+        CanEditKudosInDays = int.Parse(Config["CanEditOrDeleteKudosInDays"]);
     }
 
 
