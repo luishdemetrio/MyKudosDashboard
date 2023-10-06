@@ -90,26 +90,25 @@
 
         <table class="table">
             <tbody>
-                <tr style="height:80px">
+                <tr style="height:2vh">
                     <td scope="row" style="height:80px">
 
                         <small class="small55" style="margin-bottom: 5px;">@Localizer["SelectColleague"]</small>
 
                        
-                        <BlazoredTypeahead SearchMethod="@SearchEmployees" class="small60"
-                                           
-                                           Debounce="500" style="width:400px;padding:0px"
+                        <BlazoredTypeahead SearchMethod="@SearchEmployees" class=""
+                                           Debounce="500" style="width:400px;padding:0px;;height:4vh"
                                            MinimumLength="3"
                                            @bind-Values="@SelectedEmployees"
                                            >
                             <SelectedTemplate>
                                 @if (string.IsNullOrEmpty(context.Photo))
                                 {
-                                    <small style="margin-left:5px;padding:0px">@context.Name</small>
+                                    <small style="margin-left:5px;padding:0px;height:4vh">@context.Name</small>
                                 }
                                 else
                                 {
-                                    <div style="width:100%;height:40px;padding:0px;margin:0px">
+                                    <div style="width:100%;height:4vh;padding:0px;margin:0px">
                                         <img src=@context.Photo
                                              style="height: 26px;width: 26px;border-radius: 50%" />
                                         <small style="margin-left:5px">@context.Name</small>
