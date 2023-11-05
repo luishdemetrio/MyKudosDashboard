@@ -151,22 +151,22 @@
     <value>Após excluir os kudos, todos os comentários, curtidas e pontuações associadas serão removidos.</value>
   </data>
   <data name="KudosFromMe" xml:space="preserve">
-    <value>Reconhecimento(s) enviado(s)</value>
+    <value>Enviados</value>
   </data>
   <data name="KudosReceived" xml:space="preserve">
-    <value>Reconhecimento(s) recebido(s)</value>
+    <value>Reconhecimento(s) recebidos(s)</value>
   </data>
   <data name="KudosSent" xml:space="preserve">
-    <value>Reconhecimento(s) enviado(s)</value>
+    <value>Reconhecimento(s) enviados(s)</value>
   </data>
   <data name="KudosTabTitle" xml:space="preserve">
     <value>Reconhecimentos</value>
   </data>
   <data name="KudosToMe" xml:space="preserve">
-    <value>Reconhecimento(s) recebido(s)</value>
+    <value>Recebidos</value>
   </data>
   <data name="KudosToMyDirectReports" xml:space="preserve">
-    <value>Reconhecimentos do meu time</value>
+    <value>Meu time</value>
   </data>
   <data name="LikesReceived" xml:space="preserve">
     <value>Curtida(s) recebida(s)</value>
