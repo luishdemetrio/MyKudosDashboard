@@ -18,7 +18,7 @@
 @inject MicrosoftTeams MicrosoftTeams
 
 @inject IWelcomeView WelcomeView;
-
+@inject IJSRuntime JSRuntime;
 
 @inject IStringLocalizer<App> Localizer;
 
@@ -49,6 +49,7 @@
     .small60 {
         font-size: calc(0.60em + 1vmin)
     }
+
 
 
     </style>
@@ -90,15 +91,28 @@ else
             <!-- PROFILE -->
             <div class="column" style="height:100%;min-width:200px;padding:2px">
 
-               
+
                 <div class="card  rounded-3 shadow-sm small60" style="padding: 0px;height:94vh;width:100%">
 
-                    <div class="card-header py-3;padding:4px;">
-                        <h4 class="my-0 fw-normal" style="width:100%">🚀 @Localizer["Profile"]</h4>
-                      
-                        
-                    </div>
+                    <div class="card-header " style="display: flex;">
+                        <h4 class="my-0 fw-normal" style="height: 28px; width:40%;align-items: center;justify-content: center;display: flex">
+                            🚀 @Localizer["Profile"]
+                        </h4>
 
+                        @if (_userApp.IsAdmin)
+                        {
+                            <div style="display: flex; margin-left: 5px;width:40%">
+                                <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;"
+                                @onclick=@(()=>SettingsClick())
+                                >
+                                    <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
+                                    @Localizer["Settings"]
+                                </FluentButton>
+                            </div>
+
+                        }
+                    </div>
+                  
                    
 
                     <UserProfileScore @ref=_userProfileScore User=@_userApp  SendKudosCallBack=@OpenSendKudosPanel />
@@ -198,6 +212,7 @@ else
                 {                    
                     _userApp = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
                 }
+
             }
             else
             {
@@ -241,6 +256,10 @@ else
         _kudosTab.ReloadKudos();
     }
 
+    private void SettingsClick()
+    {
+        Navigator.NavigateTo("/config");
+    }
     
 }
 

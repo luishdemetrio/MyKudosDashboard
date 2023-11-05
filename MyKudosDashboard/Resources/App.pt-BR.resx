@@ -219,6 +219,9 @@
   <data name="SentOn" xml:space="preserve">
     <value>Enviado em</value>
   </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Configurações</value>
+  </data>
   <data name="SorryNoResultsFound" xml:space="preserve">
     <value>Nenhum resultado encontrado</value>
   </data>
