@@ -19,7 +19,7 @@
         <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
         <FluentTab Text=@Localizer["KudosToMe"] style="z-index:auto" @onclick=OnTabToMeClick />
         <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
-         @if (User.HasDirectReports)
+         @if (User != null && User.HasDirectReports)
          {
             <FluentTab Text=@Localizer["KudosToMyDirectReports"] style="z-index:auto" @onclick=OnTabToMyDirectReportsClick />
          }
@@ -35,7 +35,7 @@
                 <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>   
             
-            @if (User.HasDirectReports)
+            @if (User !=null && User.HasDirectReports)
             {
             <FluentTabPanel class="nav-item">
                     <KudosList @ref=ToMyDirectReports TypeTab=KudosList.KudosTypeTab.ToMyDirectReports User=@User  ReplyCallBack=@ReplyKudos />
