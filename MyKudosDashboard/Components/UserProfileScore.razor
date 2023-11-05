@@ -17,18 +17,18 @@
 
 <div class="card-body" style="padding:2px">
 
-           @if (User.IsAdmin)
+          @*  @if (User.IsAdmin)
             {
                 <div style="">
                     <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SettingsClick())>
                         <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
-
+                        Settings
                     </FluentButton>
                 </div>
 
-            }
+            } *@
 
-    <div class="profile" style="width:100%">
+        <div class="profile" style="width:100%;height:82vh;overflow-y:scroll;overflow:auto">
      
 
         <div class="avatar" style="float:none;width:100%;text-align: center">
@@ -112,7 +112,7 @@
 
 
                         
-                            @foreach (var badge in UserScoreValue.EarnedBagdes)
+                        @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
                             <img id=@($"badge_{badge.UserBadgeId}") src=@($"images/badges/{badge.BadgeName}")
                                  style="height:10vh;width:10vh;padding:5px" />
@@ -190,10 +190,10 @@
         base.OnAfterRender(firstRender);
 
     }
-       private void SettingsClick()
-    {
-        Navigator.NavigateTo("/config");
-    }
+    //    private void SettingsClick()
+    // {
+    //     Navigator.NavigateTo("/config");
+    // }
 
     protected override bool ShouldRender()
     {

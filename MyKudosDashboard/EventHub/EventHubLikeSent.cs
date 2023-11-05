@@ -110,7 +110,7 @@ public class EventHubLikeSent : IEventHubLikeSent//IEventHubReceived<EventHubRes
 
     public void Detach(string userId)
     {
-
+        if (userId != null)
         _observers.TryRemove(userId, out _);
     }
 

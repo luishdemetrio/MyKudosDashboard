@@ -73,9 +73,9 @@
             
         }
 
-        <FluentDialog @ref="_confirmKudosDeleteDialog" Hidden=@_hidden style="--dialog-width: 30vw;--dialog-height:30vh">
-            <div style="margin:10px;vertical-align:central;height:100%">
-                <h3>@Localizer["ConfirmDelete"]</h3>
+        <FluentDialog @ref="_confirmKudosDeleteDialog" Hidden=@_hidden style="--dialog-width: 30vw;--dialog-height:auto">
+            <div style="margin:10px;vertical-align:central;">
+                <p style="font-size:1.2rem;font-weight:100">@Localizer["ConfirmDelete"]</p>
                 <p class="small60">@Localizer["ThisActionWillDeleteKudos"]</p>
                 <p class="small60">@Localizer["KudosCommentsAndLikesWillBeDeleted"]</p>
                 <FluentButton Appearance="Appearance.Accent" Autofocus="true" @onclick="CancelDeleteOnClick">@Localizer["Cancel"]</FluentButton>
