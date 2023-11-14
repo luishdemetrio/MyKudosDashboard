@@ -1,0 +1,116 @@
+﻿@using Azure.Storage.Blobs;
+@using Azure.Storage.Sas;
+@using Azure.Storage;
+@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common;
+@using MyKudosDashboard.Interfaces.Aggregator;
+@using Microsoft.AspNetCore.Hosting
+
+@inject IRecognitionAggregator _recognitionAggregator;
+@inject IWebHostEnvironment Environment
+
+
+<h4>Recognition Groups</h4>
+
+<div class="container">
+    <!-- Display a form for adding/editing recognition groups -->
+    <form @onsubmit="SaveGroup">
+        
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input class="form-control" id="title" @bind="_currentRecognition.Title" />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input class="form-control" id="description" @bind="_currentRecognition.Description" />
+        </div>
+        
+        
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick=ClearForm>Cancel</button>
+    </form>
+
+    <!-- Display a list of recognition groups -->
+    <table class="table">
+        <!-- Table headers -->
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                
+            </tr>
+        </thead>
+        <!-- Table data -->
+        <tbody>
+            @foreach (var recognition in _recognitions)
+            {
+                <tr>
+                    <td>@recognition.Title</td>
+
+                    <td>@recognition.Description</td>
+                    
+                    <td>
+                        <button class="btn btn-primary" @onclick=@(()=>EditGroup(recognition))>Edit</button>
+                        <button class="btn btn-danger" @onclick=@(()=>DeleteGroup(recognition))>Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+</div>
+
+@code {
+
+    private List<Recognition> _recognitions = new();
+    private Recognition _currentRecognition = new ();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var result = await _recognitionAggregator.GetRecognitions();
+
+        _recognitions = result.ToList();
+
+    }
+
+    private void EditGroup(Recognition group)
+    {
+        // Populate the form with the selected group for editing
+        _currentRecognition = group;
+    }
+
+    private async Task SaveGroup()
+    {
+       
+        if (_currentRecognition.RecognitionGroupId == 0)
+        {
+            // Add new group
+            await _recognitionAggregator.AddNewRecognition(_currentRecognition);
+        }
+        else
+        {
+            // Update existing group
+            await _recognitionAggregator.UpdateRecognition(_currentRecognition);
+        }
+
+
+        ClearForm();
+    }
+
+    private async Task DeleteGroup(Recognition recognition)
+    {
+        await _recognitionAggregator.DeleteRecognition(recognition.RecognitionGroupId);
+        _recognitions.Remove(recognition);
+    }
+
+    private void ClearForm()
+    {
+        _currentRecognition = new Recognition();        
+    }
+
+
+}
