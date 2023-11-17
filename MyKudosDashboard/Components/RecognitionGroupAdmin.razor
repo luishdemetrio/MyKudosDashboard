@@ -15,10 +15,12 @@
 <div class="container">
     <!-- Display a form for adding/editing recognition groups -->
     <form @onsubmit="SaveGroup">
+
         <div class="form-group">
             <label for="description">Description:</label>
             <input class="form-control" id="description" @bind="currentGroup.Description" />
         </div>
+
         <div class="form-group">
             <label for="badgeName" >Badge Name:</label>
 
@@ -90,14 +92,21 @@
     private IBrowserFile _file;
 
 
-
     protected override async Task OnInitializedAsync()
     {
+        await GetRecognitionGroups();
+    }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await GetRecognitionGroups();
+    }
+
+    private async Task GetRecognitionGroups()
+    {
         var result = await _recognitionGroupAggregator.GetRecognitionGroups();
 
         recognitionGroups = result.ToList();
-
     }
 
     private void EditGroup(RecognitionGroup group)
@@ -122,8 +131,11 @@
             // Update existing group
             await _recognitionGroupAggregator.UpdateRecognitionGroup(currentGroup);
         }
+        
+        if (_file != null)
+            await UploadImage();
 
-        await UploadImage();
+        await GetRecognitionGroups();
 
         ClearForm();
     }
@@ -132,6 +144,8 @@
     {
         await _recognitionGroupAggregator.DeleteRecognitionGroup(group.RecognitionGroupId);
         recognitionGroups.Remove(group);
+
+        await GetRecognitionGroups();
     }
 
 

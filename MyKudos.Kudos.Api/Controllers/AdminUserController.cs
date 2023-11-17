@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Kudos.App.Interfaces;
 using MyKudos.Kudos.Data.Repository;
+using MyKudos.Kudos.Domain.Interfaces;
+using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Api.Controllers;
 
@@ -8,29 +10,35 @@ namespace MyKudos.Kudos.Api.Controllers;
 [Route("[controller]")]
 public class AdminUserController : Controller
 {
-    private IAdminUserService _adminUserService;
+    private IAdminUserRepository _repository;
 
-    public AdminUserController(IAdminUserService adminUserService)
+    public AdminUserController(IAdminUserRepository repository)
     {
-            _adminUserService = adminUserService;
+        _repository = repository;
     }
 
-    [HttpGet(Name = "IsAdminUser")]
+    [HttpGet("IsAdminUser/{userProfileId}")]
     public bool Get(Guid userProfileId)
     {
-        return _adminUserService.IsAdminUser(userProfileId);
+        return _repository.IsAdminUser(userProfileId);
     }
 
     [HttpPost(Name = "AddAdminUser")]
-    public bool Post(Guid userProfileId)
+    public bool Post([FromBody] Guid userProfileId)
     {
 
-        return _adminUserService.Add(userProfileId);
+        return _repository.Add(userProfileId);
     }
 
     [HttpDelete(Name = "RemoveAdminUser")]
-    public bool Delete(Guid userProfileId)
+    public bool Delete([FromBody] Guid userProfileId)
     {
-        return _adminUserService.Delete(userProfileId);
+        return _repository.Delete(userProfileId);
+    }
+    
+    [HttpGet("GetAdmins")]
+    public IEnumerable<AdminUser> GetAdmins()
+    {
+        return  _repository.GetAdmins();
     }
 }

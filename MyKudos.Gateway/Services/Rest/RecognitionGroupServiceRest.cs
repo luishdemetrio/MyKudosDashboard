@@ -90,7 +90,7 @@ public class RecognitionGroupServiceRest : IRecognitionGroupService
         try
         {
             result = await _restClientHelper.SendApiData<RecognitionGroup, bool>(
-                                    $"{_recognitionServiceUrl}recognitiongroup/{group.RecognitionGroupId}",
+                                    $"{_recognitionServiceUrl}recognitiongroup",
                                     HttpMethod.Put,
                                     group);
 

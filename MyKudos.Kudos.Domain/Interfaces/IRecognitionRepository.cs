@@ -10,4 +10,8 @@ public interface IRecognitionRepository
     Task SeedDatabaseAsync();
 
     bool SetRecognition(Recognition recognition);
+
+    bool DeleteRecognition(int recognitionId);
+
+    bool UpdateRecognition(Recognition recognition);
 }

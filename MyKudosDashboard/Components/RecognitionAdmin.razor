@@ -1,43 +1,65 @@
-﻿@using Azure.Storage.Blobs;
-@using Azure.Storage.Sas;
-@using Azure.Storage;
-@using MyKudos.Gateway.Domain.Models;
+﻿@using MyKudos.Gateway.Domain.Models;
 @using MyKudosDashboard.Common;
 @using MyKudosDashboard.Interfaces.Aggregator;
 @using Microsoft.AspNetCore.Hosting
 
+@inject IRecognitionGroupAggregator _recognitionGroupAggregator;
 @inject IRecognitionAggregator _recognitionAggregator;
-@inject IWebHostEnvironment Environment
 
-
-<h4>Recognition Groups</h4>
+<h4>Recognitions</h4>
 
 <div class="container">
     <!-- Display a form for adding/editing recognition groups -->
-    <form @onsubmit="SaveGroup">
+    <EditForm Model="_currentRecognition" OnValidSubmit="SaveGroup">
         
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <select class="form-control col-6" 
+                    @bind="_currentRecognition.RecognitionGroupId" 
+                    >
+                <option value="">Select a group</option>
+                @foreach (var group in _recognitionsGroup)
+                {
+                    <option value=@group.RecognitionGroupId>@group.Description</option>
+                }
+            </select>
+            <ValidationMessage For="@(() => _currentRecognition.RecognitionGroupId)" />
+
+
+        </div>
+
         <div class="form-group">
             <label for="title">Title:</label>
             <input class="form-control" id="title" @bind="_currentRecognition.Title" />
+            <ValidationMessage For="@(() => _currentRecognition.Title)" />
         </div>
 
         <div class="form-group">
             <label for="description">Description:</label>
             <input class="form-control" id="description" @bind="_currentRecognition.Description" />
+            <ValidationMessage For="@(() => _currentRecognition.Description)" />
         </div>
-        
+
+        <div class="form-group">
+            <label for="displayOrder">Display Order:</label>
+            <input class="form-control" id="displayOrder" @bind="_currentRecognition.DisplayOrder" />
+        </div>
         
         <button type="submit" class="btn btn-success">Save</button>
         <button type="button" class="btn btn-secondary" @onclick=ClearForm>Cancel</button>
-    </form>
+    </EditForm>
 
     <!-- Display a list of recognition groups -->
     <table class="table">
         <!-- Table headers -->
         <thead>
             <tr>
+                <th>Group</th>
                 <th>Title</th>
                 <th>Description</th>
+                <th>Display Order</th>
                 
             </tr>
         </thead>
@@ -46,9 +68,13 @@
             @foreach (var recognition in _recognitions)
             {
                 <tr>
+                    <td>@recognition.RecognitionGroupName</td>
+
                     <td>@recognition.Title</td>
 
                     <td>@recognition.Description</td>
+
+                    <td>@recognition.DisplayOrder</td>
                     
                     <td>
                         <button class="btn btn-primary" @onclick=@(()=>EditGroup(recognition))>Edit</button>
@@ -64,17 +90,43 @@
 
 @code {
 
+    private List<RecognitionGroup> _recognitionsGroup = new();
     private List<Recognition> _recognitions = new();
     private Recognition _currentRecognition = new ();
 
-
-    protected override async Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
     {
+         await GetRecogntionsGroup();
+         await GetRecogntions();
+    }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await GetRecogntionsGroup();
+        await GetRecogntions();
+    }
+   
+
+    private async Task GetRecogntions()
+    {
         var result = await _recognitionAggregator.GetRecognitions();
 
         _recognitions = result.ToList();
+    }
 
+    private async Task GetRecogntionsGroup()
+    {
+        var result = await _recognitionGroupAggregator.GetRecognitionGroups();
+
+        _recognitionsGroup = result.ToList();
+    }
+
+    // Method to update _currentRecognition when the select value changes
+    private void UpdateCurrentRecognition(ChangeEventArgs e)
+    {
+        int selectedGroupId = int.Parse(e.Value?.ToString());
+
+        _currentRecognition.RecognitionGroupId = selectedGroupId;
     }
 
     private void EditGroup(Recognition group)
@@ -83,12 +135,18 @@
         _currentRecognition = group;
     }
 
-    private async Task SaveGroup()
+    private async Task SaveGroup(EditContext editContext)
     {
-       
-        if (_currentRecognition.RecognitionGroupId == 0)
+
+        if (_currentRecognition.RecognitionGroupId == 0 || string.IsNullOrEmpty(_currentRecognition.Title) || string.IsNullOrEmpty(_currentRecognition.Description))
+            return;
+
+        if (_currentRecognition.RecognitionId == 0)
         {
             // Add new group
+
+            _currentRecognition.RecognitionGroupName = _recognitionsGroup.FirstOrDefault(g => g.RecognitionGroupId == _currentRecognition.RecognitionGroupId).Description;
+
             await _recognitionAggregator.AddNewRecognition(_currentRecognition);
         }
         else
@@ -97,14 +155,17 @@
             await _recognitionAggregator.UpdateRecognition(_currentRecognition);
         }
 
+        await GetRecogntions();
 
         ClearForm();
     }
 
     private async Task DeleteGroup(Recognition recognition)
     {
-        await _recognitionAggregator.DeleteRecognition(recognition.RecognitionGroupId);
+        await _recognitionAggregator.DeleteRecognition(recognition.RecognitionId);
         _recognitions.Remove(recognition);
+
+        await GetRecogntions();
     }
 
     private void ClearForm()

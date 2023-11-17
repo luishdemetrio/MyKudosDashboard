@@ -41,7 +41,11 @@ public class KudosDbContext : DbContext
             .HasForeignKey(k => k.ToPersonId)
             .OnDelete(DeleteBehavior.NoAction);
 
-
+        modelBuilder.Entity<AdminUser>()
+            .HasOne<UserProfile>(k => k.Person)
+            .WithMany()
+            .HasForeignKey(k => k.UserProfileId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 
 
