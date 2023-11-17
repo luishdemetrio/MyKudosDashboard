@@ -1,7 +1,7 @@
-﻿using MyKudos.Kudos.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using MyKudos.Kudos.Data.Context;
 using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
-
 
 namespace MyKudos.Kudos.Data.Repository;
 
@@ -33,6 +33,11 @@ public class AdminUserRepository : IAdminUserRepository
         _context.AdminUsers.Remove(admin);
 
         return _context.SaveChanges() > 0;
+    }
+
+    public IEnumerable<AdminUser> GetAdmins()
+    {   
+        return _context.AdminUsers.Include(p => p.Person);
     }
 
     public bool IsAdminUser(Guid userProfileId)

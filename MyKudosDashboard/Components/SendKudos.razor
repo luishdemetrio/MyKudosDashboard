@@ -301,7 +301,7 @@
 
     //private UserViewModel SelectedEmployee { get; set; }
 
-    private IList<UserViewModel> SelectedEmployees { get; set; }
+    private IList<Person> SelectedEmployees { get; set; }
 
     private string KudosMessage;
 
@@ -328,7 +328,7 @@
         KudosMessage = string.Empty;
 
         //SelectedEmployee = null;
-        SelectedEmployees = new List<UserViewModel>();
+        SelectedEmployees = new List<Person>();
 
         ModalHidden = false;
         KudosMessage = string.Empty;
@@ -339,9 +339,9 @@
     }
 
 
-    private Task<IEnumerable<UserViewModel>> SearchEmployees(string searchText)
+    private Task<IEnumerable<Person>> SearchEmployees(string searchText)
     {
-        return SendKudosView.GetUsersAsync(searchText);
+        return  SendKudosView.GetUsersAsync(searchText);
 
     }
 
@@ -378,7 +378,7 @@
 
                 return;
             }
-            var lst = SelectedEmployees as List<UserViewModel>;
+            var lst = SelectedEmployees as List<Person>;
 
             if (lst.Exists(u => u.Name == UserProfile.DisplayName))
             {

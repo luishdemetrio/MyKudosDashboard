@@ -9,7 +9,6 @@ public class RecognitionGateway : IRecognitionGateway
 
     private readonly string _gatewayServiceUrl;
     private IRestClientHelper _restClientHelper;
-
     private readonly ILogger<RecognitionGateway> _logger;
 
     public RecognitionGateway(IConfiguration config, ILogger<RecognitionGateway> log, IRestClientHelper clientHelper)

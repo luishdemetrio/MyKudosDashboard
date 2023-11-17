@@ -78,20 +78,7 @@ public class KudosRepository : IKudosRepository
             .Skip(pageSize * (pageNumber - 1))
             .Take(pageSize)
             .ToListAsync();
-
-        //foreach (var kudo in kudos)
-        //{
-        //    foreach (var like in kudo.Likes)
-        //    {
-        //        like.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == like.PersonId);
-        //    }
-
-        //    foreach (var receiver in kudo.Recognized)
-        //    {
-        //        receiver.Person = _kudosDbContext.UserProfiles.First(u => u.UserProfileId == receiver.ToPersonId);
-        //    }
-        //}
-
+        
         return kudos;
     }
 

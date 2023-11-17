@@ -1,12 +1,12 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using MyKudos.Kudos.Domain.Models;
+using MyKudosDashboard.Models;
 
-namespace MyKudos.Gateway.Interfaces;
+namespace MyKudosDashboard.Interfaces.Aggregator;
 
-public interface IAdminUserService
+public interface IAdminUserAggregador
 {
     Task<bool> Add(Guid userProfileId);
     Task<bool> Delete(Guid userProfileId);
     Task<bool> IsAdminUser(Guid userProfileId);
-    Task<IEnumerable<AdminUser>> GetAdminsUsers();
+    Task<IEnumerable<Person>> GetAdminsUsers();
 }

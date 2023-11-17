@@ -20,13 +20,13 @@ public class UserGateway : IUserGateway
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<UserViewModel>> GetUsers(string name)
+    public async Task<IEnumerable<Person>> GetUsers(string name)
     {
-        List<UserViewModel> result = new();
+        List<Person> result = new();
 
         try
         {
-            var users = await _restClientHelper.GetApiData<IEnumerable<UserViewModel>>($"{_gatewayServiceUrl}user/?name={name}");
+            var users = await _restClientHelper.GetApiData<IEnumerable<Person>>($"{_gatewayServiceUrl}user/?name={name}");
             result = users.ToList();
         }
         catch (Exception ex)

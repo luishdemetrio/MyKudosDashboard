@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace MyKudos.Kudos.Domain.Models;
 
 public class Recognition

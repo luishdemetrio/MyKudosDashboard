@@ -1,0 +1,107 @@
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common;
+@using MyKudosDashboard.Interfaces.Aggregator;
+@using Microsoft.AspNetCore.Hosting;
+
+@inject IAdminUserAggregador _adminUserAggregator;
+
+
+<h4 style="margin-bottom:2vh">Administrators</h4>
+
+<div class="container">
+
+    
+
+    <!-- Display a form for adding/editing recognition groups -->
+    <form @onsubmit="SaveGroup">
+
+      
+
+        <div style="margin-bottom:2vh">
+            <SearchUser @ref=_searchUser />            
+        </div>
+              
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" class="btn btn-secondary" @onclick=ClearForm>Cancel</button>
+    </form>
+
+    <!-- Display a list of recognition groups -->
+    <table class="table">
+        <!-- Table headers -->
+        <thead>
+            <tr>
+                <th>Administrator</th>
+                
+            </tr>
+        </thead>
+        <!-- Table data -->
+        <tbody>
+            @foreach (var admin in _admins)
+            {
+                <tr>
+                    <td>@admin.Name</td>
+
+                    <td>
+                        <button class="btn btn-danger" @onclick=@(()=>DeleteAdmin(admin))>Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+</div>
+
+@code {
+
+    private List<Person> _admins = new();
+
+    private SearchUser _searchUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAdmins();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await GetAdmins();
+    }
+
+
+    private async Task GetAdmins()
+    {
+        var result = await _adminUserAggregator.GetAdminsUsers();
+
+        _admins = result.ToList();
+    }
+
+    private async Task SaveGroup()
+    {
+
+        foreach (var item in _searchUser.SelectedEmployees)
+        {
+            await _adminUserAggregator.Add(item.Id);
+        }
+        
+        await GetAdmins();
+
+        ClearForm();
+    }
+
+    private async Task DeleteAdmin(Person admin)
+    {
+        await _adminUserAggregator.Delete(admin.Id);
+        
+        _admins.Remove(admin);
+
+        await GetAdmins();
+    }
+
+    private void ClearForm()
+    {
+        _searchUser.SelectedEmployees = new List<Person>();
+    }
+
+
+}

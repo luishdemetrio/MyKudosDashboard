@@ -1,21 +1,21 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
-using MyKudos.Gateway.Interfaces;
-using MyKudos.Kudos.Domain.Models;
+using MyKudosDashboard.Interfaces.Aggregator;
+using MyKudosDashboard.Models;
 
-namespace MyKudos.Gateway.Services.Rest;
+namespace MyKudosDashboard.Services;
 
-public class AdminUserService : IAdminUserService
+public class AdminUserAggregador : IAdminUserAggregador
 {
     private readonly string _serviceUrl;
     private IRestClientHelper _restClientHelper;
+    private readonly ILogger<AdminUserAggregador> _logger;
 
-    private readonly ILogger<AdminUserService> _logger;
 
-    public AdminUserService(IConfiguration config, IRestClientHelper clientHelper,
-                            ILogger<AdminUserService> log)
+    public AdminUserAggregador(IConfiguration config, IRestClientHelper clientHelper,
+                            ILogger<AdminUserAggregador> log)
     {
-        _serviceUrl = config["kudosServiceUrl"];
+        _serviceUrl = config["GatewayServiceUrl"];
         _logger = log;
         _restClientHelper = clientHelper;
     }
@@ -27,8 +27,8 @@ public class AdminUserService : IAdminUserService
         try
         {
             result = await _restClientHelper.SendApiData<Guid, bool>(
-                                $"{_serviceUrl}adminuser", 
-                                HttpMethod.Post, 
+                                $"{_serviceUrl}adminuser",
+                                HttpMethod.Post,
                                 userProfileId);
         }
         catch (Exception ex)
@@ -67,32 +67,32 @@ public class AdminUserService : IAdminUserService
         try
         {
             result = await _restClientHelper.GetApiData<bool>(
-                                $"{_serviceUrl}adminuser/IsAdminUser/{userProfileId}");
+                                $"{_serviceUrl}adminuser/?userprofileid={userProfileId}");
 
         }
         catch (Exception ex)
         {
 
-            _logger.LogError($"Error processing IsAdminUser: {ex.Message}");
+            _logger.LogError($"Error processing Add: {ex.Message}");
         }
 
         return result;
     }
 
-    public async Task<IEnumerable<AdminUser>> GetAdminsUsers()
+    public async Task<IEnumerable<Person>> GetAdminsUsers()
     {
-        IEnumerable<AdminUser> result = null;
+        IEnumerable<Person> result = null;
 
         try
         {
-            result = await _restClientHelper.GetApiData<IEnumerable<AdminUser>>(
+            result = await _restClientHelper.GetApiData<IEnumerable<Person>>(
                                 $"{_serviceUrl}adminuser/getadmins");
 
         }
         catch (Exception ex)
         {
 
-            _logger.LogError($"Error processing IsAdminUser: {ex.Message}");
+            _logger.LogError($"Error processing Add: {ex.Message}");
         }
 
         return result;

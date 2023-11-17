@@ -57,7 +57,7 @@ public class SendKudosView : ISendKudosView
         return result;
     }
 
-    public async Task<IEnumerable<UserViewModel>> GetUsersAsync(string name)
+    public async Task<IEnumerable<Person>> GetUsersAsync(string name)
     {
         return await _userGateway.GetUsers(name);              
     }

@@ -24,14 +24,10 @@ public class RecognitionGroupController : Controller
     }
 
     // PUT: api/RecognitionsGroup/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutRecognitionsGroup(int id, RecognitionGroup group)
+    [HttpPut()]
+    public async Task<IActionResult> PutRecognitionsGroup([FromBody] RecognitionGroup group)
     {
-        if (id != group.RecognitionGroupId)
-        {
-            return BadRequest();
-        }
-
+        
         if (await _recognitionGroupService.UpdateRecognitionGroup(group))
         {
             return Ok();
