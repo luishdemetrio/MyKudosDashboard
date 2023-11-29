@@ -286,13 +286,13 @@
 
 @code {
 
-        [Parameter]
-        public bool ModalHidden { get; set; } = true;
+    [Parameter]
+    public bool ModalHidden { get; set; } = true;
 
-        [Parameter]
-        public UserInfo UserProfile { get; set; }
+    [Parameter]
+    public UserInfo UserProfile { get; set; }
 
-        
+
 
     private bool isLoading = false;
     private bool btnSendKudosDisabled = false;
@@ -339,9 +339,11 @@
     }
 
 
-    private Task<IEnumerable<Person>> SearchEmployees(string searchText)
+    private async Task<IEnumerable<Person>> SearchEmployees(string searchText)
     {
-        return  SendKudosView.GetUsersAsync(searchText);
+        var foundEmployees =  await SendKudosView.GetUsersAsync(searchText);
+
+        return foundEmployees.Where(person => !SelectedEmployees.Any(selectedPerson => selectedPerson.Id == person.Id) && person.Id.ToString() != UserProfile.ObjectId);
 
     }
 

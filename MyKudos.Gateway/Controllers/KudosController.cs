@@ -69,7 +69,7 @@ public class KudosController : Controller
         var restKudos = new Kudos.Domain.Models.Kudos()
         {
             FromPersonId = kudos.FromPersonId,
-            Recognized = kudos.ToPersonId.Select(id => new KudosReceiver { ToPersonId = id }).ToList(),
+            Recognized = kudos.ToPersonId.Select(id => new KudosReceiver { ToPersonId = id }).DistinctBy(p => p.ToPersonId).ToList(),
             RecognitionId = kudos.RecognitionId,
             Message = kudos.Message,
             Date = kudos.Date
