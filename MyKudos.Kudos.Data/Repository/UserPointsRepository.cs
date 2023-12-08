@@ -9,11 +9,8 @@ using System.Data;
 
 namespace MyKudos.Kudos.Data.Repository;
 
-
-
 public class UserPointsRepository : IUserPointsRepository
 {
-
     private KudosDbContext _context;
 
     private string _allGroupCompletedImage;
@@ -23,9 +20,11 @@ public class UserPointsRepository : IUserPointsRepository
     {
         _context = scoreContext;
 
+        _allGroupCompletedImage = configuration["AllGroupCompletedImage"] ?? 
+                                throw new NullReferenceException("AllGroupCompletedImage setting missing");
 
-        _allGroupCompletedImage = configuration["AllGroupCompletedImage"];
-        _allGroupCompletedDescription = configuration["AllGroupCompletedDescription"];
+        _allGroupCompletedDescription = configuration["AllGroupCompletedDescription"] 
+                                ?? throw new NullReferenceException("AllGroupCompletedDescription setting missing");
 
     }
 
@@ -45,7 +44,7 @@ public class UserPointsRepository : IUserPointsRepository
 
         UserPointScore result = new();
 
-        var pointsPerAction = _context.Points.ToDictionary(p => p.ActionType, p => p.Score);
+        var pointsPerAction = _context.ScorePoints.First();
 
 
         result.UserId = pUserId;
@@ -58,12 +57,12 @@ public class UserPointsRepository : IUserPointsRepository
         result.MessagesSent = _context.Comments.Count(r => r.FromPersonId == pUserId) ;
         result.MessagesReceived = _context.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId)).Join(_context.Comments, k => k.KudosId, r => r.KudosId, (k, r) => r).Count();
 
-        result.Score = (result.KudosSent * pointsPerAction["send_kudos"] ) +
-                       (result.KudosReceived * pointsPerAction["receive_kudos"]) + 
-                       (result.LikesSent * pointsPerAction["send_like"] ) + 
-                       (result.LikesReceived * pointsPerAction["receive_like"]) +
-                       (result.MessagesSent * pointsPerAction["send_reply"]) + 
-                       (result.MessagesReceived * pointsPerAction["receive_reply"]);
+        result.Score = (result.KudosSent * pointsPerAction.KudosSent ) +
+                       (result.KudosReceived * pointsPerAction.KudosReceived) + 
+                       (result.LikesSent * pointsPerAction.LikesSent ) + 
+                       (result.LikesReceived * pointsPerAction.LikesReceived) +
+                       (result.MessagesSent * pointsPerAction.CommentsSent) + 
+                       (result.MessagesReceived * pointsPerAction.CommentsReceived);
 
 
 
@@ -148,10 +147,17 @@ public class UserPointsRepository : IUserPointsRepository
 
     }
 
-    public bool SetPoints(Points points)
-    {
-        _context.Points.Add(points);
+    //public bool SetPoints(Points points)
+    //{
+    //    _context.Points.Add(points);
 
-        return _context.SaveChanges() > 0;
-    }
+    //    return _context.SaveChanges() > 0;
+    //}
+
+    //public IEnumerable<Points> GetPoints()
+    //{
+    //    return _context.Points;
+    //}
+
+
 }

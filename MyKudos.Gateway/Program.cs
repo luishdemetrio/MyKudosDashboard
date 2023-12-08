@@ -51,6 +51,8 @@ builder.Services.AddScoped<IKudosMessageSender, KudosMessageSender>();
 
 builder.Services.AddScoped<IAdminUserService, AdminUserService>();
 
+builder.Services.AddScoped<IScorePointsService, ScorePointsService>();
+
 builder.Services.AddSwaggerGen(c =>
 {
    

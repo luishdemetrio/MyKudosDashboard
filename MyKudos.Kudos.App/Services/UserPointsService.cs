@@ -25,4 +25,5 @@ public class UserPointsService : IUserPointsService
     {
         return _repository.GetUserScore(pUserId);   
     }
+
 }

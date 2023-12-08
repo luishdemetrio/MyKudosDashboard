@@ -16,6 +16,11 @@ public class AdminUserController : Controller
     {
         _repository = repository;
     }
+    [HttpGet("GetAdmins")]
+    public IEnumerable<AdminUser> GetAdmins()
+    {
+        return _repository.GetAdmins();
+    }
 
     [HttpGet("IsAdminUser/{userProfileId}")]
     public bool Get(Guid userProfileId)
@@ -36,9 +41,5 @@ public class AdminUserController : Controller
         return _repository.Delete(userProfileId);
     }
     
-    [HttpGet("GetAdmins")]
-    public IEnumerable<AdminUser> GetAdmins()
-    {
-        return  _repository.GetAdmins();
-    }
+    
 }

@@ -1,0 +1,82 @@
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces.Aggregator;
+
+@inject IScorePointsAggregator PointsAggregator;
+
+<h3>Score</h3>
+
+@if (_points != null)
+{
+
+    <div class="container">
+
+        <EditForm Model="_points" OnValidSubmit="Save">
+
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            
+            <div class="form-group">
+                <label for="title">Kudos Sent:</label>
+                <input class="form-control" id="title" @bind="_points.KudosSent" />
+                <ValidationMessage For="@(() => _points.KudosSent)" />
+            </div>
+
+            <div class="form-group">
+                <label for="title">Kudos Received:</label>
+                <input class="form-control" id="title" @bind="_points.KudosReceived" />
+                <ValidationMessage For="@(() => _points.KudosReceived )" />
+            </div>
+
+           
+            <div class="form-group">
+                <label for="title">Likes Sent:</label>
+                <input class="form-control" id="title" @bind="_points.LikesSent" />
+                <ValidationMessage For="@(() => _points.LikesSent)" />
+            </div>
+
+            <div class="form-group">
+                <label for="title">Likes Received:</label>
+                <input class="form-control" id="title" @bind="_points.LikesReceived" />
+                <ValidationMessage For="@(() => _points.LikesReceived )" />
+            </div>
+
+            <div class="form-group">
+                <label for="title">Comments Sent:</label>
+                <input class="form-control" id="title" @bind="_points.CommentsSent" />
+                <ValidationMessage For="@(() => _points.CommentsSent)" />
+            </div>
+
+            <div class="form-group">
+                <label for="title">Comments Received:</label>
+                <input class="form-control" id="title" @bind="_points.CommentsReceived" />
+                <ValidationMessage For="@(() => _points.CommentsReceived )" />
+            </div>
+
+            <button type="submit" class="btn btn-success">Save</button>
+            
+        </EditForm>
+  
+    </div>
+
+}
+
+
+@code
+{
+
+    private Points _points;
+
+    protected override async Task OnInitializedAsync()
+    {
+       
+        _points = await PointsAggregator.GetPoints();
+        
+    }
+
+    private void Save()
+    {
+       
+        PointsAggregator.UpdateScore(_points); 
+    }
+}

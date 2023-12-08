@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Api.Controllers;
@@ -9,20 +10,19 @@ namespace MyKudos.Kudos.Api.Controllers;
 public class UserPointsController : Controller
 {
 
-    private readonly IUserPointsService _userPointsService;
+    private readonly IUserPointsRepository _userPointsRepository;
 
-    public UserPointsController(IUserPointsService userPointsService)
+    public UserPointsController(IUserPointsRepository userPointsRepository)
     {
-        _userPointsService = userPointsService;
+        _userPointsRepository = userPointsRepository;
     }
 
-    [HttpGet(Name = "GetUserPoints")]
-    public UserPointScore Get(Guid userId)
+    [HttpGet("GetUserPoints/{userId}")]
+    public UserPointScore GetUserPoints(Guid userId)
     {
 
-        return _userPointsService.GetUserScore(userId);
-
+        return _userPointsRepository.GetUserScore(userId);
     }
 
-
+  
 }

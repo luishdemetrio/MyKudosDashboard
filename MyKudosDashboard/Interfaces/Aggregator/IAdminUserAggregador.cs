@@ -1,5 +1,4 @@
 ﻿using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Interfaces.Aggregator;
 

@@ -46,7 +46,7 @@ public class UserPointsService : IUserPointsService
         try
         {
 
-            result = await _restClientHelper.GetApiData<UserPointScore>($"{_kudosServiceUrl}UserPoints?userid={pUserId}");
+            result = await _restClientHelper.GetApiData<UserPointScore>($"{_kudosServiceUrl}UserPoints/GetUserPoints/?userid={pUserId}");
 
         }
         catch (Exception ex)
@@ -57,4 +57,5 @@ public class UserPointsService : IUserPointsService
 
         return result;
     }
+
 }
