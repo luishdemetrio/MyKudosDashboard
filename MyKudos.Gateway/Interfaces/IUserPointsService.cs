@@ -9,8 +9,4 @@ public interface IUserPointsService
 
     public Task<UserPointScore> GetUserScoreAsync(Guid pUserId);
 
-    
-
-
-
 }

@@ -13,7 +13,7 @@ public class AdminUserAggregador : IAdminUserAggregador
 
 
     public AdminUserAggregador(IConfiguration config, IRestClientHelper clientHelper,
-                            ILogger<AdminUserAggregador> log)
+                               ILogger<AdminUserAggregador> log)
     {
         _serviceUrl = config["GatewayServiceUrl"];
         _logger = log;

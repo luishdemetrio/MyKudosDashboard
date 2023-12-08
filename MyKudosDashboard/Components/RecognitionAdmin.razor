@@ -94,7 +94,7 @@
     private List<Recognition> _recognitions = new();
     private Recognition _currentRecognition = new ();
 
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
          await GetRecogntionsGroup();
          await GetRecogntions();

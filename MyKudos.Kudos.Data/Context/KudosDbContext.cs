@@ -62,12 +62,14 @@ public class KudosDbContext : DbContext
 
     public DbSet<BadgeRules> BadgeRules{ get; set; }
 
-    public DbSet<Points> Points { get; set; }
+    //public DbSet<Points> Points { get; set; }
 
     public DbSet<RecognitionGroup> RecognitionsGroup { get; set; }
 
     public DbSet<UserProfile> UserProfiles { get; set; }
 
     public DbSet<AdminUser> AdminUsers { get; set; }
+
+    public DbSet<ScorePoints> ScorePoints { get; set; }
 
 }

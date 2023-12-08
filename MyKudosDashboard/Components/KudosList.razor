@@ -157,7 +157,13 @@
             _confirmKudosDeleteDialog!.Hide();
 
             await LoadMoreItems();
-            await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
+
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
+            }
+            catch{}
+            
         }
     }
 

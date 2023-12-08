@@ -55,7 +55,7 @@ builder.Services.AddScoped<IUserGateway, UserGateway>();
 builder.Services.AddScoped<IRecognitionGroupAggregator, RecognitionGroupAggregator>();
 builder.Services.AddScoped<IRecognitionAggregator, RecognitionAggregator>();
 builder.Services.AddScoped<IAdminUserAggregador, AdminUserAggregador>();
-
+builder.Services.AddScoped<IScorePointsAggregator, ScorePointsAggregator>();
 
 //Event Hub
 builder.Services.AddSingleton<IEventHubReceived<UserPointScore>, EventHubUserPointsReceived>();

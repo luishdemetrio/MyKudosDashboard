@@ -1,12 +1,12 @@
 ﻿
 namespace MyKudos.Kudos.Domain.Models;
 
-public class Points
-{
-    public int PointsId { get; set; }
-    public string ActionType { get; set; } = string.Empty;
-    public int Score { get; set; }
-}
+//public class Points
+//{
+//    public int PointsId { get; set; }
+//    public string ActionType { get; set; } = string.Empty;
+//    public int Score { get; set; }
+//}
 
 public class UserPointScore
 {

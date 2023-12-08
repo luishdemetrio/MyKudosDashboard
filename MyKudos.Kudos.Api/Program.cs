@@ -39,6 +39,7 @@ builder.Services.AddTransient<IRecognitionGroupRepository, RecognitionGroupRepos
 builder.Services.AddTransient<IUserPointsRepository, UserPointsRepository>();
 builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddTransient<IAdminUserRepository, AdminUserRepository>();
+builder.Services.AddTransient<IScorePointsRepository, ScorePointsRepository>();
 
 var config = builder.Configuration;
 
