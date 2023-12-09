@@ -11,5 +11,5 @@ public interface ITopContributorsView
 
     public UpdateTopContributorsCallBack TopContributorsCallBack { get; set; }
 
-    Task<IEnumerable<TopContributors>> GetTopContributors();
+    Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId);
 }

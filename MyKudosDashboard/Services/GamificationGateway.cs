@@ -40,14 +40,15 @@ public class GamificationGateway : IGamificationGateway
     }
 
 
-    public async Task<IEnumerable<TopContributors>> GetTopContributors()
+    public async Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId)
     {
         List<TopContributors> result = new();
 
         try
         {
 
-            var contributors = await _restClientHelper.GetApiData<IEnumerable<TopContributors>>($"{_gatewayServiceUrl}contributors");
+            var contributors = await _restClientHelper.GetApiData<IEnumerable<TopContributors>>(
+                            $"{_gatewayServiceUrl}contributors/?managerId={managerId}");
             result = contributors.ToList();
 
         }

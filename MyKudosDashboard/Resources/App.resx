@@ -144,6 +144,9 @@
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Please confirm the deletion of kudos.</value>
   </data>
+  <data name="JustMyTeam" xml:space="preserve">
+    <value>Visualize just my team</value>
+  </data>
   <data name="Kudos" xml:space="preserve">
     <value>kudos</value>
   </data>

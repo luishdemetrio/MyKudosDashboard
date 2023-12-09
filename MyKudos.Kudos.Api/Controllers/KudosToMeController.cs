@@ -6,8 +6,7 @@ namespace MyKudos.Kudos.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class KudosToMeController : ControllerBase
-{
+public class KudosToMeController : ControllerBase{
     
     private readonly IKudosService _kudosService;
 
@@ -24,7 +23,7 @@ public class KudosToMeController : ControllerBase
 
 
     [HttpGet(Name = "GetKudosToMeController")]
-    public Task<IEnumerable<Domain.Models.Kudos>> Get(Guid userId, int pageNumber, int pageSize)
+    public Task<IEnumerable<Domain.Models.Kudos>> Get(Guid userId, int pageNumber, int pageSize, Guid? managerId = null)
     {
         if (pageNumber == 0)
             pageNumber = _defaultPageNumber;
@@ -32,6 +31,6 @@ public class KudosToMeController : ControllerBase
         if (pageSize == 0)
             pageSize = _defaultPageSize;
 
-        return _kudosService.GetKudosToMeAsync(userId, pageNumber, pageSize);
+        return _kudosService.GetKudosToMeAsync(userId, pageNumber, pageSize, managerId);
     }
 }

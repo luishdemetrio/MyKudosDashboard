@@ -19,13 +19,14 @@ public class UserPointsService : IUserPointsService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<List<UserPoint>> GetTopUserScoresAsync(int top)
+    public async Task<List<UserPoint>> GetTopUserScoresAsync(int top, Guid? managerId)
     {
         List<UserPoint> result = new();
 
         try
         {
-            var contributors = await _restClientHelper.GetApiData<IEnumerable<UserPoint>>($"{_kudosServiceUrl}TopContributors?top={top}");
+            var contributors = await _restClientHelper.GetApiData<IEnumerable<UserPoint>>(
+                        $"{_kudosServiceUrl}TopContributors?top={top}&managerId={managerId}");
             result = contributors.ToList();
 
         }

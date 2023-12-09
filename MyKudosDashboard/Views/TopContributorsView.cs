@@ -41,9 +41,9 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
     }
 
 
-    public async Task<IEnumerable<TopContributors>> GetTopContributors()
+    public async Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId)
     {
-        return await _gamificationGateway.GetTopContributors();
+        return await _gamificationGateway.GetTopContributors(managerId);
     }
 
     public void NotifyUpdate(UserPointScore score)

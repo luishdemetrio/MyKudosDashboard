@@ -25,10 +25,10 @@ public class ContributorsController : Controller
     }
 
     [HttpGet(Name = "GetTopContributors")]
-    public async Task<IEnumerable<TopContributors>> Get()
+    public async Task<IEnumerable<TopContributors>> Get(Guid? managerId)
     {
 
-        var scores = await _topContributorsService.GetTopUserScoresAsync(_topContributors);
+        var scores = await _topContributorsService.GetTopUserScoresAsync(_topContributors, managerId);
 
         var result = from score in scores
                      select new TopContributors()

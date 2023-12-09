@@ -1,5 +1,6 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
+using MyKudosDashboard.Common;
 using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Services;
@@ -24,23 +25,36 @@ public class GatewayService : IKudosGateway
 
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
+        return await GetKudosData($"kudos/?pageNumber={pageNumber}");
+    }
 
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
+    {
+        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}");
+    }
+
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber)
+    {
+        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}");
+    }
+
+    private async Task<IEnumerable<KudosResponse>> GetKudosData(string endpoint)
+    {
         IEnumerable<KudosResponse> kudos = null;
 
         try
         {
-            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudos/?pageNumber={pageNumber}");
+            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>(
+                $"{_gatewayServiceUrl}{endpoint}&managerId={KudosCommonVariables.GetManagerId()}");
         }
         catch (Exception ex)
         {
-
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+            _logger.LogError($"Error processing {nameof(GetKudosData)}: {ex.Message}");
+            throw;
         }
 
         return kudos;
-        
     }
-
 
 
     /// <summary>
@@ -99,59 +113,9 @@ public class GatewayService : IKudosGateway
 
         return result;
 
-    }
+    }    
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
-    {
-        IEnumerable<KudosResponse> kudos = null;
-
-        try
-        {
-            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosfromme/?userid={userId}&pageNumber={pageNumber}");
-        }
-        catch (Exception ex)
-        {
-
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
-        }
-
-        return kudos;
-    }
-
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber)
-    {
-        IEnumerable<KudosResponse> kudos = null;
-
-        try
-        {
-            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosTome/?userid={userId}&pageNumber={pageNumber}");
-        }
-        catch (Exception ex)
-        {
-
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
-        }
-
-        return kudos;
-    }
-
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMyDirects(string userId, int pageNumber)
-    {
-        IEnumerable<KudosResponse> kudos = null;
-
-        try
-        {
-            kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}kudosTomydirects/?userid={userId}&pageNumber={pageNumber}");
-        }
-        catch (Exception ex)
-        {
-
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
-        }
-
-        return kudos;
-    }
-
+   
     public async Task<bool> UpdateKudos(KudosMessage kudos)
     {
         bool result = false;

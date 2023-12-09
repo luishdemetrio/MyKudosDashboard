@@ -46,7 +46,10 @@ public class KudosRepository : IKudosRepository
         return  kudosQuery.First();
     }
 
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetAllKudosAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5, bool fromMe = true, bool directReports = false)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetAllKudosAsync(Guid pUserId, int pageNumber = 1, 
+                                                                        int pageSize = 5, 
+                                                                        bool fromMe = true,
+                                                                        Guid? managerId = null)
     {
         if (pageSize > _maxPageSize)
         {
@@ -62,11 +65,9 @@ public class KudosRepository : IKudosRepository
         kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
         kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
 
-        if (directReports)
+        if (managerId != null)
         {
-           
-
-            kudosQuery = kudosQuery.Where(k => (k.UserFrom.ManagerId == pUserId) || (k.Recognized.Any(u=> u.Person.ManagerId == pUserId)));
+            kudosQuery = kudosQuery.Where(k => (k.UserFrom.ManagerId == managerId) || (k.Recognized.Any(u=> u.Person.ManagerId == managerId)));
         }
         else if (pUserId != Guid.Empty)
         {
@@ -82,34 +83,25 @@ public class KudosRepository : IKudosRepository
         return kudos;
     }
 
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5,
+                                                                      Guid? managerId = null)
 	{
-
-
-        return await GetAllKudosAsync(Guid.Empty, pageNumber, pageSize, directReports: false);
-
+        return await GetAllKudosAsync(Guid.Empty, pageNumber, pageSize, managerId: managerId);
     }
 
-
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, 
+                                                                            int pageSize = 5,
+                                                                            Guid? managerId = null)
     {
-
-        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: true, directReports: false);
-
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: true, managerId: managerId);
     }
 
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, 
+                                                                          int pageSize = 5, 
+                                                                          Guid? managerId = null)
     {
-
-        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, directReports: false);
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, managerId: managerId);
     }
-
-    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMyDirectsAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
-    {
-
-        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, directReports: true);
-    }
-
 
     //this method is used to calculate the badge
     public  IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)

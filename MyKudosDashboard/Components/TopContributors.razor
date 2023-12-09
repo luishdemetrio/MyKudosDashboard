@@ -1,12 +1,12 @@
-﻿@using MyKudosDashboard.Interfaces;
+﻿@using MyKudosDashboard.Common;
+@using MyKudosDashboard.Interfaces;
 @using MyKudos.Gateway.Domain.Models;
-
-@inject ITopContributorsView TopContributorsView;
-
 @using Microsoft.Extensions.Localization
 @using System.Globalization
-@inject IStringLocalizer<App> Localizer
 
+
+@inject ITopContributorsView TopContributorsView;
+@inject IStringLocalizer<App> Localizer
 
 <div class="card-body w-auto">
 
@@ -33,15 +33,15 @@
                 </div>
             }
          }
-      
 
     </div>
 
 </div>
 
 @code {
+
     [Parameter]
-    public UserInfo User { get; set; }
+    public UserProfile User { get; set; }
 
     private IEnumerable<MyKudos.Gateway.Domain.Models.TopContributors> _topContributors;
     private bool _isLoaded = false;
@@ -50,40 +50,41 @@
     {
         base.OnInitialized();
 
-      
-
-        TopContributorsView.GetTopContributors().ContinueWith(t =>
-        {
-            _topContributors = t.Result ;
-            _isLoaded = true;
-            InvokeAsync(StateHasChanged);
-        });
+        LoadTopContributors();
 
         TopContributorsView.TopContributorsCallBack = UpdateTopContributorsCallBack;
     }
-
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
 
-      
-            if (User != null)
-            {
-                TopContributorsView.RegisterObserver(User.ObjectId);
-            }
-      
+        if (User != null)
+        {
+            TopContributorsView.RegisterObserver(User.UserProfileId.ToString());
+        }
+
+        if (firstRender)
+            LoadTopContributors();
+    }
+
+    /// <summary>
+    /// Called by the Welcome.razor page after the visualize just my team toggle value change
+    /// </summary>
+    public void LoadTopContributors()
+    {
+        TopContributorsView.GetTopContributors(KudosCommonVariables.GetManagerId()).ContinueWith(t =>
+      {
+          _topContributors = t.Result;
+          _isLoaded = true;
+          InvokeAsync(StateHasChanged);
+      });
     }
 
     private void UpdateTopContributorsCallBack()
     {
-        TopContributorsView.GetTopContributors().ContinueWith(t =>
-        {
-            _topContributors = t.Result;
-            _isLoaded = true;
-            InvokeAsync(StateHasChanged);
-        });
-        
+        LoadTopContributors();
+
     }
 
 }

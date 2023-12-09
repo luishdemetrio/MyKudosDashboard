@@ -7,5 +7,5 @@ public interface IGamificationGateway
 
     Task<UserPointScore> GetUserScoreAsync(string pUserId);
 
-    Task<IEnumerable<TopContributors>> GetTopContributors();
+    Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId);
 }
