@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj"
 
       - name: dotnet publish
-        run: dotnet publish -c Release ${{env.AZURE_WEBAPP_PACKAGE_PATH}} -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj" -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
