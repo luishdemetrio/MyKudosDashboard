@@ -20,17 +20,43 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
-          include-prerelease: true
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Build and Publish
         run: | 
           dotnet restore ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
           dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
-          dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj -o './MyKudos.Kudos.Api/publish'
+          dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj -o './publish'
 
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app
+          path: './publish'
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app
+          
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@85270a1854658d167ab239bce43949edb336fa7c
         with:
           app-name: 'latestkudoskudos'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5692BA9671C24635BF882D09233EA6A8 }}
-          package: './MyKudos.Kudos.Api/publish'
+          package: './publish'
