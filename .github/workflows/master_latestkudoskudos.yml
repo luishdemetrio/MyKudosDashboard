@@ -26,12 +26,12 @@ jobs:
         run: dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
 
       - name: dotnet publish
-        run: dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj --property:PublishDir="./publish"
+        run: dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj --property:PublishDir='publish'
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'latestkudoskudos'
-          package: "./publish"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5692BA9671C24635BF882D09233EA6A8 }}
+          package: 'publish'
