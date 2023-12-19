@@ -22,9 +22,9 @@ jobs:
           dotnet-version: '6.0.x'
           include-prerelease: true
 
-      - name: Buildand Publish
+      - name: Build and Publish
         run: | 
-          dotnet restore
+          dotnet restore ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
           dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
           dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj --property:PublishDir='./MyKudos.Kudos.Api/publish'
 
