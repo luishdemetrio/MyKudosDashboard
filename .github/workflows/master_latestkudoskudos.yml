@@ -23,7 +23,7 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj
+        run: dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj --no-restore
 
       - name: dotnet publish
         run: dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj -o ./MyKudos.Kudos.Api/publish
