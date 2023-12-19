@@ -26,7 +26,7 @@ jobs:
         run: dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
 
       - name: dotnet publish
-        run: dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj -o ./MyKudos.Kudos.Api/publish
+        run: dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj --property:PublishDir=./MyKudos.Kudos.Api/publish
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
