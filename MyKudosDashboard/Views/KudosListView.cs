@@ -1,14 +1,12 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 
-
 namespace MyKudosDashboard.Views;
 
 public class KudosListView : IKudosListView
 {
 
     private readonly IKudosGateway _gatewayService;
-
 
     public KudosListView(IKudosGateway gatewayService)
     {
@@ -43,12 +41,6 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
     {
         return await _gatewayService.GetKudosFromMe(userId, pageNumber);
-    }
-
-
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMyDirectReports(string userId, int pageNumber)
-    {
-        return await _gatewayService.GetKudosToMyDirects(userId, pageNumber);
     }
 
     public async Task<bool> UpdateKudos(KudosMessage kudos)

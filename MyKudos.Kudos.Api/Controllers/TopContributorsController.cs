@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyKudos.Kudos.App.Interfaces;
+using MyKudos.Kudos.Domain.Interfaces;
 using MyKudos.Kudos.Domain.Models;
 
 namespace MyKudos.Kudos.Api.Controllers;
@@ -9,18 +10,16 @@ namespace MyKudos.Kudos.Api.Controllers;
 public class TopContributorsController : Controller
 {
 
-    private readonly IUserPointsService _userPointsService;
+    private readonly IUserPointsRepository _repository;
 
-    public TopContributorsController(IUserPointsService userPointsService)
+    public TopContributorsController(IUserPointsRepository repository)
     {
-        _userPointsService = userPointsService;
+        _repository = repository;
     }
 
     [HttpGet(Name = "GetTopUserPoints")]
-    public List<UserPoint> Get(int top)
+    public List<UserPoint> Get(int top, Guid? managerId)
     {
-
-        return _userPointsService.GetTopUserScores(top);
-
+        return _repository.GetTopUserScores(top, managerId).Where(t => t.TotalPoints > 0).ToList();
     }
 }

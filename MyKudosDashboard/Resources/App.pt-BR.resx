@@ -144,6 +144,9 @@
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Por favor, confirme a exclusão do reconhecimento.</value>
   </data>
+  <data name="JustMyTeam" xml:space="preserve">
+    <value>Ver apenas o meu time</value>
+  </data>
   <data name="Kudos" xml:space="preserve">
     <value>reconhecimento</value>
   </data>

@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Hosting
 @using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common;
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
@@ -10,6 +11,7 @@
 @using Microsoft.Extensions.Localization
 @using System.Globalization
 @using System.Text.RegularExpressions;
+@using System.ComponentModel;
 
 @inject NavigationManager Navigator
 
@@ -21,6 +23,7 @@
 @inject IJSRuntime JSRuntime;
 
 @inject IStringLocalizer<App> Localizer;
+
 
     <style>
     h1 {
@@ -85,24 +88,22 @@ else
 
     <div class="welcome page" style="padding-top:0px;width:100%;margin-left: 2px;height:95%;width:97vw">
 
-
         <div style="height:100%;display:grid; grid-template-columns: 1fr 1.8fr 1.2fr;padding:0px">
 
             <!-- PROFILE -->
             <div class="column" style="height:100%;min-width:200px;padding:2px">
 
-
                 <div class="card  rounded-3 shadow-sm small60" style="padding: 0px;height:94vh;width:100%">
 
                     <div class="card-header " style="display: flex;">
-                        <h4 class="my-0 fw-normal" style="height: 28px; width:40%;align-items: center;justify-content: center;display: flex">
+                        <h3 class="my-0 fw-normal" style="height: 28px; width:40%;align-items: center;justify-content: center;display: flex">
                             🚀 @Localizer["Profile"]
-                        </h4>
+                        </h3>
 
-                        @if (_userApp.IsAdmin)
+                        @if (_userProfile.IsAdmin)
                         {
                             <div style="display: flex; margin-left: 5px;width:40%">
-                                <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;"
+                                <FluentButton style="margin-left:5px;padding: 0px;"
                                 @onclick=@(()=>SettingsClick())
                                 >
                                     <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
@@ -112,10 +113,8 @@ else
 
                         }
                     </div>
-                  
-                   
 
-                    <UserProfileScore @ref=_userProfileScore User=@_userApp  SendKudosCallBack=@OpenSendKudosPanel />
+                    <UserProfileScore @ref=_userProfileScore User=@_userProfile  SendKudosCallBack=@OpenSendKudosPanel />
 
                     </div>
             </div>
@@ -124,11 +123,17 @@ else
             <div class="column " style="height:100%;min-width:480px;padding:2px;">
 
                 <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh">
-                    <div class="card-header py-3;padding:4px">
-                        <h4 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"]</h4>
-                    </div>
+                    <div class="card-header py-3;padding:2px" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"] </h3>
 
-                    <KudosTab @ref=_kudosTab User=@_userApp ReplyCallBack=@ReplyCallBack  />
+                        @if (_userProfile != null && _userProfile.HasDirectReports)
+                        {
+                            <FluentSwitch @bind-Value=VisualizeJustMyTeam>@Localizer["JustMyTeam"]</FluentSwitch>
+                        }
+                    </div>
+                   
+
+                    <KudosTab @ref=_kudosTab User=@_userProfile ReplyCallBack=@ReplyCallBack  />
                     
                 </div>
             </div>
@@ -138,11 +143,11 @@ else
 
                 <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh;width:100%">
 
-                    <div class="card-header py-3;padding:4px">
-                        <h4 class="my-0 fw-normal">🥇 @Localizer["TopContributors"]</h4>
+                    <div class="card-header py-3;padding:2px">
+                        <h3 class="my-0 fw-normal">🥇 @Localizer["TopContributors"]</h3>
                     </div>
 
-                    <TopContributors User=@_userTeams />
+                    <TopContributors @ref=_topContributors User=@_userProfile  />
 
                 </div>
             </div>
@@ -152,7 +157,7 @@ else
         </div>
 
 
-        <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_userApp  />
+        <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_userProfile  />
       
 </div>
 
@@ -161,13 +166,37 @@ else
 
 @code {
 
+    private TopContributors _topContributors;
+
+    public bool VisualizeJustMyTeam{
+        get
+        {
+
+            return KudosCommonVariables.VisualizeJustMyTeam;
+        }
+        set
+        {
+            KudosCommonVariables.VisualizeJustMyTeam = value;
+
+            _topContributors.LoadTopContributors();
+            _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+        }
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        Console.WriteLine($"Property {e.PropertyName} changed");
+        StateHasChanged();
+    }
+
+
     UserInfo _userTeams;
 
     bool _isInTeams;
     bool _isLoading = true;
     string _errorMessage = string.Empty;
 
-    private UserProfile _userApp;
+    private UserProfile _userProfile;
 
     private UserProfileScore _userProfileScore;
 
@@ -210,7 +239,9 @@ else
 
                 if (_userTeams != null)
                 {                    
-                    _userApp = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
+                    _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
+                    
+                    KudosCommonVariables.User = _userProfile;
                 }
 
             }
@@ -224,10 +255,6 @@ else
         }
 
     }
-
- 
-
-
     private void OpenSendKudosPanel()
     {
         _sendKudosIsHidden = false;
@@ -260,6 +287,8 @@ else
     {
         Navigator.NavigateTo("/config");
     }
-    
+
+   
+
 }
 

@@ -32,4 +32,8 @@
     <Protobuf Include="Proto\kudos.proto" GrpcServices="Server" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <OutputPath>wwwroot</OutputPath>
+  </PropertyGroup>
+
 </Project>

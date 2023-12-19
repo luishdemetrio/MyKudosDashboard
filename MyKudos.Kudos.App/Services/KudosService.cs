@@ -27,10 +27,25 @@ public sealed class KudosService : IKudosService
         _kudosLikeRepository = kudosLikeRepository;
     }
 
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize)
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize, Guid? managerId = null)
     {
-        return _kudosRepository.GetKudosAsync(pageNumber, pageSize);
+        return _kudosRepository.GetKudosAsync(pageNumber, pageSize, managerId);
     }
+
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, 
+                                                                      int pageSize = 5, 
+                                                                      Guid? managerId = null)
+    {
+        return _kudosRepository.GetKudosFromMeAsync(pUserId, pageNumber, pageSize, managerId);
+    }
+
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, 
+                                                                    int pageSize = 5, 
+                                                                    Guid? managerId = null)
+    {
+        return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize, managerId);
+    }
+
 
     public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
     {
@@ -86,24 +101,9 @@ public sealed class KudosService : IKudosService
         return _kudosLikeRepository.UndoLike(kudosId, personId);
     }
 
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
-    {
-        return _kudosRepository.GetKudosFromMeAsync(pUserId, pageNumber, pageSize);
-    }
-
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
-    {
-        return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize);
-    }
-
     public Domain.Models.Kudos GetKudos(int kudosId)
     {
         return _kudosRepository.GetKudos(kudosId);
-    }
-
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMyDirectsAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5)
-    {
-        return _kudosRepository.GetKudosToMyDirectsAsync(pUserId, pageNumber, pageSize);
     }
 
     public bool UpdateKudos(int kudosId, string? message)

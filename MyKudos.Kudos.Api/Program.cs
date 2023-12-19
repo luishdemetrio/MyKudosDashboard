@@ -28,7 +28,7 @@ builder.Services.AddTransient<ICommentsService, CommentsService>();
 //builder.Services.AddTransient<IRecognitionService, RecognitionService>();
 //builder.Services.AddTransient<IAdminUserService, AdminUserService>();
 
-builder.Services.AddTransient<IUserPointsService, UserPointsService>();
+//builder.Services.AddTransient<IUserPointsService, UserPointsService>();
 builder.Services.AddTransient<IUserProfileService, UserProfileService>();
 
 builder.Services.AddTransient<IKudosRepository, KudosRepository>();

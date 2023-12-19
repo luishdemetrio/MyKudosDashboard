@@ -13,16 +13,11 @@
 
 <div class="card-body " style="padding:2px">
 
-
-
     <FluentTabs  style="z-index:auto;">
         <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
         <FluentTab Text=@Localizer["KudosToMe"] style="z-index:auto" @onclick=OnTabToMeClick />
         <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
-         @if (User != null && User.HasDirectReports)
-         {
-            <FluentTab Text=@Localizer["KudosToMyDirectReports"] style="z-index:auto" @onclick=OnTabToMyDirectReportsClick />
-         }
+
         <FluentTabPanel class="nav-item">
                 <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
@@ -35,13 +30,6 @@
                 <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>   
             
-            @if (User !=null && User.HasDirectReports)
-            {
-            <FluentTabPanel class="nav-item">
-                    <KudosList @ref=ToMyDirectReports TypeTab=KudosList.KudosTypeTab.ToMyDirectReports User=@User  ReplyCallBack=@ReplyKudos />
-                </FluentTabPanel>
-            }
-
     </FluentTabs>
 
 </div>
@@ -56,24 +44,17 @@
     [Parameter]
     public ReplyKudosCallBack ReplyCallBack { get; set; }
 
-    private readonly object _lock = new object();
-
     private KudosList AllKudosTab;
     private KudosList ToMeKudosTab;
     private KudosList FromMeKudosTab;
-    private KudosList ToMyDirectReports;
-
-
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
 
-
         if (User != null)
         {
             var subscriptionName = User.UserProfileId;
-
 
             KudosTabView.RegisterObserver(User.UserProfileId.ToString());
 
@@ -91,16 +72,30 @@
 
     }
 
+    /// <summary>
+    /// This method is called by the Welcome.razor page after the SendKudos 
+    /// </summary>
     public void ReloadKudos()
     {
         var t = InvokeAsync(() =>
-      {
-          AllKudosTab.LoadKudos();
-      });
+        {
+            AllKudosTab.LoadKudos();
+        });
 
         t.Wait();
+    }
 
+    /// <summary>
+    /// This method is called by the Welcome.razor page after the user clicks on the visualize just my team option
+    /// </summary>
+    public void LoadKudosAfterVisualizeJustMyTeamValueChanged()
+    {
+        var t = InvokeAsync(() =>
+        {
+            AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+        });
 
+        t.Wait();
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)
@@ -118,20 +113,10 @@
         await FromMeKudosTab.LoadKudos();
     }
 
-    private async Task OnTabToMyDirectReportsClick(MouseEventArgs args)
-    {
-        if (User.HasDirectReports)
-        {
-            await ToMyDirectReports.LoadKudos();
-        }
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
     }
-
-
 
     public void  CommentsDeleted(CommentsRequest pComments)
     {

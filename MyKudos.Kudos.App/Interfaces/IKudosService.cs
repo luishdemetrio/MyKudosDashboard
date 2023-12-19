@@ -7,16 +7,14 @@ public interface IKudosService
 {
     public int Send(Domain.Models.Kudos kudos);
 
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize);
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize, Guid? managerId = null);
 
     Task<IEnumerable<KudosGroupedByValue>> GetUserKudosByCategory(Guid pUserId);
 
     IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId);
 
-    Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5);
-    Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5);
-
-    Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMyDirectsAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5);
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5, Guid? managerId = null);
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, int pageSize = 5, Guid? managerId = null);
 
     public bool Like(int kudosId, Guid personId);
     public bool UndoLike(int kudosId, Guid personId);

@@ -29,12 +29,17 @@ public class UserPointsRepository : IUserPointsRepository
     }
 
     
-    public List<UserPoint> GetTopUserScores(int top)
+    public List<UserPoint> GetTopUserScores(int top, Guid? managerId)
     {
 
-        var parameter = new SqlParameter("@top", SqlDbType.Int) { Value = top };
+        var parameterTop = new SqlParameter("@top", SqlDbType.Int) { Value = top };
 
-        var result = _context.Set<UserPoint>().FromSqlRaw("EXEC SP_GETTOPCONTRIBUTORS @top", parameter).ToList();
+        var parameterManagerId = new SqlParameter("@ManagerId", SqlDbType.UniqueIdentifier) { Value = managerId is null ? DBNull.Value : managerId };
+        
+        var result = _context.Set<UserPoint>().FromSqlRaw(
+                            "EXEC SP_GETTOPCONTRIBUTORS @top, @ManagerId", 
+                            parameterTop,
+                            parameterManagerId).ToList();
 
         return result;
     }

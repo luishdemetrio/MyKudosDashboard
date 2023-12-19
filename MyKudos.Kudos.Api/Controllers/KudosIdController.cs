@@ -13,11 +13,8 @@ public class KudosIdController : Controller
     
     public KudosIdController(IKudosService kudosService)
     {
-        _kudosService = kudosService;
-      
+        _kudosService = kudosService;      
     }
-
-
 
     [HttpGet(Name = "GetKudosId")]
     public Domain.Models.Kudos Get(int kudosId)

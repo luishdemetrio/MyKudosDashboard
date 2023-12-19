@@ -21,23 +21,39 @@ public class KudosServiceRest: IKudosService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber)
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber, Guid? managerId = null)
+    {
+        return await GetKudosDataAsync($"kudos/?pageNumber={pageNumber}&managerId={managerId}");
+    }
+
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber, Guid? managerId = null)
+    {
+        return await GetKudosDataAsync($"kudosfromme/?userid={userId}&pageNumber={pageNumber}&managerId={managerId}");
+    }
+
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMeAsync(string userId, int pageNumber, Guid? managerId = null)
+    {
+        return await GetKudosDataAsync($"kudostome/?userid={userId}&pageNumber={pageNumber}&managerId={managerId}");
+    }
+
+    private async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosDataAsync(string endpoint)
     {
         List<Kudos.Domain.Models.Kudos> result = new();
 
         try
         {
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudos/?pageNumber= {pageNumber}");
+            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>(
+                $"{_kudosServiceUrl}{endpoint}");
             result = kudos.ToList();
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
+            _logger.LogError($"Error processing {nameof(GetKudosDataAsync)}: {ex.Message}");
         }
 
         return result;
-
     }
+
 
     public async Task<int> SendAsync(Kudos.Domain.Models.Kudos kudos)
     {
@@ -93,40 +109,7 @@ public class KudosServiceRest: IKudosService
 
     }
 
-    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber)
-    {
-        List<Kudos.Domain.Models.Kudos> result = new();
-
-        try
-        {
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudosfromme/?userid={userId}&pageNumber= {pageNumber}");
-            result = kudos.ToList();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
-        }
-
-        return result;
-    }
-
-    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMeAsync(string userId, int pageNumber)
-    {
-        List<Kudos.Domain.Models.Kudos> result = new();
-
-        try
-        {
-            var kudos = await _restClientHelper.GetApiData<IEnumerable<Kudos.Domain.Models.Kudos>>($"{_kudosServiceUrl}kudostome/?userid={userId}&pageNumber= {pageNumber}");
-            result = kudos.ToList();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error processing GetKudos: {ex.Message}");
-        }
-
-        return result;
-    }
-
+   
     public async Task<Kudos.Domain.Models.Kudos> GetKudosUser(int kudosId)
     {
         Kudos.Domain.Models.Kudos result = new();

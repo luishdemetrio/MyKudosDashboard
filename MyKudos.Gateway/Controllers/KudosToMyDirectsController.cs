@@ -1,51 +1,51 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MyKudos.Gateway.Interfaces;
-using MyKudos.Gateway.Domain.Models;
-using MyKudos.Gateway.Helpers;
-using GatewayDomain = MyKudos.Gateway.Domain.Models;
+﻿//using Microsoft.AspNetCore.Mvc;
+//using MyKudos.Gateway.Interfaces;
+//using MyKudos.Gateway.Domain.Models;
+//using MyKudos.Gateway.Helpers;
+//using GatewayDomain = MyKudos.Gateway.Domain.Models;
 
-namespace MyKudos.Gateway.Controllers;
+//namespace MyKudos.Gateway.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class KudosToMyDirectsController : Controller
-{
-    private readonly IGraphService _graphService;
-    private readonly IRecognitionService _recognitionService;
-    private readonly IKudosService _kudosService;
+//[ApiController]
+//[Route("[controller]")]
+//public class KudosToMyDirectsController : Controller
+//{
+//    private readonly IGraphService _graphService;
+//    private readonly IRecognitionService _recognitionService;
+//    private readonly IKudosService _kudosService;
 
-    private string _defaultProfilePicture;
+//    private string _defaultProfilePicture;
 
-    private IEnumerable<GatewayDomain.Recognition> _recognitions;
-
-
-    public KudosToMyDirectsController(IGraphService graphService, IRecognitionService recognitionService,
-                                 IKudosService kudosService, IConfiguration configuration)
-    {
-
-        _graphService = graphService;
-        _recognitionService = recognitionService;
-        _kudosService = kudosService;
-
-        _ = PopulateRecognitionsAsync();
-
-        _defaultProfilePicture = configuration["DefaultProfilePicture"];
-
-    }
-
-    private async Task PopulateRecognitionsAsync()
-    {
-        _recognitions = await _recognitionService.GetRecognitionsAsync().ConfigureAwait(false);
-    }
+//    private IEnumerable<GatewayDomain.Recognition> _recognitions;
 
 
-    [HttpGet(Name = "GetKudosToMyDirects")]
-    public async Task<IEnumerable<KudosResponse>> Get(string userId, int pageNumber = 1)
-    {
-        //get kudos
-        var kudos = await _kudosService.GetKudosToMyDirectsAsync(userId, pageNumber);
+//    public KudosToMyDirectsController(IGraphService graphService, IRecognitionService recognitionService,
+//                                 IKudosService kudosService, IConfiguration configuration)
+//    {
 
-        return KudosHelper.GetKudos(kudos, _defaultProfilePicture);
+//        _graphService = graphService;
+//        _recognitionService = recognitionService;
+//        _kudosService = kudosService;
 
-    }
-}
+//        _ = PopulateRecognitionsAsync();
+
+//        _defaultProfilePicture = configuration["DefaultProfilePicture"];
+
+//    }
+
+//    private async Task PopulateRecognitionsAsync()
+//    {
+//        _recognitions = await _recognitionService.GetRecognitionsAsync().ConfigureAwait(false);
+//    }
+
+
+//    [HttpGet(Name = "GetKudosToMyDirects")]
+//    public async Task<IEnumerable<KudosResponse>> Get(string userId, int pageNumber = 1)
+//    {
+//        //get kudos
+//        var kudos = await _kudosService.GetKudosToMyDirectsAsync(userId, pageNumber);
+
+//        return KudosHelper.GetKudos(kudos, _defaultProfilePicture);
+
+//    }
+//}
