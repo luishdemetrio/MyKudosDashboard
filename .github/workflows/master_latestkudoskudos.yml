@@ -26,7 +26,7 @@ jobs:
         run: | 
           dotnet restore ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
           dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj 
-          dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj --property:PublishDir='./MyKudos.Kudos.Api/publish'
+          dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj -o './MyKudos.Kudos.Api/publish'
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
