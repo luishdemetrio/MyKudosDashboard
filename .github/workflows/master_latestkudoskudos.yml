@@ -23,15 +23,15 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj"
+        run: dotnet build --configuration Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api
 
       - name: dotnet publish
-        run: dotnet publish -c Release "MyKudos.Kudos.Api\MyKudos.Kudos.Api.csproj" -o "MyKudos.Kudos.Api\publish"
+        run: dotnet publish -c Release ./MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj -o ./MyKudos.Kudos.Api/publish
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'latestkudoskudos'
-          package: "MyKudos.Kudos.Api\publish"
+          package: ./MyKudos.Kudos.Api/publish
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5692BA9671C24635BF882D09233EA6A8 }}
