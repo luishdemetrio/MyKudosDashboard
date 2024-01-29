@@ -5,9 +5,6 @@ using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Queues;
 using MyKudos.Gateway.Services;
 using MyKudos.Gateway.Services.Rest;
-using MyKudos.MessageSender.Interfaces;
-using MyKudos.MessageSender.Services;
-using MyKudos.Queue.Services;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,10 +57,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-builder.Services.AddSingleton<IMessageSender>(t =>
-                new ServiceBusMessageSender(
-                    serviceBusConnectionString: config["KudosServiceBus_ConnectionString"]
-                ));
+//builder.Services.AddSingleton<IMessageSender>(t =>
+//                new ServiceBusMessageSender(
+//                    serviceBusConnectionString: config["KudosServiceBus_ConnectionString"]
+//                ));
 
 
 //I need to sync the users from MS Graph to database.

@@ -1,5 +1,4 @@
-﻿using Azure.Messaging.ServiceBus.Administration;
-using MyKudos.Gateway.Interfaces;
+﻿using MyKudos.Gateway.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudos.MessageSender.Services;
 using MyKudos.Kudos.Domain.Models;
