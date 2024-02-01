@@ -237,7 +237,7 @@ else
             //we need to update the three tabs
 
             _topContributors.LoadTopContributors();
-            _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+            UpdateKudosTab();
 
             UpdateScoreTab();
 
@@ -247,7 +247,12 @@ else
 
     private async void UpdateScoreTab()
     {
-          await _userProfileScore.GetUserScore();
+        await _userProfileScore.GetUserScore();
+    }
+
+    private async void UpdateKudosTab()
+    {
+        await _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged(); 
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)

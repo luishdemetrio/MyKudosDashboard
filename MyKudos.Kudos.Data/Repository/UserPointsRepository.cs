@@ -54,6 +54,7 @@ public class UserPointsRepository : IUserPointsRepository
         //populate the result with the userid
         result.UserId = pUserId;
 
+        //load the kudos
         IQueryable<Domain.Models.Kudos> kudosQuery = _context.Kudos
             .Include(c => c.Comments)
             .Include(u => u.UserFrom)
@@ -68,22 +69,28 @@ public class UserPointsRepository : IUserPointsRepository
         IQueryable<Domain.Models.KudosLike> likesQuery = _context.KudosLike
             .Include(u => u.Person);
 
-        //justMyTeam is true only for managers. When it is true, it means that the pUserId is
+        //justMyTeam is true only for managers.
+        //When it is true, it means that the pUserId is
         //the id of the manager 
         if (justMyTeam)
         {
-            kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == pUserId) || 
-                                                 (k.Recognized.Any(u => u.Person.ManagerId == pUserId))
-                                               ) || 
-                                               ( (k.UserFrom.ManagerId.HasValue == false) &&
-                                                 (k.UserFrom.UserProfileId == pUserId)
-                                                  ) 
-                                               );
 
-          //  commentsQuery = commentsQuery.Where(c => c.UserFrom.ManagerId == pUserId);
+            ////It is filtered to include only kudos where the manager of the user who gave the kudos 
+            ///or the manager of any recognized user is the same as the manager id.
+            ///Additionally, if the manager of the user who gave the kudos is not specified, 
+            ///the kudos will be included if the user profile ID of the user who gave the kudos is the same as the manager id.
 
-//            likesQuery = likesQuery.Where(c => c.Person.ManagerId == pUserId) ;
-        }       
+            kudosQuery = KudosFilterRules.FilterKudosByManagerOrProfile(kudosQuery, pUserId);
+            
+            //kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == pUserId) || 
+            //                                     (k.Recognized.Any(u => u.Person.ManagerId == pUserId))
+            //                                   ) || 
+            //                                   ( (k.UserFrom.ManagerId.HasValue == false) &&
+            //                                     (k.UserFrom.UserProfileId == pUserId)
+            //                                      ) 
+            //                                   );
+
+        }
 
         result.KudosSent = kudosQuery.Count(k => k.FromPersonId == pUserId);
         result.KudosReceived = kudosQuery.Count(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
@@ -95,8 +102,7 @@ public class UserPointsRepository : IUserPointsRepository
         result.LikesReceived  = kudosQuery.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId))
                                 .Join(likesQuery, k => k.KudosId, l => l.KudosId, (k, l) => l)
                                 .Count() ;
-        //.Where(w => justMyTeam ? w.Person.ManagerId == pUserId: true)
-
+        
         result.MessagesSent = commentsQuery.Where(r => r.FromPersonId == pUserId)
                                 .Join(kudosQuery, k => k.KudosId, r => r.KudosId, (k, r) => r).Count();
 
@@ -120,7 +126,7 @@ public class UserPointsRepository : IUserPointsRepository
                            RecognitionGroupId = g.Key,
                            Total = g.Count()
                        };
-        int index= 1;
+        int index= 1;   
 
        
         var kudosSentBadges = (from row in _context.BadgeRules
@@ -193,17 +199,5 @@ public class UserPointsRepository : IUserPointsRepository
 
     }
 
-    //public bool SetPoints(Points points)
-    //{
-    //    _context.Points.Add(points);
-
-    //    return _context.SaveChanges() > 0;
-    //}
-
-    //public IEnumerable<Points> GetPoints()
-    //{
-    //    return _context.Points;
-    //}
-
-
+    
 }

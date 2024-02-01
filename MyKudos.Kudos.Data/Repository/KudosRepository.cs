@@ -67,13 +67,16 @@ public class KudosRepository : IKudosRepository
 
         if (managerId != null)
         {
-            kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == managerId) || 
-                                                 (k.Recognized.Any(u => u.Person.ManagerId == managerId))
-                                               ) || 
-                                               ( (k.UserFrom.ManagerId.HasValue == false) &&
-                                                 (k.UserFrom.UserProfileId == managerId)
-                                                  ) 
-                                               );
+
+            kudosQuery = KudosFilterRules.FilterKudosByManagerOrProfile(kudosQuery, managerId);
+
+            //kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == managerId) || 
+            //                                     (k.Recognized.Any(u => u.Person.ManagerId == managerId))
+            //                                   ) || 
+            //                                   ( (k.UserFrom.ManagerId.HasValue == false) &&
+            //                                     (k.UserFrom.UserProfileId == managerId)
+            //                                      ) 
+            //                                   );
         }
         else if (pUserId != Guid.Empty)
         {

@@ -185,18 +185,15 @@
         StateHasChanged();
     }
 
-    public void LoadKudosAfterVisualizeJustMyTeamValueChanged()
+    
+    public async Task LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
         _kudosList = new();
         _pageNumber = 1;
 
-        var t = InvokeAsync(() =>
-       {
-           LoadKudos();
-       });
-
-        t.Wait();
+        await  LoadKudos();
     }
+
     public async Task LoadKudos(int pageNumber = 1)
     {
         if (_kudosList is null )
