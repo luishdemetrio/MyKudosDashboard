@@ -25,7 +25,7 @@
 @inject IStringLocalizer<App> Localizer;
 
 
-    <style>
+<style>
     h1 {
     font-size: 5.9vw;
     }
@@ -53,11 +53,7 @@
         font-size: calc(0.60em + 1vmin)
     }
 
-
-
-    </style>
-
-
+</style>
 
 @if (_isLoading)
 {
@@ -72,7 +68,6 @@ else if (!_isInTeams ||! string.IsNullOrEmpty(_errorMessage)){
 }
 else
 {
-
     <style>
         div {
             float: left;
@@ -124,6 +119,7 @@ else
 
                 <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh">
                     <div class="card-header py-3;padding:2px" style="display: flex; justify-content: space-between; align-items: center;">
+                       
                         <h3 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"] </h3>
 
                         @if (_userProfile != null && _userProfile.HasDirectReports)
@@ -168,28 +164,6 @@ else
 
     private TopContributors _topContributors;
 
-    public bool VisualizeJustMyTeam{
-        get
-        {
-
-            return KudosCommonVariables.VisualizeJustMyTeam;
-        }
-        set
-        {
-            KudosCommonVariables.VisualizeJustMyTeam = value;
-
-            _topContributors.LoadTopContributors();
-            _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
-        }
-    }
-
-    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        Console.WriteLine($"Property {e.PropertyName} changed");
-        StateHasChanged();
-    }
-
-
     UserInfo _userTeams;
 
     bool _isInTeams;
@@ -210,11 +184,6 @@ else
 
     private CommentsKudos _replyKudos;
 
-    private void OnDismiss()
-    {
-        _sendKudosIsHidden = true;
-
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -240,7 +209,7 @@ else
                 if (_userTeams != null)
                 {                    
                     _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
-                    
+
                     KudosCommonVariables.User = _userProfile;
                 }
 
@@ -253,8 +222,52 @@ else
             _isLoading = false;
             StateHasChanged();
         }
+    }
+
+    public bool VisualizeJustMyTeam{
+        get
+        {
+
+            return KudosCommonVariables.VisualizeJustMyTeam;
+        }
+        set
+        {
+            KudosCommonVariables.VisualizeJustMyTeam = value;
+
+            //we need to update the three tabs
+
+            _topContributors.LoadTopContributors();
+            UpdateKudosTab();
+
+            UpdateScoreTab();
+
+
+        }
+    }
+
+    private async void UpdateScoreTab()
+    {
+        await _userProfileScore.GetUserScore();
+    }
+
+    private async void UpdateKudosTab()
+    {
+        await _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged(); 
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        Console.WriteLine($"Property {e.PropertyName} changed");
+        StateHasChanged();
+    }
+
+    private void OnDismiss()
+    {
+        _sendKudosIsHidden = true;
 
     }
+
+
     private void OpenSendKudosPanel()
     {
         _sendKudosIsHidden = false;

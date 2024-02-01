@@ -17,9 +17,9 @@ public class UserPointsController : Controller
     }
 
     [HttpGet("GetUserPoints")]
-    public async Task<UserPointScore> GetUserPoints(Guid userId)
+    public async Task<UserPointScore> GetUserPoints(Guid userId, bool justMyTeam = false)
     {
-        return await _userPointsService.GetUserScoreAsync(userId);
+        return await _userPointsService.GetUserScoreAsync(userId, justMyTeam);
 
     }
 

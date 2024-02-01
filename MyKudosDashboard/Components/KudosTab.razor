@@ -88,14 +88,16 @@
     /// <summary>
     /// This method is called by the Welcome.razor page after the user clicks on the visualize just my team option
     /// </summary>
-    public void LoadKudosAfterVisualizeJustMyTeamValueChanged()
+    public async Task  LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
-        var t = InvokeAsync(() =>
-        {
-            AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
-        });
+         await AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
 
-        t.Wait();
+        // var t = InvokeAsync(() =>
+        // {
+        //     AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+        // });
+
+        // t.Wait();
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)
@@ -111,11 +113,6 @@
     private async Task OnTabFromMeClick(MouseEventArgs args)
     {
         await FromMeKudosTab.LoadKudos();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     public void  CommentsDeleted(CommentsRequest pComments)

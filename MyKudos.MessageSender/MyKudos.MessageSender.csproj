@@ -9,9 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.EventGrid" Version="4.16.0" />
     <PackageReference Include="Azure.Messaging.EventHubs" Version="5.9.1" />
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />
+    <!--<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.13.1" />-->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WindowsAzure.ServiceBus" Version="6.2.2" />
+    <!--<PackageReference Include="WindowsAzure.ServiceBus" Version="6.2.2" />-->
     
   </ItemGroup>
 

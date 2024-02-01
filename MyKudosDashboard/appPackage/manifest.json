@@ -1,33 +1,33 @@
 {
-    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.13/MicrosoftTeams.schema.json",
-    "manifestVersion": "1.13",
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.16",
     "version": "1.0.0",
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.microsoft.teams.extension",
     "developer": {
         "name": "Teams App, Inc.",
-        "websiteUrl": "${{PROVISIONOUTPUT__WEBAPPOUTPUT__ENDPOINT}}",
-        "privacyUrl": "${{PROVISIONOUTPUT__WEBAPPOUTPUT__ENDPOINT}}${{PROVISIONOUTPUT__WEBAPPOUTPUT__INDEXPATH}}/privacy",
-        "termsOfUseUrl": "${{PROVISIONOUTPUT__WEBAPPOUTPUT__ENDPOINT}}${{PROVISIONOUTPUT__WEBAPPOUTPUT__INDEXPATH}}/termsofuse"
+        "websiteUrl": "${{TAB_ENDPOINT}}",
+        "privacyUrl": "${{TAB_ENDPOINT}}/privacy",
+        "termsOfUseUrl": "${{TAB_ENDPOINT}}/termsofuse"
     },
     "icons": {
-        "color": "resources/color.png",
-        "outline": "resources/outline.png"
+        "color": "color.png",
+        "outline": "outline.png"
     },
     "name": {
-        "short": "${{CONFIG__MANIFEST__APPNAME__SHORT}}",
-        "full": "${{CONFIG__MANIFEST__APPNAME__FULL}}"
+        "short": "MyTeamsApp3-${{TEAMSFX_ENV}}",
+        "full": "Full name for MyTeamsApp3"
     },
     "description": {
-        "short": "Short description of ${{CONFIG__MANIFEST__APPNAME__SHORT}}",
-        "full": "Full description of ${{CONFIG__MANIFEST__APPNAME__SHORT}}"
+        "short": "Short description of MyTeamsApp3",
+        "full": "Full description of MyTeamsApp3"
     },
     "accentColor": "#FFFFFF",
     "bots": [],
     "composeExtensions": [],
     "configurableTabs": [
         {
-            "configurationUrl": "${{PROVISIONOUTPUT__WEBAPPOUTPUT__ENDPOINT}}${{PROVISIONOUTPUT__WEBAPPOUTPUT__INDEXPATH}}/config",
+            "configurationUrl": "${{TAB_ENDPOINT}}/config",
             "canUpdateConfiguration": true,
             "scopes": [
                 "team",
@@ -39,8 +39,8 @@
         {
             "entityId": "index",
             "name": "Personal Tab",
-            "contentUrl": "${{PROVISIONOUTPUT__WEBAPPOUTPUT__ENDPOINT}}${{PROVISIONOUTPUT__WEBAPPOUTPUT__INDEXPATH}}/tab",
-            "websiteUrl": "${{PROVISIONOUTPUT__WEBAPPOUTPUT__ENDPOINT}}${{PROVISIONOUTPUT__WEBAPPOUTPUT__INDEXPATH}}/tab",
+            "contentUrl": "${{TAB_ENDPOINT}}/tab",
+            "websiteUrl": "${{TAB_ENDPOINT}}/tab",
             "scopes": [
                 "personal"
             ]
@@ -51,10 +51,10 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{PROVISIONOUTPUT__WEBAPPOUTPUT__DOMAIN}}"
+        "${{TAB_DOMAIN}}"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",
-        "resource": "api://${{PROVISIONOUTPUT__WEBAPPOUTPUT__DOMAIN}}/${{AAD_APP_CLIENT_ID}}"
+        "resource": "api://${{TAB_DOMAIN}}/${{AAD_APP_CLIENT_ID}}"
     }
 }

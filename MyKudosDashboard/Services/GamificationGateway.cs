@@ -20,14 +20,15 @@ public class GamificationGateway : IGamificationGateway
         _restClientHelper = clientHelper;
     }
 
-    public async Task<UserPointScore> GetUserScoreAsync(string pUserId)
+    public async Task<UserPointScore> GetUserScoreAsync(string pUserId, bool justMyTeam = false)
     {
         UserPointScore result = new();
 
         try
         {
 
-            result = await _restClientHelper.GetApiData<UserPointScore>($"{_gatewayServiceUrl}userpoints?userid={pUserId}");
+            result = await _restClientHelper.GetApiData<UserPointScore>(
+                            $"{_gatewayServiceUrl}userpoints/GetUserPoints/?userid={pUserId}&justmyteam={justMyTeam}");
             
         }
         catch (Exception ex)
