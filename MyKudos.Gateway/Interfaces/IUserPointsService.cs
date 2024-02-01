@@ -7,6 +7,6 @@ public interface IUserPointsService
 
     public Task<List<UserPoint>> GetTopUserScoresAsync(int top, Guid? managerId);
 
-    public Task<UserPointScore> GetUserScoreAsync(Guid pUserId);
+    public Task<UserPointScore> GetUserScoreAsync(Guid pUserId, bool justMyTeam = false);
 
 }

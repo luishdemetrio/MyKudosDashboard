@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging.ApplicationInsights;
-using MyKudos.Gateway.Domain.Models;
+﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.EventHub;
 using MyKudosDashboard.Interfaces;
 
@@ -44,9 +43,9 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
         _eventHubUserPointsReceived.Detach(userId);
     }
 
-    public async Task<UserPointScore> GetUserScore(string userId)
+    public async Task<UserPointScore> GetUserScore(string userId, bool justMyTeam )
     {
-        return await _gamificationGateway.GetUserScoreAsync(userId);
+        return await _gamificationGateway.GetUserScoreAsync(userId, justMyTeam);
     }
 
    

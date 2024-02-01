@@ -44,23 +44,64 @@ public class UserPointsRepository : IUserPointsRepository
         return result;
     }
 
-    public UserPointScore GetUserScore(Guid pUserId)
+    public UserPointScore GetUserScore(Guid pUserId, bool justMyTeam = false)
     {
-
         UserPointScore result = new();
 
+        //get the table with the points definition
         var pointsPerAction = _context.ScorePoints.First();
 
-
+        //populate the result with the userid
         result.UserId = pUserId;
-        result.KudosSent = _context.Kudos.Count(k => k.FromPersonId == pUserId);
-        result.KudosReceived = _context.Kudos.Count(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
 
-        result.LikesSent = _context.KudosLike.Count(l => l.PersonId == pUserId) ;
-        result.LikesReceived  = _context.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId)).Join(_context.KudosLike, k => k.KudosId, l => l.KudosId, (k, l) => l).Count() ;
+        IQueryable<Domain.Models.Kudos> kudosQuery = _context.Kudos
+            .Include(c => c.Comments)
+            .Include(u => u.UserFrom)
+            .Include(u => u.Recognition);
 
-        result.MessagesSent = _context.Comments.Count(r => r.FromPersonId == pUserId) ;
-        result.MessagesReceived = _context.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId)).Join(_context.Comments, k => k.KudosId, r => r.KudosId, (k, r) => r).Count();
+        kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
+        kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
+
+        IQueryable<Domain.Models.Comments> commentsQuery = _context.Comments
+            .Include(u => u.UserFrom);
+
+        IQueryable<Domain.Models.KudosLike> likesQuery = _context.KudosLike
+            .Include(u => u.Person);
+
+        //justMyTeam is true only for managers. When it is true, it means that the pUserId is
+        //the id of the manager 
+        if (justMyTeam)
+        {
+            kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == pUserId) || 
+                                                 (k.Recognized.Any(u => u.Person.ManagerId == pUserId))
+                                               ) || 
+                                               ( (k.UserFrom.ManagerId.HasValue == false) &&
+                                                 (k.UserFrom.UserProfileId == pUserId)
+                                                  ) 
+                                               );
+
+          //  commentsQuery = commentsQuery.Where(c => c.UserFrom.ManagerId == pUserId);
+
+//            likesQuery = likesQuery.Where(c => c.Person.ManagerId == pUserId) ;
+        }       
+
+        result.KudosSent = kudosQuery.Count(k => k.FromPersonId == pUserId);
+        result.KudosReceived = kudosQuery.Count(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
+
+        
+        result.LikesSent = likesQuery.Where(l => l.PersonId == pUserId)
+                            .Join(kudosQuery, k => k.KudosId, l => l.KudosId, (k, l) => l).Count();
+
+        result.LikesReceived  = kudosQuery.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId))
+                                .Join(likesQuery, k => k.KudosId, l => l.KudosId, (k, l) => l)
+                                .Count() ;
+        //.Where(w => justMyTeam ? w.Person.ManagerId == pUserId: true)
+
+        result.MessagesSent = commentsQuery.Where(r => r.FromPersonId == pUserId)
+                                .Join(kudosQuery, k => k.KudosId, r => r.KudosId, (k, r) => r).Count();
+
+        result.MessagesReceived = kudosQuery.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId))
+                            .Join(commentsQuery, k => k.KudosId, r => r.KudosId, (k, r) => r).Count();
 
         result.Score = (result.KudosSent * pointsPerAction.KudosSent ) +
                        (result.KudosReceived * pointsPerAction.KudosReceived) + 
@@ -70,7 +111,7 @@ public class UserPointsRepository : IUserPointsRepository
                        (result.MessagesReceived * pointsPerAction.CommentsReceived);
 
 
-
+      
 
         var subquery = from rt in _context.Recognitions
                        group rt by rt.RecognitionGroupId into g

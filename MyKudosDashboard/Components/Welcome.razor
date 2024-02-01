@@ -164,28 +164,6 @@ else
 
     private TopContributors _topContributors;
 
-    public bool VisualizeJustMyTeam{
-        get
-        {
-
-            return KudosCommonVariables.VisualizeJustMyTeam;
-        }
-        set
-        {
-            KudosCommonVariables.VisualizeJustMyTeam = value;
-
-            _topContributors.LoadTopContributors();
-            _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
-        }
-    }
-
-    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        Console.WriteLine($"Property {e.PropertyName} changed");
-        StateHasChanged();
-    }
-
-
     UserInfo _userTeams;
 
     bool _isInTeams;
@@ -206,11 +184,6 @@ else
 
     private CommentsKudos _replyKudos;
 
-    private void OnDismiss()
-    {
-        _sendKudosIsHidden = true;
-
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -236,7 +209,7 @@ else
                 if (_userTeams != null)
                 {                    
                     _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
-                    
+
                     KudosCommonVariables.User = _userProfile;
                 }
 
@@ -249,8 +222,47 @@ else
             _isLoading = false;
             StateHasChanged();
         }
+    }
+
+    public bool VisualizeJustMyTeam{
+        get
+        {
+
+            return KudosCommonVariables.VisualizeJustMyTeam;
+        }
+        set
+        {
+            KudosCommonVariables.VisualizeJustMyTeam = value;
+
+            //we need to update the three tabs
+
+            _topContributors.LoadTopContributors();
+            _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+
+            UpdateScoreTab();
+
+
+        }
+    }
+
+    private async void UpdateScoreTab()
+    {
+          await _userProfileScore.GetUserScore();
+    }
+
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        Console.WriteLine($"Property {e.PropertyName} changed");
+        StateHasChanged();
+    }
+
+    private void OnDismiss()
+    {
+        _sendKudosIsHidden = true;
 
     }
+
+
     private void OpenSendKudosPanel()
     {
         _sendKudosIsHidden = false;

@@ -64,7 +64,8 @@ public class UserGateway : IUserGateway
 
         try
         {
-            result = await _restClientHelper.GetApiData<UserProfile>($"{_gatewayServiceUrl}userinfo/?userid={userId}");
+            result = await _restClientHelper.GetApiData<UserProfile>(
+                                $"{_gatewayServiceUrl}userinfo/?userid={userId}");
 
         }
         catch (Exception ex)

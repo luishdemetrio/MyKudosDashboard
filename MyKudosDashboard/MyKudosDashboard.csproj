@@ -64,6 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="env\" />
     <Folder Include="wwwroot\badges\" />
   </ItemGroup>
 

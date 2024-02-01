@@ -40,14 +40,14 @@ public class UserPointsService : IUserPointsService
 
     }
 
-    public async Task<UserPointScore> GetUserScoreAsync(Guid pUserId)
+    public async Task<UserPointScore> GetUserScoreAsync(Guid pUserId, bool justMyTeam = false)
     {
         UserPointScore result = new();
 
         try
         {
 
-            result = await _restClientHelper.GetApiData<UserPointScore>($"{_kudosServiceUrl}UserPoints/GetUserPoints/?userid={pUserId}");
+            result = await _restClientHelper.GetApiData<UserPointScore>($"{_kudosServiceUrl}UserPoints/GetUserPoints/{pUserId},{justMyTeam}");
 
         }
         catch (Exception ex)

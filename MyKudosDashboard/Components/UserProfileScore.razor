@@ -1,5 +1,6 @@
 ﻿
 @using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using Microsoft.Extensions.Localization
@@ -16,17 +17,7 @@
 
 
 <div class="card-body" style="padding:2px">
-
-          @*  @if (User.IsAdmin)
-            {
-                <div style="">
-                    <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SettingsClick())>
-                        <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
-                        Settings
-                    </FluentButton>
-                </div>
-
-            } *@
+  
 
         <div class="profile" style="width:100%;height:82vh;overflow-y:scroll;overflow:auto">
      
@@ -131,18 +122,13 @@
             
         </div>
 
-       
-
-        
-
-
     </div>
 
 </div>
 }
 @code {
 
-   
+
     [Parameter]
     public UserProfile User { get; set; }
 
@@ -175,14 +161,30 @@
 
         if (User != null)
         {
-            UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString());
+            await GetUserScore();
+
             UserProfileScoreView.RegisterObserver(User.UserProfileId.ToString());
         }
 
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
-        
+
         _isLoaded = true;
 
+    }
+
+    public async Task GetUserScore()
+    {
+        UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString(),
+                                                                 KudosCommonVariables.VisualizeJustMyTeam);
+
+        var t = InvokeAsync(() =>
+        {
+            UpdateScoreValues();
+
+            StateHasChanged();
+        });
+
+        t.Wait();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -190,11 +192,7 @@
         base.OnAfterRender(firstRender);
 
     }
-    //    private void SettingsClick()
-    // {
-    //     Navigator.NavigateTo("/config");
-    // }
-
+   
     protected override bool ShouldRender()
     {
         return _shouldRender;
@@ -259,57 +257,5 @@
 
         
     }
-
-    private string GetKudosSentBadge()
-    {
-        string result = string.Empty;
-
-        switch (UserScoreValue.KudosSent)
-        {
-            case var n when (n >= 1 && n <10):
-                result = "images/badges/accomplishments/1kudossent.png";
-                    break;
-
-            case var n when (n >= 10 && n <= 50):
-                result = "images/badges/accomplishments/10kudossent.png";
-                break;
-
-            case var n when (n > 50 && n <= 100):
-                result = "images/badges/accomplishments/50kudossent.png";
-                break;
-
-            case var n when (n > 100):
-                result = "images/badges/accomplishments/100kudossent.png";
-                break;
-        }
-
-        return result;
-    }
-
-    private string GetKudosReceivedBadge()
-    {
-        string result = string.Empty;
-
-        switch (UserScoreValue.KudosReceived)
-        {
-        
-            case var n when (n >= 10 && n <= 50):
-                result = "images/badges/accomplishments/10kudosreceived.png";
-                break;
-
-            case var n when (n > 50 && n <= 100):
-                result = "images/badges/accomplishments/50kudosreceived.png";
-                break;
-
-            case var n when (n > 100):
-                result = "images/badges/accomplishments/50kudosreceived.png";
-                break;
-        }
-
-        return result;
-    }
-
-
-   
 
 }

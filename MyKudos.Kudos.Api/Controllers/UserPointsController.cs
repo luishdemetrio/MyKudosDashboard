@@ -17,11 +17,11 @@ public class UserPointsController : Controller
         _userPointsRepository = userPointsRepository;
     }
 
-    [HttpGet("GetUserPoints/{userId}")]
-    public UserPointScore GetUserPoints(Guid userId)
+    [HttpGet("GetUserPoints/{userId},{justMyTeam}")]
+    public UserPointScore GetUserPoints(Guid userId, bool justMyTeam = false)
     {
 
-        return _userPointsRepository.GetUserScore(userId);
+        return _userPointsRepository.GetUserScore(userId, justMyTeam);
     }
 
   
