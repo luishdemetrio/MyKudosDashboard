@@ -5,7 +5,7 @@
 
 Kudos, also known as *"virtual high-fives"*, are a way for employees to recognize and appreciate each other's efforts in the workplace. They can be a simple and effective way to boost morale, build camaraderie, and acknowledge good work. Kudos allows employees to attach specific examples or achievements to their kudos, and tracking the number of kudos received by each employee to create a leaderboard. Additionally, through the top contributors, you could also include other recognition and reward options, such as bonuses, time off, or special perks for those who consistently receive kudos.
 
-[![Watch the video](images/thumb.png)](https://github.com/luishdemetrio/MyKudosDashboard/blob/master/images/SuperKudos.mp4)
+<video src="images/SuperKudos.mp4" width="640" height="480" controls></video>
 
 The Dashboard UI allows users to visualize the "kudos" that were sent to employees, as well as the ability to send "kudos", "likes" and write supportive messages. This type of system is often used in employee recognition and engagement programs to encourage positive behavior and acknowledge the achievements of employees.
 
