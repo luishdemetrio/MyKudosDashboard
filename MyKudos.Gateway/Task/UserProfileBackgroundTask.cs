@@ -1,19 +1,21 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
 
-public class UserProfileTableCacheBackgroundTask : IHostedService, IDisposable
+public class UserProfileBackgroundTask : IHostedService, IDisposable
 {
-        private Timer _timer;
+    private Timer _timer;
 
-        private readonly string _graphServiceUrl;
+    private readonly string _graphServiceUrl;
 
-        private IRestClientHelper _restClientHelper;
+    private IRestClientHelper _restClientHelper;
 
     private readonly int _timeoutInSeconds;
 
     private int _intervalInMinutes;
 
-    public UserProfileTableCacheBackgroundTask(IConfiguration configuration)
+    private bool _updateUserProfile;
+
+    public UserProfileBackgroundTask(IConfiguration configuration)
     {
         _intervalInMinutes = int.Parse(configuration["ADSyncIntervalFromMinutes"]);
 
@@ -29,6 +31,8 @@ public class UserProfileTableCacheBackgroundTask : IHostedService, IDisposable
                 );
 
         _timeoutInSeconds = int.Parse(configuration["PolulateProfilestimeoutInSeconds"]);
+
+        _updateUserProfile= bool.Parse(configuration["UpdateUserProfile"]);
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -39,8 +43,14 @@ public class UserProfileTableCacheBackgroundTask : IHostedService, IDisposable
 
     private async void DoWork(object state)
     {
-        // Update the user profile table on database
-        await _restClientHelper.SendApiData<string, bool>($"{_graphServiceUrl}AllUsers", HttpMethod.Post, string.Empty, _timeoutInSeconds);
+        if (_updateUserProfile ) 
+        {
+            // Update the user profile table on database
+            await _restClientHelper.SendApiData<string, bool>(
+                            $"{_graphServiceUrl}AllUsers", HttpMethod.Post, string.Empty, 
+                            _timeoutInSeconds);
+
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

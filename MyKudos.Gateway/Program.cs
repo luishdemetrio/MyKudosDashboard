@@ -56,16 +56,9 @@ builder.Services.AddSwaggerGen(c =>
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
 
-
-//builder.Services.AddSingleton<IMessageSender>(t =>
-//                new ServiceBusMessageSender(
-//                    serviceBusConnectionString: config["KudosServiceBus_ConnectionString"]
-//                ));
-
-
 //I need to sync the users from MS Graph to database.
 //as alternative you can use Azure functions, web jobs, etc;
-builder.Services.AddHostedService<UserProfileTableCacheBackgroundTask>();
+builder.Services.AddHostedService<UserProfileBackgroundTask>();
 
 
 var app = builder.Build();
@@ -75,8 +68,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-
 }
 
 var selectedCulture = config["SelectedCulture"];

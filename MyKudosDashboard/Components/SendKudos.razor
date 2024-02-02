@@ -103,10 +103,9 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            </div>
-       
+            </div>       
 
-        <table class="table">
+        <table class="table" style="height:90%">
             <tbody>
                 <tr style="height:2vh">
                     <td scope="row" style="height:80px">
@@ -238,7 +237,7 @@
 
                         <div class="input-group">
 
-                            <textarea class="form-control small55" aria-label="With textarea" style="height:14vh"
+                            <textarea class="form-control small55" aria-label="With textarea" style="height:24vh"
                                       @onchange="KudosMessageChanged" value=@KudosMessage />
 
 
@@ -268,7 +267,12 @@
                         }
 
 
-                        @*<button type="button" class="btn btn-secondary" style="margin-left: 20px" @onclick=@(()=>Hide() )>✖️ Cancel</button>*@
+                       @*   <button type="button" class="btn btn-secondary small50" style="margin-left: 10px" >
+                                ✍️ @Localizer["Rewrite"]
+                         </button> *@
+
+                         @* <button type="button" class="btn btn-secondary" style="margin-left: 5vw" @onclick=@(()=>Hide() )>✖️ Cancel</button> *@
+
 
                     </td>
 
