@@ -1,4 +1,5 @@
 ﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using System.Collections.Concurrent
@@ -19,15 +20,15 @@
         <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
 
         <FluentTabPanel class="nav-item">
-                <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
+                <KudosList @ref=AllKudosTab TypeTab=KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
             
             <FluentTabPanel class="nav-item" >
-            <KudosList @ref=ToMeKudosTab TypeTab =KudosList.KudosTypeTab.ToMe User=@User ReplyCallBack=@ReplyKudos />
+            <KudosList @ref=ToMeKudosTab TypeTab =KudosTypeTab.ToMe User=@User ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
 
         <FluentTabPanel class="nav-item">
-                <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
+                <KudosList @ref=FromMeKudosTab TypeTab=KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>   
             
     </FluentTabs>
@@ -92,12 +93,6 @@
     {
          await AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
 
-        // var t = InvokeAsync(() =>
-        // {
-        //     AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
-        // });
-
-        // t.Wait();
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)

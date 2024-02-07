@@ -3,7 +3,6 @@
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
-
 @inject IKudosListView KudosListView;
 
 @using Microsoft.Extensions.Localization
@@ -57,10 +56,9 @@
      style="z-index: auto ;height:76vh;overflow-y:scroll;width:100%;overflow:auto"
      class="infinite-scroll-container" @ref="scrollContainer">
 
-
     <div class="list-item" >        
 
-        @foreach (var item in _kudosList.Values.OrderByDescending(k => k.SendOn))
+        @foreach (var item in KudosListView.KudosList.Values.OrderByDescending(k => k.SendOn))
         {
             <Kudos  KudosItem=@item 
                     User=@User 
@@ -115,15 +113,6 @@
 
     public bool VisualizeJustMyTeam { get; set; }
 
-    public enum KudosTypeTab
-    {
-        All,
-        ToMe,
-        FromMe
-    }
-
-    private ConcurrentDictionary<int, KudosResponse> _kudosList;
-
     private int CanEditKudosInDays;
 
     private Dictionary<int, bool> _disabledButtons;
@@ -137,9 +126,10 @@
     private FluentDialog? _confirmKudosDeleteDialog;
     private bool _hidden = true;
 
+    private int _kudosToBeDeleted;
+
     protected override void OnInitialized()
     {
-        _kudosList = new();
         _disabledButtons = new();
 
         _pageNumber = 0;
@@ -163,6 +153,7 @@
         }
     }
 
+    //called by the infinite scroll
     [JSInvokable]
     public async Task OnScrollAsync()
     {
@@ -183,10 +174,16 @@
         StateHasChanged();
     }
 
-    
+    private async Task GetMoreKudos()
+    {
+        _pageNumber++;
+
+        await LoadKudos(_pageNumber);
+    }
+
+
     public async Task LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
-        _kudosList = new();
         _pageNumber = 1;
 
         await  LoadKudos();
@@ -194,66 +191,85 @@
 
     public async Task LoadKudos(int pageNumber = 1)
     {
-        if (_kudosList is null )
-        {
-            _kudosList = new();
-        }
-
-        IEnumerable<KudosResponse> kudos = null; 
-
-        switch (TypeTab)
-        {
-            case KudosTypeTab.All:
-                kudos = await KudosListView.GetKudos(pageNumber).ConfigureAwait(true);
-                break;
-
-            case KudosTypeTab.FromMe:
-
-                kudos = await KudosListView.GetKudosFromMe(User.UserProfileId.ToString(), 
-                                                           pageNumber
-                                                          ).ConfigureAwait(true);
-                break;
-
-            case KudosTypeTab.ToMe:
-
-                kudos = await KudosListView.GetKudosToMe(User.UserProfileId.ToString(), 
-                                                         pageNumber
-                                                         ).ConfigureAwait(true);
-                break;
-        }
-
-        if (kudos is null)
-            return;
-
-
-        foreach (var kudo in kudos)
-        {
-            if (!_kudosList.ContainsKey(kudo.Id))
-            {
-                _kudosList.TryAdd(kudo.Id, kudo);
-            }
-        }
+        await KudosListView.LoadKudos(pageNumber, User.UserProfileId, TypeTab);
 
         await InvokeAsync(StateHasChanged).ConfigureAwait(true);
         await Task.Delay(300);
 
     }
 
+    private bool Filled(KudosResponse item)
+    {
+        bool filled = false;
+
+        @if (User != null)
+        {
+            filled = item.Likes.Any(l => l.Id == User.UserProfileId);
+        }
+
+        return filled;
+    }
+
+    private void UpdateDisabledLike(int kudosId, bool disabled)
+    {
+        var t = InvokeAsync(() =>
+        {
+            if (_disabledButtons.ContainsKey(kudosId))
+            {
+                _disabledButtons[kudosId] = disabled;
+            }
+            else
+            {
+                _disabledButtons.Add(kudosId, disabled);
+            }
+
+        });
+
+        t.Wait();
+
+    }
+
+    private void ReplyKudos(KudosResponse kudos)
+    {
+        ReplyCallBack?.Invoke(kudos);
+    }
+
+    /// <summary>
+    /// This callback cames from an user control.
+    /// It is used to send likes to the kudos.
+    /// </summary>
+    /// <param name="pKudosId"></param>
+    /// <param name="pFromPersonId"></param>
     private void SendLikesCallBack(int pKudosId, Guid pFromPersonId)
     {
         KudosListView.SendLikeAsync(pKudosId, pFromPersonId);
     }
 
+    /// <summary>
+    /// This callback cames from an user control.
+    /// It is used to unlike the kudos.
+    /// </summary>
+    /// <param name="pKudosId"></param>
+    /// <param name="pFromPersonId"></param>
     private void SendUndoLikesCallBack(int pKudosId, Guid pFromPersonId)
     {
         KudosListView.SendUndoLikeAsync(pKudosId, pFromPersonId);
     }
 
+    /// <summary>
+    /// This allows user to save the kudos message after finishing to edit it.
+    /// </summary>
+    /// <param name="kudos"></param>
     private void SaveKudos(KudosResponse kudos)
     {
         KudosListView.UpdateKudos(new KudosMessage(kudos.Id, kudos.Message));
     }
 
+    /// <summary>
+    /// Disable the like button to avoid user clicking twice.
+    /// </summary>
+    /// <param name="kudosId"></param>
+    /// <returns></returns>
     private bool LikeDisabled(int kudosId)
     {
         bool disabled = false;
@@ -267,33 +283,23 @@
             _disabledButtons.Add(kudosId, false);
         }
 
-
         return disabled;
     }
 
-
-
+    /// <summary>
+    /// In case user gave up of deleting the kudos
+    /// </summary>
     private void CancelDeleteOnClick()
     {
         _confirmKudosDeleteDialog!.Hide();
         _hidden = true;
-
     }
 
-    private async Task ConfirmDeleteOnClick()
-    {
-        bool result = await KudosListView.DeleteKudos(_kudosToBeDeleted);
-
-        if (result)
-        {
-            KudosDeleted(_kudosToBeDeleted);
-        }
-
-        _hidden = true;
-    }
-
-    private int _kudosToBeDeleted;
-
+    /// <summary>
+    /// It happens when user clicks on the Delete Kudos button.
+    /// This method will pop up a confirmation deletion message to user.
+    /// </summary>
+    /// <param name="kudosId"></param>
     private void DeleteKudos(int kudosId)
     {
         _kudosToBeDeleted = kudosId;
@@ -301,55 +307,59 @@
         _hidden = false;
         _confirmKudosDeleteDialog!.Show();
 
+        RefreshPage();
+    }
+
+    /// <summary>
+    /// Deletes the Kudos after user have confirmed
+    /// </summary>
+    /// <returns></returns>
+    private async Task ConfirmDeleteOnClick()
+    {
+        bool deleted = await KudosListView.DeleteKudos(_kudosToBeDeleted);
+
+        if (deleted)
+            RefreshPage();
+
+        _hidden = true;
+    }
+
+    /// <summary>
+    /// Callback from Event Hub.
+    /// It is used to sync the kudos list.
+    /// In this case to remove the kudos from the local list.
+    /// </summary>
+    /// <param name="kudosId"></param>
+    public void KudosDeleted(int kudosId)
+    {
+        if (KudosListView.DeleteKudosLocally(kudosId))
+            RefreshPage();
+
+    }
+
+    private void RefreshPage()
+    {
         var t = InvokeAsync(() =>
-           {
-               StateHasChanged();
-           });
+            {
+                StateHasChanged();
+            });
 
         t.Wait();
     }
 
-    // call back from EventHub
-    public void KudosDeleted(int kudosId)
-    {
-        if (_kudosList.ContainsKey(kudosId))
-        {
-            _kudosList.TryRemove(kudosId, out KudosResponse kudos);
-
-            var t = InvokeAsync(() =>
-            {
-                StateHasChanged();
-            });
-
-            t.Wait();
-        }
-    }
-
+    /// <summary>
+    /// Callback from Event Hub.
+    /// It is used to update locally the Kudos' message that was edited by other user.
+    /// </summary>
+    /// <param name="message"></param>
     public void KudosMessageUpdated(KudosMessage message)
     {
-        if (_kudosList.ContainsKey(message.KudosId))
-        {
-            _kudosList.TryGetValue(message.KudosId, out KudosResponse kudos);
-
-            kudos.Message = message.Message;
-
-            var t = InvokeAsync(() =>
-            {
-                StateHasChanged();
-            });
-
-            t.Wait();
-        }
+        if (KudosListView.KudosMessageUpdatedLocally(message))
+            RefreshPage();
     }
 
     public void UpdateLikesCountAndToolTip(LikeGateway pLike)
     {
-        // The person who sent already has the like updated
-        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-        if (_kudosList == null)
-        {
-            return;
-        }
 
         // enable like button
         UpdateDisabledLike(pLike.KudosId, false);
@@ -357,27 +367,10 @@
         var t = InvokeAsync(() =>
         {
 
-            if (_kudosList.ContainsKey(pLike.KudosId))
+            if (KudosListView.UpdateLikesCountAndToolTipLocally(pLike))
             {
-                var kudo = _kudosList[pLike.KudosId];
-
-                if (!kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).Any())
-                {
-
-                    kudo.Likes.Add(new Person()
-                        {
-                            Id = pLike.FromPerson.Id,
-                            Name = pLike.FromPerson.Name,
-                            Photo = pLike.FromPerson.Photo
-                        });
-                }
+                StateHasChanged();
             }
-            else
-            {
-                _ = LoadKudos();
-            }
-
-            StateHasChanged();
 
         });
 
@@ -385,7 +378,11 @@
 
     }
 
-
+    /// <summary>
+    /// This method is called via Event Hub.
+    /// It is used to update the likes.
+    /// </summary>
+    /// <param name="pLike"></param>
     public void UpdateLikesCallBack(LikeGateway pLike)
     {
 
@@ -394,48 +391,16 @@
 
         UpdateLikesCountAndToolTip(pLike);
 
-
-
     }
 
     public void UpdateUndoLikesCountAndToolTip(LikeGateway pLike)
     {
-        // The person who sent already has the like updated
-        //if ((_kudosList == null) || (pLike.FromPerson.Id == User.ObjectId))
-        if (_kudosList == null)
-            return;
-
         // enable like button
         UpdateDisabledLike(pLike.KudosId, false);
 
-        if (_kudosList.ContainsKey(pLike.KudosId))
-        {
-            var kudo = _kudosList[pLike.KudosId];
+        if (KudosListView.UpdateUnLikesCountAndToolTipLocally(pLike))
+            RefreshPage();
 
-            var like = kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).FirstOrDefault();
-
-            if (kudo.Likes.Contains(like))
-            {
-                kudo.Likes.Remove(like);
-            }
-            else
-            {
-                //force to reload
-                _ = LoadKudos();
-            }         
-        }
-        else
-        {
-            //force to reload
-            _ = LoadKudos();
-        }
-
-        var t = InvokeAsync(() =>
-       {
-           StateHasChanged();
-
-       });
-        t.Wait();
     }
 
     public void UpdateUndoLikesCallBack(LikeGateway pLike)
@@ -477,12 +442,8 @@
 
         if (_kudosList == null)
         {
-            var t = InvokeAsync(() =>
-                     {
-                         _ = LoadKudos();
-                     });
+            RefreshPage();
 
-            t.Wait();
             return;
         }
 
@@ -559,48 +520,9 @@
         }            
     }
 
-    private bool Filled(KudosResponse item)
-    {
-        bool filled = false;
 
-        @if (User != null)
-        {
-            filled = item.Likes.Any(l => l.Id == User.UserProfileId);
-        }
 
-        return filled;
-    }
-
-    private void UpdateDisabledLike(int kudosId, bool disabled)
-    {
-        var t = InvokeAsync(() =>
-        {
-            if (_disabledButtons.ContainsKey(kudosId))
-            {
-                _disabledButtons[kudosId] = disabled;
-            }
-            else
-            {
-                _disabledButtons.Add(kudosId, disabled);
-            }
-
-        });
-
-        t.Wait();
-
-    }
-
-    private void ReplyKudos(KudosResponse kudos)
-    {
-        ReplyCallBack?.Invoke(kudos);        
-    }
-
-    private async Task GetMoreKudos()
-    {
-        _pageNumber++;
-
-        await LoadKudos(_pageNumber);
-    }
+    
 
 
 
