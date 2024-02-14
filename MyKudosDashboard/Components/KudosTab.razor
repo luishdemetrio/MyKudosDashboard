@@ -1,4 +1,5 @@
 ﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using System.Collections.Concurrent
@@ -19,15 +20,15 @@
         <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
 
         <FluentTabPanel class="nav-item">
-                <KudosList @ref=AllKudosTab TypeTab=KudosList.KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
+                <KudosList @ref=AllKudosTab TypeTab=KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
             
             <FluentTabPanel class="nav-item" >
-            <KudosList @ref=ToMeKudosTab TypeTab =KudosList.KudosTypeTab.ToMe User=@User ReplyCallBack=@ReplyKudos />
+            <KudosList @ref=ToMeKudosTab TypeTab =KudosTypeTab.ToMe User=@User ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
 
         <FluentTabPanel class="nav-item">
-                <KudosList @ref=FromMeKudosTab TypeTab=KudosList.KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
+                <KudosList @ref=FromMeKudosTab TypeTab=KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>   
             
     </FluentTabs>
@@ -90,28 +91,32 @@
     /// </summary>
     public async Task  LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
-         await AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+        await AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
 
-        // var t = InvokeAsync(() =>
-        // {
-        //     AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
-        // });
+    }
 
-        // t.Wait();
+    public string ExportToCSV()
+    {
+        return AllKudosTab.ExportToCSV();
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)
     {
+        KudosCommonVariables.KudosTypeTab = KudosTypeTab.All;
         await AllKudosTab.LoadKudos();
     }
 
     private async Task OnTabToMeClick(MouseEventArgs args)
     {
+        KudosCommonVariables.KudosTypeTab = KudosTypeTab.ToMe;
+
         await ToMeKudosTab.LoadKudos();
     }
 
     private async Task OnTabFromMeClick(MouseEventArgs args)
     {
+        KudosCommonVariables.KudosTypeTab = KudosTypeTab.FromMe;
+
         await FromMeKudosTab.LoadKudos();
     }
 

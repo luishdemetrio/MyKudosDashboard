@@ -1,0 +1,43 @@
+﻿@using Microsoft.Extensions.Localization
+
+@inject IStringLocalizer<App> Localizer
+
+<FluentDialog @ref=RewriteDialog
+               aria-label="Simple dialog" Modal="true"
+              class="both-gradient" style="--dialog-height: 95vh;--dialog-width: calc(40vw + 180px);"
+              Hidden=@ModalHidden>
+<div>
+    <div>
+        <div>
+
+            <button type="button" class="btn btn-secondary small50" style="margin-left: 10px"
+                <FluentIcon  Name="@FluentIcons.ArrowRepeatAll" Size=IconSize.Size12 Filled=false   />
+                @Localizer["Rewrite"]
+            </button>
+
+            <button type="button" class="btn btn-secondary small50" style="margin-left: 10px"
+                <FluentIcon  Name="@FluentIcons.TextAlignDistributed" Size=IconSize.Size12 Filled=false   />
+                    @Localizer["Adjust"]
+            </button>
+
+        </div>
+    </div>  
+</div>
+</FluentDialog>
+
+
+@code
+{
+
+    [Parameter]
+    public bool ModalHidden { get; set; } = true;
+
+    [Parameter]
+    public RewriteCallBackEvent RewriteCallBack { get; set; }
+
+    public delegate void RewriteCallBackEvent(string message);
+
+    private FluentDialog RewriteDialog;
+
+
+}

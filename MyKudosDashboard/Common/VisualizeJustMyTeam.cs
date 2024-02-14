@@ -8,6 +8,8 @@ public static class KudosCommonVariables
 
     public static UserProfile User { get; set; }
 
+    public static KudosTypeTab KudosTypeTab { get; set; }
+
     public static Guid? GetManagerId()
     {
         return VisualizeJustMyTeam ? User.UserProfileId : null;

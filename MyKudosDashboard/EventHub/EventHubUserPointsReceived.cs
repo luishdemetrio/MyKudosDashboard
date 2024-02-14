@@ -56,8 +56,8 @@ public class EventHubUserPointsReceived : IEventHubUserPointsReceived
 
     public void Detach(string userId)
     {
-
-        _observers.TryRemove(userId, out _);
+        if (_observers.Count > 0) 
+            _observers.TryRemove(userId, out _);
     }
 
 }

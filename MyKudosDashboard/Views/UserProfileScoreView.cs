@@ -40,6 +40,7 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
 
     public void UnregisterObserver(string userId)
     {
+        if (userId != null ) 
         _eventHubUserPointsReceived.Detach(userId);
     }
 

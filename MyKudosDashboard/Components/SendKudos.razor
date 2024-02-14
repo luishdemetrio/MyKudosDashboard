@@ -103,7 +103,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            </div>       
+        </div>       
 
         <table class="table" style="height:90%">
             <tbody>
@@ -233,6 +233,9 @@
                 <tr>
                     <td scope="row" >
 
+                       @*  <Rewrite    @ref=RewriteDialog ModalHidden=@RewriteDialogIsHidden 
+                                    RewriteCallBack=@/> *@
+
                         <small class="small55" style="margin-bottom: 1vh;padding-top:1vh;">@Localizer["Message"]</small>
 
                         <div class="input-group">
@@ -266,13 +269,10 @@
                             </button>
                         }
 
-
-                       @*   <button type="button" class="btn btn-secondary small50" style="margin-left: 10px" >
+                         @*  <button type="button" class="btn btn-secondary small50" style="margin-left: 10px"
+                                @onclick=@(()=>Rewrite() )>
                                 ✍️ @Localizer["Rewrite"]
-                         </button> *@
-
-                         @* <button type="button" class="btn btn-secondary" style="margin-left: 5vw" @onclick=@(()=>Hide() )>✖️ Cancel</button> *@
-
+                         </button>  *@
 
                     </td>
 
@@ -286,8 +286,6 @@
 
 </FluentDialog>
 
-
-
 @code {
 
     [Parameter]
@@ -296,14 +294,13 @@
     [Parameter]
     public UserInfo UserProfile { get; set; }
 
-
+    [Parameter]
+    public SendKudosCallBack sendKudosCallBack { get; set; }
 
     private bool isLoading = false;
     private bool btnSendKudosDisabled = false;
 
     private IEnumerable<RecognitionViewModel> recognitions;
-
-    //private UserViewModel SelectedEmployee { get; set; }
 
     private IList<Person> SelectedEmployees { get; set; }
 
@@ -311,18 +308,17 @@
 
     public delegate void SendKudosCallBack();
 
-    [Parameter]
-    public SendKudosCallBack sendKudosCallBack { get; set; }
-
     private FluentDialog SendKudosFluentDialog;
+
+    private bool RewriteDialogIsHidden = false;
+    private Rewrite RewriteDialog;
+
 
     protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
 
         recognitions = await SendKudosView.GetRecognitionsAsync();
-
-
 
     }
 
@@ -331,7 +327,6 @@
 
         KudosMessage = string.Empty;
 
-        //SelectedEmployee = null;
         SelectedEmployees = new List<Person>();
 
         ModalHidden = false;
@@ -388,7 +383,7 @@
 
             if (lst.Exists(u => u.Name == UserProfile.DisplayName))
             {
-                
+
                 JSRuntime.InvokeVoidAsync("alert", (string)Localizer["YouCantSendAKudosToYourself"]);
 
                 return;
@@ -411,7 +406,6 @@
             {
                 now = DateTime.Now;
             }
-            
 
             kudos = new SendKudosRequest
             {
@@ -443,12 +437,8 @@
 
                  sendKudosCallBack?.Invoke();
              });
-
-
         }
-
     }
-
 
     public void Hide()
     {
@@ -461,5 +451,14 @@
         Hide();
     }
 
+    private void Rewrite()
+    {
+
+    }
+
+    private void RewriteCallBack(string message)
+    {
+        KudosMessage = message;        
+    }
 
 }

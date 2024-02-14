@@ -144,6 +144,9 @@
   <data name="ConfirmDelete" xml:space="preserve">
     <value>Por favor, confirme a exclusão do reconhecimento.</value>
   </data>
+  <data name="ExportToCSV" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
   <data name="JustMyTeam" xml:space="preserve">
     <value>Meu time</value>
   </data>
