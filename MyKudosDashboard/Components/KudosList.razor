@@ -200,7 +200,7 @@
 
     }
 
-    public async Task LoadKudosAfterVisualizeJustMyTeamValueChanged()
+    public async Task ReloadKudos()
     {
         _pageNumber = 1;
 
@@ -213,7 +213,7 @@
     }
 
 
-    public async Task<bool> LoadKudos(int pageNumber = 1)
+    public async Task<bool> LoadKudos(int pageNumber = 0)
     {
         var result = await KudosListView.LoadKudos(pageNumber, User.UserProfileId, TypeTab);
 
@@ -324,6 +324,7 @@
     /// <summary>
     /// It happens when user clicks on the Delete Kudos button.
     /// This method will pop up a confirmation deletion message to user.
+    /// Notice that this method doesn't delete the kudos, but just show a prompt to user.
     /// </summary>
     /// <param name="kudosId"></param>
     private void DeleteKudos(int kudosId)
@@ -345,8 +346,13 @@
         bool deleted = await KudosListView.DeleteKudos(_kudosToBeDeleted);
 
         if (deleted)
-            RefreshPage();
+        {
+            //it can happens after user deleting all the kudos of the page
+            if (KudosListView.KudosList.Count == 0)
+                await ReloadKudos();
 
+            RefreshPage();
+        }
         _hidden = true;
     }
 
