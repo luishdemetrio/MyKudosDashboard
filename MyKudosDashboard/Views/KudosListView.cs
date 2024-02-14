@@ -1,5 +1,4 @@
-﻿using Microsoft.Graph;
-using MyKudos.Gateway.Domain.Models;
+﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Common;
 using MyKudosDashboard.Interfaces;
 using System.Collections.Concurrent;
@@ -28,7 +27,7 @@ public class KudosListView : IKudosListView
     {
         _resetKudos = true;
 
-        if ( await LoadKudos(0, null, KudosCommonVariables.KudosTypeTab))
+        if ( await LoadKudos(1, null, KudosCommonVariables.KudosTypeTab))
             _resetKudos = false;
     }
 
