@@ -4,7 +4,7 @@ using MyKudosDashboard.EventHub;
 using MyKudosDashboard.EventHub.Enums;
 namespace MyKudosDashboard.Views;
 
-public class KudosTabView : IKudosTabView, 
+public class KudosTabView : IKudosTabView,
                             IObserverEventHub<EventHubResponse<EventHubLikeOptions, LikeGateway>>, 
                             IObserverEventHub<KudosResponse>,
                             IObserverEventHub<EventHubResponse<EventHubCommentOptions, CommentsRequest>>,
@@ -182,5 +182,10 @@ public class KudosTabView : IKudosTabView,
     public void NotifyUpdate(KudosMessage message)
     {
         KudosMessageUpdatedCallBack?.Invoke(message);
+    }
+
+    public void ExportToCsv()
+    {
+        
     }
 }

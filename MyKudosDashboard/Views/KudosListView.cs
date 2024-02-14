@@ -1,8 +1,9 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Microsoft.Graph;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Common;
-using MyKudosDashboard.Components;
 using MyKudosDashboard.Interfaces;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace MyKudosDashboard.Views;
 
@@ -13,46 +14,32 @@ public class KudosListView : IKudosListView
 
     public ConcurrentDictionary<int, KudosResponse> KudosList { get; set; }
 
+    private bool _resetKudos = false;
+
     public KudosListView(IKudosGateway gatewayService)
     {
         _gatewayService = gatewayService;
 
-        LoadKudos();
+        LoadKudoListAgain();
 
     }
 
-    private async void LoadKudos(bool resetCollection=false)
+    private async void LoadKudoListAgain()
     {
-        //this happens when user clicks on visualize just my team
-        if (resetCollection)
-            KudosList = new();
-        
-        var kudos = await LoadKudos(0, null, KudosTypeTab.All);
+        _resetKudos = true;
 
-        /// transform the list in a dictionary
-        foreach (var kudo in kudos)
-        {
-            if (!KudosList.ContainsKey(kudo.Id))
-            {
-                KudosList.TryAdd(kudo.Id, kudo);
-            }
-        }
+        if ( await LoadKudos(0, null, KudosCommonVariables.KudosTypeTab))
+            _resetKudos = false;
     }
 
-    public async Task<bool> SendLikeAsync(int pKudosId, Guid pFromPersonId)
+    public async Task<bool> LoadKudos(int pageNumber, Guid? UserProfileId, KudosTypeTab kudosTypeTab)
     {
-        return await _gatewayService.Like(new SendLikeGateway(pKudosId, pFromPersonId));
-    }
 
-    public async Task<bool> SendUndoLikeAsync(int pKudosId, Guid pFromPersonId)
-    {
-        return await _gatewayService.UndoLike(new SendLikeGateway(pKudosId, pFromPersonId));
-    }
-
-   public async Task<IEnumerable<KudosResponse>> LoadKudos(int pageNumber, Guid? UserProfileId, KudosTypeTab kudosTypeTab)
-    {
-        
         IEnumerable<KudosResponse> kudos = null;
+
+        //this happens when user clicks on visualize just my team
+        if ( KudosList is null || pageNumber == 1)
+            KudosList = new();
 
         switch (kudosTypeTab)
         {
@@ -74,10 +61,30 @@ public class KudosListView : IKudosListView
                                            ).ConfigureAwait(true);
                 break;
         }
-        
-        return kudos;
+
+        /// transform the list in a dictionary
+        foreach (var kudo in kudos)
+        {
+            if (!KudosList.ContainsKey(kudo.Id))
+            {
+                KudosList.TryAdd(kudo.Id, kudo);
+            }
+        }
+
+        return (kudos != null & kudos.Count() > 0);
     }
 
+    public async Task<bool> SendLikeAsync(int pKudosId, Guid pFromPersonId)
+    {
+        return await _gatewayService.Like(new SendLikeGateway(pKudosId, pFromPersonId));
+    }
+
+    public async Task<bool> SendUndoLikeAsync(int pKudosId, Guid pFromPersonId)
+    {
+        return await _gatewayService.UndoLike(new SendLikeGateway(pKudosId, pFromPersonId));
+    }
+
+  
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
       
@@ -106,7 +113,7 @@ public class KudosListView : IKudosListView
 
         if (KudosList.ContainsKey(kudosId))
         {
-            KudosList.TryRemove(kudosId, out KudosResponse kudos);
+            result = KudosList.TryRemove(kudosId, out KudosResponse kudos);
 
         }
 
@@ -114,9 +121,21 @@ public class KudosListView : IKudosListView
 
     }
 
-    public void ExportToCsv()
+    public string ExportToCsv()
     {
-        throw new NotImplementedException();
+
+        var sb = new StringBuilder();
+        sb.AppendLine("Title,Message,SendOn,NumberOfLikes,NumberOfComments,From,Receivers");
+        foreach (var item in KudosList)
+        {
+            var receivers = string.Join(";", item.Value.Receivers.Select(r => r.Name));
+            sb.AppendLine($"{item.Value.Title},{item.Value.Message.Replace("\n", "")}," +
+                $"{item.Value.SendOn},{item.Value.Likes.Count}," +
+                $"{item.Value.Comments.Count},{item.Value.From.Name},{receivers}");
+        }
+
+        return sb.ToString();
+
     }
 
     /// <summary>
@@ -147,6 +166,8 @@ public class KudosListView : IKudosListView
 
             kudos.Message = message.Message;
 
+            result = true;
+
         }
 
         return result;
@@ -176,12 +197,13 @@ public class KudosListView : IKudosListView
             {
                 if (like == null)
                 {
-                    kudo.Likes.Add(new Person()
+                    kudo.Likes.Add(new MyKudos.Gateway.Domain.Models.Person()
                     {
                         Id = pLike.FromPerson.Id,
                         Name = pLike.FromPerson.Name,
                         Photo = pLike.FromPerson.Photo
                     });
+                    result = true;
                 }
             }
             else
@@ -189,18 +211,68 @@ public class KudosListView : IKudosListView
                 if (like != null)
                 {
                     kudo.Likes.Remove(like);
+                    result = true;
                 }
                 else
                 {
                     //force to reload
-                    LoadKudos(true);
+                    LoadKudoListAgain();
                 }
             }
         }
         else
         {
             //force to reload
-            LoadKudos(true);
+            LoadKudoListAgain();
+        }
+
+        return result;
+    }
+
+    public bool UpdateKudosLocally(KudosResponse pKudos)
+    {
+        bool result = false;
+
+        if (!KudosList.ContainsKey(pKudos.Id))
+            result = KudosList.TryAdd(pKudos.Id, pKudos);
+        
+        return result;
+    }
+
+    public bool CommentsDeletedLocaly(CommentsRequest pComments)
+    {
+        bool result = false;
+
+        if (KudosList.ContainsKey(pComments.KudosId))
+        {
+            var kudo = KudosList[pComments.KudosId];
+
+            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
+
+            if (kudo.Comments.Contains(comments))
+            {
+                kudo.Comments.Remove(comments);
+                result = true;
+            }
+        }
+
+        return result;
+    }
+
+    public bool CommentsSentLocally(CommentsRequest pComments)
+    {
+        bool result = false;
+
+        if (KudosList.ContainsKey(pComments.KudosId))
+        {
+            var kudo = KudosList[pComments.KudosId];
+
+            if (!kudo.Comments.Contains(pComments.Id))
+            {
+                kudo.Comments.Add(pComments.Id);
+
+                result = true;
+            }
         }
 
         return result;

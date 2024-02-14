@@ -52,8 +52,16 @@
     }
 
 </style>
-<div 
-     style="z-index: auto ;height:76vh;overflow-y:scroll;width:100%;overflow:auto"
+
+@if (_isLoading)
+{
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <FluentProgressRing />
+    </div>
+}else{
+    
+    <div 
+     style="z-index: auto ;height:78vh;overflow-y:scroll;width:100%;overflow:auto"
      class="infinite-scroll-container" @ref="scrollContainer">
 
     <div class="list-item" >        
@@ -94,7 +102,8 @@
     }
 
 </div>
-                         
+
+}                     
 @code {
 
     [Parameter]
@@ -127,6 +136,7 @@
     private bool _hidden = true;
 
     private int _kudosToBeDeleted;
+    bool _isLoading = true;
 
     protected override void OnInitialized()
     {
@@ -141,15 +151,23 @@
     {
         if (firstRender)
         {
-            _confirmKudosDeleteDialog!.Hide();
+
 
             await LoadMoreItems();
+
+            _isLoading = false;
+            RefreshPage();
 
             try
             {
                 await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
             }
             catch{}            
+        }
+
+        if (_confirmKudosDeleteDialog != null)
+        {
+            _confirmKudosDeleteDialog!.Hide();
         }
     }
 
@@ -176,11 +194,11 @@
 
     private async Task GetMoreKudos()
     {
-        _pageNumber++;
+        //I just increase the pageNumber in case there are more kudos available
+        if (await LoadKudos(_pageNumber +1))
+            _pageNumber++;
 
-        await LoadKudos(_pageNumber);
     }
-
 
     public async Task LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
@@ -189,12 +207,20 @@
         await  LoadKudos();
     }
 
-    public async Task LoadKudos(int pageNumber = 1)
+    public string ExportToCSV()
     {
-        await KudosListView.LoadKudos(pageNumber, User.UserProfileId, TypeTab);
+        return KudosListView.ExportToCsv();
+    }
+
+
+    public async Task<bool> LoadKudos(int pageNumber = 1)
+    {
+        var result = await KudosListView.LoadKudos(pageNumber, User.UserProfileId, TypeTab);
 
         await InvokeAsync(StateHasChanged).ConfigureAwait(true);
         await Task.Delay(300);
+
+        return result;
 
     }
 
@@ -336,7 +362,9 @@
             RefreshPage();
 
     }
-
+    /// <summary>
+    /// Forces page to refresh the UI
+    /// </summary>
     private void RefreshPage()
     {
         var t = InvokeAsync(() =>
@@ -375,7 +403,6 @@
         });
 
         t.Wait();
-
     }
 
     /// <summary>
@@ -393,6 +420,10 @@
 
     }
 
+    /// <summary>
+    /// This method is called via Event hubs and it is used to sync the likes
+    /// </summary>
+    /// <param name="pLike"></param>
     public void UpdateUndoLikesCountAndToolTip(LikeGateway pLike)
     {
         // enable like button
@@ -408,116 +439,33 @@
         UpdateUndoLikesCountAndToolTip(pLike);
     }
 
+    /// <summary>
+    /// This method is called via Event Hub to update the kudos
+    /// </summary>
+    /// <param name="pKudos"></param>
     public void UpdateKudos(KudosResponse pKudos)
     {
-
-        var t = InvokeAsync(() =>
-      {
-          if (_kudosList == null)
-          {
-              _=  LoadKudos();
-              return;
-          }
-
-          if (!_kudosList.ContainsKey(pKudos.Id))
-          {
-
-              if (!_kudosList.TryAdd(pKudos.Id, pKudos))
-              {
-                  _= LoadKudos();
-              }
-
-              StateHasChanged();
-
-          }
-      });
-
-        t.Wait();
+        if (KudosListView.UpdateKudosLocally(pKudos))
+            RefreshPage();
     }
 
 
-
+    /// <summary>
+    /// This method is called via EventHub and it is used to sync the comments
+    /// </summary>
+    /// <param name="pComments"></param>
     public void CommentsDeleted(CommentsRequest pComments)
     {
 
-        if (_kudosList == null)
-        {
+        if (KudosListView.CommentsDeletedLocaly(pComments))
             RefreshPage();
-
-            return;
-        }
-
-        if (_kudosList.ContainsKey(pComments.KudosId))
-        {
-            var kudo = _kudosList[pComments.KudosId];
-
-            var comments = kudo.Comments.Where(k => k == pComments.Id).FirstOrDefault();
-
-            if (kudo.Comments.Contains(comments))
-            {
-                kudo.Comments.Remove(comments);
-
-                var t = InvokeAsync(() =>
-                 {
-                     StateHasChanged();
-                 });
-
-                t.Wait();
-
-            }
-
-        }
-        else
-        {
-            var t = InvokeAsync(() =>
-               {
-                   _ = LoadKudos();
-               });
-
-            t.Wait();
-        }
 
     }
 
     public void CommentsSent(CommentsRequest pComments)
     {
-        if (_kudosList == null)
-        {
-            var t = InvokeAsync(() =>
-            {
-                _ =LoadKudos();
-            });
-            t.Wait();
-
-             return;
-        }
-
-        if (_kudosList.ContainsKey(pComments.KudosId))
-        {
-            var kudo = _kudosList[pComments.KudosId];
-
-            if (!kudo.Comments.Contains(pComments.Id))
-            {
-                kudo.Comments.Add(pComments.Id);
-
-                var t = InvokeAsync(() =>
-                 {
-                     StateHasChanged();
-                 });
-
-                t.Wait();
-            }
-        }
-        else
-        {
-
-            var t = InvokeAsync(() =>
-             {
-                 _ = LoadKudos();
-             });
-
-            t.Wait();            
-        }            
+        if (KudosListView.CommentsSentLocally(pComments))
+            RefreshPage();
     }
 
 

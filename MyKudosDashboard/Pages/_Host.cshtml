@@ -19,19 +19,45 @@
 }
 <script>
 
-   
-     window.addInfiniteScrollListener = async (element, instance) => {
-        element.addEventListener('scroll', async (event) => {
+    //https://learn.microsoft.com/en-us/aspnet/core/blazor/file-downloads?view=aspnetcore-8.0
+
+    window.downloadFileFromStream = async (filename, contentType, content) => {
+        // Create the URL
+        const file = new File([content], filename, { type: contentType });
+        const exportUrl = URL.createObjectURL(file);
+
+        // Create the <a> element and click on it
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.href = exportUrl;
+        a.download = filename;
+        a.target = "_self";
+        a.click();
+
+        // We don't need to keep the object URL, let's release the memory
+        // On older versions of Safari, it seems you need to comment this line...
+        URL.revokeObjectURL(exportUrl);
+    };
+
+    window.addInfiniteScrollListener = async (element, instance) => {
+        let isScrolling = false;
+
+        const scrollHandler = async (event) => {
             const target = event.target;
             const scrollHeight = target.scrollHeight;
             const scrollTop = target.scrollTop;
             const clientHeight = target.clientHeight;
 
-            if (scrollHeight - scrollTop <= clientHeight + 1) {
+            if (!isScrolling && scrollHeight - scrollTop <= clientHeight + 1) {
+                isScrolling = true;
                 await instance.invokeMethodAsync('OnScrollAsync');
+                isScrolling = false;
             }
-        });
+        };
+
+        element.addEventListener('scroll', scrollHandler);
     };
+
 
     window.updateReplyMessage = function(replyElementId, value) {
         var textarea = document.getElementById(replyElementId);

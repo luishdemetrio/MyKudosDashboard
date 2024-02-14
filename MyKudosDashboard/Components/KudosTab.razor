@@ -91,22 +91,32 @@
     /// </summary>
     public async Task  LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
-         await AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
+        await AllKudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
 
+    }
+
+    public string ExportToCSV()
+    {
+        return AllKudosTab.ExportToCSV();
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)
     {
+        KudosCommonVariables.KudosTypeTab = KudosTypeTab.All;
         await AllKudosTab.LoadKudos();
     }
 
     private async Task OnTabToMeClick(MouseEventArgs args)
     {
+        KudosCommonVariables.KudosTypeTab = KudosTypeTab.ToMe;
+
         await ToMeKudosTab.LoadKudos();
     }
 
     private async Task OnTabFromMeClick(MouseEventArgs args)
     {
+        KudosCommonVariables.KudosTypeTab = KudosTypeTab.FromMe;
+
         await FromMeKudosTab.LoadKudos();
     }
 

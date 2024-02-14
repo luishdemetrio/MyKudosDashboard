@@ -12,6 +12,7 @@ using MyKudosDashboard.Interop.TeamsSDK;
 using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
 using System.Globalization;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,6 +136,7 @@ var localizationOptions = new RequestLocalizationOptions
 
 app.UseRequestLocalization(localizationOptions);
 
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 
 app.UseAuthentication();

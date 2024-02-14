@@ -12,7 +12,7 @@ public interface IKudosListView
 
     Task<bool> SendUndoLikeAsync(int pKudosId, Guid pFromPersonId);
 
-    Task<IEnumerable<KudosResponse>> LoadKudos(int pageNumber, Guid? UserProfileId, 
+    Task<bool> LoadKudos(int pageNumber, Guid? UserProfileId, 
                                                KudosTypeTab kudosTypeTab);
 
     Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
@@ -30,5 +30,11 @@ public interface IKudosListView
     bool UpdateLikesCountAndToolTipLocally(LikeGateway pLike);
     bool UpdateUnLikesCountAndToolTipLocally(LikeGateway pLike);
 
-    void ExportToCsv();
+    bool UpdateKudosLocally(KudosResponse pKudos);
+
+    bool CommentsDeletedLocaly(CommentsRequest pComments);
+
+    bool CommentsSentLocally(CommentsRequest pComments);
+
+    string ExportToCsv();
 }

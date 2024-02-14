@@ -126,6 +126,15 @@ else
                         {
                             <FluentSwitch @bind-Value=VisualizeJustMyTeam>@Localizer["JustMyTeam"]</FluentSwitch>
                         }
+
+
+                        <div style="display: flex; margin-left: 5px;width:40%">
+                            <FluentButton style="margin-left:5px;padding: 0px;"
+                                          @onclick=@(()=>ExportToCSVClick())>
+                                <FluentIcon Name="@FluentIcons.ArrowDownload" Slot="start" Size="@IconSize.Size16" Filled=true />
+                                @Localizer["ExportToCSV"]
+                            </FluentButton>
+                        </div>
                     </div>
                    
 
@@ -302,7 +311,18 @@ else
         Navigator.NavigateTo("/config");
     }
 
+    private async Task ExportToCSVClick()
+    {
+        var csv = _kudosTab.ExportToCSV();
+      
+        byte[] file = System.Text.Encoding.UTF8.GetBytes('\uFEFF' + csv);
+        var fileName = "kudos.csv";
+
+        await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, "text/plain", file);
+    }
+
    
+
 
 }
 
