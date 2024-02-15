@@ -213,7 +213,7 @@
     }
 
 
-    public async Task<bool> LoadKudos(int pageNumber = 0)
+    public async Task<bool> LoadKudos(int pageNumber = 1)
     {
         var result = await KudosListView.LoadKudos(pageNumber, User.UserProfileId, TypeTab);
 
