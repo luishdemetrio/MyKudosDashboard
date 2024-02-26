@@ -23,6 +23,7 @@
 @inject IJSRuntime JSRuntime;
 
 @inject IStringLocalizer<App> Localizer;
+@inject IConfiguration Configuration;
 
 
 <style>
@@ -117,7 +118,7 @@ else
             <!-- KUDOS -->
             <div class="column " style="height:100%;min-width:480px;padding:2px;">
 
-                <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh">
+                <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh;width:100%">
                     <div class="card-header py-3;padding:2px" style="display: flex; justify-content: space-between; align-items: center;">
                        
                         <h3 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"] </h3>
@@ -157,12 +158,13 @@ else
                 </div>
             </div>
 
+            <!-- It shows the pop up to send kudos -->
             <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_userTeams  
                         sendKudosCallBack=@SendKudosCallBack />
 
         </div>
 
-
+        <!-- It shows the pop up to see and send comments -->
         <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_userProfile  />
       
 </div>
@@ -221,6 +223,9 @@ else
                     _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
 
                     KudosCommonVariables.User = _userProfile;
+
+                    KudosCommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["UsesAzureOpenAI"]);
+
                 }
 
             }
@@ -284,7 +289,7 @@ else
 
         var t = InvokeAsync(() =>
        {
-           _sendKudosPanel.SendKudosModal();
+            _sendKudosPanel.SendKudosModal();
        });
 
         t.Wait();

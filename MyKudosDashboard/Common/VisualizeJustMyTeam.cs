@@ -10,6 +10,8 @@ public static class KudosCommonVariables
 
     public static KudosTypeTab KudosTypeTab { get; set; }
 
+    public static bool UsesAzureOpenAI { get; set; }    
+
     public static Guid? GetManagerId()
     {
         return VisualizeJustMyTeam ? User.UserProfileId : null;
