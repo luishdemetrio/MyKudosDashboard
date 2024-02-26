@@ -2,8 +2,6 @@
 
 option csharp_namespace = "MyKudos.MSGraph.gRPC";
 
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 
 

@@ -54,7 +54,7 @@ public class EventHubKudosDeleted : IEventHubKudosDeleted
 
     public void Detach(string userId)
     {
-
-        _observers.TryRemove(userId, out _);
+        if (userId != null)
+            _observers.TryRemove(userId, out _);
     }
 }

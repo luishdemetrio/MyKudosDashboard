@@ -1,28 +1,56 @@
 ﻿@using Microsoft.Extensions.Localization
+@using MyKudosDashboard.Interfaces
 
 @inject IStringLocalizer<App> Localizer
+@inject IRewriteView RewriteView;
 
 <FluentDialog @ref=RewriteDialog
                aria-label="Simple dialog" Modal="true"
-              class="both-gradient" style="--dialog-height: 95vh;--dialog-width: calc(40vw + 180px);"
-              Hidden=@ModalHidden>
-<div>
-    <div>
-        <div>
+              class="both-gradient" style="--dialog-height: 30vh;--dialog-width: 40vw;z-index:1"
+              Hidden=@ModalHidden OnDismiss="OnDismiss" >
 
-            <button type="button" class="btn btn-secondary small50" style="margin-left: 10px"
-                <FluentIcon  Name="@FluentIcons.ArrowRepeatAll" Size=IconSize.Size12 Filled=false   />
-                @Localizer["Rewrite"]
-            </button>
+    <div style="width:100%">
+        <div style="width:100%">
+            <div style="width:100%">
 
-            <button type="button" class="btn btn-secondary small50" style="margin-left: 10px"
-                <FluentIcon  Name="@FluentIcons.TextAlignDistributed" Size=IconSize.Size12 Filled=false   />
-                    @Localizer["Adjust"]
-            </button>
+                <button type="button" class="btn btn-primary small50" style="margin-left: 10px"
+                        @onclick=@(() => RewriteClick())>
+                    🔁 @Localizer["Rewrite"]
+                </button>
 
+                @if (_isReplaceVisible)
+                {
+                    <button type="button" class="btn btn-secondary small50" style="margin-left: 10px;"
+                            @onclick=@(() => ReplaceMessageClick())>
+                        📋 @Localizer["Replace"]
+                    </button>
+                }
+
+                <button type="button" 
+                        class="close" 
+                        data-dismiss="modal" 
+                        aria-label="Close" 
+                        style="float: right; color: red"
+                        @onclick=@(() => OnDismiss())>
+
+                    <span aria-hidden="true">&times;</span>
+
+                </button>
+
+        </div>
+
+        <br>
+        <br>
+
+        <div style="width:100%">
+
+            <textarea   class="form-control small55" aria-label="With textarea" 
+                        style="height:24vh" readonly="readonly"
+                        value=@NewMessage />
         </div>
     </div>  
 </div>
+
 </FluentDialog>
 
 
@@ -32,6 +60,9 @@
     [Parameter]
     public bool ModalHidden { get; set; } = true;
 
+    /// <summary>
+    /// This callback is used to send back the new message
+    /// </summary>
     [Parameter]
     public RewriteCallBackEvent RewriteCallBack { get; set; }
 
@@ -39,5 +70,64 @@
 
     private FluentDialog RewriteDialog;
 
+    public string NewMessage;
+    public string OriginalMessage;
+
+    private bool _isReplaceVisible = false;
+
+    public async Task ShowModal(string message)
+    {   
+        NewMessage = OriginalMessage = message;
+
+        ModalHidden = false;
+
+        await InvokeAsync(StateHasChanged);
+
+        await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Forces page to refresh the UI
+    /// </summary>
+    private void RefreshPage()
+    {
+        var t = InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+
+        t.Wait();
+    }
+
+    private void OnDismiss()
+    {
+        ModalHidden = true;
+        _isReplaceVisible = false;
+
+        RewriteCallBack?.Invoke(OriginalMessage);
+    }
+
+    /// <summary>
+    /// It sends the message to Azure Open AI better rewrite it.
+    /// </summary>
+    private async void RewriteClick()
+    {
+        NewMessage = await RewriteView.Rewrite(OriginalMessage);
+
+        _isReplaceVisible = true;
+
+        RefreshPage();
+    }
+
+    /// <summary>
+    /// Returns the new message to the send kudos UI
+    /// </summary>
+    private void ReplaceMessageClick()
+    {
+        RewriteCallBack?.Invoke(NewMessage);
+
+    }
+
+  
 
 }
