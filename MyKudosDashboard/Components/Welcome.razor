@@ -24,6 +24,7 @@
 
 @inject IStringLocalizer<App> Localizer;
 @inject IConfiguration Configuration;
+@inject KudosCommonVariables CommonVariables;
 
 
 <style>
@@ -139,25 +140,28 @@ else
                     </div>
                    
 
-                    <KudosTab @ref=_kudosTab User=@_userProfile ReplyCallBack=@ReplyCallBack  />
+                    <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack  />
                     
                 </div>
             </div>
 
             <!-- TOP CONTRIBUTORS -->
-            <div class="column small60" style="height:100%;min-width:250px;padding:2px;padding-right: 0px;">
+            @if (CommonVariables.ShowTopContributors)
+            {
 
-                <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh;width:100%">
+                <div class="column small60" style="height:100%;min-width:250px;padding:2px;padding-right: 0px;">
 
-                    <div class="card-header py-3;padding:2px">
-                        <h3 class="my-0 fw-normal">🥇 @Localizer["TopContributors"]</h3>
+                    <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh;width:100%">
+
+                        <div class="card-header py-3;padding:2px">
+                            <h3 class="my-0 fw-normal">🥇 @Localizer["TopContributors"]</h3>
+                        </div>
+
+                        <TopContributors @ref=_topContributors User=@_userProfile  />
+
                     </div>
-
-                    <TopContributors @ref=_topContributors User=@_userProfile  />
-
                 </div>
-            </div>
-
+            }
             <!-- It shows the pop up to send kudos -->
             <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_userTeams  
                         sendKudosCallBack=@SendKudosCallBack />
@@ -222,9 +226,11 @@ else
                 {                    
                     _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
 
-                    KudosCommonVariables.User = _userProfile;
+                    CommonVariables.User = _userProfile;
 
-                    KudosCommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["UsesAzureOpenAI"]);
+                    CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["UsesAzureOpenAI"]);
+                    CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
+                    CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
 
                 }
 
@@ -243,11 +249,11 @@ else
         get
         {
 
-            return KudosCommonVariables.VisualizeJustMyTeam;
+            return CommonVariables.VisualizeJustMyTeam;
         }
         set
         {
-            KudosCommonVariables.VisualizeJustMyTeam = value;
+            CommonVariables.VisualizeJustMyTeam = value;
 
             //we need to update the three tabs
 

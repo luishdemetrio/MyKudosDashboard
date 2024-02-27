@@ -1,9 +1,11 @@
 ﻿@using Microsoft.Extensions.Localization
 @using System.Globalization
 @using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common
 
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
+@inject KudosCommonVariables CommonVariables;
 
 <style>
     /* Style The Dropdown Button */
@@ -254,9 +256,6 @@
 
 
     [Parameter]
-    public UserProfile User { get; set; }
-
-    [Parameter]
     public KudosResponse KudosItem { get; set; }
 
     [Parameter]
@@ -326,9 +325,9 @@
 
     private bool CanEditOrDelete()
     {
-        return ( (KudosItem.From.Id == User.UserProfileId) &&
+        return ( (KudosItem.From.Id == CommonVariables.User.UserProfileId) &&
                   DateTime.Now.Subtract(KudosItem.SendOn).Days <= CanEditOrDeleteKudosInDays ) 
-                 || (User.IsAdmin);
+                 || (CommonVariables.User.IsAdmin);
 
     }
 
@@ -367,9 +366,9 @@
     {
         bool filled = false;
 
-        if (User != null)
+        if (CommonVariables.User != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.UserProfileId);
+            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
         }
 
         return filled;
@@ -407,18 +406,18 @@
                                     KudosId: item.Id,
                                     FromPerson: new Person
                                         {
-                                            Id = User.UserProfileId,
-                                            Name = User.DisplayName,
-                                            Photo = User.Photo96x96
+                                            Id = CommonVariables.User.UserProfileId,
+                                            Name = CommonVariables.User.DisplayName,
+                                            Photo = CommonVariables.User.Photo96x96
                                         }
                                 );
 
 
 
-            if (KudosItem.Likes.Any(l => l.Id == User.UserProfileId))
+            if (KudosItem.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId))
             {
 
-                SendUndoLikeCallBack?.Invoke(item.Id, User.UserProfileId);
+                SendUndoLikeCallBack?.Invoke(item.Id, CommonVariables.User.UserProfileId);
 
                 UpdateLikesAsync(requestLike, false); // To remove a like
 
@@ -426,7 +425,7 @@
             else
             {
 
-                this.SendLikeCallBack?.Invoke(item.Id, User.UserProfileId);
+                this.SendLikeCallBack?.Invoke(item.Id, CommonVariables.User.UserProfileId);
 
                 UpdateLikesAsync(requestLike, true); // To add a like
             }

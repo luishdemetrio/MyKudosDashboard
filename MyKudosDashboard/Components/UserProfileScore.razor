@@ -8,9 +8,10 @@
 
 
 @inject IUserProfileScoreView UserProfileScoreView;
-@inject IStringLocalizer<App> Localizer
-@inject IJSRuntime JSRuntime
-@inject NavigationManager Navigator
+@inject IStringLocalizer<App> Localizer;
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager Navigator;
+@inject KudosCommonVariables CommonVariables;
 
 @if (User!=null)
 {
@@ -34,14 +35,17 @@
 
             @if (_isLoaded)
             {
-                <div style="width:100%;text-align: center;padding:0px">
-                    <h4 class="card-title pricing-card-title" style="margin-bottom: 0px;">
-                        <small @ref=_score style="font-size: 3vmin">@UserScoreValue.Score</small>
-                        <small class="text-muted fw-light" style="font-size: 3vmin"> @Localizer["Points"]</small>
-                    </h4>
 
-                </div>
-             
+                    @if (CommonVariables.ShowTopContributors)
+                    {
+                        <div style="width:100%;text-align: center;padding:0px">
+                            <h4 class="card-title pricing-card-title" style="margin-bottom: 0px;">
+                                <small @ref=_score style="font-size: 3vmin">@UserScoreValue.Score</small>
+                                <small class="text-muted fw-light" style="font-size: 3vmin"> @Localizer["Points"]</small>
+                            </h4>
+
+                        </div>
+                    }
            
                 <div style="margin-left:10px; display:flex; flex-direction: column;">
 
@@ -175,7 +179,7 @@
     public async Task GetUserScore()
     {
         UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString(),
-                                                                 KudosCommonVariables.VisualizeJustMyTeam);
+                                                                 CommonVariables.VisualizeJustMyTeam);
 
         var t = InvokeAsync(() =>
         {

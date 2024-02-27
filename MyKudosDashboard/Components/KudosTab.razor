@@ -3,32 +3,40 @@
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using System.Collections.Concurrent
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+
 
 @inject IKudosTabView KudosTabView;
 @inject ILogger<KudosTab> Logger;
 
-@using Microsoft.Extensions.Localization
-@using System.Globalization
-@inject IStringLocalizer<App> Localizer
-
+@inject IStringLocalizer<App> Localizer;
+@inject KudosCommonVariables CommonVariables;
 
 <div class="card-body " style="padding:2px">
 
     <FluentTabs  style="z-index:auto;">
-        <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
+        @if (CommonVariables.ShowAllKudosTab)
+        {
+            <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
+        }
+        
         <FluentTab Text=@Localizer["KudosToMe"] style="z-index:auto" @onclick=OnTabToMeClick />
         <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
 
-        <FluentTabPanel class="nav-item">
-                <KudosList @ref=AllKudosTab TypeTab=KudosTypeTab.All User=@User  ReplyCallBack=@ReplyKudos   />
+        @if (CommonVariables.ShowAllKudosTab)
+        {
+            <FluentTabPanel class="nav-item">
+                <KudosList @ref=AllKudosTab TypeTab=KudosTypeTab.All   ReplyCallBack=@ReplyKudos   />
             </FluentTabPanel>
-            
+        }
+
             <FluentTabPanel class="nav-item" >
-            <KudosList @ref=ToMeKudosTab TypeTab =KudosTypeTab.ToMe User=@User ReplyCallBack=@ReplyKudos />
+            <KudosList @ref=ToMeKudosTab TypeTab =KudosTypeTab.ToMe ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>
 
-        <FluentTabPanel class="nav-item">
-                <KudosList @ref=FromMeKudosTab TypeTab=KudosTypeTab.FromMe User=@User  ReplyCallBack=@ReplyKudos />
+            <FluentTabPanel class="nav-item">
+                <KudosList @ref=FromMeKudosTab TypeTab=KudosTypeTab.FromMe ReplyCallBack=@ReplyKudos />
             </FluentTabPanel>   
             
     </FluentTabs>
@@ -37,8 +45,6 @@
 
 @code {
 
-    [Parameter]
-    public UserProfile User { get; set; }
 
     public delegate void ReplyKudosCallBack(KudosResponse pKudos);
 
@@ -53,11 +59,20 @@
     {
         base.OnAfterRender(firstRender);
 
-        if (User != null)
+        if (firstRender)
         {
-            var subscriptionName = User.UserProfileId;
+            if (CommonVariables.ShowAllKudosTab)
+                CommonVariables.KudosTypeTab = KudosTypeTab.All;
+            else
+                CommonVariables.KudosTypeTab = KudosTypeTab.ToMe;
 
-            KudosTabView.RegisterObserver(User.UserProfileId.ToString());
+        }
+
+        if (CommonVariables.User != null)
+        {
+            var subscriptionName = CommonVariables.User.UserProfileId;
+
+            KudosTabView.RegisterObserver(CommonVariables.User.UserProfileId.ToString());
 
             KudosTabView.LikeCallback = UpdateLikesCallBack;
             KudosTabView.UndoLikeCallback = UpdateUndoLikesCallBack;
@@ -69,6 +84,9 @@
 
             KudosTabView.KudosDeletedCallback = KudosDeleted;
             KudosTabView.KudosMessageUpdatedCallBack = KudosMessageUpdated;
+
+
+
         }
 
     }
@@ -78,13 +96,9 @@
     /// </summary>
     public void ReloadKudos()
     {
-        var t = InvokeAsync(() =>
-        {
-            AllKudosTab.LoadKudos();
-        });
-
-        t.Wait();
+        ExecuteKudosAction((tab) => _= tab.LoadKudos());     
     }
+
 
     /// <summary>
     /// This method is called by the Welcome.razor page after the user clicks on the visualize just my team option
@@ -92,7 +106,6 @@
     public async Task  LoadKudosAfterVisualizeJustMyTeamValueChanged()
     {
         await AllKudosTab.ReloadKudos();
-
     }
 
     public string ExportToCSV()
@@ -102,50 +115,51 @@
 
     private async Task OnTabAllClick(MouseEventArgs args)
     {
-        KudosCommonVariables.KudosTypeTab = KudosTypeTab.All;
+        CommonVariables.KudosTypeTab = KudosTypeTab.All;
         await AllKudosTab.LoadKudos();
     }
 
-    private async Task OnTabToMeClick(MouseEventArgs args)
+    private async void LoadToMeKudos()
     {
-        KudosCommonVariables.KudosTypeTab = KudosTypeTab.ToMe;
+        CommonVariables.KudosTypeTab = KudosTypeTab.ToMe;
 
         await ToMeKudosTab.LoadKudos();
     }
 
+    private void OnTabToMeClick(MouseEventArgs args)
+    {
+        LoadToMeKudos();
+    }
+
     private async Task OnTabFromMeClick(MouseEventArgs args)
     {
-        KudosCommonVariables.KudosTypeTab = KudosTypeTab.FromMe;
+        CommonVariables.KudosTypeTab = KudosTypeTab.FromMe;
 
         await FromMeKudosTab.LoadKudos();
     }
 
     public void  CommentsDeleted(CommentsRequest pComments)
     {
-
-         AllKudosTab.CommentsDeleted(pComments);
-        
+        ExecuteKudosAction((tab) => tab.CommentsDeleted(pComments));        
     }
 
     public void CommentsSent(CommentsRequest pComments)
     {
-
-        AllKudosTab.CommentsSent(pComments);
-
+        ExecuteKudosAction((tab) => tab.CommentsSent(pComments));
     }
 
     public void KudosDeleted(int kudosId)
     {
-
-        AllKudosTab.KudosDeleted(kudosId);
-
+        ExecuteKudosAction((tab) => tab.KudosDeleted(kudosId));        
     }
 
+    /// <summary>
+    /// This method is called after a kudos message is updated
+    /// </summary>
+    /// <param name="message"></param>
     public void KudosMessageUpdated(KudosMessage message)
     {
-
-        AllKudosTab.KudosMessageUpdated(message);
-
+        ExecuteKudosAction((tab) => tab.KudosMessageUpdated(message));
     }
 
     private void ReplyKudos(KudosResponse kudos)
@@ -153,28 +167,50 @@
         ReplyCallBack?.Invoke(kudos);
     }
 
-  
 
+    /// <summary>
+    /// This method is called by event hub after a Kudos is sent
+    /// </summary>
+    /// <param name="pKudos"></param>
     public void UpdateKudosCallback(KudosResponse pKudos)
     {
-
-        AllKudosTab.UpdateKudos(pKudos);
-
+        ExecuteKudosAction((tab) => tab.UpdateKudos(pKudos));
     }
 
-
+    /// <summary>
+    /// This method is called via Event Hub after a Like is sent
+    /// </summary>
+    /// <param name="pLike"></param>
     public void UpdateLikesCallBack(LikeGateway pLike)
     {
-
-         AllKudosTab.UpdateLikesCallBack(pLike);
-
+        ExecuteKudosAction((tab) => tab.UpdateLikesCallBack(pLike));
     }
 
+    /// <summary>
+    /// this method is called via events for undo like
+    /// </summary>
+    /// <param name="pLike"></param>
     public void UpdateUndoLikesCallBack(LikeGateway pLike)
     {
+        ExecuteKudosAction((tab) => tab.UpdateUndoLikesCallBack(pLike));
+    }
 
-        AllKudosTab.UpdateUndoLikesCallBack(pLike);
+    private void ExecuteKudosAction(Action<KudosList> action)
+    {
+        switch (CommonVariables.KudosTypeTab)
+        {
+            case KudosTypeTab.All:
+                action(AllKudosTab);
+                break;
 
+            case KudosTypeTab.FromMe:
+                action(FromMeKudosTab);
+                break;
+
+            case KudosTypeTab.ToMe:
+                action(ToMeKudosTab);
+                break;
+        }
     }
 
 }

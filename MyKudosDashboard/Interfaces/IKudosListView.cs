@@ -12,12 +12,11 @@ public interface IKudosListView
 
     Task<bool> SendUndoLikeAsync(int pKudosId, Guid pFromPersonId);
 
-    Task<bool> LoadKudos(int pageNumber, Guid? UserProfileId, 
-                                               KudosTypeTab kudosTypeTab);
+    Task<bool> LoadKudos(int pageNumber, KudosTypeTab kudosTypeTab);
 
     Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
-    Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber);
-    Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber);
+    Task<IEnumerable<KudosResponse>> GetKudosToMe(int pageNumber);
+    Task<IEnumerable<KudosResponse>> GetKudosFromMe(int pageNumber);
     
     Task<bool> UpdateKudos(KudosMessage kudos);
 

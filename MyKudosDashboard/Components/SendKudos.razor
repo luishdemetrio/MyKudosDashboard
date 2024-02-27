@@ -2,15 +2,17 @@
 @using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
+@using Microsoft.Extensions.Localization
+@using System.Globalization
 
 @inject ISendKudosView SendKudosView;
 @inject IJSRuntime JSRuntime;
 
-@using Microsoft.Extensions.Localization
-@using System.Globalization
-@inject IStringLocalizer<App> Localizer
-@inject IConfiguration Configuration
 
+@inject IStringLocalizer<App> Localizer;
+@inject IConfiguration Configuration;
+
+@inject KudosCommonVariables CommonVariables;
 <style>
 
     fluent-card {
@@ -268,7 +270,7 @@
                                 📩 @Localizer["Send"]
                             </button>
                         }
-                        @if (KudosCommonVariables.UsesAzureOpenAI)
+                        @if (CommonVariables.UsesAzureOpenAI)
                         {
                             <button type="button" class="btn btn-secondary small50" style="margin-left: 10px"
                                     @onclick=@(()=>Rewrite() )>

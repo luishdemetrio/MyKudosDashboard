@@ -15,11 +15,15 @@ public class KudosListView : IKudosListView
 
     private bool _resetKudos = false;
 
-    public KudosListView(IKudosGateway gatewayService)
+    private KudosCommonVariables _commonVariables;
+
+    public KudosListView(IKudosGateway gatewayService, 
+                         KudosCommonVariables commonVariables)
     {
         _gatewayService = gatewayService;
+        _commonVariables = commonVariables;
 
-        LoadKudoListAgain();
+        //LoadKudoListAgain();
 
     }
 
@@ -27,18 +31,14 @@ public class KudosListView : IKudosListView
     {
         _resetKudos = true;
 
-        if ( await LoadKudos(1, null, KudosCommonVariables.KudosTypeTab))
+        if ( await LoadKudos(1,  _commonVariables.KudosTypeTab))
             _resetKudos = false;
     }
 
-    public async Task<bool> LoadKudos(int pageNumber, Guid? UserProfileId, KudosTypeTab kudosTypeTab)
+    public async Task<bool> LoadKudos(int pageNumber, KudosTypeTab kudosTypeTab)
     {
-
+        
         IEnumerable<KudosResponse> kudos = null;
-
-        //this happens when user clicks on visualize just my team
-        if ( KudosList is null || pageNumber == 1)
-            KudosList = new();
 
         switch (kudosTypeTab)
         {
@@ -48,18 +48,20 @@ public class KudosListView : IKudosListView
 
             case KudosTypeTab.FromMe:
 
-                kudos = await GetKudosFromMe(UserProfileId.ToString(),
-                                             pageNumber
+                kudos = await GetKudosFromMe(pageNumber
                                              ).ConfigureAwait(true);
                 break;
 
             case KudosTypeTab.ToMe:
 
-                kudos = await GetKudosToMe(UserProfileId.ToString(),
-                                           pageNumber
+                kudos = await GetKudosToMe(pageNumber
                                            ).ConfigureAwait(true);
                 break;
         }
+
+        //this happens when user clicks on visualize just my team
+        if (KudosList is null || pageNumber == 1)
+            KudosList = new();
 
         /// transform the list in a dictionary
         foreach (var kudo in kudos)
@@ -87,18 +89,22 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
       
-        return await _gatewayService.GetKudos(pageNumber);
+        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString());
            
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber)
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(int pageNumber)
     {
-        return await _gatewayService.GetKudosToMe(userId, pageNumber);
+        return await _gatewayService.GetKudosToMe(_commonVariables.User.UserProfileId.ToString(),
+                                                  pageNumber,  
+                                                  _commonVariables.GetManagerId().ToString());
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(int pageNumber)
     {
-        return await _gatewayService.GetKudosFromMe(userId, pageNumber);
+        return await _gatewayService.GetKudosFromMe(_commonVariables.User.UserProfileId.ToString(), 
+                                                    pageNumber,
+                                                    _commonVariables.GetManagerId().ToString());
     }
 
     public async Task<bool> UpdateKudos(KudosMessage kudos)
@@ -228,9 +234,41 @@ public class KudosListView : IKudosListView
         return result;
     }
 
+    /// <summary>
+    /// Check what is the Tab selected by user (All, ToMe, FromMe)
+    /// In case of All, not action is needed.
+    /// ToMe: we need to update the list only if the kudos is to me 
+    /// FromMe: we need to update the list only the user sent the kudos
+    /// </summary>
+    /// <returns></returns>
+    private bool ShouldUpdatePage(KudosResponse pKudos)
+    {
+        bool result = false;
+
+        switch (_commonVariables.KudosTypeTab)
+        {
+            case KudosTypeTab.All:
+                result = true;
+                break;
+            case KudosTypeTab.ToMe:
+                result = pKudos.Receivers.Any(p => p.Id == _commonVariables.User.UserProfileId);
+                break;
+            case KudosTypeTab.FromMe:
+                result = pKudos.From.Id == _commonVariables.User.UserProfileId;
+                break;
+            default:
+                break;
+        }
+
+        return result;
+    }
+
     public bool UpdateKudosLocally(KudosResponse pKudos)
     {
         bool result = false;
+
+        if (ShouldUpdatePage(pKudos) == false)
+            return true;
 
         if (!KudosList.ContainsKey(pKudos.Id))
             result = KudosList.TryAdd(pKudos.Id, pKudos);

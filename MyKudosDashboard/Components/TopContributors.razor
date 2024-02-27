@@ -6,7 +6,8 @@
 
 
 @inject ITopContributorsView TopContributorsView;
-@inject IStringLocalizer<App> Localizer
+@inject IStringLocalizer<App> Localizer;
+@inject KudosCommonVariables CommonVariables;
 
 <div class="card-body w-auto">
 
@@ -73,7 +74,7 @@
     /// </summary>
     public void LoadTopContributors()
     {
-        TopContributorsView.GetTopContributors(KudosCommonVariables.GetManagerId()).ContinueWith(t =>
+        TopContributorsView.GetTopContributors(CommonVariables.GetManagerId()).ContinueWith(t =>
       {
           _topContributors = t.Result;
           _isLoaded = true;
