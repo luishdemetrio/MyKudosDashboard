@@ -2,17 +2,21 @@
 
 namespace MyKudosDashboard.Common;
 
-public static class KudosCommonVariables
+public class KudosCommonVariables 
 {
-    public static bool VisualizeJustMyTeam { get; set; }
+    public  bool VisualizeJustMyTeam { get; set; }
 
-    public static UserProfile User { get; set; }
+    public UserProfile User { get; set; }
 
-    public static KudosTypeTab KudosTypeTab { get; set; }
+    public KudosTypeTab KudosTypeTab { get; set; }
 
-    public static bool UsesAzureOpenAI { get; set; }    
+    public bool UsesAzureOpenAI { get; set; }
+    
+    public bool ShowTopContributors { get; set; }
+    
+    public bool ShowAllKudosTab { get; set; }
 
-    public static Guid? GetManagerId()
+    public Guid? GetManagerId()
     {
         return VisualizeJustMyTeam ? User.UserProfileId : null;
     }

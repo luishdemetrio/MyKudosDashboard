@@ -1,6 +1,5 @@
 ﻿using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
-using MyKudosDashboard.Common;
 using MyKudosDashboard.Interfaces;
 
 namespace MyKudosDashboard.Services;
@@ -19,33 +18,32 @@ public class GatewayService : IKudosGateway
         _gatewayServiceUrl = config["GatewayServiceUrl"];
         _restClientHelper = restClientHelper;
         _logger = log;
-        
     }
 
 
-    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
+    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber, string userManagerId)
     {
-        return await GetKudosData($"kudos/?pageNumber={pageNumber}");
+        return await GetKudosData($"kudos/?pageNumber={pageNumber}", userManagerId);
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber)
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber, string userManagerId)
     {
-        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}");
+        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}", userManagerId);
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber)
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber, string userManagerId)
     {
-        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}");
+        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}", userManagerId);
     }
 
-    private async Task<IEnumerable<KudosResponse>> GetKudosData(string endpoint)
+    private async Task<IEnumerable<KudosResponse>> GetKudosData(string endpoint, string userManagerId)
     {
         IEnumerable<KudosResponse> kudos = null;
 
         try
         {
             kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>(
-                $"{_gatewayServiceUrl}{endpoint}&managerId={KudosCommonVariables.GetManagerId()}");
+                $"{_gatewayServiceUrl}{endpoint}&managerId={userManagerId}");
         }
         catch (Exception ex)
         {

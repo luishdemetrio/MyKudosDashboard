@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Bot.Builder.Dialogs.Memory.Scopes;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
@@ -34,11 +35,15 @@ builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IImageHelper, ImageHelper>();
+builder.Services.AddScoped<KudosCommonVariables>();
 
 //Views
 builder.Services.AddScoped<ISendKudosView, SendKudosView>();
 builder.Services.AddScoped<IWelcomeView, WelcomeView>();
-builder.Services.AddScoped<IKudosListView, KudosListView>();
+
+//this one needs to be transient since it is used by user control having dedicated lists on it
+builder.Services.AddTransient<IKudosListView, KudosListView>();
+
 builder.Services.AddScoped<IUserProfileScoreView, UserProfileScoreView>();  
 builder.Services.AddScoped<ITopContributorsView, TopContributorsView>();
 builder.Services.AddScoped<IKudosTabView, KudosTabView>();

@@ -3,16 +3,17 @@
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 
-@inject IKudosListView KudosListView;
-
 @using Microsoft.Extensions.Localization
 @using System.Globalization
 @using System.Text;
 @using System.Collections.Concurrent;
 
-@inject IStringLocalizer<App> Localizer
-@inject IJSRuntime JSRuntime
-@inject IConfiguration Config
+@inject IKudosListView KudosListView;
+@inject IStringLocalizer<App> Localizer;
+@inject IJSRuntime JSRuntime;
+@inject IConfiguration Config;
+
+@inject KudosCommonVariables CommonVariables;
 
 <style>
     .infinite-scroll-container {
@@ -69,7 +70,6 @@
         @foreach (var item in KudosListView.KudosList.Values.OrderByDescending(k => k.SendOn))
         {
             <Kudos  KudosItem=@item 
-                    User=@User 
                     SendLikeCallBack=@SendLikesCallBack 
                     SendUndoLikeCallBack=@SendUndoLikesCallBack 
                     ReplyCallBack=@ReplyKudos 
@@ -151,8 +151,6 @@
     {
         if (firstRender)
         {
-
-
             await LoadMoreItems();
 
             _isLoading = false;
@@ -215,7 +213,7 @@
 
     public async Task<bool> LoadKudos(int pageNumber = 1)
     {
-        var result = await KudosListView.LoadKudos(pageNumber, User.UserProfileId, TypeTab);
+        var result = await KudosListView.LoadKudos(pageNumber, TypeTab);
 
         await InvokeAsync(StateHasChanged).ConfigureAwait(true);
         await Task.Delay(300);
@@ -230,7 +228,7 @@
 
         @if (User != null)
         {
-            filled = item.Likes.Any(l => l.Id == User.UserProfileId);
+            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
         }
 
         return filled;

@@ -6,9 +6,9 @@ public interface IKudosGateway
 {   
     Task<string> SendKudos(SendKudosRequest kudos);
 
-    Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber);
-    Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber);
-    Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber);
+    Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber, string userManagerId);
+    Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber, string userManagerId);
+    Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber, string userManagerId);
     
     Task<bool> Like(SendLikeGateway like);
 
