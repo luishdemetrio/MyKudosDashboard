@@ -118,9 +118,8 @@
           "description": "The branch of the GitHub repository to deploy."
         },
         "defaultValue": "master"
-      }
-    },
-
+      },
+      
     "variables": {
 
       "hostingPlanName": "[parameters('baseResourceName')]",
