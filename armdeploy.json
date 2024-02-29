@@ -1268,21 +1268,6 @@
       }
     },
 
-    {
-      "type": "Microsoft.Sql/servers",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[variables('servers_kudosdb_name')]",
-      "location": "[parameters('location')]",
-      "kind": "v12.0",
-      "properties": {
-        "version": "12.0",
-        "minimalTlsVersion": "1.2",
-        "publicNetworkAccess": "Enabled",     
-        "restrictOutboundNetworkAccess": "Disabled"
-      }
-    },
-
-   
    
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices",
