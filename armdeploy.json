@@ -183,2324 +183,2162 @@
       "storageAccounts_kudosstorage_name": "[concat(parameters('baseResourceName'), 'storage' )]"
 
     },
-    "resources": [
-      {
-        "type": "Microsoft.Web/serverfarms",
-        "apiVersion": "2022-03-01",
-        "name": "[variables('appserviceplan')]",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "[if(variables('isSharedPlan'), concat(variables('skuFamily'), '1'), concat(variables('skuFamily'), parameters('hostingPlanSize')))]",
-          "tier": "[parameters('hostingPlanSku')]",
-          "size": "[concat(variables('skuFamily'), parameters('hostingPlanSize'))]",
-          "family": "[variables('skuFamily')]",
-          "capacity": 1
-        },
-        "kind": "app",
-        "properties": {
-          "perSiteScaling": false,
-          "elasticScaleEnabled": false,
-          "maximumElasticWorkerCount": 1,
-          "isSpot": false,
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "targetWorkerCount": 0,
-          "targetWorkerSizeId": 0,
-          "zoneRedundant": false
-        }
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('appserviceplan')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[if(variables('isSharedPlan'), concat(variables('skuFamily'), '1'), concat(variables('skuFamily'), parameters('hostingPlanSize')))]",
+        "tier": "[parameters('hostingPlanSku')]",
+        "size": "[concat(variables('skuFamily'), parameters('hostingPlanSize'))]",
+        "family": "[variables('skuFamily')]",
+        "capacity": 1
       },
+      "kind": "app",
+      "properties": {
+        "perSiteScaling": false,
+        "elasticScaleEnabled": false,
+        "maximumElasticWorkerCount": 1,
+        "isSpot": false,
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0,
+        "zoneRedundant": false
+      }
+    },
 
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2022-03-01",
-        "name": "[variables('msgraph_appservice')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('msgraph_appservice')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
 
-        ],
-        "resources": [
+      ],
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+          ],
+          "properties": {
+            "PROJECT": "MyKudos.MSGraph.Api/MyKudos.MSGraph.Api.csproj",
+            "SCM_COMMAND_IDLE_TIMEOUT": "120",
+            "settings__clientid": "[parameters('MsGraphClientId')]",
+            "settings__clientsecret": "[parameters('MsGraphClientSecret')]",
+            "settings__tenantid": "[variables('subscriptionTenantId')]",
+            "EmailDomain": "[parameters('EmailDomain')]",
+            "EmailPrefixExclusion": "",
+            "ConnectionStrings__AZURE_SQL_CONNECTIONSTRING": ""
+          }
+        },
+
+        {
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "condition": "[not(empty(parameters('gitRepoUrl')))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('msgraph_appservice'), 'appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('gitRepoUrl')]",
+            "branch": "[parameters('gitBranch')]",
+            "IsManualIntegration": true
+          }
+        }
+      ],
+      "kind": "app",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
           {
-            "apiVersion": "2015-08-01",
-            "name": "appsettings",
-            "type": "config",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
-            ],
-            "properties": {
-              "PROJECT": "MyKudos.MSGraph.Api/MyKudos.MSGraph.Api.csproj",
-              "SCM_COMMAND_IDLE_TIMEOUT": "120",
-              "settings__clientid": "[parameters('MsGraphClientId')]",
-              "settings__clientsecret": "[parameters('MsGraphClientSecret')]",
-              "settings__tenantid": "[variables('subscriptionTenantId')]",
-              "EmailDomain": "[parameters('EmailDomain')]",
-              "EmailPrefixExclusion": "",
-              "ConnectionStrings__AZURE_SQL_CONNECTIONSTRING": ""
-            }
+            "name": "[concat( variables('msgraph_appservice'), '.azurewebsites.net' )]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
           },
-          
           {
-            "apiVersion": "2016-08-01",
-            "name": "web",
-            "type": "sourcecontrols",
-            "condition": "[not(empty(parameters('gitRepoUrl')))]",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]",
-              "[resourceId('Microsoft.Web/sites/config', variables('msgraph_appservice'), 'appsettings')]"
-            ],
-            "properties": {
-              "RepoUrl": "[parameters('gitRepoUrl')]",
-              "branch": "[parameters('gitBranch')]",
-              "IsManualIntegration": true
-            }
+            "name": "[concat( variables('msgraph_appservice'), '.scm.azurewebsites.net' )]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
           }
         ],
-        "kind": "app",
-        "identity": {
-          "type": "SystemAssigned"
-        },
-        "properties": {
-          "enabled": true,
-          "hostNameSslStates": [
-            {
-              "name": "[concat( variables('msgraph_appservice'), '.azurewebsites.net' )]",
-              "sslState": "Disabled",
-              "hostType": "Standard"
-            },
-            {
-              "name": "[concat( variables('msgraph_appservice'), '.scm.azurewebsites.net' )]",
-              "sslState": "Disabled",
-              "hostType": "Repository"
-            }
-          ],
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "vnetRouteAllEnabled": false,
-          "vnetImagePullEnabled": false,
-          "vnetContentShareEnabled": false,
-          "siteConfig": {
-            "numberOfWorkers": 1,
-            "acrUseManagedIdentityCreds": false,
-            "alwaysOn": true,
-            "http20Enabled": false,
-            "functionAppScaleLimit": 0,
-            "minimumElasticInstanceCount": 0
-          },
-          "scmSiteAlsoStopped": false,
-          "clientAffinityEnabled": true,
-          "clientCertEnabled": false,
-          "clientCertMode": "Required",
-          "hostNamesDisabled": false,
-          "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
-          "containerSize": 0,
-          "dailyMemoryTimeQuota": 0,
-          "httpsOnly": true,
-          "redundancyMode": "None",
-          "storageAccountRequired": false,
-          "keyVaultReferenceIdentity": "SystemAssigned"
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('msgraph_appservice'), '/ftp')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
-        ],
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('msgraph_appservice'), '/scm')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
-        ],
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/config",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('msgraph_appservice'), '/web')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
-        ],
-        "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
           "numberOfWorkers": 1,
-          "defaultDocuments": [
-            "Default.htm",
-            "Default.html",
-            "Default.asp",
-            "index.htm",
-            "index.html",
-            "iisstart.htm",
-            "default.aspx",
-            "index.php",
-            "hostingstart.html"
-          ],
-          "netFrameworkVersion": "v6.0",
-          "phpVersion": "5.6",
-          "requestTracingEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": false,
           "acrUseManagedIdentityCreds": false,
-          "logsDirectorySizeLimit": 35,
-          "detailedErrorLoggingEnabled": false,
-          "use32BitWorkerProcess": true,
-          "webSocketsEnabled": false,
           "alwaysOn": true,
-          "managedPipelineMode": "Integrated",
-          "virtualApplications": [
-            {
-              "virtualPath": "/",
-              "physicalPath": "site\\wwwroot",
-              "preloadEnabled": false
-            }
-          ],
-          "loadBalancing": "LeastRequests",
-          "experiments": {
-            "rampUpRules": []
-          },
-          "autoHealEnabled": false,
-          "vnetRouteAllEnabled": false,
-          "vnetPrivatePortsCount": 0,
-          "localMySqlEnabled": false,
-          "managedServiceIdentityId": 11945,
-          "ipSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictionsUseMain": false,
           "http20Enabled": false,
-          "minTlsVersion": "1.2",
-          "scmMinTlsVersion": "1.2",
-          "ftpsState": "FtpsOnly",
-          "preWarmedInstanceCount": 0,
-          "functionsRuntimeScaleMonitoringEnabled": false,
-          "minimumElasticInstanceCount": 0,
-          "azureStorageAccounts": {}
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/hostNameBindings",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('msgraph_appservice'), '/', variables('msgraph_appservice'), '.azurewebsites.net')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 0
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "SystemAssigned"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('msgraph_appservice'), '/ftp')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('msgraph_appservice'), '/scm')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('msgraph_appservice'), '/web')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
         ],
-        "properties": {
-          "siteName": "[variables('msgraph_appservice')]",
-          "hostNameType": "Verified"
-        }
-      },
-
-
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2022-03-01",
-        "name": "[variables('kudos_appservice')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "resources": [
+        "netFrameworkVersion": "v6.0",
+        "phpVersion": "5.6",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "acrUseManagedIdentityCreds": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": true,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
           {
-            "apiVersion": "2015-08-01",
-            "name": "appsettings",
-            "type": "config",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
-              "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
-              "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-            ],
-            "properties": {
-              "PROJECT": "MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj",
-              "SCM_COMMAND_IDLE_TIMEOUT": "120",
-              "AllGroupCompletedDescription": "Completou todos os comportamentos",
-              "AllGroupCompletedImage": "all_group.png",
-              "ClientId": "[parameters('dashboardAppClientId')]",
-              "ClientSecret": "[parameters('dashboardAppClientSecret')]",
-              "TenantId": "[variables('subscriptionTenantId')]",
-              "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-              "ConnectionStrings__AZURE_SQL_CONNECTIONSTRING": "",
-              "KudosMaxPageSize": 10,
-              "DefaultPageNumber": 1,
-              "DefaultPageSize": 5
-            }
-          },
-          {
-            "apiVersion": "2016-08-01",
-            "name": "web",
-            "type": "sourcecontrols",
-            "condition": "[not(empty(parameters('gitRepoUrl')))]",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
-              "[resourceId('Microsoft.Web/sites/config', variables('kudos_appservice'), 'appsettings')]"
-            ],
-            "properties": {
-              "RepoUrl": "[parameters('gitRepoUrl')]",
-              "branch": "[parameters('gitBranch')]",
-              "IsManualIntegration": true
-            }
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
           }
         ],
-
-        "kind": "app",
-        "identity": {
-          "type": "SystemAssigned"
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
         },
-        "properties": {
-          "enabled": true,
-          "hostNameSslStates": [
-            {
-              "name": "[concat( variables('kudos_appservice'), '.azurewebsites.net' )]",
-              "sslState": "Disabled",
-              "hostType": "Standard"
-            },
-            {
-              "name": "[concat( variables('kudos_appservice'), '.scm.azurewebsites.net' )]",
-              "sslState": "Disabled",
-              "hostType": "Repository"
-            }
+        "autoHealEnabled": false,
+        "vnetRouteAllEnabled": false,
+        "vnetPrivatePortsCount": 0,
+        "localMySqlEnabled": false,
+        "managedServiceIdentityId": 11945,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "scmMinTlsVersion": "1.2",
+        "ftpsState": "FtpsOnly",
+        "preWarmedInstanceCount": 0,
+        "functionsRuntimeScaleMonitoringEnabled": false,
+        "minimumElasticInstanceCount": 0,
+        "azureStorageAccounts": {}
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('msgraph_appservice'), '/', variables('msgraph_appservice'), '.azurewebsites.net')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('msgraph_appservice'))]"
+      ],
+      "properties": {
+        "siteName": "[variables('msgraph_appservice')]",
+        "hostNameType": "Verified"
+      }
+    },
+
+
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('kudos_appservice')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
+            "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
           ],
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "vnetRouteAllEnabled": false,
-          "vnetImagePullEnabled": false,
-          "vnetContentShareEnabled": false,
-          "siteConfig": {
-            "numberOfWorkers": 1,
-            "acrUseManagedIdentityCreds": false,
-            "alwaysOn": true,
-            "http20Enabled": false,
-            "functionAppScaleLimit": 0,
-            "minimumElasticInstanceCount": 0
+          "properties": {
+            "PROJECT": "MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj",
+            "SCM_COMMAND_IDLE_TIMEOUT": "120",
+            "AllGroupCompletedDescription": "Completou todos os comportamentos",
+            "AllGroupCompletedImage": "all_group.png",
+            "ClientId": "[parameters('dashboardAppClientId')]",
+            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TenantId": "[variables('subscriptionTenantId')]",
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
+            "ConnectionStrings__AZURE_SQL_CONNECTIONSTRING": "",
+            "KudosMaxPageSize": 10,
+            "DefaultPageNumber": 1,
+            "DefaultPageSize": 5
+          }
+        },
+        {
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "condition": "[not(empty(parameters('gitRepoUrl')))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('kudos_appservice'), 'appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('gitRepoUrl')]",
+            "branch": "[parameters('gitBranch')]",
+            "IsManualIntegration": true
+          }
+        }
+      ],
+
+      "kind": "app",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat( variables('kudos_appservice'), '.azurewebsites.net' )]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
           },
-          "scmSiteAlsoStopped": false,
-          "clientAffinityEnabled": true,
-          "clientCertEnabled": false,
-          "clientCertMode": "Required",
-          "hostNamesDisabled": false,
-          "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
-          "containerSize": 0,
-          "dailyMemoryTimeQuota": 0,
-          "httpsOnly": true,
-          "redundancyMode": "None",
-          "storageAccountRequired": false,
-          "keyVaultReferenceIdentity": "SystemAssigned"
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('kudos_appservice'), '/ftp')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+          {
+            "name": "[concat( variables('kudos_appservice'), '.scm.azurewebsites.net' )]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
         ],
-
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('kudos_appservice'), '/scm')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
-        ],
-
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/config",
-        "apiVersion": "2022-09-01",
-        "name": "[concat(variables('kudos_appservice'), '/web')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
-        ],
-
-        "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
           "numberOfWorkers": 1,
-          "defaultDocuments": [
-            "Default.htm",
-            "Default.html",
-            "Default.asp",
-            "index.htm",
-            "index.html",
-            "iisstart.htm",
-            "default.aspx",
-            "index.php",
-            "hostingstart.html"
-          ],
-          "netFrameworkVersion": "v6.0",
-          "phpVersion": "5.6",
-          "requestTracingEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": false,
           "acrUseManagedIdentityCreds": false,
-          "logsDirectorySizeLimit": 35,
-          "detailedErrorLoggingEnabled": false,
-          "publishingUsername": "[variables('kudos_appservice')]",
-          "use32BitWorkerProcess": true,
-          "webSocketsEnabled": false,
           "alwaysOn": true,
-          "managedPipelineMode": "Integrated",
-          "virtualApplications": [
-            {
-              "virtualPath": "/",
-              "physicalPath": "site\\wwwroot",
-              "preloadEnabled": false
-            }
-          ],
-          "loadBalancing": "LeastRequests",
-          "experiments": {
-            "rampUpRules": []
-          },
-          "autoHealEnabled": false,
-          "vnetRouteAllEnabled": false,
-          "vnetPrivatePortsCount": 0,
-          "localMySqlEnabled": false,
-          "managedServiceIdentityId": 11947,
-          "ipSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictionsUseMain": false,
           "http20Enabled": false,
-          "minTlsVersion": "1.2",
-          "scmMinTlsVersion": "1.2",
-          "ftpsState": "FtpsOnly",
-          "preWarmedInstanceCount": 0,
-          "functionsRuntimeScaleMonitoringEnabled": false,
-          "minimumElasticInstanceCount": 0,
-          "azureStorageAccounts": {}
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/hostNameBindings",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('kudos_appservice'), '/', variables('kudos_appservice'), '.azurewebsites.net')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 0
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "SystemAssigned"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('kudos_appservice'), '/ftp')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+      ],
+
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('kudos_appservice'), '/scm')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+      ],
+
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('kudos_appservice'), '/web')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+      ],
+
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
         ],
-        "properties": {
-          "siteName": "[variables('kudos_appservice')]",
-          "hostNameType": "Verified"
-        }
-      },
-
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2022-03-01",
-        "name": "[variables('gateway_appservice')]",
-        "location": "[parameters('location')]",
-
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "resources": [
+        "netFrameworkVersion": "v6.0",
+        "phpVersion": "5.6",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "acrUseManagedIdentityCreds": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "[variables('kudos_appservice')]",
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": true,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
           {
-            "apiVersion": "2015-08-01",
-            "name": "appsettings",
-            "type": "config",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]",
-              "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-            ],
-            "properties": {
-              "PROJECT": "MyKudos.Gateway/MyKudos.Gateway.csproj",
-              "SCM_COMMAND_IDLE_TIMEOUT": "120",
-              "ADSyncIntervalFromMinutes": "1400",
-              "agentServiceUrl": "",
-
-              "ClientId": "[parameters('dashboardAppClientId')]",
-              "ClientSecret": "[parameters('dashboardAppClientSecret')]",
-              "TenantId": "[subscription().tenantId]",
-              "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-              "DefaultProfilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAyADIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD98Me2c5pVTDdKTHHHHv61xP7T3xdb9nz9mr4iePo7U30ngjwzqfiBbbOPPNpaS3ATP+15ePxoJjFydkeE/td/8FVdB+AHxJufh54F8I6x8WviXp4RtS0rTJhaWGg71V4xe3jK4SR0YMsMMc0oG0uqK6M3jsH/AAWt8ffCDWIZvjJ8ANT8M+GZnAk1LQ766uJ7QEE7jBd2lskyjqTFMWABwjEgH3j/AIJefso2P7Nf7Jnhe+vturfEDxhZDxJ4p1+ceZeanqN9/pVy7SHLcySnPPOM+mO8+PWlWfifw5fabqVrDqGn3qGKe2uEEkUynIIKng/0NcWPxXsIcy/r+vQ9rLMPQrV/YyjdbX1+/wBfw8jvPhX8UPDvxv8Ah1pHizwnqlrrnh3XrZbuxvbcnZMh46EBlZSCrIwDIysrBWBA3t2O2PpX53f8EP8AVrr4TfHD4/8AwT+1TSaF4SvbDxDpEMrbjAt4bmKXb/djKW1t8veQTPyzuT+iR/2enTArfD1lVpRqLZnJm2B+p4ueGvflf5q+vn38xDwetFI33j938qK2PPHdu3Xv9a86/bB+DE/7SX7J/wATPh7aXclheeOPC2paHb3COV8iW4tZIkY4IyAzDIJwwyDwTXooLY+7nnivOPjj+2F8Kf2aLy2tfH/xD8G+EdQvk32lhqOqxRX94CSB5NtnzZckEAIhyRgc0MdPmUk47mH+wN8V4fjf+w98MfEkUbW8t14dtbe8tn4ks7u3T7PcwOOoeOaKRGB5DKR2q18ZWxazY644/OvivwN/wUr8C/Ab9qHx3c/Cu18a/Ez4N+J7o674xtdL8P3UNx4B125Ks9xaw3KQyXdvfDfcSxQrIyTLJIhfzjGmp+0n/wAFafBnxQtLXwv8Gbi78QeNfElxFp1tfa7o9/oOh+HHnlWJbi/uLyGIgK7qBFCskjMQAprwc4mpUuRbr+l959dkWX13jI1IwfLLVaP5/cXv+CVnw5g8b/8ABQn4/fFG1jk+x6RZWfgyO4j/ANTc3LSNdTxN2LRQpYSL6C+f+9X6GcZIHB+leX/sd/ss6P8Asbfs/aP4H0m8m1aa1Ml3qmr3ESx3GuahM3mXF3IF4Uu5O1ASI0VI1+VBXp2W3ccc+ma9TA4d0KEaT3SPDzrMFjcbUxMdm9PRaL/N+Yvl/T86KQx5NFdZ5p4n+3Z8RfEXhf4d+F/Cfg/U5NC8VfFTxLb+E7HVolRptHgMFxe393CHBX7RHp9lemEsrKJvKLK6go3F/Crwd8Jv2dfFd14D8J2Ph/QPE+pad/bl9ArF9Z1qEyGFr66uZCbi9kMg2yTyySSb2Uu2XUnc/bj8AfEDXfGfwn8WeB/Cdl44j+Hesahqt7o/9sxabfTST6Zc2ET27TL5LlVu59yySRcMMMeQfgv/AIKHan8bvGPxP+GPj3QfgT8atB8VfDfV5WeKPQ4NWW80+6Cx3lus2l3F1vRgkbhGUDdECMlvl9/JaNGb/eTUX5tJ/ifJcQ4LF4utDD07+zad2tubW1120S8r3Oq/bD/Z0+IHwh/aGT43fAS4tW8Uy2h0/wAQ+HroqbbXrbIPKMyLL0BMZeNtyxsksf7xZPA/2k/jJ+0R+3N4Dm8D3H7P+i+ALrUImtLvWb67+0WkauNryKjkKpClsZ83k42twR9TS/tY2s+hrc6/4X+LHht1QGVtV+GfiSziBPH35LAKOfU965XXf2rvBcsbf8TbUbds423Ghalbv/3zJbqfxxX1k+HcixtWNbGSi5RtrzJXttfWz+Z7PDGe5zltD6vTcoq1ttUnpva/3WOT+Hfg/wAQ/sNfBp9V0f44eOvC/wDwiGmSahfvNdHVtBkSCIs+/TrneDGQpG23aGRjgIUYgV+iH/BPX9rR/wBtT9lnQ/Gl5YwaTr3mzaZrdlAHENvewPtdow+XWKVfLnjVyXWOdFY7ga/H/wDbt+NOqfGfQNF+Hvgjw/4w8QWPiS8iuNa1Ow8J6veW8MNvIs0VviK1YyF5lieRUDZiikUj5q/Rz/gh74c1Hw98AfiM17o/iPSLa98dtNYHWdDvNHmvYl0TR4XnSG6ijk8tp4pwG27SUYAnBrweKsty3DTjLLkktmou62Tva9lulpa+vY+sxWOrYzCurinzTjJJNpc1mpXTe7V11vb5n2cYsminB8UV8iePzMkuFy/TtTQi7vujt2oooBjnYjPJpiyN/eb86KKAHhj6mkcbn55+tFFAhKKKKBH/2Q==",
-
-              "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
-              "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
-
-              "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
-
-              "PolulateProfilestimeoutInSeconds": "600",
-
-              "TopContributors": 30,
-
-              "SelectedCulture": "pt-Br",
-
-              "EventHub_CommentDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentDeleted/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_CommentDeletedName": "CommentDeleted",
-
-              "EventHub_CommentSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentSent/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_CommentSentName": "CommentSent",
-
-              "EventHub_CommentUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentUpdated/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_CommentUpdatedName": "CommentUpdated",
-
-              "EventHub_KudosDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosDeleted/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_KudosDeletedName": "KudosDeleted",
-
-              "EventHub_KudosSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosSent/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_KudosSentName": "KudosSent",
-
-              "EventHub_KudosUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosUpdated/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_KudosUpdatedName": "KudosUpdated",
-
-              "EventHub_LikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'LikeSent/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_LikeSentName": "LikeSent",
-
-              "EventHub_ScoreConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'calculateuserscore/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_ScoreName": "calculateuserscore",
-
-              "EventHub_UndoLikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'UndoLikeSent/publisher', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_UndoLikeSentName": "UndoLikeSent"
-
-            }
-          },
-          {
-            "apiVersion": "2016-08-01",
-            "name": "web",
-            "type": "sourcecontrols",
-            "condition": "[not(empty(parameters('gitRepoUrl')))]",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]",
-              "[resourceId('Microsoft.Web/sites/config', variables('gateway_appservice'), 'appsettings')]"
-            ],
-            "properties": {
-              "RepoUrl": "[parameters('gitRepoUrl')]",
-              "branch": "[parameters('gitBranch')]",
-              "IsManualIntegration": true
-            }
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
           }
         ],
-        "kind": "app",
-        "identity": {
-          "type": "SystemAssigned"
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
         },
-        "properties": {
-          "enabled": true,
-          "hostNameSslStates": [
-            {
-              "name": "[concat(variables('gateway_appservice'), '.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Standard"
-            },
-            {
-              "name": "[concat(variables('gateway_appservice'), '.scm.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Repository"
-            }
+        "autoHealEnabled": false,
+        "vnetRouteAllEnabled": false,
+        "vnetPrivatePortsCount": 0,
+        "localMySqlEnabled": false,
+        "managedServiceIdentityId": 11947,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "scmMinTlsVersion": "1.2",
+        "ftpsState": "FtpsOnly",
+        "preWarmedInstanceCount": 0,
+        "functionsRuntimeScaleMonitoringEnabled": false,
+        "minimumElasticInstanceCount": 0,
+        "azureStorageAccounts": {}
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('kudos_appservice'), '/', variables('kudos_appservice'), '.azurewebsites.net')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
+      ],
+      "properties": {
+        "siteName": "[variables('kudos_appservice')]",
+        "hostNameType": "Verified"
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('gateway_appservice')]",
+      "location": "[parameters('location')]",
+
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"        
+      ],
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'CommentDeleted')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'CommentSent')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'CommentUpdated')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'KudosDeleted')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'KudosSent')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'KudosUpdated')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'LikeSent')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
+            "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'UndoLikeSent')]",
+            "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
           ],
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "vnetRouteAllEnabled": false,
-          "vnetImagePullEnabled": false,
-          "vnetContentShareEnabled": false,
-          "siteConfig": {
-            "numberOfWorkers": 1,
-            "acrUseManagedIdentityCreds": false,
-            "alwaysOn": true,
-            "http20Enabled": false,
-            "functionAppScaleLimit": 0,
-            "minimumElasticInstanceCount": 0
+          "properties": {
+            "PROJECT": "MyKudos.Gateway/MyKudos.Gateway.csproj",
+            "SCM_COMMAND_IDLE_TIMEOUT": "120",
+            "ADSyncIntervalFromMinutes": "1400",
+            "agentServiceUrl": "",
+
+            "ClientId": "[parameters('dashboardAppClientId')]",
+            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TenantId": "[subscription().tenantId]",
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
+            "DefaultProfilePicture": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAyADIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD98Me2c5pVTDdKTHHHHv61xP7T3xdb9nz9mr4iePo7U30ngjwzqfiBbbOPPNpaS3ATP+15ePxoJjFydkeE/td/8FVdB+AHxJufh54F8I6x8WviXp4RtS0rTJhaWGg71V4xe3jK4SR0YMsMMc0oG0uqK6M3jsH/AAWt8ffCDWIZvjJ8ANT8M+GZnAk1LQ766uJ7QEE7jBd2lskyjqTFMWABwjEgH3j/AIJefso2P7Nf7Jnhe+vturfEDxhZDxJ4p1+ceZeanqN9/pVy7SHLcySnPPOM+mO8+PWlWfifw5fabqVrDqGn3qGKe2uEEkUynIIKng/0NcWPxXsIcy/r+vQ9rLMPQrV/YyjdbX1+/wBfw8jvPhX8UPDvxv8Ah1pHizwnqlrrnh3XrZbuxvbcnZMh46EBlZSCrIwDIysrBWBA3t2O2PpX53f8EP8AVrr4TfHD4/8AwT+1TSaF4SvbDxDpEMrbjAt4bmKXb/djKW1t8veQTPyzuT+iR/2enTArfD1lVpRqLZnJm2B+p4ueGvflf5q+vn38xDwetFI33j938qK2PPHdu3Xv9a86/bB+DE/7SX7J/wATPh7aXclheeOPC2paHb3COV8iW4tZIkY4IyAzDIJwwyDwTXooLY+7nnivOPjj+2F8Kf2aLy2tfH/xD8G+EdQvk32lhqOqxRX94CSB5NtnzZckEAIhyRgc0MdPmUk47mH+wN8V4fjf+w98MfEkUbW8t14dtbe8tn4ks7u3T7PcwOOoeOaKRGB5DKR2q18ZWxazY644/OvivwN/wUr8C/Ab9qHx3c/Cu18a/Ez4N+J7o674xtdL8P3UNx4B125Ks9xaw3KQyXdvfDfcSxQrIyTLJIhfzjGmp+0n/wAFafBnxQtLXwv8Gbi78QeNfElxFp1tfa7o9/oOh+HHnlWJbi/uLyGIgK7qBFCskjMQAprwc4mpUuRbr+l959dkWX13jI1IwfLLVaP5/cXv+CVnw5g8b/8ABQn4/fFG1jk+x6RZWfgyO4j/ANTc3LSNdTxN2LRQpYSL6C+f+9X6GcZIHB+leX/sd/ss6P8Asbfs/aP4H0m8m1aa1Ml3qmr3ESx3GuahM3mXF3IF4Uu5O1ASI0VI1+VBXp2W3ccc+ma9TA4d0KEaT3SPDzrMFjcbUxMdm9PRaL/N+Yvl/T86KQx5NFdZ5p4n+3Z8RfEXhf4d+F/Cfg/U5NC8VfFTxLb+E7HVolRptHgMFxe393CHBX7RHp9lemEsrKJvKLK6go3F/Crwd8Jv2dfFd14D8J2Ph/QPE+pad/bl9ArF9Z1qEyGFr66uZCbi9kMg2yTyySSb2Uu2XUnc/bj8AfEDXfGfwn8WeB/Cdl44j+Hesahqt7o/9sxabfTST6Zc2ET27TL5LlVu59yySRcMMMeQfgv/AIKHan8bvGPxP+GPj3QfgT8atB8VfDfV5WeKPQ4NWW80+6Cx3lus2l3F1vRgkbhGUDdECMlvl9/JaNGb/eTUX5tJ/ifJcQ4LF4utDD07+zad2tubW1120S8r3Oq/bD/Z0+IHwh/aGT43fAS4tW8Uy2h0/wAQ+HroqbbXrbIPKMyLL0BMZeNtyxsksf7xZPA/2k/jJ+0R+3N4Dm8D3H7P+i+ALrUImtLvWb67+0WkauNryKjkKpClsZ83k42twR9TS/tY2s+hrc6/4X+LHht1QGVtV+GfiSziBPH35LAKOfU965XXf2rvBcsbf8TbUbds423Ghalbv/3zJbqfxxX1k+HcixtWNbGSi5RtrzJXttfWz+Z7PDGe5zltD6vTcoq1ttUnpva/3WOT+Hfg/wAQ/sNfBp9V0f44eOvC/wDwiGmSahfvNdHVtBkSCIs+/TrneDGQpG23aGRjgIUYgV+iH/BPX9rR/wBtT9lnQ/Gl5YwaTr3mzaZrdlAHENvewPtdow+XWKVfLnjVyXWOdFY7ga/H/wDbt+NOqfGfQNF+Hvgjw/4w8QWPiS8iuNa1Ow8J6veW8MNvIs0VviK1YyF5lieRUDZiikUj5q/Rz/gh74c1Hw98AfiM17o/iPSLa98dtNYHWdDvNHmvYl0TR4XnSG6ijk8tp4pwG27SUYAnBrweKsty3DTjLLkktmou62Tva9lulpa+vY+sxWOrYzCurinzTjJJNpc1mpXTe7V11vb5n2cYsminB8UV8iePzMkuFy/TtTQi7vujt2oooBjnYjPJpiyN/eb86KKAHhj6mkcbn55+tFFAhKKKKBH/2Q==",
+
+            "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
+            "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
+
+            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
+
+            "PolulateProfilestimeoutInSeconds": "600",
+
+            "TopContributors": 30,
+
+            "SelectedCulture": "pt-Br",
+
+            "EventHub_CommentDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', variables('KudosEventHubs_name'), 'CommentDeleted', 'Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_CommentDeletedName": "CommentDeleted",
+
+            "EventHub_CommentSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentSent','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_CommentSentName": "CommentSent",
+
+            "EventHub_CommentUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentUpdated', 'Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_CommentUpdatedName": "CommentUpdated",
+
+            "EventHub_KudosDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosDeleted','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_KudosDeletedName": "KudosDeleted",
+
+            "EventHub_KudosSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosSent','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_KudosSentName": "KudosSent",
+
+            "EventHub_KudosUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosUpdated','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_KudosUpdatedName": "KudosUpdated",
+
+            "EventHub_LikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'LikeSent','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_LikeSentName": "LikeSent",
+
+            "EventHub_ScoreConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'calculateuserscore','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_ScoreName": "calculateuserscore",
+
+            "EventHub_UndoLikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'UndoLikeSent','Publisher'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_UndoLikeSentName": "UndoLikeSent"
+
+          }
+        },
+        {
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "condition": "[not(empty(parameters('gitRepoUrl')))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('gateway_appservice'), 'appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('gitRepoUrl')]",
+            "branch": "[parameters('gitBranch')]",
+            "IsManualIntegration": true
+          }
+        }
+      ],
+      "kind": "app",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat(variables('gateway_appservice'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
           },
-          "scmSiteAlsoStopped": false,
-          "clientAffinityEnabled": true,
-          "clientCertEnabled": false,
-          "clientCertMode": "Required",
-          "hostNamesDisabled": false,
-          "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
-          "containerSize": 0,
-          "dailyMemoryTimeQuota": 0,
-          "httpsOnly": true,
-          "redundancyMode": "None",
-          "storageAccountRequired": false,
-          "keyVaultReferenceIdentity": "SystemAssigned"
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('gateway_appservice'), '/ftp')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+          {
+            "name": "[concat(variables('gateway_appservice'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
         ],
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('gateway_appservice'), '/scm')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
-        ],
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/config",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('gateway_appservice'), '/web')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
-        ],
-        "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
           "numberOfWorkers": 1,
-          "defaultDocuments": [
-            "Default.htm",
-            "Default.html",
-            "Default.asp",
-            "index.htm",
-            "index.html",
-            "iisstart.htm",
-            "default.aspx",
-            "index.php",
-            "hostingstart.html"
-          ],
-          "netFrameworkVersion": "v6.0",
-          "phpVersion": "5.6",
-          "requestTracingEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": false,
           "acrUseManagedIdentityCreds": false,
-          "logsDirectorySizeLimit": 35,
-          "detailedErrorLoggingEnabled": false,
-          "publishingUsername": "[variables('gateway_appservice')]",
-          "use32BitWorkerProcess": true,
-          "webSocketsEnabled": false,
           "alwaysOn": true,
-          "managedPipelineMode": "Integrated",
-          "virtualApplications": [
-            {
-              "virtualPath": "/",
-              "physicalPath": "site\\wwwroot",
-              "preloadEnabled": false
-            }
-          ],
-          "loadBalancing": "LeastRequests",
-          "experiments": {
-            "rampUpRules": []
-          },
-          "autoHealEnabled": false,
-          "vnetRouteAllEnabled": false,
-          "vnetPrivatePortsCount": 0,
-          "localMySqlEnabled": false,
-          "managedServiceIdentityId": 8757,
-          "ipSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictionsUseMain": false,
           "http20Enabled": false,
-          "minTlsVersion": "1.2",
-          "scmMinTlsVersion": "1.2",
-          "ftpsState": "FtpsOnly",
-          "preWarmedInstanceCount": 0,
-          "functionsRuntimeScaleMonitoringEnabled": false,
-          "minimumElasticInstanceCount": 0,
-          "azureStorageAccounts": {}
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/hostNameBindings",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('gateway_appservice'), '/', variables('gateway_appservice'), '.azurewebsites.net')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 0
+        },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "SystemAssigned"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('gateway_appservice'), '/ftp')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('gateway_appservice'), '/scm')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('gateway_appservice'), '/web')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
         ],
-        "properties": {
-          "siteName": "[variables('gateway_appservice')]",
-          "hostNameType": "Verified"
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/siteextensions",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('gateway_appservice'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
-        ]
-      },
+        "netFrameworkVersion": "v6.0",
+        "phpVersion": "5.6",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "acrUseManagedIdentityCreds": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "[variables('gateway_appservice')]",
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": true,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "vnetRouteAllEnabled": false,
+        "vnetPrivatePortsCount": 0,
+        "localMySqlEnabled": false,
+        "managedServiceIdentityId": 8757,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "scmMinTlsVersion": "1.2",
+        "ftpsState": "FtpsOnly",
+        "preWarmedInstanceCount": 0,
+        "functionsRuntimeScaleMonitoringEnabled": false,
+        "minimumElasticInstanceCount": 0,
+        "azureStorageAccounts": {}
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('gateway_appservice'), '/', variables('gateway_appservice'), '.azurewebsites.net')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+      ],
+      "properties": {
+        "siteName": "[variables('gateway_appservice')]",
+        "hostNameType": "Verified"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/siteextensions",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('gateway_appservice'), '/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('gateway_appservice'))]"
+      ]
+    },
 
-      {
-        "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-        "apiVersion": "2022-01-31-preview",
-        "name": "[variables('userAssignedIdentities_teams_appservice')]",
-        "location": "[parameters('location')]"
-      },
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2022-01-31-preview",
+      "name": "[variables('userAssignedIdentities_teams_appservice')]",
+      "location": "[parameters('location')]"
+    },
 
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('teams_appservice'), '/ftp')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('teams_appservice'), '/ftp')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('teams_appservice'), '/scm')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
+      ],
+      "properties": {
+        "allow": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('teams_appservice'), '/web')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
+      ],
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
         ],
-        "properties": {
-          "allow": true
+        "netFrameworkVersion": "v6.0",
+        "phpVersion": "5.6",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "httpLoggingEnabled": false,
+        "acrUseManagedIdentityCreds": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "[variables('userAssignedIdentities_teams_appservice')]",
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": true,
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": false
+          }
+        ],
+        "loadBalancing": "LeastRequests",
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "vnetRouteAllEnabled": false,
+        "vnetPrivatePortsCount": 0,
+        "localMySqlEnabled": false,
+        "xManagedServiceIdentityId": 247,
+        "ipSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictions": [
+          {
+            "ipAddress": "Any",
+            "action": "Allow",
+            "priority": 2147483647,
+            "name": "Allow all",
+            "description": "Allow all access"
+          }
+        ],
+        "scmIpSecurityRestrictionsUseMain": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "scmMinTlsVersion": "1.2",
+        "ftpsState": "FtpsOnly",
+        "preWarmedInstanceCount": 0,
+        "functionsRuntimeScaleMonitoringEnabled": false,
+        "minimumElasticInstanceCount": 0,
+        "azureStorageAccounts": {}
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('teams_appservice'), '/', variables('teams_appservice'), '.azurewebsites.net')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
+      ],
+      "properties": {
+        "siteName": "[variables('teams_appservice')]",
+        "hostNameType": "Verified"
+      }
+    },
+
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('teams_appservice')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]",
+            "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+          ],
+          "properties": {
+            "PROJECT": "MyKudosDashboard/MyKudosDashboard.csproj",
+            "SCM_COMMAND_IDLE_TIMEOUT": "240",
+
+            "IDENTITY_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice') )).clientId]",
+            "TeamsFx__Authentication__ClientId": "[parameters('dashboardAppClientId')]",
+            "TeamsFx__Authentication__ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('teams_appservice')) , '.azurewebsites.net/auth-start.html')]",
+            "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', subscription().tenantId)]",
+
+            "GatewayServiceUrl": "[concat( concat('https://', variables('gateway_appservice')) , '.azurewebsites.net/')]",
+
+            "ClientId": "[parameters('dashboardAppClientId')]",
+            "ClientSecret": "[parameters('dashboardAppClientSecret')]",
+            "TenantId": "[subscription().tenantId]",
+            "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
+
+            "EventHub_CommentDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentDeleted', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_CommentDeletedName": "CommentDeleted",
+
+            "EventHub_CommentSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentSent', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_CommentSentName": "CommentSent",
+
+            "EventHub_CommentUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentUpdated', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_CommentUpdatedName": "CommentUpdated",
+
+            "EventHub_KudosDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosDeleted', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_KudosDeletedName": "KudosDeleted",
+
+            "EventHub_KudosSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosSent', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_KudosSentName": "KudosSent",
+
+            "EventHub_KudosUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosUpdated', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_KudosUpdatedName": "KudosUpdated",
+
+            "EventHub_LikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'LikeSent', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_LikeSentName": "LikeSent",
+
+            "EventHub_ScoreConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'calculateuserscore', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_ScoreName": "calculateuserscore",
+
+            "EventHub_UndoLikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'UndoLikeSent', 'Consumer'), '2023-01-01-preview').primaryConnectionString]",
+            "EventHub_UndoLikeSentName": "UndoLikeSent",
+
+            "EventHub_blobContainerName": "kudoseventhubcontainer",
+            "EventHub_blobStorageConnectionString": "",
+
+            "selectedCulture": "pt-Br",
+
+            "WEBSITE_TIME_ZONE": "E. South America Standard Time",
+
+            "Storage_ConnectionString": "",
+
+            "Storage_ContainerName": "images",
+
+            "CanEditOrDeleteKudosInDays": "7",
+
+            "UsesAzureOpenAI": true,
+
+            "AZURE_OPENAI_API_KEY": "",
+
+            "ShowTopContributors": true,
+
+            "ShowAllKudosTab": true
+
+
+          }
+        },
+        {
+          "apiVersion": "2016-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "condition": "[not(empty(parameters('gitRepoUrl')))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]",
+            "[resourceId('Microsoft.Web/sites/config', variables('teams_appservice'), 'appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('gitRepoUrl')]",
+            "branch": "[parameters('gitBranch')]",
+            "IsManualIntegration": true
+          }
+        }
+      ],
+
+      "kind": "app",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[variables('userAssignedIdentities_externalid')]": {}
         }
       },
-
-      {
-        "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('teams_appservice'), '/scm')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
+      "properties": {
+        "enabled": true,
+        "hostNameSslStates": [
+          {
+            "name": "[concat(variables('teams_appservice'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat(variables('teams_appservice'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
         ],
-        "properties": {
-          "allow": true
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/config",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('teams_appservice'), '/web')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
-        ],
-        "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
+        "reserved": false,
+        "isXenon": false,
+        "hyperV": false,
+        "vnetRouteAllEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetContentShareEnabled": false,
+        "siteConfig": {
           "numberOfWorkers": 1,
-          "defaultDocuments": [
-            "Default.htm",
-            "Default.html",
-            "Default.asp",
-            "index.htm",
-            "index.html",
-            "iisstart.htm",
-            "default.aspx",
-            "index.php",
-            "hostingstart.html"
-          ],
-          "netFrameworkVersion": "v6.0",
-          "phpVersion": "5.6",
-          "requestTracingEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "httpLoggingEnabled": false,
           "acrUseManagedIdentityCreds": false,
-          "logsDirectorySizeLimit": 35,
-          "detailedErrorLoggingEnabled": false,
-          "publishingUsername": "[variables('userAssignedIdentities_teams_appservice')]",
-          "use32BitWorkerProcess": true,
-          "webSocketsEnabled": false,
           "alwaysOn": true,
-          "managedPipelineMode": "Integrated",
-          "virtualApplications": [
-            {
-              "virtualPath": "/",
-              "physicalPath": "site\\wwwroot",
-              "preloadEnabled": false
-            }
-          ],
-          "loadBalancing": "LeastRequests",
-          "experiments": {
-            "rampUpRules": []
-          },
-          "autoHealEnabled": false,
-          "vnetRouteAllEnabled": false,
-          "vnetPrivatePortsCount": 0,
-          "localMySqlEnabled": false,
-          "xManagedServiceIdentityId": 247,
-          "ipSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictions": [
-            {
-              "ipAddress": "Any",
-              "action": "Allow",
-              "priority": 2147483647,
-              "name": "Allow all",
-              "description": "Allow all access"
-            }
-          ],
-          "scmIpSecurityRestrictionsUseMain": false,
           "http20Enabled": false,
-          "minTlsVersion": "1.2",
-          "scmMinTlsVersion": "1.2",
-          "ftpsState": "FtpsOnly",
-          "preWarmedInstanceCount": 0,
-          "functionsRuntimeScaleMonitoringEnabled": false,
-          "minimumElasticInstanceCount": 0,
-          "azureStorageAccounts": {}
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites/hostNameBindings",
-        "apiVersion": "2022-03-01",
-        "name": "[concat(variables('teams_appservice'), '/', variables('teams_appservice'), '.azurewebsites.net')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]"
-        ],
-        "properties": {
-          "siteName": "[variables('teams_appservice')]",
-          "hostNameType": "Verified"
-        }
-      },
-
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2022-03-01",
-        "name": "[variables('teams_appservice')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-
-        "resources": [
-          {
-            "apiVersion": "2015-08-01",
-            "name": "appsettings",
-            "type": "config",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]",
-              "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-            ],
-            "properties": {
-              "PROJECT": "MyKudosDashboard/MyKudosDashboard.csproj",
-              "SCM_COMMAND_IDLE_TIMEOUT": "240",
-
-              "IDENTITY_ID": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice') )).clientId]",
-              "TeamsFx__Authentication__ClientId": "[parameters('dashboardAppClientId')]",
-              "TeamsFx__Authentication__ClientSecret": "[parameters('dashboardAppClientSecret')]",
-              "TeamsFx__Authentication__InitiateLoginEndpoint": "[concat( concat('https://', variables('teams_appservice')) , '.azurewebsites.net/auth-start.html')]",
-              "TeamsFx__Authentication__OAuthAuthority": "[concat('https://login.microsoftonline.com/', subscription().tenantId)]",
-
-              "GatewayServiceUrl": "[concat( concat('https://', variables('gateway_appservice')) , '.azurewebsites.net/')]",
-
-              "ClientId": "[parameters('dashboardAppClientId')]",
-              "ClientSecret": "[parameters('dashboardAppClientSecret')]",
-              "TenantId": "[subscription().tenantId]",
-              "ExposedApi": "[concat( concat( concat('api://', variables('teams_appservice')) , '.azurewebsites.net/'), concat(parameters('dashboardAppClientId'), '/.default') )]",
-
-              "EventHub_CommentDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentDeleted/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_CommentDeletedName": "CommentDeleted",
-
-              "EventHub_CommentSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentSent/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_CommentSentName": "CommentSent",
-
-              "EventHub_CommentUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'CommentUpdated/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_CommentUpdatedName": "CommentUpdated",
-
-              "EventHub_KudosDeletedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosDeleted/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_KudosDeletedName": "KudosDeleted",
-
-              "EventHub_KudosSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosSent/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_KudosSentName": "KudosSent",
-
-              "EventHub_KudosUpdatedConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'KudosUpdated/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_KudosUpdatedName": "KudosUpdated",
-
-              "EventHub_LikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'LikeSent/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_LikeSentName": "LikeSent",
-
-              "EventHub_ScoreConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'calculateuserscore/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_ScoreName": "calculateuserscore",
-
-              "EventHub_UndoLikeSentConnectionString": "[listKeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationrules', variables('KudosEventHubs_name'), 'UndoLikeSent/consumer', 'RootManageSharedAccessKey'), '2023-01-01-preview').primaryConnectionString]",
-              "EventHub_UndoLikeSentName": "UndoLikeSent",
-
-              "EventHub_blobContainerName": "kudoseventhubcontainer",
-              "EventHub_blobStorageConnectionString": "",
-
-              "selectedCulture": "pt-Br",
-
-              "WEBSITE_TIME_ZONE": "E. South America Standard Time",
-
-              "Storage_ConnectionString": "",
-
-              "Storage_ContainerName": "images",
-
-              "CanEditOrDeleteKudosInDays": "7",
-
-              "UsesAzureOpenAI": true,
-
-              "AZURE_OPENAI_API_KEY": "",
-
-              "ShowTopContributors": true,
-
-              "ShowAllKudosTab": true
-
-
-            }
-          },
-          {
-            "apiVersion": "2016-08-01",
-            "name": "web",
-            "type": "sourcecontrols",
-            "condition": "[not(empty(parameters('gitRepoUrl')))]",
-            "dependsOn": [
-              "[resourceId('Microsoft.Web/sites', variables('teams_appservice'))]",
-              "[resourceId('Microsoft.Web/sites/config', variables('teams_appservice'), 'appsettings')]"
-            ],
-            "properties": {
-              "RepoUrl": "[parameters('gitRepoUrl')]",
-              "branch": "[parameters('gitBranch')]",
-              "IsManualIntegration": true
-            }
-          }
-        ],
-
-        "kind": "app",
-        "identity": {
-          "type": "UserAssigned",
-          "userAssignedIdentities": {
-            "[variables('userAssignedIdentities_externalid')]": {}
-          }
+          "functionAppScaleLimit": 0,
+          "minimumElasticInstanceCount": 0
         },
-        "properties": {
-          "enabled": true,
-          "hostNameSslStates": [
-            {
-              "name": "[concat(variables('teams_appservice'), '.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Standard"
-            },
-            {
-              "name": "[concat(variables('teams_appservice'), '.scm.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Repository"
-            }
-          ],
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "vnetRouteAllEnabled": false,
-          "vnetImagePullEnabled": false,
-          "vnetContentShareEnabled": false,
-          "siteConfig": {
-            "numberOfWorkers": 1,
-            "acrUseManagedIdentityCreds": false,
-            "alwaysOn": true,
-            "http20Enabled": false,
-            "functionAppScaleLimit": 0,
-            "minimumElasticInstanceCount": 0
-          },
-          "scmSiteAlsoStopped": false,
-          "clientAffinityEnabled": true,
-          "clientCertEnabled": false,
-          "clientCertMode": "Required",
-          "hostNamesDisabled": false,
-          "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
-          "containerSize": 0,
-          "dailyMemoryTimeQuota": 0,
-          "httpsOnly": true,
-          "redundancyMode": "None",
-          "storageAccountRequired": false,
-          "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]"
-        }
-      },
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": true,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "hostNamesDisabled": false,
+        "customDomainVerificationId": "C4D5B1C8EC9500A78A17DAB7A6A43A07B1BEC54EA34C21231227CA8832F463CA",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "redundancyMode": "None",
+        "storageAccountRequired": false,
+        "keyVaultReferenceIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('userAssignedIdentities_teams_appservice'))]"
+      }
+    },
 
-      {
-        "type": "Microsoft.EventHub/namespaces",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[variables('KudosEventHubs_name')]",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "Standard",
-          "tier": "Standard",
-          "capacity": 1
-        },
-        "properties": {
-          "minimumTlsVersion": "1.2",
-          "publicNetworkAccess": "Enabled",
-          "disableLocalAuth": false,
-          "privateEndpointConnections": [],
-          "zoneRedundant": true,
-          "isAutoInflateEnabled": false,
-          "maximumThroughputUnits": 0,
-          "kafkaEnabled": true
-        }
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('storageAccounts_kudoseventstorage_name')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
       },
-      {
-        "type": "Microsoft.EventHub/namespaces/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/Publisher')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/RootManageSharedAccessKey')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Listen",
-            "Manage",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/consumer')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Listen"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/likesent/consumer')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Listen"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/PreviewDataPolicy')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Listen"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/likesent/PreviewDataPolicy')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Listen"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/likesent/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/publisher')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Manage",
-            "Listen",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentupdated')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/likesent/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/$Default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/getkudossent_consumer_group')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/kudossentpbi-cg')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "userMetadata": "KudosSentPBI-cg"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/preview_data_consumer_group')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/likesent/preview_data_consumer_group')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/Publisher')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/authorizationrules",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/RootManageSharedAccessKey')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "rights": [
-            "Listen",
-            "Manage",
-            "Send"
-          ]
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentsent')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudossent')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 24
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/likesent')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 24
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/eventhubs",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "retentionDescription": {
-            "cleanupPolicy": "Delete",
-            "retentionTimeInHours": 1
-          },
-          "messageRetentionInDays": 1,
-          "partitionCount": 1,
-          "status": "Active"
-        }
-      },
-      {
-        "type": "Microsoft.EventHub/namespaces/networkrulesets",
-        "apiVersion": "2023-01-01-preview",
-        "name": "[concat(variables('KudosEventHubs_name'), '/default')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
-        ],
-        "properties": {
-          "publicNetworkAccess": "Enabled",
-          "defaultAction": "Allow",
+      "kind": "StorageV2",
+      "properties": {
+        "dnsEndpointType": "Standard",
+        "defaultToOAuthAuthentication": false,
+        "publicNetworkAccess": "Enabled",
+        "allowCrossTenantReplication": true,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false,
+        "allowSharedKeyAccess": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
           "virtualNetworkRules": [],
           "ipRules": [],
-          "trustedServiceAccessEnabled": false
-        }
-      },
-
-      {
-        "type": "Microsoft.Storage/storageAccounts",
-        "apiVersion": "2023-01-01",
-        "name": "[variables('storageAccounts_kudoseventstorage_name')]",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
+          "defaultAction": "Allow"
         },
-        "kind": "StorageV2",
-        "properties": {
-          "dnsEndpointType": "Standard",
-          "defaultToOAuthAuthentication": false,
-          "publicNetworkAccess": "Enabled",
-          "allowCrossTenantReplication": true,
-          "minimumTlsVersion": "TLS1_2",
-          "allowBlobPublicAccess": false,
-          "allowSharedKeyAccess": true,
-          "networkAcls": {
-            "bypass": "AzureServices",
-            "virtualNetworkRules": [],
-            "ipRules": [],
-            "defaultAction": "Allow"
-          },
-          "supportsHttpsTrafficOnly": true,
-          "encryption": {
-            "requireInfrastructureEncryption": false,
-            "services": {
-              "file": {
-                "keyType": "Account",
-                "enabled": true
-              },
-              "blob": {
-                "keyType": "Account",
-                "enabled": true
-              }
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "requireInfrastructureEncryption": false,
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
             },
-            "keySource": "Microsoft.Storage"
-          },
-          "accessTier": "Hot"
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts",
-        "apiVersion": "2023-01-01",
-        "name": "[variables('storageAccounts_kudosstorage_name')]",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "kind": "StorageV2",
-        "properties": {
-          "dnsEndpointType": "Standard",
-          "defaultToOAuthAuthentication": false,
-          "publicNetworkAccess": "Enabled",
-          "allowCrossTenantReplication": false,
-          "minimumTlsVersion": "TLS1_2",
-          "allowBlobPublicAccess": false,
-          "allowSharedKeyAccess": true,
-          "networkAcls": {
-            "bypass": "AzureServices",
-            "virtualNetworkRules": [],
-            "ipRules": [],
-            "defaultAction": "Allow"
-          },
-          "supportsHttpsTrafficOnly": true,
-          "encryption": {
-            "requireInfrastructureEncryption": false,
-            "services": {
-              "file": {
-                "keyType": "Account",
-                "enabled": true
-              },
-              "blob": {
-                "keyType": "Account",
-                "enabled": true
-              }
-            },
-            "keySource": "Microsoft.Storage"
-          },
-          "accessTier": "Hot"
-        }
-      },
-
-      {
-        "type": "Microsoft.Sql/servers",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[variables('servers_kudosdb_name')]",
-        "location": "[parameters('location')]",
-        "kind": "v12.0",
-        "properties": {
-          "administratorLogin": "CloudSA549d39ed",
-          "version": "12.0",
-          "minimalTlsVersion": "1.2",
-          "publicNetworkAccess": "Enabled",
-          "administrators": {
-            "administratorType": "ActiveDirectory",
-            "principalType": "User",
-            "azureADOnlyAuthentication": false
-          },
-          "restrictOutboundNetworkAccess": "Disabled"
-        }
-      },
-
-      {
-        "type": "Microsoft.Sql/servers/advisors",
-        "apiVersion": "2014-04-01",
-        "name": "[concat(variables('servers_kudosdb_name'), '/ForceLastGoodPlan')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "autoExecuteValue": "Enabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/auditingPolicies",
-        "apiVersion": "2014-04-01",
-        "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "auditingState": "Disabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/azureADOnlyAuthentications",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "azureADOnlyAuthentication": false
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/connectionPolicies",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/default')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "connectionType": "Default"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/kudosdb')]",
-         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "sku": {
-          "name": "Basic",
-          "tier": "Basic",
-          "capacity": 5
-        },
-        "kind": "v12.0,user",
-        "properties": {
-          "collation": "SQL_Latin1_General_CP1_CI_AS",
-          "maxSizeBytes": 2147483648,
-          "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-          "zoneRedundant": false,
-          "readScale": "Disabled",
-          "requestedBackupStorageRedundancy": "Local",
-          "maintenanceConfigurationId": "/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
-          "isLedgerOn": false,
-          "availabilityZone": "NoPreference"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "state": "Disabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/auditingPolicies",
-        "apiVersion": "2014-04-01",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "auditingState": "Disabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/auditingSettings",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "retentionDays": 0,
-          "auditActionsAndGroups": [],
-          "isStorageSecondaryKeyInUse": false,
-          "isAzureMonitorTargetEnabled": false,
-          "isManagedIdentityInUse": false,
-          "state": "Disabled",
-          "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "retentionDays": 0,
-          "auditActionsAndGroups": [],
-          "isStorageSecondaryKeyInUse": false,
-          "isAzureMonitorTargetEnabled": false,
-          "isManagedIdentityInUse": false,
-          "state": "Disabled",
-          "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "state": "Disabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Current')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {}
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "state": "Disabled",
-          "disabledAlerts": [
-            ""
-          ],
-          "emailAddresses": [
-            ""
-          ],
-          "emailAccountAdmins": false,
-          "retentionDays": 0
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Current')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "state": "Disabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "recurringScans": {
-            "isEnabled": false,
-            "emailSubscriptionAdmins": true,
-            "emails": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/devOpsAuditingSettings",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "isAzureMonitorTargetEnabled": false,
-          "isManagedIdentityInUse": false,
-          "state": "Disabled",
-          "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/encryptionProtector",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/current')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "kind": "servicemanaged",
-        "properties": {
-          "serverKeyName": "ServiceManaged",
-          "serverKeyType": "ServiceManaged",
-          "autoRotationEnabled": false
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/firewallRules",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/AllowAllWindowsAzureIps')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.Sql/servers/firewallRules",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/ClientIPAddress_2024-2-26_15-14-31')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.Sql/servers/firewallRules",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/sqlfw-allowazureips')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ]
-      },
-      {
-        "type": "Microsoft.Sql/servers/keys",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/ServiceManaged')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "kind": "servicemanaged",
-        "properties": {
-          "serverKeyType": "ServiceManaged"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/securityAlertPolicies",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "state": "Enabled",
-          "disabledAlerts": [
-            ""
-          ],
-          "emailAddresses": [
-            ""
-          ],
-          "emailAccountAdmins": false,
-          "retentionDays": 0
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "state": "Enabled"
-        }
-      },
-      {
-        "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
-        "apiVersion": "2023-05-01-preview",
-        "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-        ],
-        "properties": {
-          "recurringScans": {
-            "isEnabled": false,
-            "emailSubscriptionAdmins": true
-          },
-          "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/blobServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
-        ],
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "properties": {
-          "changeFeed": {
-            "enabled": false
-          },
-          "restorePolicy": {
-            "enabled": false
-          },
-          "containerDeleteRetentionPolicy": {
-            "enabled": true,
-            "days": 7
-          },
-          "cors": {
-            "corsRules": []
-          },
-          "deleteRetentionPolicy": {
-            "allowPermanentDelete": false,
-            "enabled": true,
-            "days": 7
-          },
-          "isVersioningEnabled": false
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/blobServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudosstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudosstorage_name'))]"
-        ],
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "properties": {
-          "cors": {
-            "corsRules": []
-          },
-          "deleteRetentionPolicy": {
-            "allowPermanentDelete": false,
-            "enabled": true,
-            "days": 7
-          },
-          "isVersioningEnabled": false,
-          "changeFeed": {
-            "enabled": false
-          },
-          "restorePolicy": {
-            "enabled": false
-          },
-          "containerDeleteRetentionPolicy": {
-            "enabled": true,
-            "days": 7
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/blobServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_rglatestkudos9dba_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_rglatestkudos9dba_name'))]"
-        ],
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "properties": {
-          "cors": {
-            "corsRules": []
-          },
-          "deleteRetentionPolicy": {
-            "allowPermanentDelete": false,
-            "enabled": false
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/fileServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
-        ],
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "properties": {
-          "protocolSettings": {
-            "smb": {}
-          },
-          "cors": {
-            "corsRules": []
-          },
-          "shareDeleteRetentionPolicy": {
-            "enabled": true,
-            "days": 7
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/fileServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudosstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudosstorage_name'))]"
-        ],
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "properties": {
-          "protocolSettings": {
-            "smb": {}
-          },
-          "cors": {
-            "corsRules": []
-          },
-          "shareDeleteRetentionPolicy": {
-            "enabled": true,
-            "days": 14
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/fileServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_rglatestkudos9dba_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_rglatestkudos9dba_name'))]"
-        ],
-        "sku": {
-          "name": "Standard_LRS",
-          "tier": "Standard"
-        },
-        "properties": {
-          "protocolSettings": {
-            "smb": {}
-          },
-          "cors": {
-            "corsRules": []
-          },
-          "shareDeleteRetentionPolicy": {
-            "enabled": true,
-            "days": 7
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/queueServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
-        ],
-        "properties": {
-          "cors": {
-            "corsRules": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/queueServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudosstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudosstorage_name'))]"
-        ],
-        "properties": {
-          "cors": {
-            "corsRules": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/queueServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_rglatestkudos9dba_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_rglatestkudos9dba_name'))]"
-        ],
-        "properties": {
-          "cors": {
-            "corsRules": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/tableServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
-        ],
-        "properties": {
-          "cors": {
-            "corsRules": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/tableServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudosstorage_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudosstorage_name'))]"
-        ],
-        "properties": {
-          "cors": {
-            "corsRules": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts/tableServices",
-        "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_rglatestkudos9dba_name'), '/default')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_rglatestkudos9dba_name'))]"
-        ],
-        "properties": {
-          "cors": {
-            "corsRules": []
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2023-01-01",
-        "name": "[parameters('sites_latestkudosgateway_name')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_latestkudosplan_name'))]"
-        ],
-        "kind": "app",
-        "identity": {
-          "type": "SystemAssigned"
-        },
-        "properties": {
-          "enabled": true,
-          "hostNameSslStates": [
-            {
-              "name": "[concat(parameters('sites_latestkudosgateway_name'), '.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Standard"
-            },
-            {
-              "name": "[concat(parameters('sites_latestkudosgateway_name'), '.scm.azurewebsites.net')]",
-              "sslState": "Disabled",
-              "hostType": "Repository"
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
             }
-          ],
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_latestkudosplan_name'))]",
-          "reserved": false,
-          "isXenon": false,
-          "hyperV": false,
-          "vnetRouteAllEnabled": false,
-          "vnetImagePullEnabled": false,
-          "vnetContentShareEnabled": false,
-          "siteConfig": {
-            "numberOfWorkers": 1,
-            "acrUseManagedIdentityCreds": false,
-            "alwaysOn": true,
-            "http20Enabled": false,
-            "functionAppScaleLimit": 0,
-            "minimumElasticInstanceCount": 0
           },
-          "scmSiteAlsoStopped": false,
-          "clientAffinityEnabled": true,
-          "clientCertEnabled": false,
-          "clientCertMode": "Required",
-          "hostNamesDisabled": false,
-          "customDomainVerificationId": "F08A2DD1E529C3A34E34B2AB2D034C4B365FE9CE0521DE2BF344BDF62F0631AB",
-          "containerSize": 0,
-          "dailyMemoryTimeQuota": 0,
-          "httpsOnly": true,
-          "redundancyMode": "None",
-          "storageAccountRequired": false,
-          "keyVaultReferenceIdentity": "SystemAssigned"
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[variables('storageAccounts_kudosstorage_name')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "dnsEndpointType": "Standard",
+        "defaultToOAuthAuthentication": false,
+        "publicNetworkAccess": "Enabled",
+        "allowCrossTenantReplication": false,
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false,
+        "allowSharedKeyAccess": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "requireInfrastructureEncryption": false,
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[variables('servers_kudosdb_name')]",
+      "location": "[parameters('location')]",
+      "kind": "v12.0",
+      "properties": {
+        "administratorLogin": "CloudSA549d39ed",
+        "version": "12.0",
+        "minimalTlsVersion": "1.2",
+        "publicNetworkAccess": "Enabled",
+        "administrators": {
+          "administratorType": "ActiveDirectory",
+          "principalType": "User",
+          "azureADOnlyAuthentication": false
+        },
+        "restrictOutboundNetworkAccess": "Disabled"
+      }
+    },
+
+    {
+      "type": "Microsoft.Sql/servers/advisors",
+      "apiVersion": "2014-04-01",
+      "name": "[concat(variables('servers_kudosdb_name'), '/ForceLastGoodPlan')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "autoExecuteValue": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/auditingPolicies",
+      "apiVersion": "2014-04-01",
+      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "auditingState": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/azureADOnlyAuthentications",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "azureADOnlyAuthentication": false
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/connectionPolicies",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/default')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "connectionType": "Default"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/kudosdb')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "sku": {
+        "name": "Basic",
+        "tier": "Basic",
+        "capacity": 5
+      },
+      "kind": "v12.0,user",
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "maxSizeBytes": 2147483648,
+        "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "zoneRedundant": false,
+        "readScale": "Disabled",
+        "requestedBackupStorageRedundancy": "Local",
+        "maintenanceConfigurationId": "/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+        "isLedgerOn": false,
+        "availabilityZone": "NoPreference"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "state": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/auditingPolicies",
+      "apiVersion": "2014-04-01",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "auditingState": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/auditingSettings",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "retentionDays": 0,
+        "auditActionsAndGroups": [],
+        "isStorageSecondaryKeyInUse": false,
+        "isAzureMonitorTargetEnabled": false,
+        "isManagedIdentityInUse": false,
+        "state": "Disabled",
+        "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "retentionDays": 0,
+        "auditActionsAndGroups": [],
+        "isStorageSecondaryKeyInUse": false,
+        "isAzureMonitorTargetEnabled": false,
+        "isManagedIdentityInUse": false,
+        "state": "Disabled",
+        "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "state": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Current')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "state": "Disabled",
+        "disabledAlerts": [
+          ""
+        ],
+        "emailAddresses": [
+          ""
+        ],
+        "emailAccountAdmins": false,
+        "retentionDays": 0
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Current')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "state": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "recurringScans": {
+          "isEnabled": false,
+          "emailSubscriptionAdmins": true,
+          "emails": []
         }
       }
-    ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/devOpsAuditingSettings",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "isAzureMonitorTargetEnabled": false,
+        "isManagedIdentityInUse": false,
+        "state": "Disabled",
+        "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/encryptionProtector",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/current')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "kind": "servicemanaged",
+      "properties": {
+        "serverKeyName": "ServiceManaged",
+        "serverKeyType": "ServiceManaged",
+        "autoRotationEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/AllowAllWindowsAzureIps')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/ClientIPAddress_2024-2-26_15-14-31')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/sqlfw-allowazureips')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/keys",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/ServiceManaged')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "kind": "servicemanaged",
+      "properties": {
+        "serverKeyType": "ServiceManaged"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/securityAlertPolicies",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "state": "Enabled",
+        "disabledAlerts": [
+          ""
+        ],
+        "emailAddresses": [
+          ""
+        ],
+        "emailAccountAdmins": false,
+        "retentionDays": 0
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "state": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
+      "apiVersion": "2023-05-01-preview",
+      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+      ],
+      "properties": {
+        "recurringScans": {
+          "isEnabled": false,
+          "emailSubscriptionAdmins": true
+        },
+        "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "changeFeed": {
+          "enabled": false
+        },
+        "restorePolicy": {
+          "enabled": false
+        },
+        "containerDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 7
+        },
+        "cors": {
+          "corsRules": []
+        },
+        "deleteRetentionPolicy": {
+          "allowPermanentDelete": false,
+          "enabled": true,
+          "days": 7
+        },
+        "isVersioningEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudosstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        },
+        "deleteRetentionPolicy": {
+          "allowPermanentDelete": false,
+          "enabled": true,
+          "days": 7
+        },
+        "isVersioningEnabled": false,
+        "changeFeed": {
+          "enabled": false
+        },
+        "restorePolicy": {
+          "enabled": false
+        },
+        "containerDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 7
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "protocolSettings": {
+          "smb": {}
+        },
+        "cors": {
+          "corsRules": []
+        },
+        "shareDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 7
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudosstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name'))]"
+      ],
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "properties": {
+        "protocolSettings": {
+          "smb": {}
+        },
+        "cors": {
+          "corsRules": []
+        },
+        "shareDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 14
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudosstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices",
+      "apiVersion": "2023-01-01",
+      "name": "[concat(variables('storageAccounts_kudosstorage_name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.EventHub/namespaces",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[variables('KudosEventHubs_name')]",
+      "location": "brazilsouth",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard",
+        "capacity": 1
+      },
+      "properties": {
+        "minimumTlsVersion": "1.2",
+        "publicNetworkAccess": "Enabled",
+        "disableLocalAuth": false,
+        "privateEndpointConnections": [],
+        "zoneRedundant": true,
+        "isAutoInflateEnabled": false,
+        "maximumThroughputUnits": 0,
+        "kafkaEnabled": true
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/Publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/RootManageSharedAccessKey')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen",
+          "Manage",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentsent')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 24
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/likesent')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 24
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "retentionDescription": {
+          "cleanupPolicy": "Delete",
+          "retentionTimeInHours": 1
+        },
+        "messageRetentionInDays": 1,
+        "partitionCount": 1,
+        "status": "Active"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/networkrulesets",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "publicNetworkAccess": "Enabled",
+        "defaultAction": "Allow",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "trustedServiceAccessEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/consumer')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/likesent/consumer')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/PreviewDataPolicy')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/likesent/PreviewDataPolicy')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/likesent/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/publisher')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentupdated')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/likesent/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/$Default')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/getkudossent_consumer_group')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/kudossentpbi-cg')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "userMetadata": "KudosSentPBI-cg"
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/preview_data_consumer_group')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/likesent/preview_data_consumer_group')]",
+      "location": "brazilsouth",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {}
+    }
+
+
+  ]
 }
