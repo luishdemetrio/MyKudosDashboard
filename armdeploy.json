@@ -47,7 +47,7 @@
     },
 
     "EmailDomain": {
-      "type": "securestring",
+      "type": "string",
       "minLength": 1,
       "metadata": {
         "description": "The email domain used to filter the users returned by MS Graph. Example: microsoft.com"
@@ -2213,9 +2213,9 @@
       {
         "type": "Microsoft.Storage/storageAccounts/blobServices",
         "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudoseventstorage_name'), '/default')]",
+        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
         "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudoseventstorage_name'))]"
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
         ],
         "sku": {
           "name": "Standard_LRS",
@@ -2300,9 +2300,9 @@
       {
         "type": "Microsoft.Storage/storageAccounts/fileServices",
         "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudoseventstorage_name'), '/default')]",
+        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
         "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudoseventstorage_name'))]"
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
         ],
         "sku": {
           "name": "Standard_LRS",
@@ -2372,9 +2372,9 @@
       {
         "type": "Microsoft.Storage/storageAccounts/queueServices",
         "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudoseventstorage_name'), '/default')]",
+        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
         "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudoseventstorage_name'))]"
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
         ],
         "properties": {
           "cors": {
@@ -2411,9 +2411,9 @@
       {
         "type": "Microsoft.Storage/storageAccounts/tableServices",
         "apiVersion": "2023-01-01",
-        "name": "[concat(parameters('storageAccounts_latestkudoseventstorage_name'), '/default')]",
+        "name": "[concat(parameters('storageAccounts_kudoseventstorage_name'), '/default')]",
         "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_latestkudoseventstorage_name'))]"
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_kudoseventstorage_name'))]"
         ],
         "properties": {
           "cors": {
