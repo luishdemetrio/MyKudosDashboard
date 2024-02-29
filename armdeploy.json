@@ -217,10 +217,7 @@
       "name": "[variables('msgraph_appservice')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-        "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
       ],
       "resources": [
         {
@@ -428,9 +425,7 @@
       "name": "[variables('kudos_appservice')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]",
-        "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
       ],
       "resources": [
         {
@@ -438,9 +433,7 @@
           "name": "appsettings",
           "type": "config",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('servers_kudosdb_name'), 'kudosdb')]",
-            "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
+            "[resourceId('Microsoft.Web/sites', variables('kudos_appservice'))]"
           ],
           "properties": {
             "PROJECT": "MyKudos.Kudos.Api/MyKudos.Kudos.Api.csproj",
@@ -648,7 +641,7 @@
       "location": "[parameters('location')]",
 
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"        
+        "[resourceId('Microsoft.Web/serverfarms', variables('appserviceplan'))]"
       ],
       "resources": [
         {
@@ -990,7 +983,7 @@
         "vnetRouteAllEnabled": false,
         "vnetPrivatePortsCount": 0,
         "localMySqlEnabled": false,
-        "xManagedServiceIdentityId": 247,
+        "ManagedServiceIdentityId": 247,
         "ipSecurityRestrictions": [
           {
             "ipAddress": "Any",
@@ -1282,322 +1275,15 @@
       "location": "[parameters('location')]",
       "kind": "v12.0",
       "properties": {
-        "administratorLogin": "CloudSA549d39ed",
         "version": "12.0",
         "minimalTlsVersion": "1.2",
-        "publicNetworkAccess": "Enabled",
-        "administrators": {
-          "administratorType": "ActiveDirectory",
-          "principalType": "User",
-          "azureADOnlyAuthentication": false
-        },
+        "publicNetworkAccess": "Enabled",     
         "restrictOutboundNetworkAccess": "Disabled"
       }
     },
 
-    {
-      "type": "Microsoft.Sql/servers/advisors",
-      "apiVersion": "2014-04-01",
-      "name": "[concat(variables('servers_kudosdb_name'), '/ForceLastGoodPlan')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "autoExecuteValue": "Enabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/auditingPolicies",
-      "apiVersion": "2014-04-01",
-      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "auditingState": "Disabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/azureADOnlyAuthentications",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "azureADOnlyAuthentication": false
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/connectionPolicies",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/default')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "connectionType": "Default"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/kudosdb')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "sku": {
-        "name": "Basic",
-        "tier": "Basic",
-        "capacity": 5
-      },
-      "kind": "v12.0,user",
-      "properties": {
-        "collation": "SQL_Latin1_General_CP1_CI_AS",
-        "maxSizeBytes": 2147483648,
-        "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-        "zoneRedundant": false,
-        "readScale": "Disabled",
-        "requestedBackupStorageRedundancy": "Local",
-        "maintenanceConfigurationId": "/subscriptions/00a967c0-b3df-4f05-84ff-9af9243061f1/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
-        "isLedgerOn": false,
-        "availabilityZone": "NoPreference"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "state": "Disabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/auditingPolicies",
-      "apiVersion": "2014-04-01",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "auditingState": "Disabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/auditingSettings",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "retentionDays": 0,
-        "auditActionsAndGroups": [],
-        "isStorageSecondaryKeyInUse": false,
-        "isAzureMonitorTargetEnabled": false,
-        "isManagedIdentityInUse": false,
-        "state": "Disabled",
-        "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "retentionDays": 0,
-        "auditActionsAndGroups": [],
-        "isStorageSecondaryKeyInUse": false,
-        "isAzureMonitorTargetEnabled": false,
-        "isManagedIdentityInUse": false,
-        "state": "Disabled",
-        "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "state": "Disabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Current')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {}
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "state": "Disabled",
-        "disabledAlerts": [
-          ""
-        ],
-        "emailAddresses": [
-          ""
-        ],
-        "emailAccountAdmins": false,
-        "retentionDays": 0
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Current')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "state": "Disabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/master/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "recurringScans": {
-          "isEnabled": false,
-          "emailSubscriptionAdmins": true,
-          "emails": []
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/devOpsAuditingSettings",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "isAzureMonitorTargetEnabled": false,
-        "isManagedIdentityInUse": false,
-        "state": "Disabled",
-        "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/encryptionProtector",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/current')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "kind": "servicemanaged",
-      "properties": {
-        "serverKeyName": "ServiceManaged",
-        "serverKeyType": "ServiceManaged",
-        "autoRotationEnabled": false
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/firewallRules",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/AllowAllWindowsAzureIps')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Sql/servers/firewallRules",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/ClientIPAddress_2024-2-26_15-14-31')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Sql/servers/firewallRules",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/sqlfw-allowazureips')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Sql/servers/keys",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/ServiceManaged')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "kind": "servicemanaged",
-      "properties": {
-        "serverKeyType": "ServiceManaged"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/securityAlertPolicies",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "state": "Enabled",
-        "disabledAlerts": [
-          ""
-        ],
-        "emailAddresses": [
-          ""
-        ],
-        "emailAccountAdmins": false,
-        "retentionDays": 0
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "state": "Enabled"
-      }
-    },
-    {
-      "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
-      "apiVersion": "2023-05-01-preview",
-      "name": "[concat(variables('servers_kudosdb_name'), '/Default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('servers_kudosdb_name'))]"
-      ],
-      "properties": {
-        "recurringScans": {
-          "isEnabled": false,
-          "emailSubscriptionAdmins": true
-        },
-        "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
-      }
-    },
+   
+   
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices",
       "apiVersion": "2023-01-01",
@@ -1754,6 +1440,7 @@
         }
       }
     },
+
     {
       "type": "Microsoft.Storage/storageAccounts/tableServices",
       "apiVersion": "2023-01-01",
@@ -1768,11 +1455,13 @@
       }
     },
 
+
+
     {
       "type": "Microsoft.EventHub/namespaces",
       "apiVersion": "2023-01-01-preview",
       "name": "[variables('KudosEventHubs_name')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "sku": {
         "name": "Standard",
         "tier": "Standard",
@@ -1793,7 +1482,7 @@
       "type": "Microsoft.EventHub/namespaces/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/Publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1807,7 +1496,7 @@
       "type": "Microsoft.EventHub/namespaces/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/RootManageSharedAccessKey')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1823,7 +1512,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1841,7 +1530,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1859,7 +1548,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentsent')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1877,7 +1566,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1895,7 +1584,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1913,7 +1602,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1931,7 +1620,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1949,7 +1638,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/likesent')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1967,7 +1656,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -1985,7 +1674,7 @@
       "type": "Microsoft.EventHub/namespaces/networkrulesets",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
@@ -2001,7 +1690,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/consumer')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2015,8 +1704,98 @@
     {
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentupdated')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/likesent/consumer')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2030,8 +1809,23 @@
     {
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/consumer')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Listen"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/PreviewDataPolicy')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2046,7 +1840,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/likesent/PreviewDataPolicy')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2061,7 +1855,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2078,7 +1872,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2095,7 +1889,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2111,8 +1905,25 @@
     {
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
+      "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated/publisher')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentupdated')]",
+        "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
+      ],
+      "properties": {
+        "rights": [
+          "Manage",
+          "Listen",
+          "Send"
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
+      "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2129,7 +1940,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2146,7 +1957,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2163,7 +1974,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/likesent/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2180,7 +1991,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationrules",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/publisher')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2197,7 +2008,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/calculateuserscore/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'calculateuserscore')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2208,7 +2019,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentdeleted/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentdeleted')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2219,7 +2030,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentsent/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentsent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2230,7 +2041,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/commentupdated/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'commentupdated')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2241,7 +2052,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudosdeleted/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosdeleted')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2252,7 +2063,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2263,7 +2074,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudosupdated/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudosupdated')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2274,7 +2085,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/likesent/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2285,7 +2096,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/undolikesent/$Default')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'undolikesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2296,7 +2107,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/getkudossent_consumer_group')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2307,7 +2118,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/kudossentpbi-cg')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2320,7 +2131,7 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/kudossent/preview_data_consumer_group')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'kudossent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
@@ -2331,14 +2142,13 @@
       "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
       "apiVersion": "2023-01-01-preview",
       "name": "[concat(variables('KudosEventHubs_name'), '/likesent/preview_data_consumer_group')]",
-      "location": "brazilsouth",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('KudosEventHubs_name'), 'likesent')]",
         "[resourceId('Microsoft.EventHub/namespaces', variables('KudosEventHubs_name'))]"
       ],
       "properties": {}
     }
-
 
   ]
 }
