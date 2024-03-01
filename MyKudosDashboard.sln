@@ -40,6 +40,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{C4FAFEEB-25D6-4DA5-8A7D-912238923CF4}"
 	ProjectSection(SolutionItems) = preProject
 		armdeploy.json = armdeploy.json
+		database.sql = database.sql
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{0CA52694-53D9-410D-8AC3-57624EDE444E}"

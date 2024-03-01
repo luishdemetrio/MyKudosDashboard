@@ -676,8 +676,6 @@
             "KudosServiceUrl": "[concat( concat('https://', variables('kudos_appservice')), '.azurewebsites.net/')]",
             "graphServiceUrl": "[concat( concat('https://', variables('msgraph_appservice')), '.azurewebsites.net/')]",
 
-            "gamificationServiceUrl": "[concat( concat('https://', variables('gamification_appservice')), '.azurewebsites.net/')]",
-
             "PolulateProfilestimeoutInSeconds": "600",
 
             "TopContributors": 30,
