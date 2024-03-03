@@ -16,9 +16,9 @@ public class ScorePointsController : Controller
     }
 
     [HttpGet(Name ="GetScore")]
-    public ScorePoints Get()
+    public ScorePoints? Get()
     {
-        return _scorePointsRepository.GetScore().First();
+        return _scorePointsRepository.GetScore().FirstOrDefault();
     }
 
     [HttpPut(Name = "UpdateScore")]
