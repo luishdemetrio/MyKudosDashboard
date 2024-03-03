@@ -15,7 +15,7 @@ public class RewriteView : IRewriteView
     public RewriteView(IConfiguration config)
     {
         client = new OpenAIClient(
-                           new Uri("https://luisdemopenai.openai.azure.com/"),
+                           new Uri(config["AZURE_OPENAI_ENDPOINT"]),
                            new AzureKeyCredential(config["AZURE_OPENAI_API_KEY"]));
     }
 
