@@ -21,11 +21,11 @@ public class ScorePointsService : IScorePointsService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<ScorePoints> GetScore()
+    public async Task<ScorePoints?> GetScore()
     {
         try
         {
-            return await _restClientHelper.GetApiData<ScorePoints>(
+            return await _restClientHelper.GetApiData<ScorePoints?>(
                                     $"{_kudosServiceUrl}ScorePoints");
 
         }
