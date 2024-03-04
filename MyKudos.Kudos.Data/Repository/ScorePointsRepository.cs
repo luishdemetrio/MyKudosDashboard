@@ -28,7 +28,20 @@ public class ScorePointsRepository : IScorePointsRepository
     public bool UpdateScore(ScorePoints score)
     {
 
-        _context.Entry(score).State = EntityState.Modified;
+        //I need to check if there are any record there in the database
+
+        var scoreInDb = _context.ScorePoints.FirstOrDefault();
+
+        //modify in case there are the score
+        if (scoreInDb != null)
+        {
+            _context.Entry(score).State = EntityState.Modified;
+        }
+        else
+        {
+            _context.ScorePoints.Add(score);
+        }
+        
 
         return _context.SaveChanges() > 0;
     }
