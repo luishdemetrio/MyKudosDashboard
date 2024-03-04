@@ -42,7 +42,7 @@ public class RestClientHelper : IRestClientHelper
 
         // response.EnsureSuccessStatusCode();
         
-        if ((response != null) && (response.StatusCode != HttpStatusCode.OK))
+        if ((response != null) && (response.StatusCode != HttpStatusCode.OK && response.StatusCode !=  HttpStatusCode.NoContent))
         {
 
             throw new Exception(responseContent);
