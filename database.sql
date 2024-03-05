@@ -257,9 +257,139 @@ ALTER ROLE db_datawriter ADD MEMBER [superkudoskudos];
 ALTER ROLE db_ddladmin ADD MEMBER [superkudoskudos];
 
 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_GETTOPCONTRIBUTORS]
+	@top int = 10,
+    @ManagerId uniqueidentifier = null
+AS
+
+    DECLARE @ScorePointsId INT,
+        @KudosSent INT,
+        @KudosReceived INT,
+        @LikesSent INT,
+        @LikesReceived INT,
+        @CommentsSent INT,
+        @CommentsReceived INT;
+
+    SELECT TOP 1
+        @ScorePointsId = ScorePointsId,
+        @KudosSent = KudosSent,
+        @KudosReceived = KudosReceived,
+        @LikesSent = LikesSent,
+        @LikesReceived = LikesReceived,
+        @CommentsSent = CommentsSent,
+        @CommentsReceived = CommentsReceived
+    FROM dbo.ScorePoints; 
+	
+	WITH UserPoints AS (
 
 
 
+  SELECT
+    KR.ToPersonId user_id,
+    SUM(@KudosReceived) AS total_points
+  FROM
+    Kudos K   
+    JOIN KudosReceiver KR
+        ON K.KudosId = KR.KudosId
+  WHERE
+    KR.ToPersonId IS NOT NULL
+  GROUP BY
+    KR.ToPersonId
 
+  UNION ALL
+    SELECT
+    frompersonid AS user_id,
+    SUM(@KudosSent) AS total_points
+  FROM
+    Kudos k
+        
+  WHERE
+    k.frompersonid IS NOT NULL
+  GROUP BY
+    frompersonid
+UNION ALL
+   
+   SELECT
+    PersonId,
+    SUM(@LikesSent) AS total_points
+  FROM
+    KudosLike l
+  
+  WHERE
+    l.PersonId IS NOT NULL
+  GROUP BY
+    PersonId
+
+  UNION ALL
+
+  SELECT
+        KR.toPersonId AS user_id,
+    SUM(@LikesReceived) AS total_points
+    FROM
+        DBO.KUDOS K
+    JOIN KUDOSLIKE KL
+        ON K.KUDOSID = KL.KUDOSID
+    
+    JOIN KudosReceiver KR
+        ON K.KudosId = KR.KudosId
+  WHERE
+    KR.ToPersonId IS NOT NULL
+  GROUP BY
+    KR.toPersonId
+
+  UNION ALL
+ 
+  SELECT
+    FromPersonId,
+    SUM(@CommentsSent) AS total_points
+  FROM
+    Comments r
+    
+  WHERE
+    r.FromPersonId IS NOT NULL
+  GROUP BY
+    FromPersonId
+
+    UNION ALL
+    
+    SELECT
+        KR.toPersonId AS user_id,
+    SUM(@CommentsReceived) AS total_points
+    FROM
+        DBO.KUDOS K
+    JOIN Comments KC
+        ON K.KUDOSID = KC.KUDOSID
+   
+    JOIN KudosReceiver KR
+        ON K.KudosId = KR.KudosId
+    WHERE
+        KR.toPersonId IS NOT NULL     
+  GROUP BY
+    KR.toPersonId
+
+
+)
+SELECT
+up.user_id as UserId,
+p.DisplayName,
+ISNULL(p.Photo96x96,'') Photo,
+SUM(up.total_points) AS TotalPoints
+FROM
+UserPoints up 
+INNER JOIN UserProfiles p
+ on up.user_id = p.UserProfileId
+WHERE (@ManagerId is null or p.ManagerId = @ManagerId)
+GROUP BY
+  up.user_id,p.DisplayName,
+p.Photo96x96
+ORDER BY
+  TotalPoints DESC
+GO
+
+GRANT EXECUTE ON OBJECT::dbo.SP_GETTOPCONTRIBUTORS TO superkudoskudos;
 
 
