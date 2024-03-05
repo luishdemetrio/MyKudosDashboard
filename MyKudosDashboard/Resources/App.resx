@@ -207,6 +207,12 @@
   <data name="Received_Plural" xml:space="preserve">
     <value>Received</value>
   </data>
+  <data name="Replace" xml:space="preserve">
+    <value>Replace</value>
+  </data>
+  <data name="RewriteWithAI" xml:space="preserve">
+    <value>Rewrite with AI</value>
+  </data>
   <data name="SelectColleague" xml:space="preserve">
     <value>Select one or more colleagues</value>
   </data>
