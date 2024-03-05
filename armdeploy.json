@@ -178,8 +178,6 @@
       "KudosEventHubs_likesent": "likesent",
       "KudosEventHubs_undolikesent": "undolikesent",
 
-      "storageAccounts_kudoseventstorage_name": "[concat(parameters('baseResourceName'), 'eventstorage' )]",
-
       "storageAccounts_kudosstorage_name": "[concat(parameters('baseResourceName'), 'storage' )]"
 
     },
@@ -1090,13 +1088,13 @@
             "EventHub_UndoLikeSentName": "UndoLikeSent",
 
             "EventHub_blobContainerName": "kudoseventhubcontainer",
-            "EventHub_blobStorageConnectionString": "",
+            "EventHub_blobStorageConnectionString": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name')), '2023-01-01').keys.value]",
 
             "selectedCulture": "pt-Br",
 
             "WEBSITE_TIME_ZONE": "E. South America Standard Time",
 
-            "Storage_ConnectionString": "",
+            "Storage_ConnectionString": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name')), '2023-01-01').keys.value]",
 
             "Storage_ContainerName": "images",
 
@@ -1185,7 +1183,7 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2023-01-01",
-      "name": "[variables('storageAccounts_kudoseventstorage_name')]",
+      "name": "[variables('storageAccounts_kudosstorage_name')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "Standard_LRS",
@@ -1224,56 +1222,14 @@
         "accessTier": "Hot"
       }
     },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2023-01-01",
-      "name": "[variables('storageAccounts_kudosstorage_name')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "Standard_LRS",
-        "tier": "Standard"
-      },
-      "kind": "StorageV2",
-      "properties": {
-        "dnsEndpointType": "Standard",
-        "defaultToOAuthAuthentication": false,
-        "publicNetworkAccess": "Enabled",
-        "allowCrossTenantReplication": false,
-        "minimumTlsVersion": "TLS1_2",
-        "allowBlobPublicAccess": false,
-        "allowSharedKeyAccess": true,
-        "networkAcls": {
-          "bypass": "AzureServices",
-          "virtualNetworkRules": [],
-          "ipRules": [],
-          "defaultAction": "Allow"
-        },
-        "supportsHttpsTrafficOnly": true,
-        "encryption": {
-          "requireInfrastructureEncryption": false,
-          "services": {
-            "file": {
-              "keyType": "Account",
-              "enabled": true
-            },
-            "blob": {
-              "keyType": "Account",
-              "enabled": true
-            }
-          },
-          "keySource": "Microsoft.Storage"
-        },
-        "accessTier": "Hot"
-      }
-    },
 
-   
+
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices",
       "apiVersion": "2023-01-01",
-      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
+      "name": "[concat(variables('storageAccounts_kudosstorage_name'), '/default')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name'))]"
       ],
       "sku": {
         "name": "Standard_LRS",
@@ -1301,64 +1257,7 @@
         "isVersioningEnabled": false
       }
     },
-    {
-      "type": "Microsoft.Storage/storageAccounts/blobServices",
-      "apiVersion": "2023-01-01",
-      "name": "[concat(variables('storageAccounts_kudosstorage_name'), '/default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudosstorage_name'))]"
-      ],
-      "sku": {
-        "name": "Standard_LRS",
-        "tier": "Standard"
-      },
-      "properties": {
-        "cors": {
-          "corsRules": []
-        },
-        "deleteRetentionPolicy": {
-          "allowPermanentDelete": false,
-          "enabled": true,
-          "days": 7
-        },
-        "isVersioningEnabled": false,
-        "changeFeed": {
-          "enabled": false
-        },
-        "restorePolicy": {
-          "enabled": false
-        },
-        "containerDeleteRetentionPolicy": {
-          "enabled": true,
-          "days": 7
-        }
-      }
-    },
 
-    {
-      "type": "Microsoft.Storage/storageAccounts/fileServices",
-      "apiVersion": "2023-01-01",
-      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
-      ],
-      "sku": {
-        "name": "Standard_LRS",
-        "tier": "Standard"
-      },
-      "properties": {
-        "protocolSettings": {
-          "smb": {}
-        },
-        "cors": {
-          "corsRules": []
-        },
-        "shareDeleteRetentionPolicy": {
-          "enabled": true,
-          "days": 7
-        }
-      }
-    },
     {
       "type": "Microsoft.Storage/storageAccounts/fileServices",
       "apiVersion": "2023-01-01",
@@ -1379,24 +1278,11 @@
         },
         "shareDeleteRetentionPolicy": {
           "enabled": true,
-          "days": 14
+          "days": 7
         }
       }
     },
 
-    {
-      "type": "Microsoft.Storage/storageAccounts/queueServices",
-      "apiVersion": "2023-01-01",
-      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
-      ],
-      "properties": {
-        "cors": {
-          "corsRules": []
-        }
-      }
-    },
     {
       "type": "Microsoft.Storage/storageAccounts/queueServices",
       "apiVersion": "2023-01-01",
@@ -1411,19 +1297,6 @@
       }
     },
 
-    {
-      "type": "Microsoft.Storage/storageAccounts/tableServices",
-      "apiVersion": "2023-01-01",
-      "name": "[concat(variables('storageAccounts_kudoseventstorage_name'), '/default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccounts_kudoseventstorage_name'))]"
-      ],
-      "properties": {
-        "cors": {
-          "corsRules": []
-        }
-      }
-    },
 
     {
       "type": "Microsoft.Storage/storageAccounts/tableServices",
@@ -1439,6 +1312,7 @@
       }
     },
 
+  
 
 
     {
