@@ -62,5 +62,5 @@ jobs:
         with:
           app-name: 'superkudosdashboard'
           slot-name: 'Production'
-          package: .
+          package: ./myapp
           
