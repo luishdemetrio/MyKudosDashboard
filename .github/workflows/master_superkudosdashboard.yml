@@ -52,6 +52,6 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'superkudosdashboard'
-          slot-name: 'Production'
+          slot-name: 'superkudosdashboard'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_82C58A8C7DB7421E8A291CF80C4CF921 }}
