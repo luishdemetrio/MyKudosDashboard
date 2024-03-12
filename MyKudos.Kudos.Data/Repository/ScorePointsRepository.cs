@@ -35,7 +35,13 @@ public class ScorePointsRepository : IScorePointsRepository
         //modify in case there are the score
         if (scoreInDb != null)
         {
-            _context.Entry(score).State = EntityState.Modified;
+            //_context.Entry(score).State = EntityState.Modified;
+            scoreInDb.KudosSent = score.KudosSent;
+            scoreInDb.KudosReceived = score.KudosReceived;
+            scoreInDb.LikesSent = score.LikesSent;
+            scoreInDb.LikesReceived = score.LikesReceived;
+            scoreInDb.CommentsSent = score.CommentsSent;
+            scoreInDb.CommentsReceived = score.CommentsReceived;
         }
         else
         {

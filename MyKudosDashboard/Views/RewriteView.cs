@@ -20,7 +20,7 @@ public class RewriteView : IRewriteView
                            new Uri(config["AZURE_OPENAI_ENDPOINT"]),
                            new AzureKeyCredential(config["AZURE_OPENAI_API_KEY"]));
 
-        _deploymentName = config["DeploymentName"];
+        _deploymentName = config["AZURE_OPENAI_DEPLOYMENT_NAME"];
     }
 
 

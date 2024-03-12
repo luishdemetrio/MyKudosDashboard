@@ -49,7 +49,7 @@ builder.Services.AddScoped<ITopContributorsView, TopContributorsView>();
 builder.Services.AddScoped<IKudosTabView, KudosTabView>();
 builder.Services.AddScoped<ICommentsView, CommentsView>();
 builder.Services.AddScoped<IReplyView, ReplyView>();
-builder.Services.AddScoped<IRewriteView, RewriteView>();
+
 
 //Services
 
@@ -91,6 +91,13 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
                 )
                 ));
 
+
+if (bool.Parse(config["AZURE_OPENAI_ENABLED"])  )
+{
+    builder.Services.AddScoped<IRewriteView, RewriteView>();
+}
+
+builder.Services.AddScoped<IRewriteView, RewriteView>();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
