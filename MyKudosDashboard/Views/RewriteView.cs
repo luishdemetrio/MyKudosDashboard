@@ -11,12 +11,16 @@ public class RewriteView : IRewriteView
     // Install the .NET library via NuGet: dotnet add package Azure.AI.OpenAI --version 1.0.0-beta.5
 
     OpenAIClient client;
+    string _deploymentName;
+
 
     public RewriteView(IConfiguration config)
     {
         client = new OpenAIClient(
                            new Uri(config["AZURE_OPENAI_ENDPOINT"]),
                            new AzureKeyCredential(config["AZURE_OPENAI_API_KEY"]));
+
+        _deploymentName = config["DeploymentName"];
     }
 
 
@@ -25,7 +29,7 @@ public class RewriteView : IRewriteView
     {
         var chatCompletionsOptions = new ChatCompletionsOptions()
         {
-            DeploymentName = "CopilotFAQ", // Use DeploymentName for "model" with non-Azure clients
+            DeploymentName = _deploymentName, // Use DeploymentName for "model" with non-Azure clients
             Messages =
             {
                 // The system message represents instructions or other guidance about how the assistant should behave
