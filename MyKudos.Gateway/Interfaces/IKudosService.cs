@@ -15,6 +15,8 @@ public interface IKudosService
 
     Task<Kudos.Domain.Models.Kudos> GetKudosUser(int kudosId);
 
+    Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosByName(string name, int pageSize,int fromNumberOfDays);
+
     Task<bool> UpdateKudos(Kudos.Domain.Models.KudosMessage kudos);
 
     Task<bool> DeleteKudos(int kudosId);

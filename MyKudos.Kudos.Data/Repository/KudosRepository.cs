@@ -46,6 +46,30 @@ public class KudosRepository : IKudosRepository
         return  kudosQuery.First();
     }
 
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosByName(string name, int pageSize, int fromNumberOfDays)
+    {
+        DateTime date = DateTime.Today.AddDays(-fromNumberOfDays);
+
+        IQueryable<Domain.Models.Kudos> kudosQuery =
+            _kudosDbContext.Kudos
+               .Include(c => c.Comments)
+               .Include(u => u.UserFrom)
+               .Include(u => u.Recognition)
+               .Include(r => r.Recognized).ThenInclude(p => p.Person)
+               .Include(r => r.Likes).ThenInclude(p => p.Person);
+
+        kudosQuery = kudosQuery.Where(k => k.Recognized != null &&
+                                           k.Recognized.Any(u => u.Person != null && u.Person.DisplayName.Contains(name)) &&
+                                   k.Date >= date);
+
+        var kudos = await kudosQuery
+           .OrderByDescending(k => k.Date)
+           .Take(pageSize)
+           .ToListAsync();
+
+        return kudos;
+    }
+
     public async Task<IEnumerable<Domain.Models.Kudos>> GetAllKudosAsync(Guid pUserId, int pageNumber = 1, 
                                                                         int pageSize = 5, 
                                                                         bool fromMe = true,
@@ -70,13 +94,6 @@ public class KudosRepository : IKudosRepository
 
             kudosQuery = KudosFilterRules.FilterKudosByManagerOrProfile(kudosQuery, managerId);
 
-            //kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == managerId) || 
-            //                                     (k.Recognized.Any(u => u.Person.ManagerId == managerId))
-            //                                   ) || 
-            //                                   ( (k.UserFrom.ManagerId.HasValue == false) &&
-            //                                     (k.UserFrom.UserProfileId == managerId)
-            //                                      ) 
-            //                                   );
         }
         else if (pUserId != Guid.Empty)
         {

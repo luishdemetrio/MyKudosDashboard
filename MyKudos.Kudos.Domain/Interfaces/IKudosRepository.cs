@@ -13,7 +13,9 @@ public interface IKudosRepository
                                                              Guid? managerId = null);
 
     IEnumerable<Models.Kudos> GetUserKudos(Guid pUserId);
-    
+
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosByName(string name, int pageSize, int fromNumberOfDays);
+
     int Add(Models.Kudos kudos);
 
     Domain.Models.Kudos? GetKudos(int kudosId);

@@ -93,11 +93,11 @@ else
                 <div class="card  rounded-3 shadow-sm small60" style="padding: 0px;height:94vh;width:100%">
 
                     <div class="card-header " style="display: flex;">
-                        <h3 class="my-0 fw-normal" style="height: 28px; width:40%;align-items: center;justify-content: center;display: flex">
+                        <h3 class="my-0 fw-normal" style="height: 28px; align-items: center;justify-content: center;display: flex">
                             🚀 @Localizer["Profile"]
                         </h3>
 
-                        @if (_userProfile.IsAdmin)
+                        @if (_userProfile != null && _userProfile.IsAdmin)
                         {
                             <div style="display: flex; margin-left: 5px;width:40%">
                                 <FluentButton style="margin-left:5px;padding: 0px;"
@@ -220,11 +220,17 @@ else
                 catch (Exception ex)
                 {
                     _errorMessage = ex.Message;
-                }               
+                }
 
                 if (_userTeams != null)
-                {                    
+                {
                     _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
+
+                    if (_userProfile == null)
+                    {
+                        _errorMessage = "User profile not found.";
+
+                    }
 
                     CommonVariables.User = _userProfile;
 

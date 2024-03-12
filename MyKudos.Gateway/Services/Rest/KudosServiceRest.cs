@@ -26,6 +26,11 @@ public class KudosServiceRest: IKudosService
         return await GetKudosDataAsync($"kudos/?pageNumber={pageNumber}&managerId={managerId}");
     }
 
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosByName(string name, int pageSize, int fromNumberOfDays)
+    {
+        return await GetKudosDataAsync($"Kudos/GetKudosByName/{name},{pageSize},{fromNumberOfDays}");
+    }
+
     public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber, Guid? managerId = null)
     {
         return await GetKudosDataAsync($"kudosfromme/?userid={userId}&pageNumber={pageNumber}&managerId={managerId}");
