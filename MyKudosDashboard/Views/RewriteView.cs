@@ -16,6 +16,11 @@ public class RewriteView : IRewriteView
 
     public RewriteView(IConfiguration config)
     {
+        //if Azure OpenAI is disable, this class will not be used
+        //Also, when disabled, we dont have the endpoint and apikey
+        if (! bool.Parse(config["AZURE_OPENAI_ENABLED"]))
+            return;
+
         client = new OpenAIClient(
                            new Uri(config["AZURE_OPENAI_ENDPOINT"]),
                            new AzureKeyCredential(config["AZURE_OPENAI_API_KEY"]));
