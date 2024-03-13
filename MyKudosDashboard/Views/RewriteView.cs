@@ -1,5 +1,4 @@
 ﻿using Azure;
-using Microsoft.Graph;
 using MyKudosDashboard.Interfaces;
 using Azure.AI.OpenAI;
 
@@ -55,23 +54,6 @@ public class RewriteView : IRewriteView
         Console.WriteLine($"[{responseMessage.Role.ToString().ToUpperInvariant()}]: {responseMessage.Content}");
 
         return responseMessage.Content;
-        //CompletionsOptions completionsOptions = new()
-        //{
-        //    DeploymentName = "CopilotFAQ",
-        //    Prompts = { $"melhor reescreva: {message}" },
-        //    Temperature = (float)0.7,
-        //    MaxTokens = 1000,
-
-        //    NucleusSamplingFactor = (float)0.95,
-        //    FrequencyPenalty = 0,
-        //    PresencePenalty = 0,
-        //};
-
-        //Response<Completions> completionsResponse = client.GetCompletions(completionsOptions);
-        //string completion = completionsResponse.Value.Choices[0].Text;
-
-
-
         
     }
 }
