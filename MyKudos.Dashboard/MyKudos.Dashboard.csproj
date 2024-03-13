@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>8d39b9d0-c94f-48b5-9a90-21177c24a57c</UserSecretsId>
-    
-    
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>    
   </PropertyGroup>
 
   <ItemGroup>
