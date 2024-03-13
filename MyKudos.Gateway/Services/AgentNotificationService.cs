@@ -56,6 +56,14 @@ public class AgentNotificationService : IAgentNotificationService
                 }
 
             }
+            else
+            {
+                foreach (var item in kudos.Receivers)
+                {
+                    item.Photo = $"data:image/png;base64,{ResizeBase64Image(item.Photo.Replace("data:image/png;base64,", ""), 48, 48)}";
+                }
+            }
+
             var uri = $"{_agentServiceUrl}";
 
             var client = new RestClient(uri);
