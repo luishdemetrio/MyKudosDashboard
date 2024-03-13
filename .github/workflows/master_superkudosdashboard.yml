@@ -28,9 +28,9 @@ jobs:
        # Run dotnet build and publish
       - name: dotnet build and publish
         run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet publish -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
+          dotnet restore "MyKudos.Dashboard\MyKudos.Dashboard.csproj"
+          dotnet build --configuration Release "MyKudos.Dashboard\MyKudos.Dashboard.csproj"
+          dotnet publish -c Release "MyKudos.Dashboard\MyKudos.Dashboard.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
