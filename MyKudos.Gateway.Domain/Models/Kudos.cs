@@ -66,7 +66,6 @@ public class KudosResponse
     
     public List<Person> Receivers { get; set; } = new();
 
-
 }
 
 public record Reward(int Id, string Title);

@@ -135,13 +135,13 @@ public class KudosListView : IKudosListView
     {
 
         var sb = new StringBuilder();
-        sb.AppendLine("Title,Message,SendOn,NumberOfLikes,NumberOfComments,From,Receivers");
+        sb.AppendLine("Title;Message;SendOn;NumberOfLikes;NumberOfComments;From;Receivers;EMail");
         foreach (var item in KudosList)
         {
             var receivers = string.Join(";", item.Value.Receivers.Select(r => r.Name));
-            sb.AppendLine($"{item.Value.Title},{item.Value.Message.Replace("\n", "")}," +
-                $"{item.Value.SendOn},{item.Value.Likes.Count}," +
-                $"{item.Value.Comments.Count},{item.Value.From.Name},{receivers}");
+            sb.AppendLine($"{item.Value.Title};{item.Value.Message.Replace("\n", "").Replace(";", ".")};" +
+                $"{item.Value.SendOn};{item.Value.Likes.Count};" +
+                $"{item.Value.Comments.Count};{item.Value.From.Name};{receivers};{item.Value.From.EMail}");
         }
 
         return sb.ToString();

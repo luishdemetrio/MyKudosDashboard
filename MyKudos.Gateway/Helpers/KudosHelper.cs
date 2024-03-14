@@ -19,7 +19,8 @@ public class KudosHelper
                 {
                     Id = kudo.UserFrom.UserProfileId,
                     Name = kudo.UserFrom.DisplayName,
-                    Photo = kudo.UserFrom.Photo != null ? $"data:image/png;base64,{kudo.UserFrom.Photo}" : defaultProfilePicture
+                    Photo = kudo.UserFrom.Photo != null ? $"data:image/png;base64,{kudo.UserFrom.Photo}" : defaultProfilePicture,
+                    EMail = kudo.UserFrom.Mail
                 },
                 Likes = kudo.Likes.Where(l => l.Person != null).Select(x => new GatewayDomain.Person()
                 {
@@ -31,6 +32,7 @@ public class KudosHelper
                 Message = kudo.Message,
                 SendOn = kudo.Date,
                 Title = kudo.Recognition.Title
+                
 
             };
 
