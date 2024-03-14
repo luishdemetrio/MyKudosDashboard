@@ -131,17 +131,40 @@ public class KudosListView : IKudosListView
 
     }
 
-    public string ExportToCsv()
-    {
 
+    public async Task<string> ExportToCsv()
+    {
+        IEnumerable<KudosResponse> kudos;
+
+        if (_commonVariables.User.IsAdmin)
+        {
+            //Get All Kudos
+            kudos = await _gatewayService.GetKudos(0, string.Empty, _currentYear);
+
+        }
+        else if (_commonVariables.HasDirectReports)
+        {
+            //Get the kudos from his/her direct reports
+            kudos = await _gatewayService.GetKudos(0, _commonVariables.GetManagerId().ToString(), _currentYear);
+        }
+        else
+        {
+            //Get the kudos received and sent
+            kudos = await GetKudosToMe(0);
+
+            kudos.Concat(await GetKudosFromMe(0));
+            
+        }
+
+       
         var sb = new StringBuilder();
         sb.AppendLine("Title;Message;SendOn;NumberOfLikes;NumberOfComments;From;Receivers;EMail");
-        foreach (var item in KudosList)
+        foreach (var item in kudos)
         {
-            var receivers = string.Join(";", item.Value.Receivers.Select(r => r.Name));
-            sb.AppendLine($"{item.Value.Title};{item.Value.Message.Replace("\n", "").Replace(";", ".")};" +
-                $"{item.Value.SendOn};{item.Value.Likes.Count};" +
-                $"{item.Value.Comments.Count};{item.Value.From.Name};{receivers};{item.Value.From.EMail}");
+            var receivers = string.Join(";", item.Receivers.Select(r => r.Name));
+            sb.AppendLine($"{item.Title};{item.Message.Replace("\n", "").Replace(";", ".")};" +
+                $"{item.SendOn};{item.Likes.Count};" +
+                $"{item.Comments.Count};{item.From.Name};{receivers};{item.From.EMail}");
         }
 
         return sb.ToString();

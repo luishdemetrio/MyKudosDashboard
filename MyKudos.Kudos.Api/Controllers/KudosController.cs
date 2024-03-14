@@ -26,6 +26,8 @@ public class KudosController : ControllerBase
     [HttpPost]
     public int Post([FromBody] Domain.Models.Kudos kudos)
     {
+        kudos.SentOnYear = DateTime.Today.Year;
+
         return _kudosService.Send(kudos);
     }
 
