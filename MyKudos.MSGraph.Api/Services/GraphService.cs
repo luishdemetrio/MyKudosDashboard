@@ -508,6 +508,8 @@ public class GraphService : IGraphService
                 }
             }
 
+            
+
             if (usersPage.NextPageRequest != null)
             {
                 usersPage = await usersPage.NextPageRequest.GetAsync();

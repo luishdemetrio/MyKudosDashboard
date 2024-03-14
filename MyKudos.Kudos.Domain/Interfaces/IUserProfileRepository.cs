@@ -14,6 +14,7 @@ public interface IUserProfileRepository
     string? GetUserPhoto(Guid userid);
 
     bool PopulateUserProfile(List<UserProfile> users);
+    bool AddUpdateUserProfile(UserProfile user);
 
     List<UserProfile> GetUsers(Guid[] ids);
 
