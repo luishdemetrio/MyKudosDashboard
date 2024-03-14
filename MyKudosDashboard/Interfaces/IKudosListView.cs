@@ -35,5 +35,5 @@ public interface IKudosListView
 
     bool CommentsSentLocally(CommentsRequest pComments);
 
-    string ExportToCsv();
+    Task<string> ExportToCsv();
 }

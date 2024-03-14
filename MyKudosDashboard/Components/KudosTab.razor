@@ -108,9 +108,9 @@
         await AllKudosTab.ReloadKudos();
     }
 
-    public string ExportToCSV()
+    public async Task<string> ExportToCSV()
     {
-        return AllKudosTab.ExportToCSV();
+        return await AllKudosTab.ExportToCSV();
     }
 
     private async Task OnTabAllClick(MouseEventArgs args)

@@ -82,13 +82,26 @@ public class KudosRepository : IKudosRepository
             kudosQuery = kudosQuery.Where(k => fromMe ? k.FromPersonId == pUserId : k.Recognized.Any(u => u.ToPersonId == pUserId));
         }
 
-        var kudos = await kudosQuery
-            .OrderByDescending(k => k.Date)
-            .Skip(pageSize * (pageNumber - 1))
-            .Take(pageSize)
-            .ToListAsync();
         
-        return kudos;
+        if (pageSize == 0)
+        {
+            //It will return all records
+            //It happens when user clicks on Export
+            var kudos = await kudosQuery
+                .OrderByDescending(k => k.Date)
+                .ToListAsync();
+            return kudos;
+        }
+        else
+        {
+            var kudos = await kudosQuery
+                .OrderByDescending(k => k.Date)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .ToListAsync();
+            return kudos;
+        }
+
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5,

@@ -239,7 +239,7 @@ else
                     CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["AZURE_OPENAI_ENABLED"]);
                     CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
                     CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
-                    
+                    CommonVariables.HasDirectReports = _userProfile.HasDirectReports; // it is used to manage the export to csv on KudosListView
 
                 }
 
@@ -334,7 +334,7 @@ else
 
     private async Task ExportToCSVClick()
     {
-        var csv = _kudosTab.ExportToCSV();
+        var csv = await _kudosTab.ExportToCSV();
 
         byte[] file = System.Text.Encoding.UTF8.GetBytes('\uFEFF' + csv);
         var fileName = "kudos.csv";

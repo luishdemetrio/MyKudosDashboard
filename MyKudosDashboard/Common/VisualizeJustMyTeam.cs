@@ -16,7 +16,9 @@ public class KudosCommonVariables
     
     public bool ShowAllKudosTab { get; set; }
 
-    
+    public bool HasDirectReports { get; set; }
+
+
     public Guid? GetManagerId()
     {
         return VisualizeJustMyTeam ? User.UserProfileId : null;
