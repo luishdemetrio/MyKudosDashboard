@@ -49,7 +49,8 @@ public class KudosRepository : IKudosRepository
     public async Task<IEnumerable<Domain.Models.Kudos>> GetAllKudosAsync(Guid pUserId, int pageNumber = 1, 
                                                                         int pageSize = 5, 
                                                                         bool fromMe = true,
-                                                                        Guid? managerId = null)
+                                                                        Guid? managerId = null,
+                                                                        int? year = null)
     {
         if (pageSize > _maxPageSize)
         {
@@ -60,7 +61,12 @@ public class KudosRepository : IKudosRepository
             .Include(c => c.Comments)
             .Include(u => u.UserFrom)
             .Include(u => u.Recognition);
-        
+
+
+        if (!year.HasValue)
+            year = DateTime.Today.Year;
+
+        kudosQuery = kudosQuery.Where(k => k.SentOnYear == year);
 
         kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
         kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
@@ -70,13 +76,6 @@ public class KudosRepository : IKudosRepository
 
             kudosQuery = KudosFilterRules.FilterKudosByManagerOrProfile(kudosQuery, managerId);
 
-            //kudosQuery = kudosQuery.Where(k => ( (k.UserFrom.ManagerId == managerId) || 
-            //                                     (k.Recognized.Any(u => u.Person.ManagerId == managerId))
-            //                                   ) || 
-            //                                   ( (k.UserFrom.ManagerId.HasValue == false) &&
-            //                                     (k.UserFrom.UserProfileId == managerId)
-            //                                      ) 
-            //                                   );
         }
         else if (pUserId != Guid.Empty)
         {
@@ -93,35 +92,41 @@ public class KudosRepository : IKudosRepository
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosAsync(int pageNumber = 1, int pageSize=5,
-                                                                      Guid? managerId = null)
+                                                                      Guid? managerId = null,
+                                                                      int? year = null)
 	{
-        return await GetAllKudosAsync(Guid.Empty, pageNumber, pageSize, managerId: managerId);
+        return await GetAllKudosAsync(Guid.Empty, pageNumber, pageSize, fromMe: false, managerId, year);
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, 
                                                                             int pageSize = 5,
-                                                                            Guid? managerId = null)
+                                                                            Guid? managerId = null,
+                                                                            int? year = null)
     {
-        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: true, managerId: managerId);
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: true, managerId: managerId, year);
     }
 
     public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, 
                                                                           int pageSize = 5, 
-                                                                          Guid? managerId = null)
+                                                                          Guid? managerId = null,
+                                                                          int? year = null)
     {
-        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, managerId: managerId);
+        return await GetAllKudosAsync(pUserId, pageNumber, pageSize, fromMe: false, managerId: managerId, year);
     }
 
     //this method is used to calculate the badge
-    public  IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
+    public  IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId, int? year = null)
     {
 
         IQueryable<Domain.Models.Kudos> kudosQuery = _kudosDbContext.Kudos
-
            .Include(c => c.Comments)
            .Include(u => u.UserFrom)
            .Include(u => u.Recognition);
-       
+
+        if (!year.HasValue)
+            year = DateTime.Today.Year;
+
+        kudosQuery = kudosQuery.Where(k => k.SentOnYear == year);
 
         kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
         kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
@@ -129,9 +134,6 @@ public class KudosRepository : IKudosRepository
         kudosQuery = kudosQuery.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
         
         return kudosQuery.ToList();
-
-
-       // return _kudosDbContext.Kudos.Where(k => k.Recognized.Any(u => u.ToPersonId == pUserId));
 
     }
 

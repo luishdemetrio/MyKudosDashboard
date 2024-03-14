@@ -18,8 +18,8 @@ public class TopContributorsController : Controller
     }
 
     [HttpGet(Name = "GetTopUserPoints")]
-    public List<UserPoint> Get(int top, Guid? managerId)
+    public List<UserPoint> Get(int top, Guid? managerId, int? sentOnYear = null)
     {
-        return _repository.GetTopUserScores(top, managerId).Where(t => t.TotalPoints > 0).ToList();
+        return _repository.GetTopUserScores(top, managerId, sentOnYear).Where(t => t.TotalPoints > 0).ToList();
     }
 }

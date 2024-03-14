@@ -18,15 +18,21 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     private string _userId;
 
+    private int _currentYear;
+
+
     public TopContributorsView(IGamificationGateway gamificationGateway,
                               ILogger<TopContributorsView> logger,
-                               IEventHubUserPointsReceived eventHubUserPointsReceived)
+                              IEventHubUserPointsReceived eventHubUserPointsReceived, 
+                              IConfiguration config)
     {
         _gamificationGateway = gamificationGateway;
 
         _eventHubUserPointsReceived = eventHubUserPointsReceived;
 
         _logger = logger;
+
+        _currentYear = int.Parse(config["CurrentYear"]);
     }
 
     public void RegisterObserver(string userId)
@@ -43,7 +49,7 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
     public async Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId)
     {
-        return await _gamificationGateway.GetTopContributors(managerId);
+        return await _gamificationGateway.GetTopContributors(_currentYear, managerId);
     }
 
     public void NotifyUpdate(UserPointScore score)

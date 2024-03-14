@@ -17,13 +17,16 @@ public class KudosListView : IKudosListView
 
     private KudosCommonVariables _commonVariables;
 
+    private int _currentYear;
+
     public KudosListView(IKudosGateway gatewayService, 
-                         KudosCommonVariables commonVariables)
+                         KudosCommonVariables commonVariables,
+                         IConfiguration config)
     {
         _gatewayService = gatewayService;
         _commonVariables = commonVariables;
 
-        //LoadKudoListAgain();
+        _currentYear = int.Parse(config["CurrentYear"]);
 
     }
 
@@ -89,7 +92,7 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
       
-        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString());
+        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString(), _currentYear);
            
     }
 
@@ -97,14 +100,16 @@ public class KudosListView : IKudosListView
     {
         return await _gatewayService.GetKudosToMe(_commonVariables.User.UserProfileId.ToString(),
                                                   pageNumber,  
-                                                  _commonVariables.GetManagerId().ToString());
+                                                  _commonVariables.GetManagerId().ToString(),
+                                                  _currentYear);
     }
 
     public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(int pageNumber)
     {
         return await _gatewayService.GetKudosFromMe(_commonVariables.User.UserProfileId.ToString(), 
                                                     pageNumber,
-                                                    _commonVariables.GetManagerId().ToString());
+                                                    _commonVariables.GetManagerId().ToString(),
+                                                    _currentYear);
     }
 
     public async Task<bool> UpdateKudos(KudosMessage kudos)

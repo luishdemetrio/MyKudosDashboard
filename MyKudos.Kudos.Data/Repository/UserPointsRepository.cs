@@ -29,22 +29,32 @@ public class UserPointsRepository : IUserPointsRepository
     }
 
     
-    public List<UserPoint> GetTopUserScores(int top, Guid? managerId)
+    public List<UserPoint> GetTopUserScores(int top, Guid? managerId, int? sentOnYear = null)
     {
 
         var parameterTop = new SqlParameter("@top", SqlDbType.Int) { Value = top };
 
-        var parameterManagerId = new SqlParameter("@ManagerId", SqlDbType.UniqueIdentifier) { Value = managerId is null ? DBNull.Value : managerId };
-        
+        var parameterManagerId = new SqlParameter("@ManagerId", SqlDbType.UniqueIdentifier) 
+                                        { 
+                                            Value = managerId is null ? DBNull.Value : managerId 
+                                        };
+
+        var parameterSentOnYear = new SqlParameter("@SentOnYear", SqlDbType.Int)
+        {
+            Value = sentOnYear.HasValue ? sentOnYear : DateTime.Today.Year 
+        };
+
         var result = _context.Set<UserPoint>().FromSqlRaw(
-                            "EXEC SP_GETTOPCONTRIBUTORS @top, @ManagerId", 
-                            parameterTop,
-                            parameterManagerId).ToList();
+                                    "EXEC SP_GETTOPCONTRIBUTORS @top, @ManagerId, @SentOnYear", 
+                                    parameterTop,
+                                    parameterManagerId,
+                                    parameterSentOnYear
+                                    ).ToList();
 
         return result;
     }
 
-    public UserPointScore GetUserScore(Guid pUserId, bool justMyTeam = false)
+    public UserPointScore GetUserScore(Guid pUserId, bool justMyTeam = false, int? sentOnYear = null)
     {
         UserPointScore result = new();
 
@@ -62,6 +72,11 @@ public class UserPointsRepository : IUserPointsRepository
 
         kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
         kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);
+
+        if (!sentOnYear.HasValue)
+            sentOnYear = DateTime.Today.Year;
+
+        kudosQuery = kudosQuery.Where(k => k.SentOnYear == sentOnYear);
 
         IQueryable<Domain.Models.Comments> commentsQuery = _context.Comments
             .Include(u => u.UserFrom);

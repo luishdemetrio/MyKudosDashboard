@@ -30,7 +30,8 @@ public class KudosController : ControllerBase
     }
 
     [HttpGet(Name = "GetKudos")]
-    public Task<IEnumerable<Domain.Models.Kudos>> Get(int pageNumber, int pageSize, Guid? managerId = null)
+    public Task<IEnumerable<Domain.Models.Kudos>> Get(int pageNumber, int pageSize, 
+                                                      Guid? managerId = null, int? sentOnYear = null)
     {
         if (pageNumber == 0)
             pageNumber = _defaultPageNumber;
@@ -38,7 +39,7 @@ public class KudosController : ControllerBase
         if (pageSize == 0)
             pageSize = _defaultPageSize;
 
-        return _kudosService.GetKudos(pageNumber, pageSize, managerId);
+        return _kudosService.GetKudos(pageNumber, pageSize, managerId, sentOnYear);
     }
 
     [HttpPut(Name = "UpdateKudos")]

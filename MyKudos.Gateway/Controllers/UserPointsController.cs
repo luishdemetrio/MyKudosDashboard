@@ -16,10 +16,10 @@ public class UserPointsController : Controller
         _userPointsService = userPointsService;
     }
 
-    [HttpGet("GetUserPoints")]
-    public async Task<UserPointScore> GetUserPoints(Guid userId, bool justMyTeam = false)
+    [HttpGet("GetUserPoints/{userId},{justMyTeam},{sentOnYear}")]
+    public async Task<UserPointScore> GetUserPoints(Guid userId, bool justMyTeam = false, int? sentOnYear = null)
     {
-        return await _userPointsService.GetUserScoreAsync(userId, justMyTeam);
+        return await _userPointsService.GetUserScoreAsync(userId, justMyTeam, sentOnYear);
 
     }
 

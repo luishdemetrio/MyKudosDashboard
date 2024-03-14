@@ -21,29 +21,31 @@ public class GatewayService : IKudosGateway
     }
 
 
-    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber, string userManagerId)
+    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber, string userManagerId, int sentOnYear)
     {
-        return await GetKudosData($"kudos/?pageNumber={pageNumber}", userManagerId);
+        return await GetKudosData($"kudos/?pageNumber={pageNumber}", userManagerId, sentOnYear);
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber, string userManagerId)
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber, string userManagerId,
+                                                                 int sentOnYear)
     {
-        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}", userManagerId);
+        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}", userManagerId, sentOnYear);
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber, string userManagerId)
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber, string userManagerId, 
+                                                               int sentOnYear)
     {
-        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}", userManagerId);
+        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}", userManagerId, sentOnYear);
     }
 
-    private async Task<IEnumerable<KudosResponse>> GetKudosData(string endpoint, string userManagerId)
+    private async Task<IEnumerable<KudosResponse>> GetKudosData(string endpoint, string userManagerId, int sentOnYear)
     {
         IEnumerable<KudosResponse> kudos = null;
 
         try
         {
             kudos = await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>(
-                $"{_gatewayServiceUrl}{endpoint}&managerId={userManagerId}");
+                $"{_gatewayServiceUrl}{endpoint}&managerId={userManagerId}&sentOnYear={sentOnYear}");
         }
         catch (Exception ex)
         {
