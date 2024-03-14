@@ -37,6 +37,8 @@ public class Kudos
     [ForeignKey("KudosId")]
     public List<KudosReceiver> Recognized { get; set; } = new();
 
+    public int SentOnYear { get; set; }
+
 }
 
 public class KudosReceiver

@@ -5,7 +5,7 @@ namespace MyKudosDashboard.Interfaces;
 public interface IGamificationGateway
 {
 
-    Task<UserPointScore> GetUserScoreAsync(string pUserId, bool justMyTeam = false);
+    Task<UserPointScore> GetUserScoreAsync(string pUserId, int sentOnYear, bool justMyTeam = false );
 
-    Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId);
+    Task<IEnumerable<TopContributors>> GetTopContributors(int sentOnYear, Guid? managerId);
 }

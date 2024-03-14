@@ -19,14 +19,14 @@ public class UserPointsService : IUserPointsService
         _restClientHelper = clientHelper;
     }
 
-    public async Task<List<UserPoint>> GetTopUserScoresAsync(int top, Guid? managerId)
+    public async Task<List<UserPoint>> GetTopUserScoresAsync(int top, Guid? managerId, int? sentOnYear = null)
     {
         List<UserPoint> result = new();
 
         try
         {
             var contributors = await _restClientHelper.GetApiData<IEnumerable<UserPoint>>(
-                        $"{_kudosServiceUrl}TopContributors?top={top}&managerId={managerId}");
+                        $"{_kudosServiceUrl}TopContributors?top={top}&managerId={managerId}&sentOnYear={sentOnYear}");
             result = contributors.ToList();
 
         }
@@ -40,14 +40,14 @@ public class UserPointsService : IUserPointsService
 
     }
 
-    public async Task<UserPointScore> GetUserScoreAsync(Guid pUserId, bool justMyTeam = false)
+    public async Task<UserPointScore> GetUserScoreAsync(Guid pUserId, bool justMyTeam = false, int? sentOnYear = null)
     {
         UserPointScore result = new();
 
         try
         {
 
-            result = await _restClientHelper.GetApiData<UserPointScore>($"{_kudosServiceUrl}UserPoints/GetUserPoints/{pUserId},{justMyTeam}");
+            result = await _restClientHelper.GetApiData<UserPointScore>($"{_kudosServiceUrl}UserPoints/GetUserPoints/{pUserId},{justMyTeam},{sentOnYear}");
 
         }
         catch (Exception ex)

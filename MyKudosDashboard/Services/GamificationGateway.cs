@@ -20,7 +20,7 @@ public class GamificationGateway : IGamificationGateway
         _restClientHelper = clientHelper;
     }
 
-    public async Task<UserPointScore> GetUserScoreAsync(string pUserId, bool justMyTeam = false)
+    public async Task<UserPointScore> GetUserScoreAsync(string pUserId, int sentOnYear, bool justMyTeam = false)
     {
         UserPointScore result = new();
 
@@ -28,7 +28,7 @@ public class GamificationGateway : IGamificationGateway
         {
 
             result = await _restClientHelper.GetApiData<UserPointScore>(
-                            $"{_gatewayServiceUrl}userpoints/GetUserPoints/?userid={pUserId}&justmyteam={justMyTeam}");
+                            $"{_gatewayServiceUrl}UserPoints/GetUserPoints/{pUserId},{justMyTeam},{sentOnYear}");
             
         }
         catch (Exception ex)
@@ -41,7 +41,7 @@ public class GamificationGateway : IGamificationGateway
     }
 
 
-    public async Task<IEnumerable<TopContributors>> GetTopContributors(Guid? managerId)
+    public async Task<IEnumerable<TopContributors>> GetTopContributors(int sentOnYear, Guid? managerId)
     {
         List<TopContributors> result = new();
 
@@ -49,7 +49,7 @@ public class GamificationGateway : IGamificationGateway
         {
 
             var contributors = await _restClientHelper.GetApiData<IEnumerable<TopContributors>>(
-                            $"{_gatewayServiceUrl}contributors/?managerId={managerId}");
+                            $"{_gatewayServiceUrl}contributors/?managerId={managerId}&sentOnYear={sentOnYear}");
             result = contributors.ToList();
 
         }
