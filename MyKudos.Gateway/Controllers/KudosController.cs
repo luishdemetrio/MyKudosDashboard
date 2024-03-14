@@ -4,6 +4,7 @@ using MyKudos.Gateway.Domain.Models;
 using GatewayDomain = MyKudos.Gateway.Domain.Models;
 using MyKudos.Kudos.Domain.Models;
 using MyKudos.Gateway.Helpers;
+using MyKudos.MSGraph.gRPC;
 
 
 namespace MyKudos.Gateway.Controllers;
@@ -93,14 +94,14 @@ public class KudosController : Controller
                     {
                         Id = kudosDb.FromPersonId,
                         Name = kudosDb.UserFrom.DisplayName,
-                        Photo = $"data:image/png;base64,{kudosDb.UserFrom.Photo}",
+                        Photo = kudosDb.UserFrom.Photo != null ? $"data:image/png;base64,{kudosDb.UserFrom.Photo}" : _defaultProfilePicture
                     },
                     Receivers: kudosDb.Recognized.Select(r =>
                                 new GatewayDomain.Person
                                 {
                                     Id = r.ToPersonId,
                                     Name = r.Person.DisplayName,
-                                    Photo = $"data:image/png;base64,{r.Person.Photo96x96}",
+                                    Photo = r.Person.Photo96x96 != null ? $"data:image/png;base64,{r.Person.Photo96x96}" : _defaultProfilePicture,
                                     GivenName = r.Person.GivenName
                                 }).ToList(),
                     Reward: new GatewayDomain.Reward(Id: kudosDb.Recognition.RecognitionId, Title: kudosDb.Recognition.Title),
