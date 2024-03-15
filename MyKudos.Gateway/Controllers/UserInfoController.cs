@@ -13,10 +13,15 @@ public class UserInfoController : Controller
 
     private readonly IAdminUserService _adminUserService;
 
-    public UserInfoController(IUserProfileService userProfileService, IAdminUserService adminUserService)
+    private string _defaultProfilePicture;
+
+    public UserInfoController(IUserProfileService userProfileService, IAdminUserService adminUserService,
+                             IConfiguration configuration)
     {
         _userProfileService = userProfileService;
         _adminUserService = adminUserService;
+
+        _defaultProfilePicture = configuration["DefaultProfilePicture"];
     }
 
     [HttpGet(Name = "GetUser")]
@@ -42,8 +47,8 @@ public class UserInfoController : Controller
                 GivenName = userInfo.GivenName,
                 Mail = userInfo.Mail,
                 ManagerId = userInfo.ManagerId,
-                Photo = userInfo.Photo,    
-                Photo96x96 = userInfo.Photo96x96,
+                Photo = userInfo.Photo != null ? $"data:image/png;base64,{userInfo.Photo}" : _defaultProfilePicture,
+                Photo96x96 = userInfo.Photo96x96 != null ? $"data:image/png;base64,{userInfo.Photo96x96}" : _defaultProfilePicture,
                 HasDirectReports = userInfo.HasDirectReports,
                 IsAdmin = isAdminUser
             };

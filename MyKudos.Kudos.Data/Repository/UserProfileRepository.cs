@@ -15,34 +15,88 @@ public class UserProfileRepository : IUserProfileRepository
         _context = kudosLikeDbContext;
     }
 
-    public bool Truncate()
-    {
-         return _context.Database.ExecuteSqlRaw("TRUNCATE TABLE UserProfiles") >0;
-
-    }
-
     public bool Add(UserProfile user)
     {
+        user.IsActive = true;
         _context.UserProfiles.Add(user);
         return _context.SaveChanges() > 0;
     }
 
-    public bool AddRange(List<UserProfile> user)
-    {
-        _context.UserProfiles.AddRange(user);
-        return _context.SaveChanges() > 0;
-    }
-
+    /// <summary>
+    /// Add or update the users and deactivate the users that are not in the list
+    /// </summary>
+    /// <param name="users"></param>
+    /// <returns></returns>
     public bool PopulateUserProfile(List<UserProfile> users)
     {
-        bool result = false;
+        try
+        {
 
-        //        Truncate();
-        _context.UserProfiles.ExecuteDelete();
-        result = AddRange(users);
-        
-        return result;
+       
+        // Set IsActive to false for all users in the database
+        _context.Database.ExecuteSqlRaw("UPDATE UserProfiles SET IsActive = 0");
+
+        foreach (var user in users)
+        {
+            var existingUser = _context.UserProfiles.FirstOrDefault(u => u.UserProfileId == user.UserProfileId);
+            if (existingUser != null)
+            {
+                // Update existing user
+                _context.Entry(existingUser).CurrentValues.SetValues(user);
+                existingUser.IsActive = true;
+            }
+            else
+            {
+                // Add new user
+                user.IsActive = true;
+                _context.UserProfiles.Add(user);
+            }
+        }
+        return _context.SaveChanges() > 0;
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
+
+    /// <summary>
+    /// Add or update the user
+    /// </summary>
+    /// <param name="users"></param>
+    /// <returns></returns>
+    public bool AddUpdateUserProfile(UserProfile user)
+    {
+
+        
+        try
+        {
+            var existingUser = _context.UserProfiles.FirstOrDefault(u => u.UserProfileId == user.UserProfileId);
+
+            if (existingUser != null)
+            {
+                // Update existing user
+                _context.Entry(existingUser).CurrentValues.SetValues(user);
+                existingUser.IsActive = true;
+            }
+            else
+            {
+                // Add new user
+                user.IsActive = true;
+                _context.UserProfiles.Add(user);
+            }
+
+            return _context.SaveChanges() > 0;
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+       
+    }
+
 
     public List<UserProfile> GetAll()
     {
@@ -57,7 +111,7 @@ public class UserProfileRepository : IUserProfileRepository
     public List<UserProfile> GetUsers(string name)
     {
         return _context.UserProfiles
-            .Where(u => u.DisplayName.Contains(name)) // EF.Functions.Like(u.DisplayName, $"%{name}%"))
+            .Where(u => u.DisplayName.Contains(name) && u.IsActive) // EF.Functions.Like(u.DisplayName, $"%{name}%"))
             .ToList();
     }
 

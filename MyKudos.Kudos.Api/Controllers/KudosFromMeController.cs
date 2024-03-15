@@ -24,7 +24,8 @@ public class KudosFromMeController : ControllerBase
 
 
     [HttpGet(Name = "GetKudosFromMeController")]
-    public Task<IEnumerable<Domain.Models.Kudos>> Get(Guid userId, int pageNumber, int pageSize, Guid? managerId = null)
+    public Task<IEnumerable<Domain.Models.Kudos>> Get(Guid userId, int pageNumber, int pageSize, 
+                                                      Guid? managerId = null, int? sentOnYear = null)
     {
         if (pageNumber == 0)
             pageNumber = _defaultPageNumber;
@@ -32,6 +33,6 @@ public class KudosFromMeController : ControllerBase
         if (pageSize == 0)
             pageSize = _defaultPageSize;
 
-        return _kudosService.GetKudosFromMeAsync(userId, pageNumber, pageSize, managerId);
+        return _kudosService.GetKudosFromMeAsync(userId, pageNumber, pageSize, managerId, sentOnYear);
     }
 }

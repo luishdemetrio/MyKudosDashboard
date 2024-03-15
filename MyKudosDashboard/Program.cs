@@ -92,6 +92,7 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
                 ));
 
 
+
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 

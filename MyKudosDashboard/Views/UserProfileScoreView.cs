@@ -17,19 +17,21 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
 
     private string _userId;
 
+    private int _currentYear;
+
     public UserProfileScoreView(IGamificationGateway gamificationGateway, 
                                 ILogger<UserProfileScoreView> logger,
-                                IEventHubUserPointsReceived eventHubUserPointsReceived
+                                IEventHubUserPointsReceived eventHubUserPointsReceived,
+                                IConfiguration config
                                 )
     {
         _logger = logger;
 
         _gamificationGateway = gamificationGateway;
 
-       
         _eventHubUserPointsReceived = eventHubUserPointsReceived;
 
-
+        _currentYear = int.Parse(config["CurrentYear"]);
     }
 
     public void RegisterObserver(string userId)
@@ -46,7 +48,7 @@ public class UserProfileScoreView : IUserProfileScoreView, IObserverEventHub<Use
 
     public async Task<UserPointScore> GetUserScore(string userId, bool justMyTeam )
     {
-        return await _gamificationGateway.GetUserScoreAsync(userId, justMyTeam);
+        return await _gamificationGateway.GetUserScoreAsync(userId, _currentYear, justMyTeam);
     }
 
    

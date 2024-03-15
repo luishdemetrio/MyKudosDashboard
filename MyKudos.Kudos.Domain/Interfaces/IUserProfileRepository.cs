@@ -6,17 +6,15 @@ public interface IUserProfileRepository
 {
   
     bool Add(UserProfile user);
-    bool AddRange(List<UserProfile> user);
-
+    
     List<UserProfile> GetAll();
 
     List<UserProfile> GetUsers(string name);
 
     string? GetUserPhoto(Guid userid);
 
-    bool Truncate();
-
     bool PopulateUserProfile(List<UserProfile> users);
+    bool AddUpdateUserProfile(UserProfile user);
 
     List<UserProfile> GetUsers(Guid[] ids);
 

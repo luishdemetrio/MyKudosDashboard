@@ -12,6 +12,7 @@
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager Navigator;
 @inject KudosCommonVariables CommonVariables;
+@inject IImageHelper ImageHelper
 
 @if (User!=null)
 {
@@ -25,7 +26,7 @@
 
         <div class="avatar" style="float:none;width:100%;text-align: center">
 
-            <img src=@((User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image /png;base64,{User.Photo96x96}") style="height:10vh;width:10vh;border-radius: 50%;" />
+            <img src=@((User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image /png;base64,{User.Photo96x96}") style="height:8vh;width:8vh;border-radius: 50%;" />
 
             
         </div>
@@ -109,7 +110,7 @@
                         
                         @foreach (var badge in UserScoreValue.EarnedBagdes)
                         {
-                            <img id=@($"badge_{badge.UserBadgeId}") src=@($"images/badges/{badge.BadgeName}")
+                                <img id=@($"badge_{badge.UserBadgeId}") src=@(ImageHelper.GetImageUrl(badge.BadgeName))
                                  style="height:10vh;width:10vh;padding:5px" />
 
                             <FluentTooltip  Anchor=@($"badge_{badge.UserBadgeId}") 

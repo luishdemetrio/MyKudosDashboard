@@ -29,17 +29,19 @@
 
 <style>
     h1 {
-    font-size: 5.9vw;
+        font-size: 5.9vw;
     }
+
     h2 {
-    font-size: 3.0vh;
+        font-size: 3.0vh;
     }
+
     h4 {
-    font-size: 2.5vh;
+        font-size: 2.5vh;
     }
 
     p {
-    font-size: 2vmin;
+        font-size: 2vmin;
     }
 
     .small40 {
@@ -63,7 +65,8 @@
         <FluentProgressRing />
     </div>
 }
-else if (!_isInTeams ||! string.IsNullOrEmpty(_errorMessage)){
+else if (!_isInTeams || !string.IsNullOrEmpty(_errorMessage))
+{
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
         @_errorMessage
     </div>
@@ -101,8 +104,7 @@ else
                         {
                             <div style="display: flex; margin-left: 5px;width:40%">
                                 <FluentButton style="margin-left:5px;padding: 0px;"
-                                @onclick=@(()=>SettingsClick())
-                                >
+                                              @onclick=@(()=>SettingsClick())>
                                     <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
                                     @Localizer["Settings"]
                                 </FluentButton>
@@ -111,9 +113,9 @@ else
                         }
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_userProfile  SendKudosCallBack=@OpenSendKudosPanel />
+                    <UserProfileScore @ref=_userProfileScore User=@_userProfile SendKudosCallBack=@OpenSendKudosPanel />
 
-                    </div>
+                </div>
             </div>
 
             <!-- KUDOS -->
@@ -121,7 +123,7 @@ else
 
                 <div class="card  rounded-3 shadow-sm" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;height:94vh;width:100%">
                     <div class="card-header py-3;padding:2px" style="display: flex; justify-content: space-between; align-items: center;">
-                       
+
                         <h3 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"] </h3>
 
                         @if (_userProfile != null && _userProfile.HasDirectReports)
@@ -138,10 +140,10 @@ else
                             </FluentButton>
                         </div>
                     </div>
-                   
 
-                    <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack  />
-                    
+
+                    <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
+
                 </div>
             </div>
 
@@ -157,21 +159,21 @@ else
                             <h3 class="my-0 fw-normal">🥇 @Localizer["TopContributors"]</h3>
                         </div>
 
-                        <TopContributors @ref=_topContributors User=@_userProfile  />
+                        <TopContributors @ref=_topContributors User=@_userProfile />
 
                     </div>
                 </div>
             }
             <!-- It shows the pop up to send kudos -->
-            <SendKudos  @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_userTeams  
-                        sendKudosCallBack=@SendKudosCallBack />
+            <SendKudos @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_userTeams
+                       sendKudosCallBack=@SendKudosCallBack />
 
         </div>
 
         <!-- It shows the pop up to see and send comments -->
-        <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_userProfile  />
-      
-</div>
+        <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_userProfile />
+
+    </div>
 
 }
 
@@ -231,12 +233,17 @@ else
                         _errorMessage = "User profile not found.";
 
                     }
+                    else
+                    {
+                        CommonVariables.User = _userProfile;
 
-                    CommonVariables.User = _userProfile;
+                        CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["AZURE_OPENAI_ENABLED"]);
+                        CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
+                        CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
+                        CommonVariables.HasDirectReports = _userProfile.HasDirectReports; // it is used to manage the export to csv on KudosListView
+                    }
 
-                    CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["UsesAzureOpenAI"]);
-                    CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
-                    CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
+                    
 
                 }
 
@@ -251,7 +258,8 @@ else
         }
     }
 
-    public bool VisualizeJustMyTeam{
+    public bool VisualizeJustMyTeam
+    {
         get
         {
 
@@ -279,7 +287,7 @@ else
 
     private async void UpdateKudosTab()
     {
-        await _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged(); 
+        await _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
     }
 
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -301,7 +309,7 @@ else
 
         var t = InvokeAsync(() =>
        {
-            _sendKudosPanel.SendKudosModal();
+           _sendKudosPanel.SendKudosModal();
        });
 
         t.Wait();
@@ -330,15 +338,15 @@ else
 
     private async Task ExportToCSVClick()
     {
-        var csv = _kudosTab.ExportToCSV();
-      
+        var csv = await _kudosTab.ExportToCSV();
+
         byte[] file = System.Text.Encoding.UTF8.GetBytes('\uFEFF' + csv);
         var fileName = "kudos.csv";
 
         await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, "text/plain", file);
     }
 
-   
+
 
 
 }

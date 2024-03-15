@@ -17,13 +17,16 @@ public class KudosListView : IKudosListView
 
     private KudosCommonVariables _commonVariables;
 
+    private int _currentYear;
+
     public KudosListView(IKudosGateway gatewayService, 
-                         KudosCommonVariables commonVariables)
+                         KudosCommonVariables commonVariables,
+                         IConfiguration config)
     {
         _gatewayService = gatewayService;
         _commonVariables = commonVariables;
 
-        //LoadKudoListAgain();
+        _currentYear = int.Parse(config["CurrentYear"]);
 
     }
 
@@ -89,7 +92,7 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
       
-        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString());
+        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString(), _currentYear);
            
     }
 
@@ -97,14 +100,16 @@ public class KudosListView : IKudosListView
     {
         return await _gatewayService.GetKudosToMe(_commonVariables.User.UserProfileId.ToString(),
                                                   pageNumber,  
-                                                  _commonVariables.GetManagerId().ToString());
+                                                  _commonVariables.GetManagerId().ToString(),
+                                                  _currentYear);
     }
 
     public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(int pageNumber)
     {
         return await _gatewayService.GetKudosFromMe(_commonVariables.User.UserProfileId.ToString(), 
                                                     pageNumber,
-                                                    _commonVariables.GetManagerId().ToString());
+                                                    _commonVariables.GetManagerId().ToString(),
+                                                    _currentYear);
     }
 
     public async Task<bool> UpdateKudos(KudosMessage kudos)
@@ -126,17 +131,40 @@ public class KudosListView : IKudosListView
 
     }
 
-    public string ExportToCsv()
-    {
 
-        var sb = new StringBuilder();
-        sb.AppendLine("Title,Message,SendOn,NumberOfLikes,NumberOfComments,From,Receivers");
-        foreach (var item in KudosList)
+    public async Task<string> ExportToCsv()
+    {
+        IEnumerable<KudosResponse> kudos;
+
+        if (_commonVariables.User.IsAdmin)
         {
-            var receivers = string.Join(";", item.Value.Receivers.Select(r => r.Name));
-            sb.AppendLine($"{item.Value.Title},{item.Value.Message.Replace("\n", "")}," +
-                $"{item.Value.SendOn},{item.Value.Likes.Count}," +
-                $"{item.Value.Comments.Count},{item.Value.From.Name},{receivers}");
+            //Get All Kudos
+            kudos = await _gatewayService.GetKudos(0, string.Empty, _currentYear);
+
+        }
+        else if (_commonVariables.HasDirectReports)
+        {
+            //Get the kudos from his/her direct reports
+            kudos = await _gatewayService.GetKudos(0, _commonVariables.GetManagerId().ToString(), _currentYear);
+        }
+        else
+        {
+            //Get the kudos received and sent
+            kudos = await GetKudosToMe(0);
+
+            kudos.Concat(await GetKudosFromMe(0));
+            
+        }
+
+       
+        var sb = new StringBuilder();
+        sb.AppendLine("Title;Message;SendOn;NumberOfLikes;NumberOfComments;From;Receivers;EMail");
+        foreach (var item in kudos)
+        {
+            var receivers = string.Join(";", item.Receivers.Select(r => r.Name));
+            sb.AppendLine($"{item.Title};{item.Message.Replace("\n", "").Replace(";", ".")};" +
+                $"{item.SendOn};{item.Likes.Count};" +
+                $"{item.Comments.Count};{item.From.Name};{receivers};{item.From.EMail}");
         }
 
         return sb.ToString();

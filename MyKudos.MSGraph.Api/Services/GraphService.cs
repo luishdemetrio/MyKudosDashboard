@@ -462,7 +462,7 @@ public class GraphService : IGraphService
                     usersDictionary.Add(userIds[j]);
                 }
 
-                var photos96x96 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "96x96");
+                var photos96x96 = await GetUserPhotosChunckGraph(usersDictionary.ToArray(), "64x64");
 
 
                 foreach (var photo in photos96x96)
@@ -507,6 +507,8 @@ public class GraphService : IGraphService
                     }
                 }
             }
+
+            
 
             if (usersPage.NextPageRequest != null)
             {

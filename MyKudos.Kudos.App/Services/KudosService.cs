@@ -27,29 +27,32 @@ public sealed class KudosService : IKudosService
         _kudosLikeRepository = kudosLikeRepository;
     }
 
-    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize, Guid? managerId = null)
+    public Task<IEnumerable<Domain.Models.Kudos>> GetKudos(int pageNumber, int pageSize, 
+                                                           Guid? managerId = null, int? year = null)
     {
-        return _kudosRepository.GetKudosAsync(pageNumber, pageSize, managerId);
+        return _kudosRepository.GetKudosAsync(pageNumber, pageSize, managerId, year);
     }
 
     public Task<IEnumerable<Domain.Models.Kudos>> GetKudosFromMeAsync(Guid pUserId, int pageNumber = 1, 
                                                                       int pageSize = 5, 
-                                                                      Guid? managerId = null)
+                                                                      Guid? managerId = null,
+                                                                      int? year = null)
     {
-        return _kudosRepository.GetKudosFromMeAsync(pUserId, pageNumber, pageSize, managerId);
+        return _kudosRepository.GetKudosFromMeAsync(pUserId, pageNumber, pageSize, managerId, year);
     }
 
     public Task<IEnumerable<Domain.Models.Kudos>> GetKudosToMeAsync(Guid pUserId, int pageNumber = 1, 
                                                                     int pageSize = 5, 
-                                                                    Guid? managerId = null)
+                                                                    Guid? managerId = null, 
+                                                                    int? year = null)
     {
-        return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize, managerId);
+        return _kudosRepository.GetKudosToMeAsync(pUserId, pageNumber, pageSize, managerId, year);
     }
 
 
-    public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId)
+    public IEnumerable<Domain.Models.Kudos> GetUserKudos(Guid pUserId, int? year = null)
     {
-        return _kudosRepository.GetUserKudos(pUserId);
+        return _kudosRepository.GetUserKudos(pUserId, year);
     }
 
 

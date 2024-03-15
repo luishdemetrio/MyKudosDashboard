@@ -41,10 +41,11 @@ public class KudosFromMeController : Controller
 
 
     [HttpGet(Name = "GetKudosFromMe")]
-    public async Task<IEnumerable<KudosResponse>> Get(string userId, int pageNumber = 1)
+    public async Task<IEnumerable<KudosResponse>> Get(string userId, int pageNumber = 1,
+                                                      int? sentOnYear = null)
     {
         //get kudos
-        var kudos = await _kudosService.GetKudosFromMeAsync(userId, pageNumber);
+        var kudos = await _kudosService.GetKudosFromMeAsync(userId, pageNumber, null, sentOnYear);
 
         return KudosHelper.GetKudos(kudos, _defaultProfilePicture);
 
