@@ -7,6 +7,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'MyKudos.Kudos.Data/**/*'
+      - 'MyKudos.Kudos.App/**/*'
+      - 'MyKudos.Kudos.Api/**/*'
   workflow_dispatch:
 
 jobs:
