@@ -369,3 +369,4 @@ FodyWeavers.xsd
 /MyKudos.Gamification.KudosSent.Receiver/local.json
 /MyKudos.Gamification.Api/appsettings.Development.json
 /MyKudos.Kudos.App/appsettings.Development.json
+/MyKudosDashboard/env/.env.local
