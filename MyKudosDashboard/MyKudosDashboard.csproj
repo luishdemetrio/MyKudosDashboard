@@ -16,14 +16,18 @@
     <None Include=".fx/**/*" />
     <Compile Remove="EventGrid\**" />
     <Compile Remove="MessageSender\**" />
+    <Compile Remove="wwwroot\badges\**" />
     <None Remove="build/**/*" />
     <None Remove="EventGrid\**" />
     <None Remove="MessageSender\**" />
+    <None Remove="wwwroot\badges\**" />
     <Content Remove="build/**/*" />
     <Content Remove="EventGrid\**" />
     <Content Remove="MessageSender\**" />
+    <Content Remove="wwwroot\badges\**" />
     <EmbeddedResource Remove="EventGrid\**" />
     <EmbeddedResource Remove="MessageSender\**" />
+    <EmbeddedResource Remove="wwwroot\badges\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,7 +70,6 @@
 
   <ItemGroup>
     <Folder Include="env\" />
-    <Folder Include="wwwroot\badges\" />
   </ItemGroup>
 
 </Project>
