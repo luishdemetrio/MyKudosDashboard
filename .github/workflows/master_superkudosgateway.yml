@@ -1,16 +1,19 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - superkudosgateway
+name: Build and deploy ASP.Net Core app to Azure Web App - superkudosdashboard
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'MyKudos.Gateway/**/*'
+      - 'MyKudos.Gateway'
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -22,38 +25,19 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
-          include-prerelease: true
+          include-prerelease: false
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+       # Run dotnet build and publish
+      - name: dotnet build and publish
+        run: |
+          dotnet restore "MyKudosDashboard\MyKudosDashboard.csproj"
+          dotnet build --configuration Release "MyKudosDashboard\MyKudosDashboard.csproj"
+          dotnet publish -c Release "MyKudosDashboard\MyKudosDashboard.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
-      
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'superkudosgateway'
-          slot-name: 'Production'
-          package: .
+          app-name: 'superkudosdashboard'
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_22A13AA67E6A4E3185B6AFF8F5F7AE12 }}
