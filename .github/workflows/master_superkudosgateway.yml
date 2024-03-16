@@ -8,7 +8,7 @@ on:
     branches:
       - master
     paths:
-      - 'MyKudos.Gateway'
+      - 'MyKudos.Gateway/**/*'
   workflow_dispatch:
 
 env:
@@ -30,7 +30,7 @@ jobs:
        # Run dotnet build and publish
       - name: dotnet build and publish
         run: |
-          dotnet restore "MyKudosGateway\MyKudosGateway.csproj"
+          dotnet restore "MyKudos.Gateway\MyKudos.Gateway.csproj"
           dotnet build --configuration Release "MyKudos.Gateway\MyKudos.Gateway.csproj"
           dotnet publish -c Release "MyKudos.Gateway\MyKudos.Gateway.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
