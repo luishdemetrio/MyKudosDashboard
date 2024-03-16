@@ -30,14 +30,14 @@ jobs:
        # Run dotnet build and publish
       - name: dotnet build and publish
         run: |
-          dotnet restore "MyKudosDashboard\MyKudosDashboard.csproj"
-          dotnet build --configuration Release "MyKudosDashboard\MyKudosDashboard.csproj"
-          dotnet publish -c Release "MyKudosDashboard\MyKudosDashboard.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
+          dotnet restore "MyKudosGateway\MyKudosGateway.csproj"
+          dotnet build --configuration Release "MyKudosGateway\MyKudosGateway.csproj"
+          dotnet publish -c Release "MyKudosGateway\MyKudosGateway.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'superkudosdashboard'
+          app-name: 'superkudosgateway'
           package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_22A13AA67E6A4E3185B6AFF8F5F7AE12 }}
