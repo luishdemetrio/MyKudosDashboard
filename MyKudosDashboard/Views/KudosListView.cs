@@ -221,7 +221,7 @@ public class KudosListView : IKudosListView
     {
         bool result = false;
 
-        if (KudosList.ContainsKey(pLike.KudosId))
+        if (KudosList != null && KudosList.ContainsKey(pLike.KudosId))
         {
             var kudo = KudosList[pLike.KudosId];
             var like = kudo.Likes.Where(l => l.Id == pLike.FromPerson.Id).FirstOrDefault();
