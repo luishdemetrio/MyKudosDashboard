@@ -49,7 +49,7 @@ public class LikesController : Controller
 
         if (kudos != null)
         {
-            var whoLiked = kudos.Likes.Where(p=> p.PersonId == like.UserProfileId).First();
+            var whoLiked = kudos.Likes.Where(p=> p.PersonId == like.UserProfileId).FirstOrDefault();
 
             if (whoLiked != null)
             {
@@ -65,6 +65,21 @@ public class LikesController : Controller
                         }
                     ),
                     kudos.Recognized);
+            }
+            else
+            {
+                await _kudosQueue.SendUndoLikeAsync(
+                   new LikeGateway(
+                       KudosId: like.KudosId,
+                       FromPerson: new Person()
+                       {
+                           Id = like.UserProfileId,
+                           Name = string.Empty,
+                           GivenName = string.Empty,
+                           Photo = string.Empty
+                       }
+                   ),
+                   kudos.Recognized) ;
             }
             
         }

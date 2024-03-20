@@ -5,12 +5,16 @@ namespace MyKudos.Gateway.Helpers;
 
 public class KudosHelper
 {
-    public static IEnumerable<KudosResponse> GetKudos(IEnumerable<Kudos.Domain.Models.Kudos> kudos, string defaultProfilePicture)
+    public static IEnumerable<KudosResponse> GetKudos(IEnumerable<Kudos.Domain.Models.Kudos> kudos, 
+                                                      string defaultProfilePicture,
+                                                      bool userSmallPhoto = false)
     {
         var result = new List<KudosResponse>();
 
         foreach (var kudo in kudos)
         {
+
+            
 
             var kudosResponse = new KudosResponse()
             {
@@ -38,11 +42,13 @@ public class KudosHelper
 
             foreach (var receiver in kudo.Recognized)
             {
+                var ToPhoto = userSmallPhoto ? receiver.Person.Photo : receiver.Person.Photo96x96;
+
                 kudosResponse.Receivers.Add(new GatewayDomain.Person()
                 {
                     Id = receiver.Person.UserProfileId,
                     Name = receiver.Person.DisplayName,
-                    Photo = receiver.Person.Photo96x96 != null ? $"data:image/png;base64,{receiver.Person.Photo96x96}" : defaultProfilePicture,
+                    Photo = ToPhoto != null ? $"data:image/png;base64,{ToPhoto}" : defaultProfilePicture,
                     GivenName = receiver.Person.GivenName
                 });
             }

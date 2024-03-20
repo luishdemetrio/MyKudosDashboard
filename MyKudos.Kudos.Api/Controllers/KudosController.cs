@@ -44,6 +44,16 @@ public class KudosController : ControllerBase
         return _kudosService.GetKudos(pageNumber, pageSize, managerId, sentOnYear);
     }
 
+    [HttpGet("GetKudosByName/{name},{pageSize},{fromNumberOfDays}")]
+    public Task<IEnumerable<Domain.Models.Kudos>> Get(string name, int pageSize, int fromNumberOfDays)
+    {
+
+        if (pageSize == 0)
+            pageSize = _defaultPageSize;
+
+        return _kudosService.GetKudosByName(name, pageSize, fromNumberOfDays);
+    }
+
     [HttpPut(Name = "UpdateKudos")]
     public  bool UpdateKudos([FromBody] Domain.Models.KudosMessage     kudos)
     {

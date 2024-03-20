@@ -45,7 +45,12 @@ public class KudosController : Controller
 
     }
 
-
+    /// <summary>
+    /// Returns the Kudos by pageNumber and opnionally by manager
+    /// </summary>
+    /// <param name="pageNumber"></param>
+    /// <param name="managerId"></param>
+    /// <returns></returns>
     [HttpGet(Name = "GetKudos")]
     public async Task<IEnumerable<KudosResponse>> Get(int pageNumber = 1, Guid? managerId = null, 
                                                       int? sentOnYear = null)
@@ -54,9 +59,27 @@ public class KudosController : Controller
         var kudos = await _kudosService.GetKudosAsync(pageNumber, managerId, sentOnYear);
 
 
-        return KudosHelper.GetKudos(kudos, _defaultProfilePicture);
+        return KudosHelper.GetKudos(kudos, _defaultProfilePicture, false);
 
     }
+
+    /// <summary>
+    /// Returns the Kudos by pageNumber and opnionally by manager
+    /// </summary>
+    /// <param name="pageNumber"></param>
+    /// <param name="managerId"></param>
+    /// <returns></returns>
+    [HttpGet("GetKudosByName/{name},{pageSize},{fromNumberOfDays}")]
+    public async Task<IEnumerable<KudosResponse>> Get(string name, int pageSize=10, int fromNumberOfDays=0, bool useSmallPhoto = true)
+    {
+        //get kudos
+        var kudos = await _kudosService.GetKudosByName(name, pageSize, fromNumberOfDays);
+
+
+        return KudosHelper.GetKudos(kudos, _defaultProfilePicture, useSmallPhoto);
+
+    }
+
 
     /// <summary>
     /// Send a recognition (KUDOS) to one or more person. Each person (sender/receivers) will receive a notification card on Teams as well as their respective managers.

@@ -21,6 +21,8 @@ public interface IKudosService
     public bool UndoLike(int kudosId, Guid personId);
 
     Domain.Models.Kudos GetKudos(int kudosId);
+    Task<IEnumerable<Domain.Models.Kudos>> GetKudosByName(string name, int pageSize, int fromNumberOfDays);
+
     bool UpdateKudos(int kudosId, string? message);
     bool DeleteKudos(int kudosId);
 }

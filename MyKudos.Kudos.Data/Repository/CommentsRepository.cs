@@ -19,9 +19,26 @@ public class CommentsRepository : ICommentsRepository
 
     public int Add(Comments comments)
     {
-        _context.Comments.Add(comments);
-        _context.SaveChanges();
 
+        int result = 0;
+
+        var commentsFromDb = _context.Comments.Where(k => k.KudosId == comments.KudosId &&
+                                                     k.FromPersonId == comments.FromPersonId &&
+                                                     k.Message == comments.Message).FirstOrDefault();
+
+
+        if (commentsFromDb == null)
+        {
+            _context.Comments.Add(comments);
+            _context.SaveChanges();
+
+            result = comments.CommentsId;
+        }
+        else
+        {
+            result = commentsFromDb.CommentsId;
+        }
+        
         return comments.CommentsId;
     }
 

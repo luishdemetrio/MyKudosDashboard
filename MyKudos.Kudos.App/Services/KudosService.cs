@@ -109,6 +109,11 @@ public sealed class KudosService : IKudosService
         return _kudosRepository.GetKudos(kudosId);
     }
 
+    public async Task<IEnumerable<Domain.Models.Kudos>> GetKudosByName(string name, int pageSize, int fromNumberOfDays)
+    {
+        return await _kudosRepository.GetKudosByName(name, pageSize, fromNumberOfDays);
+    }
+
     public bool UpdateKudos(int kudosId, string? message)
     {
         return _kudosRepository.UpdateMessage(kudosId, message);
