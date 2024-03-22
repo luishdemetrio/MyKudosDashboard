@@ -9,7 +9,7 @@ on:
       - master
     paths:
       - 'MyKudos.MSGraph.Api/**/*'
-    workflow_dispatch:
+  workflow_dispatch:
 
 env:
   AZURE_WEBAPP_PACKAGE_PATH: '.'
