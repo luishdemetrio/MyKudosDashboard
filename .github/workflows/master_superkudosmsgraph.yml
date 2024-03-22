@@ -9,8 +9,11 @@ on:
       - master
     paths:
       - 'MyKudos.MSGraph.Api/**/*'
-  workflow_dispatch:
+    workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -22,38 +25,19 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
-          include-prerelease: true
+          include-prerelease: false
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+       # Run dotnet build and publish
+      - name: dotnet build and publish
+        run: |
+          dotnet restore "MyKudos.Gateway\MyKudos.Gateway.csproj"
+          dotnet build --configuration Release "MyKudos.Gateway\MyKudos.Gateway.csproj"
+          dotnet publish -c Release "MyKudos.Gateway\MyKudos.Gateway.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
-      
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'superkudosmsgraph'
-          slot-name: 'Production'
-          package: .
+          app-name: 'superkudosgateway'
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_27F6926C20F74390A5DB341CE93277B4 }}
