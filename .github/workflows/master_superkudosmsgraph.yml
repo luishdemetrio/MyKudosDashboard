@@ -30,14 +30,14 @@ jobs:
        # Run dotnet build and publish
       - name: dotnet build and publish
         run: |
-          dotnet restore "MyKudos.Gateway\MyKudos.Gateway.csproj"
-          dotnet build --configuration Release "MyKudos.Gateway\MyKudos.Gateway.csproj"
-          dotnet publish -c Release "MyKudos.Gateway\MyKudos.Gateway.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
+          dotnet restore "MyKudos.MSGraph.Api/MyKudos.MSGraph.Api.csproj"
+          dotnet build --configuration Release "MyKudos.MSGraph.Api/MyKudos.MSGraph.Api.csproj"
+          dotnet publish -c Release "MyKudos.MSGraph.Api/MyKudos.MSGraph.Api.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'superkudosgateway'
+          app-name: 'superkudosmsgraph'
           package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_27F6926C20F74390A5DB341CE93277B4 }}
