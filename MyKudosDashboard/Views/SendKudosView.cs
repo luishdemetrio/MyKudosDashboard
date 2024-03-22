@@ -39,17 +39,18 @@ public class SendKudosView : ISendKudosView
         await Task.WhenAll(recognitions, recognitionsGroup);
 
         var result = from g in recognitionsGroup.Result
-                                      join r in recognitions.Result
-                                        on g.RecognitionGroupId equals r.RecognitionGroupId
-                                      select new RecognitionViewModel
-                                      {
-                                          Description = r.Description,
-                                          DisplayOrder = r.DisplayOrder,
-                                          Emoji = g.Emoji,
-                                          GroupName = g.Description,
-                                          RecognitionId = r.RecognitionId,
-                                          Title = r.Title
-                                      };
+                     join r in recognitions.Result
+                        on g.RecognitionGroupId equals r.RecognitionGroupId
+                     orderby r.DisplayOrder
+                     select new RecognitionViewModel
+                            {
+                                Description = r.Description,
+                                DisplayOrder = r.DisplayOrder,
+                                Emoji = g.Emoji,
+                                GroupName = g.Description,
+                                RecognitionId = r.RecognitionId,
+                                Title = r.Title
+                            };
 
 
 
