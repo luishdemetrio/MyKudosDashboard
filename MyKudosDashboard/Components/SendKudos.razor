@@ -424,14 +424,7 @@
 
         await t;
 
-        if (kudos == null)
-            return;
-
-        kudosId = await SendKudosView.Send(kudos);
-
-
-        if (t.IsCompleted && !string.IsNullOrEmpty(kudosId))
-        {
+            kudosId = await SendKudosView.Send(kudos);
 
             await InvokeAsync(() =>
              {
@@ -441,7 +434,7 @@
 
                  sendKudosCallBack?.Invoke();
              });
-        }
+        
     }
 
     public void Hide()
