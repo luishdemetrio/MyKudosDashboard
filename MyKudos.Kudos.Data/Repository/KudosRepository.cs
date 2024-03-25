@@ -87,10 +87,8 @@ public class KudosRepository : IKudosRepository
             .Include(u => u.Recognition);
 
 
-        if (!year.HasValue)
-            year = DateTime.Today.Year;
-
-        kudosQuery = kudosQuery.Where(k => k.SentOnYear == year);
+        if (year.HasValue && year.Value > 0)
+            kudosQuery = kudosQuery.Where(k => k.SentOnYear == year);
 
         kudosQuery = kudosQuery.Include(r => r.Recognized).ThenInclude(p => p.Person);
         kudosQuery = kudosQuery.Include(r => r.Likes).ThenInclude(p => p.Person);

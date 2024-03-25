@@ -32,7 +32,7 @@ public class TopContributorsView : ITopContributorsView, IObserverEventHub<UserP
 
         _logger = logger;
 
-        _currentYear = int.Parse(config["CurrentYear"]);
+        _currentYear = int.Parse(config["CurrentYearTopContributor"]);
     }
 
     public void RegisterObserver(string userId)

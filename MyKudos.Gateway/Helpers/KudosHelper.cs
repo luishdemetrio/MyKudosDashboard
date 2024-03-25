@@ -49,7 +49,8 @@ public class KudosHelper
                     Id = receiver.Person.UserProfileId,
                     Name = receiver.Person.DisplayName,
                     Photo = ToPhoto != null ? $"data:image/png;base64,{ToPhoto}" : defaultProfilePicture,
-                    GivenName = receiver.Person.GivenName
+                    GivenName = receiver.Person.GivenName,
+                    EMail = kudo.UserFrom.Mail
                 });
             }
 
