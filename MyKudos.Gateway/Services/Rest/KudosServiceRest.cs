@@ -22,10 +22,11 @@ public class KudosServiceRest: IKudosService
     }
 
     public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber, 
+                                                                            int pageSize,   
                                                                             Guid? managerId = null, 
                                                                             int? sentOnYear = null)
     {
-        return await GetKudosDataAsync($"kudos/?pageNumber={pageNumber}&managerId={managerId}&sentOnYear={sentOnYear}");
+        return await GetKudosDataAsync($"kudos/?pageNumber={pageNumber}&pageSize={pageSize}&managerId={managerId}&sentOnYear={sentOnYear}");
     }
 
     public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosByName(string name, int pageSize, int fromNumberOfDays)
@@ -34,16 +35,18 @@ public class KudosServiceRest: IKudosService
     }
 
     public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber,
+                                                                                  int pageSize,
                                                                                   Guid? managerId = null,
                                                                                   int? sentOnYear = null)
     {
-        return await GetKudosDataAsync($"kudosfromme/?userid={userId}&pageNumber={pageNumber}&managerId={managerId}&sentOnYear={sentOnYear}");
+        return await GetKudosDataAsync($"kudosfromme/?userid={userId}&pageNumber={pageNumber}&pageSize={pageSize}&managerId={managerId}&sentOnYear={sentOnYear}");
     }
 
-    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMeAsync(string userId, int pageNumber, Guid? managerId = null, 
+    public async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMeAsync(string userId, int pageNumber,
+                                                                                int pageSize, Guid? managerId = null, 
                                                                                 int? sentOnYear = null)
     {
-        return await GetKudosDataAsync($"kudostome/?userid={userId}&pageNumber={pageNumber}&managerId={managerId}&sentOnYear={sentOnYear}");
+        return await GetKudosDataAsync($"kudostome/?userid={userId}&pageNumber={pageNumber}&pageSize={pageSize}&managerId={managerId}&sentOnYear={sentOnYear}");
     }
 
     private async Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosDataAsync(string endpoint)

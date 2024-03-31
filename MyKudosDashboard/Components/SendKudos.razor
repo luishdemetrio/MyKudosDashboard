@@ -424,16 +424,16 @@
 
         await t;
 
-            kudosId = await SendKudosView.Send(kudos);
+        kudosId = await SendKudosView.Send(kudos);
 
-            await InvokeAsync(() =>
-             {
-                 BlockSendButton(false);
-                 Hide();
-                 StateHasChanged();
+        sendKudosCallBack?.Invoke();
 
-                 sendKudosCallBack?.Invoke();
-             });
+        await InvokeAsync(() =>
+            {
+                BlockSendButton(false);
+                Hide();
+                StateHasChanged();
+            });
         
     }
 

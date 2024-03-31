@@ -344,6 +344,8 @@ else
         var fileName = "kudos.csv";
 
         await JSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, "text/plain", file);
+
+        _sendKudosIsHidden = true;
     }
 
 

@@ -1,4 +1,5 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Azure.AI.OpenAI;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Common;
 using MyKudosDashboard.Interfaces;
 using System.Collections.Concurrent;
@@ -23,6 +24,8 @@ public class KudosListView : IKudosListView
     private int _currentYearTopContributors;
     private int _currentYearExportToCsv;
 
+    private int _pageSize;
+
     public KudosListView(IKudosGateway gatewayService,
                          KudosCommonVariables commonVariables,
                          IConfiguration config)
@@ -40,6 +43,7 @@ public class KudosListView : IKudosListView
 
         int.TryParse(config["CurrentYearExportToCsv"], out _currentYearExportToCsv);
 
+        int.TryParse(config["pageSize"], out _pageSize);
     }
 
     private async void LoadKudoListAgain()
@@ -104,7 +108,7 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
       
-        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString(), 
+        return await _gatewayService.GetKudos(pageNumber, _pageSize, _commonVariables.GetManagerId().ToString(), 
                                               _currentYearKudosAll);
            
     }
@@ -112,7 +116,7 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudosToMe(int pageNumber)
     {
         return await _gatewayService.GetKudosToMe(_commonVariables.User.UserProfileId.ToString(),
-                                                  pageNumber,  
+                                                  pageNumber, _pageSize,
                                                   _commonVariables.GetManagerId().ToString(),
                                                   _currentYearKudosReceived);
     }
@@ -120,7 +124,7 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(int pageNumber)
     {
         return await _gatewayService.GetKudosFromMe(_commonVariables.User.UserProfileId.ToString(), 
-                                                    pageNumber,
+                                                    pageNumber, _pageSize,
                                                     _commonVariables.GetManagerId().ToString(),
                                                     _currentYearKudosSent   );
     }
@@ -152,13 +156,13 @@ public class KudosListView : IKudosListView
         if (_commonVariables.User.IsAdmin)
         {
             //Get All Kudos
-            kudos = await _gatewayService.GetKudos(0, string.Empty, _currentYearExportToCsv);
+            kudos = await _gatewayService.GetKudos(0, 0, string.Empty, _currentYearExportToCsv);
 
         }
         else if (_commonVariables.HasDirectReports)
         {
             //Get the kudos from his/her direct reports
-            kudos = await _gatewayService.GetKudos(0, _commonVariables.GetManagerId().ToString(), _currentYearExportToCsv);
+            kudos = await _gatewayService.GetKudos(0, 0, _commonVariables.User.UserProfileId.ToString(), _currentYearExportToCsv);
         }
         else
         {
