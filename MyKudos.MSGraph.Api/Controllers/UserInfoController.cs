@@ -20,4 +20,10 @@ public class UserInfoController : Controller
     {
         return _graphService.GetUserInfo(users);
     }
+
+    [HttpGet(Name = "Teste")]
+    public Task<List<Models.GraphUser>> Teste([FromBody] string[] users)
+    {
+        return _graphService.GetUserInfo(users);
+    }
 }
