@@ -59,8 +59,10 @@ public class KudosRepository : IKudosRepository
                .Include(r => r.Likes).ThenInclude(p => p.Person);
 
         kudosQuery = kudosQuery.Where(k => k.Recognized != null &&
-                                           k.Recognized.Any(u => u.Person != null && u.Person.DisplayName.Contains(name)) &&
-                                   k.Date >= date);
+                                           k.Recognized.Any(u => u.Person != null && 
+                                                            u.Person.DisplayName.Contains(name)
+                                                           ) &&
+                                           (fromNumberOfDays == 0 || k.Date >= date));
 
         var kudos = await kudosQuery
            .OrderByDescending(k => k.Date)

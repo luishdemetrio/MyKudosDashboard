@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MyKudosDashboard.Pages
 {
-    public class SendKudosModel : PageModel
+    public class SendKudosChatModel : PageModel
     {
         public void OnGet()
         {
