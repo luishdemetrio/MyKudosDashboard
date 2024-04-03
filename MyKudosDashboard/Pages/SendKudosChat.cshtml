@@ -1,13 +1,16 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<html>
 <head>
+    <title>Send Kudos Chat</title>
+    
     <script src="https://res.cdn.office.net/teams-js/2.2.0/js/MicrosoftTeams.min.js"
             integrity="sha384yBjE++eHeBPzIg+IKl9OHFqMbSdrzY2S/LW3qeitc5vqXewEYRWegByWzBN/chRh"
             crossorigin="anonymous">
     </script>
     <script>
+
         // Initialize the library
         await microsoftTeams.app.initialize();
+        await microsoftTeams.app.executeDeepLink('https://teams.microsoft.com/l/channel/19%3AggRK9yTyMTF_pCLvTTYjPUPs9phGZxD188jtNdiaZOI1%40thread.tacv2/tab%3A%3Ab343b036-5239-4971-acc0-293702a6bf9b?context=%7B%22channelId%22%3A%2219%3AggRK9yTyMTF_pCLvTTYjPUPs9phGZxD188jtNdiaZOI1%40thread.tacv2%22%7D&tenantId=935d1d6d-2c54-492a-996e-8366e1d992dd');
     </script>
 </head>
 <body>
