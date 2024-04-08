@@ -1,7 +1,6 @@
 ﻿using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 using MyKudosDashboard.Interfaces.Aggregator;
-using MyKudosDashboard.Models;
 
 namespace MyKudosDashboard.Views;
 
@@ -58,9 +57,14 @@ public class SendKudosView : ISendKudosView
         return result;
     }
 
-    public async Task<IEnumerable<Person>> GetUsersAsync(string name)
+    public async Task<IEnumerable<Person>> GetUserProfile(string name)
     {
         return await _userGateway.GetUsers(name);              
+    }
+
+    public async Task<UserProfile> GetUserById(string userId)
+    {
+        return await _userGateway.GetUserInfo(userId);
     }
 
     public async Task<string> Send(SendKudosRequest kudos)

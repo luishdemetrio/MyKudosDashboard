@@ -1,0 +1,197 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.18",
+  "id": "${{TEAMS_APP_ID}}",
+  "packageName": "com.microsoft.teams.extension",
+  "developer": {
+    "name": "Teams App, Inc.",
+    "websiteUrl": "https://www.example.com",
+    "privacyUrl": "https://www.example.com/privacy",
+    "termsOfUseUrl": "https://www.example.com/termofuse"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Super Kudos Chat ${{APP_NAME_SUFFIX}}",
+    "full": "Super Kudos Chat"
+  },
+  "description": {
+    "short": "Shows the kudos or recognitions sent or received by a person.",
+    "full": "Find the kudos send or received by a person on a period of time"
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [],
+  "composeExtensions": [
+    {
+      "botId": "${{BOT_ID}}",
+      "commands": [
+
+        {
+          "id": "createCard",
+          "context": [
+            "compose",
+            "message",
+            "commandBox"
+          ],
+          "description": "Command to run action to create a Card from Compose Box",
+          "title": "Create Card",
+          "type": "action",
+          "fetchTask": true
+        },
+        {
+          "id": "findKudosReceived",
+          "context": [
+            "message",
+            "commandBox"
+          ],
+          "description": "what kudos that I have received",
+          "title": "Show me the kudos I received",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "Number of days until today to find kudos. No future dates. Output: Number",
+              "inputType": "text"
+            },
+            {
+              "name": "I",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "findRecognitionsReceived",
+          "context": [
+            "message",
+            "commandBox"
+          ],
+          "description": "what recognitions I received",
+          "title": "what kudos I received",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "Number of days from today for which to find tasks. Output: Datetime",
+              "inputType": "date"
+            },
+            {
+              "name": "I",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "findKudosSentToMe",
+          "context": [
+            "commandBox",
+            "message"
+          ],
+          "description": "what kudos was sent to me",
+          "title": "show the kudos was sent to me",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "The time period used to search the kudos received",
+              "inputType": "date"
+            },
+            {
+              "name": "me",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "findRecognitionsSentToMe",
+          "context": [
+            "commandBox",
+            "message"
+          ],
+          "description": "what kudos was sent to me",
+          "title": "Show recognitions sent to me",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "Number of days until today to find kudos. No future dates. Output: Number",
+              "inputType": "date"
+            },
+            {
+              "name": "me",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "findRecognitionsSentToMeBr",
+          "context": [
+            "commandBox",
+            "message"
+          ],
+          "description": "quais reconhecimentos foram enviados para mim?",
+          "title": "kudos que eu recebi?",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "Number of days until today to find kudos. No future dates. Output: Number",
+              "inputType": "date"
+            },
+            {
+              "name": "eu",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        }
+      ],
+      "messageHandlers": [
+        {
+          "type": "link",
+          "value": {
+            "domains": [
+              "superkudosdashboard.azurewebsites.net",
+              "localhost:44302"
+            ],
+            "supportsAnonymizedPayloads": true
+          }
+        }
+      ]
+    }
+  ],
+
+  "configurableTabs": [],
+  "staticTabs": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "devicePermissions": [
+    "geolocation",
+    "media",
+    "notifications",
+    "midi",
+    "openExternal"
+  ],
+  "validDomains": [
+    "superkudosdashboard.azurewebsites.net",
+    "localhost:44302"
+  ]
+}

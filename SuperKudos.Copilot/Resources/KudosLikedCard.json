@@ -1,0 +1,74 @@
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${name}",
+      "wrap": true,
+      "size": "large"
+    },
+    {
+      "type": "TextBlock",
+      "text": "${description}",
+      "wrap": true,
+      "size": "Medium"
+    },
+    {
+      "type": "TextBlock",
+      "text": "From: ${from}",
+      "wrap": true,
+      "size": "Small"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Sent on: ${senton}",
+      "wrap": true,
+      "size": "Small"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "title": "👍 Liked",
+      "verb": "send-like",
+      "id": "likeButton",
+      "data": {
+        "kudosId": "${kudosId}",
+        "userProfileId": "${userProfileId}"
+      }
+    },
+    {
+      "type": "Action.ShowCard",
+      "title": "↩️ Reply",
+      "card": {
+        "type": "AdaptiveCard",
+        "body": [
+          {
+            "type": "Input.Text",
+            "id": "replyText",
+            "placeholder": "Type your reply here",
+            "isMultiline": true
+          }
+        ],
+        "actions": [
+          {
+            "type": "Action.Execute",
+            "title": "Send",
+            "verb": "send-reply",
+            "id": "replyButton",
+            "data": {
+              "id": "sendButton",
+              "replyText": "${replyText}",
+              "kudosId": "${kudosId}",
+              "userProfileId": "${userProfileId}"
+
+            }
+          }
+          
+        ]
+      }
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4"
+}

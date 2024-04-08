@@ -1,0 +1,84 @@
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "Container",
+      "style": "default",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Enviar Reconhecimento",
+          "size": "Large",
+          "style": "default"
+        },
+        {
+          "type": "TextBlock",
+          "text": "🎯 To: ${ToPersonName}",
+          "size": "Medium",
+          "isSubtle": true,
+          "style": "default"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Escolha o comportamento:",
+          "size": "Medium",
+          "separator": true
+        },
+        {
+          "type": "Input.ChoiceSet",
+          "id": "selectedBehavior",
+          "choices": "${selectedBehavior}",
+          "value": "${selectedBehavior[0].value}",
+          "text": "First 1"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Message",
+          "size": "Medium"
+        },
+        {
+          "type": "Input.Text",
+          "id": "messageInput",
+          "placeholder": "Write your message here...",
+          "isMultiline": true
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "style": "default",
+      "items": [
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.Submit",
+              "title": "📩 Enviar",
+              "style": "positive",
+              "data": {
+                "recognition": "${selectedBehavior}",
+                "message": "${messageInput}",
+                "toPersonId": "${ToPersonId}",
+                "fromPersonId": "${FromPersonId}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5"
+}
