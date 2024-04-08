@@ -27,10 +27,15 @@ public class KudosFetchTask : IKudosFetchTask
     private ClientSecretCredential _clientSecretCredential;
     private GraphServiceClient _appClient;
 
+    private string _sendKudosPage;
+
     public KudosFetchTask(IRestClientHelper clientHelper, IConfiguration configuration)
     {
         _restClientHelper = clientHelper;
         _gatewayServiceUrl = configuration["GatewayServiceUrl"];
+
+        _sendKudosPage = configuration["SendKudosPage"];
+
 
         _clientSecretCredential = new ClientSecretCredential(
               configuration["tenantId"], configuration["BOT_ID"], configuration["BOT_PASSWORD"]);
@@ -79,7 +84,7 @@ public class KudosFetchTask : IKudosFetchTask
                     Height = "large",
                     Width = "large",
                     Title = "Super Kudos",
-                    Url = $"https://localhost:44302/kudos?touserid={toPersonId}&fromuserid={fromPersonId}"
+                    Url = $"{_sendKudosPage}?touserid={toPersonId}&fromuserid={fromPersonId}"
                 }
             }
         };
