@@ -7,8 +7,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'SuperKudos.Copilot/**/*'
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -19,39 +24,21 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '8.x'
-          include-prerelease: true
+          dotnet-version: '8.0.x'
+          include-prerelease: false
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+       # Run dotnet build and publish
+      - name: dotnet build and publish
+        run: |
+          dotnet restore "SuperKudos.Copilot\SuperKudos.Copilot.csproj"
+          dotnet build --configuration Release "SuperKudos.Copilot\SuperKudos.Copilot.csproj"
+          dotnet publish -c Release "SuperKudos.Copilot\SuperKudos.Copilot.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'superkudoschat'
-          slot-name: 'Production'
-          package: .
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1F7E8C99D2B14AF09D55CD711D751225 }}
