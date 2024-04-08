@@ -7,13 +7,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'SuperKudos.Copilot/**/*'
   workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
-  
 jobs:
   build:
     runs-on: windows-latest
@@ -24,28 +19,39 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '8.0.x'
-          include-prerelease: false
+          dotnet-version: '8.x'
+          include-prerelease: true
 
-       # Run dotnet build and publish
-      - name: dotnet build and publish
-        run: |
-          dotnet restore "SuperKudos.Copilot\SuperKudos.Copilot.csproj"
-          dotnet build --configuration Release "SuperKudos.Copilot\SuperKudos.Copilot.csproj"
-          dotnet publish -c Release "SuperKudos.Copilot\SuperKudos.Copilot.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
-          
-      - name: Login to Azure
-        uses: azure/login@v1
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E82ADAAA6C8E479E8F2E951582DF5FBA }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EA31575E689D49138A4E653A0A4A7B21 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8C8D010FCFBA44B2A35E75E3868152B8 }}
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app
+      
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'superkudoschat'
           slot-name: 'Production'
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
-          
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1F7E8C99D2B14AF09D55CD711D751225 }}
