@@ -33,20 +33,12 @@ jobs:
           dotnet restore "SuperKudos.Copilot\SuperKudos.Copilot.csproj"
           dotnet build --configuration Release "SuperKudos.Copilot\SuperKudos.Copilot.csproj"
           dotnet publish -c Release "SuperKudos.Copilot\SuperKudos.Copilot.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
-          
-      
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_CE247A1F0F8B43EA892B5BEE68EF8E3C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EC8D0F8E3BDB4349BBD20725E4C93D4F }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A709AE83448E45EAB3E2B3DC836AE2ED }}
 
+      
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'superkudoschat'
           package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
-          
-          
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1F7E8C99D2B14AF09D55CD711D751225 }}
