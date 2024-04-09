@@ -1,5 +1,158 @@
-﻿<h3>MobileDashboard</h3>
+﻿@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using MyKudos.Gateway.Domain.Models
+@using MyKudosDashboard.Common
+
+@inject IStringLocalizer<App> Localizer;
+@inject KudosCommonVariables CommonVariables;
+
+<style>
+    .navbar {
+        background-color: gray;
+        overflow: hidden;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
+        /* Style the links inside the navigation bar */
+        .navbar a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        /* Change the color of links on hover */
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        /* Add a color to the active/current link */
+        .navbar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        .nav-link {
+            float: left;
+            display: block;
+            color: white
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .nav-link.active {
+            color: blue;
+            
+        }
+
+       
+
+</style>
+
+@*
+<div class="card-body " style="padding:2px">
+
+    <FluentTabs >
+   
+        <FluentTab Text=@Localizer["Profile"] />
+        <FluentTab Text=@Localizer["Feed"] />
+        <FluentTab Text=@Localizer["Leaderboard"]  />
+
+        <FluentTabPanel class="nav-item">
+            <UserProfileScore @ref=_userProfileScore User=@CommonVariables.User
+                              ShowSendKudosButton=false />
+        </FluentTabPanel>
+
+        <FluentTabPanel class="nav-item">
+
+            <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
+
+        </FluentTabPanel>
+
+        <FluentTabPanel class="nav-item">
+
+            
+
+        </FluentTabPanel>
+
+
+    </FluentTabs>
+</div>
+*@
+<div>
+    <div class="content">
+
+        @if (_currentTab != null)
+        {
+            @if (_currentTab == "profile")
+            {
+                <UserProfileScore @ref=_userProfileScore User=@CommonVariables.User
+                                  ShowSendKudosButton=false />
+            }
+            else if (_currentTab == "feed")
+            {
+                <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
+            }
+            else if (_currentTab == "leaderboard")
+            {
+
+            }
+        }
+
+    </div>
+
+
+    <div class="navbar">
+        <NavLink  @onclick=@(()=>HandleNavLinkClick("profile"))>@Localizer["Profile"]</NavLink>
+        <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>@Localizer["Feed"]</NavLink>
+        <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>@Localizer["Leaderboard"]</NavLink>
+    </div>
+
+
+</div>
+
 
 @code {
 
+    private UserProfileScore _userProfileScore;
+
+    private KudosTab _kudosTab;
+
+    private string _currentTab;
+
+    // Inject NavigationManager
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    private void HandleNavLinkClick(string tab)
+    {
+        _currentTab = tab;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _currentTab = "feed";
+            StateHasChanged();
+        }
+        
+    }
+
+    private void ReplyCallBack(KudosResponse pKudos)
+    {
+        var t = InvokeAsync(() =>
+       {
+          // _replyKudos.ShowModal(pKudos);
+       });
+
+        t.Wait();
+    }
 }

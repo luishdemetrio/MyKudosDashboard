@@ -1,11 +1,96 @@
 ﻿@page "/"
 @page "/tab"
-@using MyKudosDashboard.Components;
 
+@using Microsoft.Extensions.Localization
+@using MyKudos.Gateway.Domain.Models
+@using MyKudosDashboard.Common
+@using MyKudosDashboard.Components;
+@using MyKudosDashboard.Interfaces
+
+@inject IJSRuntime JSRuntime
+@inject TeamsFx teamsfx
+@inject TeamsUserCredential teamsUserCredential
+@inject MicrosoftTeams MicrosoftTeams
+
+@inject IWelcomeView WelcomeView;
+
+@inject IStringLocalizer<App> Localizer;
+@inject KudosCommonVariables CommonVariables;
+@inject IConfiguration Configuration;
 
 <div>
-    <Welcome />
+    @if (isMobile)
+    {
+        <MobileDashboard/>
+    }
+    else
+    {
+        <Welcome />
+    }
+    
 </div>
 
 
+@code{
 
+    private bool isMobile;
+    bool _isInTeams;
+    string _errorMessage = string.Empty;
+
+    private UserProfile _userProfile;
+    UserInfo _userTeams;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isInTeams = await MicrosoftTeams.IsInTeams();
+            _errorMessage = string.Empty;
+
+            if (_isInTeams)
+            {
+                try
+                {
+                    _userTeams = await teamsUserCredential.GetUserInfoAsync();
+
+                }
+                catch (Exception ex)
+                {
+                    _errorMessage = ex.Message;
+                }
+
+                if (_userTeams != null)
+                {
+                    _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
+
+                    if (_userProfile == null)
+                    {
+                        _errorMessage = "User profile not found.";
+
+                    }
+                    else
+                    {
+                        CommonVariables.User = _userProfile;
+
+                        CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["AZURE_OPENAI_ENABLED"]);
+                        CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
+                        CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
+                        CommonVariables.HasDirectReports = _userProfile.HasDirectReports; // it is used to manage the export to csv on KudosListView
+                    }
+
+
+
+                }
+
+            }
+            else
+            {
+                _errorMessage = "Not running in Microsoft Teams!";
+            }
+
+            isMobile = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
+            StateHasChanged();
+        }
+    }
+    
+}
