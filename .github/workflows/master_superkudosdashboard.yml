@@ -1,0 +1,43 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - superkudosdashboard
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'MyKudosDashboard/**/*'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x'
+          include-prerelease: false
+
+       # Run dotnet build and publish
+      - name: dotnet build and publish
+        run: |
+          dotnet restore "MyKudosDashboard\MyKudosDashboard.csproj"
+          dotnet build --configuration Release "MyKudosDashboard\MyKudosDashboard.csproj"
+          dotnet publish -c Release "MyKudosDashboard\MyKudosDashboard.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'superkudosdashboard'
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_636FD25231C045B899B59CAEC1606A6D }}
