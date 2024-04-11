@@ -15,31 +15,7 @@
 @inject KudosCommonVariables CommonVariables;
 <style>
 
-    fluent-card {
-        padding: 5px;
-        margin: 5px;
-        height: 55px
-    }
-
-    fluent-horizontal-scroll {
-        max-width: 620px;
-        margin-top: 20px;
-        margin-left: 0px;
-        margin-right: 10px;
-    }
-
-    .both-gradient {
-        --scroll-fade-next: var(--fill-color);
-        --scroll-fade-previous: var(--fill-color)
-    }
-
-    .top-align {
-        --scroll-align: flex-start
-    }
-
-    .bottom-align {
-        --scroll-align: flex-end
-    }
+  
 
     .blazored-typeahead__controls {
         position: relative;
@@ -89,30 +65,37 @@
         margin-bottom: 1vh;
         font-size: 1rem;
     }
+
     
+
+
 </style>
 
-<FluentDialog @ref=SendKudosFluentDialog
-               aria-label="Simple dialog" Modal="true"
-              class="both-gradient" style="--dialog-height: 95vh;--dialog-width: calc(40vw + 180px);"
-              Hidden=@ModalHidden>
 
-    <div style="margin:1vh;height:95%;overflow-y:scroll;overflow:auto">
 
-        <div class="modal-content;" style="width:100%">
+<div style="margin: 0;
+            height: 100%;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            width: 100%;
+            padding: 0px;
+            margin-left: 0;
+            margin-right: 0">
+
+         <div class="modal-content;" style="width:100%">
             <div class="modal-header" style="width:98%">
                 <h5 class="modal-title" id="exampleModalLabel">👏 @Localizer["SendKudosToPeople"]</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="float: right; color: red" 
+                @* <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="float: right; color: red" 
                         @onclick=@(() => Hide())>
                     <span aria-hidden="true">&times;</span>
-                </button>
+                </button> *@
             </div>
-        </div>       
+        </div>        
 
-        <table class="table" style="height:90%">
-            <tbody>
-                <tr style="height:2vh">
-                    <td scope="row" style="height:80px">
+    <table style="table-layout: fixed;width: 100%;">
+        <tbody style="">
+            <tr style="">
+                <td scope="row" style="height:80px;">
 
                         <small class="small55" style="margin-bottom: 5px;">@Localizer["SelectColleague"]</small>
 
@@ -161,7 +144,7 @@
                     </td>
 
                 </tr>
-                <tr>
+            <tr style="">
                     <td scope="row">
 
                         <small class="small55" style="margin-bottom: 5px;padding-top:2px;">@Localizer["Category"]:</small>
@@ -234,8 +217,8 @@
 
                 </tr>
 
-                <tr>
-                    <td scope="row" >
+            <tr style="">
+                <td scope="row" style="height:80px;">
 
                          <Rewrite   @ref=RewriteDialog ModalHidden=@RewriteDialogIsHidden  
                                     RewriteCallBack =@RewriteCallBack /> 
@@ -252,7 +235,7 @@
 
                 </tr>
 
-                <tr>
+            <tr style="">
 
                     <td scope="row">
 
@@ -288,18 +271,13 @@
 
     </div>
 
-</FluentDialog>
+
 
 @code {
 
     [Parameter]
-    public bool ModalHidden { get; set; } = true;
-
-    [Parameter]
-    public UserInfo UserProfile { get; set; }
-
-    [Parameter]
     public SendKudosCallBack sendKudosCallBack { get; set; }
+    public delegate void SendKudosCallBack();
 
     private bool isLoading = false;
     private bool btnSendKudosDisabled = false;
@@ -310,9 +288,9 @@
 
     private string KudosMessage;
 
-    public delegate void SendKudosCallBack();
+    
 
-    private FluentDialog SendKudosFluentDialog;
+
 
     private bool RewriteDialogIsHidden = true;
     private Rewrite RewriteDialog;
@@ -326,19 +304,18 @@
 
     }
 
-    public async Task SendKudosModal()
+    protected override void OnAfterRender(bool firstRender)
     {
+        if (firstRender)
+        {
+            KudosMessage = string.Empty;
 
-        KudosMessage = string.Empty;
+            SelectedEmployees = new List<Person>();
 
-        SelectedEmployees = new List<Person>();
+            KudosMessage = string.Empty;
 
-        ModalHidden = false;
-        KudosMessage = string.Empty;
-
-        await InvokeAsync(StateHasChanged);
-
-        await Task.CompletedTask;
+            StateHasChanged();
+        }
     }
 
 
@@ -346,7 +323,10 @@
     {
         var foundEmployees =  await SendKudosView.GetUserProfile(searchText);
 
-        return foundEmployees.Where(person => !SelectedEmployees.Any(selectedPerson => selectedPerson.Id == person.Id) && person.Id.ToString() != UserProfile.ObjectId);
+        return foundEmployees.Where(
+                person => !SelectedEmployees.Any(
+                                selectedPerson => selectedPerson.Id == person.Id) && 
+                                person.Id != CommonVariables.User.UserProfileId);
 
     }
 
@@ -385,7 +365,7 @@
             }
             var lst = SelectedEmployees as List<Person>;
 
-            if (lst.Exists(u => u.Name == UserProfile.DisplayName))
+            if (lst.Exists(u => u.Name == CommonVariables.User.DisplayName))
             {
 
                 JSRuntime.InvokeVoidAsync("alert", (string)Localizer["YouCantSendAKudosToYourself"]);
@@ -413,7 +393,7 @@
 
             kudos = new SendKudosRequest
             {
-                FromPersonId = new Guid(UserProfile.ObjectId),
+                    FromPersonId = CommonVariables.User.UserProfileId,
                 ToPersonId = SelectedEmployees.Select(user => user.Id).ToList(),
                 RecognitionId = recognition.RecognitionId,
                 Message = KudosMessage,
@@ -431,21 +411,9 @@
         await InvokeAsync(() =>
             {
                 BlockSendButton(false);
-                Hide();
                 StateHasChanged();
             });
         
-    }
-
-    public void Hide()
-    {
-        ModalHidden = true;
-        SendKudosFluentDialog!.Hide();
-    }
-
-    private void OnDismiss()
-    {
-        Hide();
     }
 
     /// <summary>

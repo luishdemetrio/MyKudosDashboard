@@ -1,11 +1,12 @@
 ﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using Microsoft.Fast.Components.FluentUI
 
 @inject IReplyView ReplyView
 @inject IJSRuntime JSRuntime
-
+@inject KudosCommonVariables CommonVariables;
 
 <style>
 /* Style The Dropdown Button */
@@ -201,16 +202,17 @@
 
     private bool CanEditOrDeleteComment()
     {
-        return (Reply.FromPerson.Id == ReplyUser.UserProfileId);
+        
+        return (ReplyUser != null && Reply.FromPerson.Id == ReplyUser.UserProfileId);
     }
 
     private bool FilledLikeComments(CommentsResponse item)
     {
         bool filled = false;
 
-        @if (ReplyUser != null)
+        @if (CommonVariables.User != null)
         {
-            filled = item.Likes.Any(l => l.Id == ReplyUser.UserProfileId);
+            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
         }
 
         return filled;
@@ -226,7 +228,7 @@
         try
         {
 
-            if (item.Likes.Any(l => l.Id == ReplyUser.UserProfileId))
+            if (item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId))
             {
                 var t = InvokeAsync(() =>
                   {
@@ -235,9 +237,9 @@
                                  KudosId: item.Id,
                                  FromPerson: new Person
                                   {
-                                      Id = ReplyUser.UserProfileId,
-                                      Name = ReplyUser.DisplayName,
-                                      Photo = ReplyUser.Photo96x96
+                                         Id = CommonVariables.User.UserProfileId,
+                                         Name = CommonVariables.User.DisplayName,
+                                      Photo = CommonVariables.User.Photo96x96
                                   }));
                   });
                 t.Wait();

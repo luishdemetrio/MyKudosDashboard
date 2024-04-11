@@ -8,11 +8,12 @@
 
 <style>
     .navbar {
-        background-color: gray;
+        background-color: lightgray;
         overflow: hidden;
         position: fixed;
         bottom: 0;
         width: 100%;
+        
     }
 
         /* Style the links inside the navigation bar */
@@ -21,9 +22,9 @@
             display: block;
             color: #f2f2f2;
             text-align: center;
-            padding: 14px 16px;
+            padding: 2vh 2vh;
             text-decoration: none;
-            font-size: 17px;
+            font-size: 14px;
         }
 
         /* Change the color of links on hover */
@@ -38,82 +39,88 @@
             color: white;
         }
 
-        .nav-link {
-            float: left;
-            display: block;
-            color: white
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 17px;
-        }
-
-        .nav-link.active {
-            color: blue;
-            
-        }
+       
 
        
 
 </style>
 
-@*
-<div class="card-body " style="padding:2px">
-
-    <FluentTabs >
-   
-        <FluentTab Text=@Localizer["Profile"] />
-        <FluentTab Text=@Localizer["Feed"] />
-        <FluentTab Text=@Localizer["Leaderboard"]  />
-
-        <FluentTabPanel class="nav-item">
-            <UserProfileScore @ref=_userProfileScore User=@CommonVariables.User
-                              ShowSendKudosButton=false />
-        </FluentTabPanel>
-
-        <FluentTabPanel class="nav-item">
-
-            <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
-
-        </FluentTabPanel>
-
-        <FluentTabPanel class="nav-item">
-
-            
-
-        </FluentTabPanel>
-
-
-    </FluentTabs>
-</div>
-*@
 <div>
-    <div class="content">
 
-        @if (_currentTab != null)
+    <div class="content" style="width:100%;overflow-y: hidden;
+            overflow-x: hidden; height:90%">
+        @switch (_currentTab)
         {
-            @if (_currentTab == "profile")
-            {
-                <UserProfileScore @ref=_userProfileScore User=@CommonVariables.User
-                                  ShowSendKudosButton=false />
-            }
-            else if (_currentTab == "feed")
-            {
+            case "profile":
+                <UserProfileScore @ref=_userProfileScore ShowSendKudosButton=false />
+                break;
+            case "feed":
                 <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
-            }
-            else if (_currentTab == "leaderboard")
-            {
-
-            }
+                break;
+            case "leaderboard":
+                <TopContributors @ref=_topContributors />
+                break;
+            case "sendkudos":
+                <SendKudos sendKudosCallBack=@SendKudosCallBack />
+                break;     
         }
+
+        <KudosCommentsDialog @ref=_replyKudos ModalHidden=true 
+                             Style="--dialog-height: 100%;--dialog-width: 100%;margin-left:1vh" />
+
+       @*  <SendKudosDialog @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden
+                         sendKudosCallBack=@SendKudosCallBack
+                         Style="--dialog-height: 100%;--dialog-width: 100%;margin-left:2vh" /> *@
 
     </div>
 
 
-    <div class="navbar">
-        <NavLink  @onclick=@(()=>HandleNavLinkClick("profile"))>@Localizer["Profile"]</NavLink>
-        <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>@Localizer["Feed"]</NavLink>
-        <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>@Localizer["Leaderboard"]</NavLink>
+
+    <div class="navbar gap-1 border-0" style="height:8vh;padding-top:0px; padding-bottom:0px">
+        <NavLink  @onclick=@(()=>HandleNavLinkClick("profile")) >
+           <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Name="@FluentIcons.Person" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                </div>   
+               @*  <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Profile"]
+                </div>     *@ 
+            </div>
+
+            
+            </NavLink>
+    
+         <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>
+              <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Name="@FluentIcons.News" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                </div>   
+                @* <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Feed"]
+                </div>     *@ 
+            </div>
+        </NavLink>
+            <NavLink @onclick=@(()=>HandleNavLinkClick("sendkudos"))>
+             <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Name="@FluentIcons.Send" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                </div>   
+                @* <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Send"]
+                </div>      *@
+            </div>
+            </NavLink>
+            
+        <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>
+             <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Name="@FluentIcons.AppsList" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                </div>   
+               @*  <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Leaderboard"]
+                </div>   *@   
+            </div>
+            </NavLink>
     </div>
 
 
@@ -128,8 +135,14 @@
 
     private string _currentTab;
 
-    // Inject NavigationManager
-    [Inject] private NavigationManager NavigationManager { get; set; }
+    private TopContributors _topContributors;
+
+    private KudosResponse _currentKudos;
+
+    private KudosCommentsDialog _replyKudos;
+
+    private SendKudosDialog _sendKudosPanel;
+    private bool _sendKudosIsHidden = true;
 
     private void HandleNavLinkClick(string tab)
     {
@@ -143,16 +156,29 @@
             _currentTab = "feed";
             StateHasChanged();
         }
-        
+
+    }
+
+    private void SendKudosClick()
+    {
+        _sendKudosIsHidden = false;
+
+        _sendKudosPanel.SendKudosModal();
+    }
+
+    private void SendKudosCallBack()
+    {
+        //_sendKudosIsHidden = true;
+        _currentTab = "feed";
+        StateHasChanged();
     }
 
     private void ReplyCallBack(KudosResponse pKudos)
     {
-        var t = InvokeAsync(() =>
-       {
-          // _replyKudos.ShowModal(pKudos);
-       });
-
-        t.Wait();
+        _currentKudos = pKudos;        
+        _replyKudos.ShowModal(pKudos);
+        StateHasChanged();
     }
+
+ 
 }

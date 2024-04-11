@@ -96,19 +96,19 @@
     @if (KudosItem.Receivers.Count == 1)
     {
         <div style="display: grid; grid-template-columns: 1fr 8fr ">
-            <div class="info" style="float:left">
-                <img src=@KudosItem.Receivers[0].Photo style="height:7vh;width:7vh;float:left;border-radius: 50%" />
+            <div class="info" style="float:left;">
+                <img src=@KudosItem.Receivers[0].Photo 
+                     style="height:7vh;width:7vh;float:left;border-radius: 50%;" />
             </div>
 
             <div >
-                <h5 style="grid-column: 1 / span 3;margin-top:1vh;padding-left:10px">@KudosItem.Receivers[0].Name</h5>
+                <h5 style="grid-column: 1 / span 3;;padding-left:10px;padding-top:2vh">@KudosItem.Receivers[0].Name</h5>
             </div>
         </div>
 
     }
 
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr;">
+    <div style="display: flex; flex-wrap: wrap;">
             @*In case of an individual kudos, the name is also displayed*@
             @if (KudosItem.Receivers.Count > 1)            
             {
@@ -117,14 +117,17 @@
                 {
                     
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
+                            
                             <img src=@receiver.Photo
+                                 style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
 
-                                    style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
+
                             <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
                                 <span style="margin-left:5px">@receiver.Name</span>
                             </FluentTooltip>
-                            </div>
+
+                        </div>
                        
                     
                 }
@@ -132,11 +135,8 @@
             }
         </div>
 
-    <div class="info" style="width:94%;padding-left:8vh">
-
-        
-        
-            
+    <div class="info" style="width:94%;padding-left:4vh">
+    
                 <div class="text-wrap small55" style="width: 100%;margin-top:1vh">
                     @if (KudosItem.Receivers.Count == 1)
                     {
@@ -296,23 +296,6 @@
     private string _originalMessage;
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         // Attach a listener to the textarea for input changes
-    //         await JSRuntime.InvokeVoidAsync("attachTextareaListener", $"textareareply_{@KudosItem.Id}",
-    //                                         DotNetObjectReference.Create(this));
-    //     }
-    // }
-
-    // [JSInvokable]
-    // public async Task PlayConfettiAnimation()
-    // {
-    //     // Trigger the JavaScript function to create the explosion-like confetti
-    //     await JSRuntime.InvokeVoidAsync("triggerConfettiExplosion");
-    // }
 
     private void EditKudosOnClick()
     {

@@ -17,6 +17,8 @@ public class KudosCommonVariables
     public bool ShowAllKudosTab { get; set; }
 
     public bool HasDirectReports { get; set; }
+    
+    public bool IsMobile { get; set; }
 
 
     public Guid? GetManagerId()
