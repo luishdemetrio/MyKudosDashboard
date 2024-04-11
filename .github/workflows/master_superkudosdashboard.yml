@@ -7,8 +7,13 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'MyKudosDashboard/**/*'
   workflow_dispatch:
 
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -19,39 +24,20 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
-          include-prerelease: true
+          dotnet-version: '8.0.x'
+          include-prerelease: false
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
-
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
+       # Run dotnet build and publish
+      - name: dotnet build and publish
+        run: |
+          dotnet restore "MyKudosDashboard\MyKudosDashboard.csproj"
+          dotnet build --configuration Release "MyKudosDashboard\MyKudosDashboard.csproj"
+          dotnet publish -c Release "MyKudosDashboard\MyKudosDashboard.csproj" -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'superkudosdashboard'
-          slot-name: 'Production'
-          package: .
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/myapp' 
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_636FD25231C045B899B59CAEC1606A6D }}
