@@ -1,0 +1,92 @@
+﻿@using MyKudos.Gateway.Domain.Models;
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+
+
+@inject IStringLocalizer<App> Localizer
+
+<div>
+    @*In case of an individual kudos, the image size is bigger*@
+    @if (KudosItem.Receivers.Count == 1)
+    {
+        <div style="display: grid; grid-template-columns: 1fr 8fr ">
+            <div class="info" style="float:left;">
+                <img src=@KudosItem.Receivers[0].Photo
+                     style="height:7vh;width:7vh;float:left;border-radius: 50%;" />
+            </div>
+
+            <div>
+                <h5 style="grid-column: 1 / span 3;;padding-left:10px;padding-top:2vh">@KudosItem.Receivers[0].Name</h5>
+            </div>
+        </div>
+
+    }
+
+    <div style="display: flex; flex-wrap: wrap;">
+        @*In case of an individual kudos, the name is also displayed*@
+        @if (KudosItem.Receivers.Count > 1)
+        {
+            @*for multiple kudos, it's shown just the pictures for better visualization*@
+            foreach (var receiver in KudosItem.Receivers)
+            {
+
+                <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
+
+                    <img src=@receiver.Photo
+                         style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
+
+                    <small style="display:block; text-align:center">@receiver.GivenName</small>
+
+                    <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
+                        <span style="margin-left:5px">@receiver.Name</span>
+                    </FluentTooltip>
+
+                </div>
+
+
+            }
+
+        }
+    </div>
+
+    <div class="info" style="width:94%;padding-left:4vh">
+
+        <div class="text-wrap small55" style="width: 100%;margin-top:1vh">
+            @if (KudosItem.Receivers.Count == 1)
+            {
+                <small class="card-title pricing-card-title">@Localizer["Received"] @Localizer["A"] <spam style="font-weight: bold">@KudosItem.Title.ToUpper()</spam> </small>
+            }
+            else
+            {
+                <small class="card-title pricing-card-title">@Localizer["Received_Plural"] @Localizer["A"] <spam style="font-weight: bold">@KudosItem.Title.ToUpper()</spam> </small>
+            }
+
+        </div>
+
+
+        <div class="small55" style="width: 100%;margin-top:0.5vh">
+            <small style="margin-right:5px;">@Localizer["SentBy"]:</small>
+            <img src=@KudosItem.From.Photo
+                 style="height: 26px;width: 26px;border-radius: 50%" />
+            <small style="margin-left:5px;font-weight: bold">@KudosItem.From.Name</small>
+        </div>
+
+
+
+
+        <div class="small55">
+            <small style="margin-right:5px">@Localizer["SentOn"]:</small>
+
+            <small style="margin-left:5px">@KudosItem.SendOn</small>
+        </div>
+
+
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public KudosResponse KudosItem { get; set; }
+}

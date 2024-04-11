@@ -1,11 +1,116 @@
 ﻿@page "/"
 @page "/tab"
+
+@using Microsoft.Extensions.Localization
+@using MyKudos.Gateway.Domain.Models
+@using MyKudosDashboard.Common
 @using MyKudosDashboard.Components;
+@using MyKudosDashboard.Interfaces
+
+@inject IJSRuntime JSRuntime
+@inject TeamsFx teamsfx
+@inject TeamsUserCredential teamsUserCredential
+@inject MicrosoftTeams MicrosoftTeams
+
+@inject IWelcomeView WelcomeView;
+
+@inject IStringLocalizer<App> Localizer;
+@inject KudosCommonVariables CommonVariables;
+@inject IConfiguration Configuration;
+
+@if (_isLoading)
+{
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <FluentProgressRing />
+    </div>
+}
+else if (!_isInTeams || !string.IsNullOrEmpty(_errorMessage))
+{
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        @_errorMessage
+    </div>
+}
+else
+{
+    <div>
+        @if (CommonVariables.IsMobile)
+        {
+            <MobileDashboard/>
+        }
+        else
+        {
+            <Welcome />
+        }
+    
+    </div>
+}
+
+@code{
+
+    bool _isLoading = true;
+    string _errorMessage = string.Empty;
+
+    bool _isInTeams;
+    
+    private UserProfile _userProfile;
+    UserInfo _userTeams;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isInTeams = await MicrosoftTeams.IsInTeams();
+            _errorMessage = string.Empty;
+
+            if (_isInTeams)
+            {
+                try
+                {
+                    _userTeams = await teamsUserCredential.GetUserInfoAsync();
+
+                }
+                catch (Exception ex)
+                {
+                    _errorMessage = ex.Message;
+                }
+
+                if (_userTeams != null)
+                {
+                    _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
+
+                    if (_userProfile == null)
+                    {
+                        _errorMessage = "User profile not found.";
+
+                    }
+                    else
+                    {
+                        CommonVariables.User = _userProfile;
+
+                        CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["AZURE_OPENAI_ENABLED"]);
+                        CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
+                        CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
+                        CommonVariables.HasDirectReports = _userProfile.HasDirectReports; // it is used to manage the export to csv on KudosListView
+
+                        CommonVariables.IsMobile = await JSRuntime.InvokeAsync<bool>("isMobileDevice");
 
 
-<div>
-    <Welcome />
-</div>
+                    }
 
 
 
+                }
+
+            }
+            else
+            {
+                _errorMessage = "Not running in Microsoft Teams!";
+            }
+
+            
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+    
+}

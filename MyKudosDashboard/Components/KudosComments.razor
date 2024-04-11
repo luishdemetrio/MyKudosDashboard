@@ -1,0 +1,463 @@
+﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Interfaces;
+@using MyKudosDashboard.Models;
+@using MyKudosDashboard.Common;
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+
+@inject ICommentsView CommentsView;
+@inject IStringLocalizer<App> Localizer
+@inject IJSRuntime JSRuntime
+@inject KudosCommonVariables CommonVariables;
+
+<div>
+   
+   @*  @if (CommonVariables.IsMobile)
+    {
+        <button style="float:left;padding-right:5px"
+                type="button" class="close" data-dismiss="modal" aria-label="Close"
+                @onclick=@(() => GoBackClick())>
+            <span aria-hidden="true">
+                <FluentIcon Name="@FluentIcons.ArrowLeft" Filled=false style="width: 3vh; height: 3vh" />
+            </span>
+        </button>
+    } *@
+
+    <div class="list-group list-group-checkable d-grid gap-1 border-0 " 
+         style="height: 92%;overflow-y:scroll;margin:5px;width:98%;">
+
+
+
+        @if (KudosItem != null)
+        {
+            <table class="table" style="width:98%;margin:5px">
+                <tbody>
+                    <tr style="height:80px">
+                        <td scope="row" style="padding-top: 0px;padding-bottom: 0px;width:98%;">
+
+
+                            <div class="profile" data-is-focusable="true" style="width:90%">
+
+                                <KudosReceivers KudosItem=@KudosItem />
+                               
+                            </div>
+                            <div class="text-wrap small55" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0px;width:98%">
+                                <a>@KudosItem.Message</a>
+                            </div>
+
+                            <div style="float:right">
+
+
+                                <FluentButton style="margin-left:20px;">
+                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                    <div @ref=_numberOfComments>@KudosItem.Comments.Count()</div>
+
+                                </FluentButton>
+
+                                <FluentButton id=@($"Details_{KudosItem.Id}") style="margin-left:20px;margin-right:20px"
+                                              @onclick=@(()=>LikeKudosClick(KudosItem))
+                                              Disabled=@_isLikeButtonDisabled>
+
+                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
+                                                Filled=@FilledLikeKudos(KudosItem) />
+                                    @KudosItem.Likes.Count()
+                                </FluentButton>
+
+                                <FluentTooltip Anchor=@($"Details_{KudosItem.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+
+                                    @if (KudosItem.Likes.Count() > 0)
+                                    {
+                                        <ul class="list-unstyled ">
+                                            @foreach (var like in KudosItem.Likes)
+                                            {
+                                                <li>
+                                                    <div>
+                                                        <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
+                                                             style="height: 26px;width: 26px;border-radius: 50%;" />
+                                                        <span style="margin-left:5px">@like.Name</span>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </FluentTooltip>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td scope="row">
+
+
+                            <div style="display: flex;padding-bottom: 0px;width:90%">
+                                <div style="width:50px;margin-top:5px;padding-top: 15px">
+                                    <img src=@((CommonVariables.User.Photo96x96.Contains("data")) ?
+                                     CommonVariables.User.Photo96x96 :
+                                     $"data:image /png;base64,{CommonVariables.User.Photo96x96}")
+                                         style="height:40px;width:40px;float:left;border-radius: 50%" />
+                                </div>
+
+                                <div class="form-group small55" style="width:90%">
+                                    <a for="formGroupExampleInput2">@CommonVariables.User.DisplayName</a>
+                                    <input type="text" class="form-control" id="formGroupExampleInput2"
+                                           style="margin-left:1px;margin-top:5px;width:100%"
+                                           placeholder="Another input"
+                                           onchange=@PostValueChanged
+                                           value=@_replyMessage>
+                                </div>
+
+                            </div>
+
+                            <FluentButton class="small55" style="margin-left:60px;padding-top: 0px;height: 28px;"
+                                          @onclick=@(()=>PostMessageClick()) disabled=@btnSendKudosDisabled>
+                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=true />
+                                @Localizer["Post"]
+                            </FluentButton>
+
+                        </td>
+
+                    </tr>
+
+                    @if (_comments.Count() > 0)
+                    {
+
+                        <tr>
+
+                            <td scope="row">
+
+
+                                <div style="width:100%">
+
+                                    <ul class="list-unstyled ">
+
+                                        @foreach (var comment in _comments)
+                                        {
+
+                                            <li>
+
+                                                <ReplyControl Reply=@comment
+                                                              replyDeleteCommentCallBack=@DeleteComment
+                                                              replyUpdateCommentCallBack=@UpdateCommentCallBack />
+
+
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+
+
+        }
+
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public KudosResponse KudosItem { get; set; }
+
+    private string _replyMessage;
+
+    private List<CommentsResponse> _comments = new();
+
+    private bool _showReply;
+
+    private ElementReference _numberOfComments;
+
+    private bool isLoading = false;
+    private bool btnSendKudosDisabled = false;
+
+    private bool _isLikeButtonDisabled = false;
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (KudosItem != null)
+            {
+                _comments = new();
+
+                var comments = await CommentsView.GetComments(KudosItem.Id);
+
+                if (comments != null)
+                {
+                    _comments = comments.ToList();
+                }
+
+
+                BlockSendButton(false);
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+    }
+
+    public async Task GoBackClick()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+
+    }
+
+    private bool FilledLikeKudos(KudosResponse item)
+    {
+        bool filled = false;
+
+        @if (CommonVariables.User != null)
+        {
+            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
+        }
+
+        return filled;
+    }
+
+
+    private void LikeKudosClick(KudosResponse kudos)
+    {
+        if (_isLikeButtonDisabled)
+            return;
+
+
+        try
+        {
+
+
+            _isLikeButtonDisabled = true;
+
+
+            if (kudos.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId))
+            {
+                var t = InvokeAsync(() =>
+                   {
+                       CommentsView.UndoLikeKudosAsync(
+                         new LikeGateway(
+                           KudosId: kudos.Id,
+                           FromPerson: new Person
+                               {
+                                   Id = CommonVariables.User.UserProfileId,
+                                   Name = CommonVariables.User.DisplayName,
+                                   Photo = CommonVariables.User.Photo96x96
+                               }
+                       )
+                   );
+                   });
+
+                t.Wait();
+
+
+            }
+            else
+            {
+
+                var t = InvokeAsync(() =>
+                   {
+                       CommentsView.LikeKudosAsync(
+                           new LikeGateway(
+                             KudosId: kudos.Id,
+                             FromPerson: new Person
+                                 {
+                                     Id = CommonVariables.User.UserProfileId,
+                                     Name = CommonVariables.User.DisplayName,
+                                     Photo = CommonVariables.User.Photo96x96
+                                 }
+                            ));
+                   });
+
+                t.Wait();
+
+            }
+
+            UpdateLikesKudos(kudos.Id, CommonVariables.User.UserProfileId);
+
+        }
+        finally
+        {
+
+            _isLikeButtonDisabled = false;
+
+            var t = InvokeAsync(() =>
+                    {
+                        StateHasChanged();
+                    });
+
+            t.Wait();
+        }
+    }
+
+
+    private void UpdateLikeCallback(LikeGateway like)
+    {
+        // The person who sent already has the like updated
+        if (like.FromPerson.Id == CommonVariables.User.UserProfileId)
+            return;
+
+        UpdateLikesKudos(like.KudosId, like.FromPerson.Id);
+    }
+
+    private void UpdateLikesKudos(int pKudosId, Guid personId)
+    {
+
+        if (KudosItem.Id == pKudosId)
+        {
+            var like = KudosItem.Likes.Where(k => k.Id == personId).FirstOrDefault();
+
+
+            if ((like is null) || (!KudosItem.Likes.Contains(like)))
+            {
+
+                KudosItem.Likes.Add(new Person()
+                    {
+                        Id = personId,
+                        Name = CommonVariables.User.DisplayName,
+                        Photo = (CommonVariables.User.Photo96x96.Contains("data")) ?
+                                         CommonVariables.User.Photo96x96 :
+                                             $"data:image/png;base64,{CommonVariables.User.Photo96x96}"
+                    });
+            }
+            else
+            {
+                KudosItem.Likes.Remove(like);
+            }
+        }
+    }
+
+
+
+    private void PostValueChanged(ChangeEventArgs args)
+    {
+        _replyMessage = args.Value.ToString();
+    }
+
+    private void BlockSendButton(bool block)
+    {
+        isLoading = block;
+        btnSendKudosDisabled = block;
+
+    }
+
+    private async Task PostMessageClick()
+    {
+
+        if (string.IsNullOrEmpty(_replyMessage))
+            return;
+
+
+
+        BlockSendButton(true);
+
+        await InvokeAsync(StateHasChanged);
+
+        var comment = await CommentsView.SendComments(
+                         new CommentsRequest()
+                             {
+                                 KudosId = KudosItem.Id,
+                                 FromPersonId = CommonVariables.User.UserProfileId,
+                                 Message = _replyMessage,
+                                 Date = DateTime.Now
+                             }
+                      );
+
+
+        _comments.Add(new CommentsResponse()
+            {
+                Id = comment,
+                KudosId = KudosItem.Id,
+                FromPerson = new Person()
+                {
+                    Id = CommonVariables.User.UserProfileId,
+                    Photo = (CommonVariables.User.Photo96x96.Contains("data")) ?
+                                     CommonVariables.User.Photo96x96 :
+                                     $"data:image/png;base64,{CommonVariables.User.Photo96x96}",
+                    Name = CommonVariables.User.DisplayName
+                },
+                Message = _replyMessage,
+
+                Date = DateTime.Now
+            });
+
+        _replyMessage = string.Empty;
+
+
+
+        await UpdateNumberOfComments();
+
+        BlockSendButton(false);
+
+        await InvokeAsync(StateHasChanged);
+
+        await Task.CompletedTask;
+
+    }
+
+
+    public async Task UpdateNumberOfComments()
+    {
+
+        if (_comments != null)
+        {
+            await JSRuntime.InvokeVoidAsync(
+               "updateCount", _numberOfComments, _comments.Count);
+
+        }
+
+    }
+
+    private void ReplyMessageClick()
+    {
+        _showReply = !_showReply;
+    }
+
+    public void DeleteComment(CommentsResponse pComments)
+    {
+
+        var t = InvokeAsync(() =>
+                     {
+                         CommentsView.DeleteComments(pComments);
+
+                     });
+
+        t.Wait();
+
+
+        var comments = _comments.First(c => c.Id == pComments.Id);
+
+        if (_comments.Contains(comments))
+            _comments.Remove(comments);
+
+        var t2 = InvokeAsync(() =>
+                {
+                    UpdateNumberOfComments();
+
+                });
+
+        t.Wait();
+
+        StateHasChanged();
+    }
+
+    public void UpdateCommentCallBack(CommentsResponse comments)
+    {
+        CommentsView.UpdateComments(comments);
+
+
+    }
+
+
+
+}

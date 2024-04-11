@@ -14,39 +14,37 @@
 @inject KudosCommonVariables CommonVariables;
 @inject IImageHelper ImageHelper
 
-@if (User!=null)
+@if (CommonVariables.User != null)
 {
 
+    <div class="card-body" style="padding:2px">  
 
-<div class="card-body" style="padding:2px">
-  
-
-        <div class="profile" style="width:100%;height:82vh;overflow-y:scroll;overflow:auto">
-     
+        <div class="profile" style="width:100%;height:82vh;overflow-y:scroll;overflow:auto">     
 
         <div class="avatar" style="float:none;width:100%;text-align: center">
 
-            <img src=@((User.Photo96x96.Contains("data")) ? User.Photo96x96 : $"data:image /png;base64,{User.Photo96x96}") style="height:8vh;width:8vh;border-radius: 50%;" />
-
-            
+                <img src=@((CommonVariables.User.Photo96x96.Contains("data")) ?
+                 CommonVariables.User.Photo96x96 : 
+                 $"data:image /png;base64,{CommonVariables.User.Photo96x96}")
+                 style="height:8vh;width:8vh;border-radius: 50%;" />            
         </div>
 
         <div class="info " style="width:100%;margin-bottom: 0px;">
-            <h4 style="text-align: center;padding:0px;margin-bottom: 0px">@User.DisplayName</h4>
+
+                <h4 style="text-align: center;padding:0px;margin-bottom: 0px">@CommonVariables.User.DisplayName</h4>
 
             @if (_isLoaded)
             {
+                @if (CommonVariables.ShowTopContributors)
+                {
+                    <div style="width:100%;text-align: center;padding:0px">
+                        <h4 class="card-title pricing-card-title" style="margin-bottom: 0px;">
+                                <small class="small55"  @ref=_score>@UserScoreValue.Score</small>
+                                <small class="text-muted fw-light small55" > @Localizer["Points"]</small>
+                        </h4>
 
-                    @if (CommonVariables.ShowTopContributors)
-                    {
-                        <div style="width:100%;text-align: center;padding:0px">
-                            <h4 class="card-title pricing-card-title" style="margin-bottom: 0px;">
-                                <small @ref=_score style="font-size: 3vmin">@UserScoreValue.Score</small>
-                                <small class="text-muted fw-light" style="font-size: 3vmin"> @Localizer["Points"]</small>
-                            </h4>
-
-                        </div>
-                    }
+                    </div>
+                }
            
                 <div style="margin-left:10px; display:flex; flex-direction: column;">
 
@@ -119,23 +117,26 @@
                     </div>
                 }
 
-                <button type="button" class="btn btn-primary small55" style="height:7vh;margin-top:3vh;margin-left:1vh;margin-right:1vh ;width:90%;"
-                    @onclick=@(()=>OpenSendKudosPanel() )>
+                @if (ShowSendKudosButton)
+                {
+                    <button type="button" class="btn btn-primary small55" 
+                            style="height:7vh;margin-top:3vh;margin-left:1vh;margin-right:1vh ;width:90%;"
+                            @onclick=@(()=>OpenSendKudosPanel() )>
                     📩 @Localizer["SendKudos"]
-                </button>
+                    </button>
+                }                
             }
             
+            </div>
+
         </div>
 
     </div>
-
-</div>
 }
+
 @code {
 
 
-    [Parameter]
-    public UserProfile User { get; set; }
 
     [Parameter]
     public UserPointScore UserScoreValue { get; set; }
@@ -143,6 +144,10 @@
     [Parameter]
     public SendKudos SendKudosCallBack { get; set; }
     public delegate void SendKudos();
+
+    [Parameter]
+    public bool ShowSendKudosButton{ get; set; }
+
 
     private bool _isLoaded = false;
 
@@ -164,11 +169,11 @@
 
         UserScoreValue = new();
 
-        if (User != null)
+        if (CommonVariables.User != null)
         {
             await GetUserScore();
 
-            UserProfileScoreView.RegisterObserver(User.UserProfileId.ToString());
+            UserProfileScoreView.RegisterObserver(CommonVariables.User.UserProfileId.ToString());
         }
 
         UserProfileScoreView.UserScoreCallback = UpdateScoreCallBack;
@@ -179,7 +184,7 @@
 
     public async Task GetUserScore()
     {
-        UserScoreValue = await UserProfileScoreView.GetUserScore(User.UserProfileId.ToString(),
+        UserScoreValue = await UserProfileScoreView.GetUserScore(CommonVariables.User.UserProfileId.ToString(),
                                                                  CommonVariables.VisualizeJustMyTeam);
 
         var t = InvokeAsync(() =>
@@ -211,7 +216,7 @@
     public void UpdateScoreCallBack(UserPointScore userScore)
     {
 
-        if (userScore.UserId != User.UserProfileId.ToString())
+        if (userScore.UserId != CommonVariables.User.UserProfileId.ToString())
             return;
 
          UserScoreValue = userScore;

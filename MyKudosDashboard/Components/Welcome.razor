@@ -57,22 +57,13 @@
         font-size: calc(0.60em + 1vmin)
     }
 
+    .small65 {
+        font-size: calc(0.65em + 1vmin)
+    }
+
 </style>
 
-@if (_isLoading)
-{
-    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-        <FluentProgressRing />
-    </div>
-}
-else if (!_isInTeams || !string.IsNullOrEmpty(_errorMessage))
-{
-    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-        @_errorMessage
-    </div>
-}
-else
-{
+
     <style>
         div {
             float: left;
@@ -100,7 +91,7 @@ else
                             🚀 @Localizer["Profile"]
                         </h3>
 
-                        @if (_userProfile != null && _userProfile.IsAdmin)
+                    @if (CommonVariables != null && CommonVariables.User.IsAdmin)
                         {
                             <div style="display: flex; margin-left: 5px;width:40%">
                                 <FluentButton style="margin-left:5px;padding: 0px;"
@@ -113,7 +104,9 @@ else
                         }
                     </div>
 
-                    <UserProfileScore @ref=_userProfileScore User=@_userProfile SendKudosCallBack=@OpenSendKudosPanel />
+                    <UserProfileScore @ref=_userProfileScore 
+                                      SendKudosCallBack=@OpenSendKudosPanel 
+                                      ShowSendKudosButton=true/>
 
                 </div>
             </div>
@@ -126,7 +119,7 @@ else
 
                         <h3 class="my-0 fw-normal">👏 @Localizer["KudosTabTitle"] </h3>
 
-                        @if (_userProfile != null && _userProfile.HasDirectReports)
+                    @if (CommonVariables != null && CommonVariables.User.HasDirectReports)
                         {
                             <FluentSwitch @bind-Value=VisualizeJustMyTeam>@Localizer["JustMyTeam"]</FluentSwitch>
                         }
@@ -159,40 +152,30 @@ else
                             <h3 class="my-0 fw-normal">🥇 @Localizer["TopContributors"]</h3>
                         </div>
 
-                        <TopContributors @ref=_topContributors User=@_userProfile />
+                    <TopContributors @ref=_topContributors  />
 
                     </div>
                 </div>
             }
             <!-- It shows the pop up to send kudos -->
-            <SendKudos @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden UserProfile=@_userTeams
-                       sendKudosCallBack=@SendKudosCallBack />
+            <SendKudosDialog @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden 
+                             sendKudosCallBack=@SendKudosCallBack />
 
         </div>
 
         <!-- It shows the pop up to see and send comments -->
-        <CommentsKudos @ref=_replyKudos ModalHidden=true User=@_userProfile />
+        <KudosCommentsDialog @ref=_replyKudos ModalHidden=true  />
 
     </div>
-
-}
 
 
 @code {
 
     private TopContributors _topContributors;
 
-    UserInfo _userTeams;
-
-    bool _isInTeams;
-    bool _isLoading = true;
-    string _errorMessage = string.Empty;
-
-    private UserProfile _userProfile;
-
     private UserProfileScore _userProfileScore;
 
-    private SendKudos _sendKudosPanel;
+    private SendKudosDialog _sendKudosPanel;
     private bool _sendKudosIsHidden = true;
 
     private void OnOpenModalParameterButtonClick() => _sendKudosIsHidden = false;
@@ -200,63 +183,8 @@ else
 
     private KudosTab _kudosTab;
 
-    private CommentsKudos _replyKudos;
+    private KudosCommentsDialog _replyKudos;
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            _isInTeams = await MicrosoftTeams.IsInTeams();
-            _errorMessage = string.Empty;
-
-            if (_isInTeams)
-            {
-                try
-                {
-                    _userTeams = await teamsUserCredential.GetUserInfoAsync();
-
-                }
-                catch (Exception ex)
-                {
-                    _errorMessage = ex.Message;
-                }
-
-                if (_userTeams != null)
-                {
-                    _userProfile = await WelcomeView.GetUserInfo(_userTeams.ObjectId);
-
-                    if (_userProfile == null)
-                    {
-                        _errorMessage = "User profile not found.";
-
-                    }
-                    else
-                    {
-                        CommonVariables.User = _userProfile;
-
-                        CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["AZURE_OPENAI_ENABLED"]);
-                        CommonVariables.ShowTopContributors = bool.Parse(Configuration["ShowTopContributors"]);
-                        CommonVariables.ShowAllKudosTab = bool.Parse(Configuration["ShowAllKudosTab"]);
-                        CommonVariables.HasDirectReports = _userProfile.HasDirectReports; // it is used to manage the export to csv on KudosListView
-                    }
-
-                    
-
-                }
-
-            }
-            else
-            {
-                _errorMessage = "Not running in Microsoft Teams!";
-            }
-
-            _isLoading = false;
-            StateHasChanged();
-        }
-    }
 
     public bool VisualizeJustMyTeam
     {
@@ -272,6 +200,7 @@ else
             //we need to update the three tabs
 
             _topContributors.LoadTopContributors();
+
             UpdateKudosTab();
 
             UpdateScoreTab();
@@ -290,18 +219,10 @@ else
         await _kudosTab.LoadKudosAfterVisualizeJustMyTeamValueChanged();
     }
 
-    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        Console.WriteLine($"Property {e.PropertyName} changed");
-        StateHasChanged();
-    }
-
     private void OnDismiss()
     {
         _sendKudosIsHidden = true;
-
     }
-
 
     private void OpenSendKudosPanel()
     {
