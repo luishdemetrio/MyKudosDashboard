@@ -94,12 +94,14 @@
 
             </div>
         </FluentDialog>
+
+            @if (isLoading)
+            {
+                <div class="loading-indicator" style="clear: both;">@Localizer["LoadingMoreItems"]</div>
+            }
     </div>
 
-    @if (isLoading)
-    {
-            <div class="loading-indicator" style="clear: both;">@Localizer["LoadingMoreItems"]</div>
-    }
+   
 
 </div>
 
