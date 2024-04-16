@@ -260,15 +260,15 @@
                                 KudosId: item.Id,
                                 FromPerson: new Person
                                 {
-                                    Id = ReplyUser.UserProfileId,
-                                    Name = ReplyUser.DisplayName,
-                                    Photo = ReplyUser.Photo96x96
+                                    Id = CommonVariables.User.UserProfileId,
+                                        Name = CommonVariables.User.DisplayName,
+                                        Photo = CommonVariables.User.Photo
                                 }));
                   });
                 t.Wait();
             }
 
-            UpdateLikes(item.Id, ReplyUser.UserProfileId);
+            UpdateLikes(item.Id, CommonVariables.User.UserProfileId);
 
         }
         finally
@@ -299,8 +299,8 @@
                 Reply.Likes.Add(new Person()
                     {
                         Id = personId,
-                        Name = ReplyUser.DisplayName,
-                        Photo = ReplyUser.Photo96x96
+                        Name = CommonVariables.User.DisplayName,
+                        Photo = CommonVariables.User.Photo
                     });
             }
             else

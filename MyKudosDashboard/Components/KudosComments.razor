@@ -199,25 +199,23 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (KudosItem != null)
         {
-            if (KudosItem != null)
+            _comments = new();
+
+            var comments = await CommentsView.GetComments(KudosItem.Id);
+
+            if (comments != null)
             {
-                _comments = new();
-
-                var comments = await CommentsView.GetComments(KudosItem.Id);
-
-                if (comments != null)
-                {
-                    _comments = comments.ToList();
-                }
-
-
-                BlockSendButton(false);
-
-                await InvokeAsync(StateHasChanged);
+                _comments = comments.ToList();
             }
+
+
+            BlockSendButton(false);
+
+            await InvokeAsync(StateHasChanged);
         }
+        
 
     }
 
