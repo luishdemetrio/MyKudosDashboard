@@ -214,27 +214,37 @@
 
             <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(KudosItem))>
 
-                    <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" />
+                <div style="display:flex">
+
+                @KudosItem.Comments.Count()
+
+                <FluentIcon Value="@(new Icons.Regular.Size16.Comment())"
+                            Style="margin-left:2px" />               
                 
-                <div>
-                    @KudosItem.Comments.Count()
+                    
                 </div>
             </FluentButton>
 
             <FluentButton id=@KudosItem.Id.ToString() style="margin-left:20px;" @onclick=@(()=>LikeKudosClick(KudosItem))
                           Disabled=@_isLikeButtonDisabled>
                 
+                 <div style="display:flex">
+
+                    <div @ref=numberOfLikes[KudosItem.Id] id=@($"likevalue_{KudosItem.Id}")>
+                         @KudosItem.Likes.Count()
+                </div>
+
                 @if (Filled(KudosItem))
                 {
-                    <FluentIcon Value="@(new Icons.Filled.Size16.Heart())" />
+                    <FluentIcon Value="@(new Icons.Filled.Size16.Heart())"
+                                Style="margin-left:2px" />
                 }
                 else
                 {
-                    <FluentIcon Value="@(new Icons.Regular.Size16.Heart())" />
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Heart())"
+                                Style="margin-left:2px" />
                 }               
 
-                <div @ref=numberOfLikes[KudosItem.Id] id=@($"likevalue_{KudosItem.Id}")>
-                    @KudosItem.Likes.Count()
                 </div>
 
             </FluentButton>

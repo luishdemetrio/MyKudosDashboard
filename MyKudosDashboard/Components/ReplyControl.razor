@@ -55,17 +55,19 @@
 }
 </style>
 
-<div style="width:100%;padding-bottom: 0px">
+<div style="width:100%;margin-top: 2vh">
 
-    <div style="height: auto;width:100%">
-        <div style="width:50px;margin-top:0px;padding-top: 5px">
-            <img src=@((Reply.FromPerson.Photo.Contains("data")) ? Reply.FromPerson.Photo : $"data:image /png;base64,{Reply.FromPerson.Photo}") style="height:40px;width:40px;float:left;border-radius: 50%" />
+    <div style="height: auto;width:100%;display:flex">
+        <div style=";margin-top:0px;padding-top: 5px">
+            <img src=@((Reply.FromPerson.Photo.Contains("data")) ? Reply.FromPerson.Photo : $"data:image /png;base64,{Reply.FromPerson.Photo}") 
+                 style="height:3vh;width:3vh;float:left;border-radius: 50%;vertical-align:central" />
         </div>
 
-        <div style="width:90%;margin-bottom: 0px;">
+        <div style="width:100%;margin-bottom: 0px;display:flex">
 
        
-            <div class="form-group small55" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;width:90%">
+            <div class="form-group small55" 
+                 style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;width:90%;margin-left:1vh">
                 <small for="formGroupExampleInput2">@Reply.FromPerson.Name</small>
                 <textarea id=@($"textareareply_{@Reply.Id}") type ="text" class="form-control"
                           Readonly=@_isReplyCommendReadOnly
@@ -105,17 +107,28 @@
     </div>
 </div>
 
-<div style="float:left;margin-left:37px;padding-top: 0px">
+<div style=";margin-left:37px;padding-top: 0px">
 
-    <FluentButton id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
+    <FluentButton id=@($"reply_{@Reply.Id}") style="flex-wrap:nowrap;" 
                   @onclick=@(()=>LikeCommentClick(Reply))
                   Disabled=@_isLikeButtonDisabled>
-
-        <FluentIcon Value="@(new Icons.Regular.Size16.Heart())"
-                    Appearence=@FilledLikeComments(@Reply) />
-
+    <div style="display:flex">
+            
         <div @ref=_numberOfLikeComments>@Reply.Likes.Count()</div>
+
+            @if (FilledLikeComments(@Reply))
+            {
+                <FluentIcon Value="@(new Icons.Filled.Size16.Heart())"
+                            Style="margin-left:1vh" />
+
+            }else{
+                <FluentIcon Value="@(new Icons.Regular.Size16.Heart())"
+                            Style="margin-left:1vh" />
+
+            }
+            
         
+    </div>    
     </FluentButton>
 
     <FluentTooltip Anchor=@($"reply_{Reply.Id}") 
@@ -164,9 +177,6 @@
     [Parameter]
     public CommentsResponse Reply { get; set; }
 
-    [Parameter]
-    public UserProfile ReplyUser { get; set; }
-
     public delegate void DeleteCommentCallBack(CommentsResponse comments);
 
     [Parameter]
@@ -192,32 +202,32 @@
     {
         bool filled = false;
 
-        @if (ReplyUser != null)
+        @if (CommonVariables.User != null)
         {
-            filled = item.Likes.Any(l => l.Id== ReplyUser.UserProfileId);
+            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
         }
 
         return filled;
     }
     private bool LikeDisabled(CommentsResponse item)
     {
-        return item.FromPerson.Id == ReplyUser.UserProfileId;
+        return item.FromPerson.Id == CommonVariables.User.UserProfileId;
     }
 
     private bool CanEditOrDeleteComment()
     {
         
-        return (ReplyUser != null && Reply.FromPerson.Id == ReplyUser.UserProfileId);
+        return (CommonVariables.User != null && Reply.FromPerson.Id == CommonVariables.User.UserProfileId);
     }
 
-    private string FilledLikeComments(CommentsResponse item)
+    private bool FilledLikeComments(CommentsResponse item)
     {
-        string filled = string.Empty;
+        bool filled = false;
 
         @if (CommonVariables.User != null)
         {
-            if (item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId))
-                filled = "Appearance.Filled";
+            return item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
+
         }
 
         return filled;

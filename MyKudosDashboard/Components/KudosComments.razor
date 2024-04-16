@@ -25,13 +25,13 @@
     } *@
 
     <div class="list-group list-group-checkable d-grid gap-1 border-0 " 
-         style="height: 92%;overflow-y:scroll;margin:5px;width:98%;">
+         style="height: 78vh;overflow-y:scroll;margin:1px;width:98%;">
 
 
 
         @if (KudosItem != null)
         {
-            <table class="table" style="width:98%;margin:5px">
+            <table class="table" style="width:98%;margin:2px">
                 <tbody>
                     <tr style="height:80px">
                         <td scope="row" style="padding-top: 0px;padding-bottom: 0px;width:98%;">
@@ -49,10 +49,13 @@
                             <div style="float:right">
 
 
-                                <FluentButton style="margin-left:20px;">
-                                    <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" />
-                                    <div @ref=_numberOfComments>@KudosItem.Comments.Count()</div>
+                                <FluentButton style="margin-left:20px;margin-right:20px">
+                                    <div style="display:flex">
+                                        <div @ref=_numberOfComments>@KudosItem.Comments.Count()</div>
 
+                                        <FluentIcon Value="@(new Icons.Regular.Size16.Comment())"
+                                                    Style="margin-left:2px"/>                                    
+                                    </div>
                                 </FluentButton>
 
                                 <FluentButton id=@($"Details_{KudosItem.Id}") style="margin-left:20px;margin-right:20px"
@@ -63,7 +66,8 @@
 
                                     @if (FilledLikeKudos(KudosItem))
                                     {
-                                        <FluentIcon Value="@(new Icons.Filled.Size16.Heart())" />
+                                        <FluentIcon Value="@(new Icons.Filled.Size16.Heart())"
+                                                    Style="margin-left:2px" />
                                     }
                                     else
                                     {
