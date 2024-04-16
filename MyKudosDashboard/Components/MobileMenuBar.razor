@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using Microsoft.Extensions.Localization
+@using Microsoft.Fast.Components.FluentUI
 
 @inject IStringLocalizer<App> Localizer;
 
@@ -61,7 +62,7 @@
         <NavLink  @onclick=@(()=>HandleNavLinkClick("profile")) >
            <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.Person" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Person())" style="width: 2.5vh; height: 2.5vh" />
                 </div>   
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
                     @Localizer["Profile"]
@@ -73,7 +74,7 @@
         <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>
               <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.News" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                    <FluentIcon Value="@(new Icons.Regular.Size16.News())" style="width: 2.5vh; height: 2.5vh" />
                 </div>   
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
                     @Localizer["Feed"]
@@ -83,7 +84,7 @@
         <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>
              <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.AppsList" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                    <FluentIcon Value="@(new Icons.Regular.Size16.List())" style="width: 2.5vh; height: 2.5vh" />
                 </div>   
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
                     @Localizer["Leaderboard"]

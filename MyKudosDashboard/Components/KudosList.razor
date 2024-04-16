@@ -1,4 +1,5 @@
-﻿@using MyKudos.Gateway.Domain.Models;
+﻿@using Microsoft.Fast.Components.FluentUI
+@using MyKudos.Gateway.Domain.Models;
 @using MyKudosDashboard.Common;
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
@@ -78,8 +79,8 @@
                     CanEditOrDeleteKudosInDays = "@CanEditKudosInDays"/>            
         }
 
-        <FluentDialog   @ref="_confirmKudosDeleteDialog" Hidden=@_hidden 
-                        style="--dialog-width: 30vw;--dialog-height:auto">
+            <FluentDialog @ref="_confirmKudosDeleteDialog" Hidden=@_hidden
+                          style="--dialog-width: 30vw;--dialog-height:auto">
 
             <div style="margin:10px;vertical-align:central;">
 
@@ -99,9 +100,7 @@
             {
                 <div class="loading-indicator" style="clear: both;">@Localizer["LoadingMoreItems"]</div>
             }
-    </div>
-
-   
+    </div>   
 
 </div>
 
@@ -151,8 +150,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
+        if (firstRender )
+        {  
             await LoadMoreItems();
 
             _isLoading = false;
@@ -160,18 +159,26 @@
 
             try
             {
-                await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener", scrollContainer, DotNetObjectReference.Create(this));
+                await JSRuntime.InvokeVoidAsync("addInfiniteScrollListener",
+                                                scrollContainer,
+                                                DotNetObjectReference.Create(this));
             }
-            catch{}            
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            if (_confirmKudosDeleteDialog != null)
+            {
+                _confirmKudosDeleteDialog!.Hide();
+            }
         }
 
-        if (_confirmKudosDeleteDialog != null)
-        {
-            _confirmKudosDeleteDialog!.Hide();
-        }
+       
     }
 
-    //called by the infinite scroll
+    //called by the infinite scroll JavaScript
+    //to load more Kudos
     [JSInvokable]
     public async Task OnScrollAsync()
     {
@@ -272,7 +279,7 @@
     }
 
     /// <summary>
-    /// This callback cames from an user control.
+    /// This callback came from an user control.
     /// It is used to unlike the kudos.
     /// </summary>
     /// <param name="pKudosId"></param>
@@ -332,7 +339,7 @@
         _kudosToBeDeleted = kudosId;
 
         _hidden = false;
-        _confirmKudosDeleteDialog!.Show();
+        //_confirmKudosDeleteDialog!.Show();
 
         RefreshPage();
     }

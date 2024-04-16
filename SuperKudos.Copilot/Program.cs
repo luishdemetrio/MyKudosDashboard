@@ -13,6 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient("WebClient", client => client.Timeout = TimeSpan.FromSeconds(600));
 builder.Services.AddHttpContextAccessor();
 
+
+
 // Create the Bot Framework Authentication to be used with the Bot Adapter.
 var config = builder.Configuration.Get<ConfigOptions>();
 builder.Configuration["MicrosoftAppType"] = "MultiTenant";

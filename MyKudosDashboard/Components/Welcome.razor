@@ -96,7 +96,8 @@
                             <div style="display: flex; margin-left: 5px;width:40%">
                                 <FluentButton style="margin-left:5px;padding: 0px;"
                                               @onclick=@(()=>SettingsClick())>
-                                    <FluentIcon Name="@FluentIcons.Settings" Slot="start" Size="@IconSize.Size16" Filled=true />
+                                <FluentIcon Value="@(new Icons.Regular.Size16.Settings())"
+                                            Appearance="Appearance.Filled" />
                                     @Localizer["Settings"]
                                 </FluentButton>
                             </div>
@@ -128,7 +129,8 @@
                         <div style="display: flex; margin-left: 5px;width:40%">
                             <FluentButton style="margin-left:5px;padding: 0px;"
                                           @onclick=@(()=>ExportToCSVClick())>
-                                <FluentIcon Name="@FluentIcons.ArrowDownload" Slot="start" Size="@IconSize.Size16" Filled=true />
+                            <FluentIcon Value="@(new Icons.Regular.Size16.ArrowDownload())"
+                                        Appearance="Appearance.Filled" />
                                 @Localizer["ExportToCSV"]
                             </FluentButton>
                         </div>

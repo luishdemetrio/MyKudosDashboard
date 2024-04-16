@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using Microsoft.Extensions.Localization
+@using Microsoft.Fast.Components.FluentUI
 @using MyKudos.Gateway.Domain.Models
 @using MyKudosDashboard.Common
 
@@ -16,32 +17,28 @@
         
     }
 
-        /* Style the links inside the navigation bar */
-        .navbar a {
-            float: left;
-            display: block;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 2vh 2vh;
-            text-decoration: none;
-            font-size: 14px;
-        }
+    /* Style the links inside the navigation bar */
+    .navbar a {
+        float: left;
+        display: block;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 2vh 2vh;
+        text-decoration: none;
+        font-size: 14px;
+    }
 
-        /* Change the color of links on hover */
-        .navbar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
+    /* Change the color of links on hover */
+    .navbar a:hover {
+        background-color: #ddd;
+        color: black;
+    }
 
-        /* Add a color to the active/current link */
-        .navbar a.active {
-            background-color: #04AA6D;
-            color: white;
-        }
-
-       
-
-       
+    /* Add a color to the active/current link */
+    .navbar a.active {
+        background-color: #04AA6D;
+        color: white;
+    }
 
 </style>
 
@@ -49,38 +46,62 @@
 
     <div class="content" style="width:100%;overflow-y: hidden;
             overflow-x: hidden; height:90%">
+
         @switch (_currentTab)
         {
             case "profile":
-                <UserProfileScore @ref=_userProfileScore ShowSendKudosButton=false />
+
+                <div>
+
+                    <h3 class="my-0 fw-normal"
+                        style="height: 28px; align-items: center;justify-content: center;display: flex">
+                        🚀 @Localizer["Profile"]
+                    </h3>
+
+
+                    <UserProfileScore @ref=_userProfileScore ShowSendKudosButton=false />
+                
+                </div>
+                
                 break;
+
             case "feed":
                 <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
                 break;
+
             case "leaderboard":
-                <TopContributors @ref=_topContributors />
+
+                <div>
+
+                    <h3 class="my-0 fw-normal"
+                        style="height: 28px; align-items: center;justify-content: center;display: flex">
+                        🥇 @Localizer["TopContributors"]
+                    </h3>
+
+                    <TopContributors @ref=_topContributors />
+
+                </div>
+
                 break;
+
             case "sendkudos":
-                <SendKudos sendKudosCallBack=@SendKudosCallBack />
+
+                    <SendKudos sendKudosCallBack=@SendKudosCallBack />
+
                 break;     
         }
 
         <KudosCommentsDialog @ref=_replyKudos ModalHidden=true 
                              Style="--dialog-height: 100%;--dialog-width: 100%;margin-left:1vh" />
 
-       @*  <SendKudosDialog @ref=_sendKudosPanel ModalHidden=@_sendKudosIsHidden
-                         sendKudosCallBack=@SendKudosCallBack
-                         Style="--dialog-height: 100%;--dialog-width: 100%;margin-left:2vh" /> *@
-
     </div>
-
-
 
     <div class="navbar gap-1 border-0" style="height:8vh;padding-top:0px; padding-bottom:0px">
         <NavLink  @onclick=@(()=>HandleNavLinkClick("profile")) >
            <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.Person" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Person())"
+                                 style="width: 2.5vh; height: 2.5vh" />
                 </div>   
                @*  <div style="flex: 50%;"> <!-- This will take up half the width -->
                     @Localizer["Profile"]
@@ -93,36 +114,31 @@
          <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>
               <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.News" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
-                </div>   
-                @* <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    @Localizer["Feed"]
-                </div>     *@ 
+                    <FluentIcon Value="@(new Icons.Regular.Size16.News())"
+                                style="width: 2.5vh; height: 2.5vh" Size=IconSize.Size12 />                    
+                </div>                  
             </div>
         </NavLink>
             <NavLink @onclick=@(()=>HandleNavLinkClick("sendkudos"))>
              <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.Send" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
-                </div>   
-                @* <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    @Localizer["Send"]
-                </div>      *@
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Send())"
+                                Appearance="Appearance.Filled" style="width: 2.5vh; height: 2.5vh"
+                                 />
+                </div>                   
             </div>
             </NavLink>
             
         <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>
              <div style="display: flex; flex-wrap: wrap;">
                 <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    <FluentIcon Name="@FluentIcons.AppsList" Filled=false style="width: 2.5vh; height: 2.5vh" />                    
-                </div>   
-               @*  <div style="flex: 50%;"> <!-- This will take up half the width -->
-                    @Localizer["Leaderboard"]
-                </div>   *@   
+                    <FluentIcon Value="@(new Icons.Regular.Size16.List())"
+                                Appearance="Appearance.Filled" style="width: 2.5vh; height: 2.5vh"
+                                 />
+                </div>                  
             </div>
             </NavLink>
     </div>
-
 
 </div>
 
@@ -159,16 +175,15 @@
 
     }
 
-    private void SendKudosClick()
+    private async Task SendKudosClick()
     {
         _sendKudosIsHidden = false;
 
-        _sendKudosPanel.SendKudosModal();
+        await _sendKudosPanel.SendKudosModal();
     }
 
     private void SendKudosCallBack()
     {
-        //_sendKudosIsHidden = true;
         _currentTab = "feed";
         StateHasChanged();
     }
@@ -180,5 +195,4 @@
         StateHasChanged();
     }
 
- 
 }

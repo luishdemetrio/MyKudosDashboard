@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Bot.Builder.Dialogs.Memory.Scopes;
 using Microsoft.Extensions.Logging.ApplicationInsights;
-using Microsoft.Fast.Components.FluentUI;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Communication.Helper.Services;
 using MyKudos.Gateway.Domain.Models;
@@ -14,6 +12,8 @@ using MyKudosDashboard.Services;
 using MyKudosDashboard.Views;
 using System.Globalization;
 using System.Text;
+using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.Fast.Components.FluentUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,11 +94,10 @@ builder.Services.AddScoped<IRestClientHelper>(t =>
 
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-
 builder.Services.AddFluentUIComponents();
-//LibraryConfiguration configUI = new(Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetIconConfiguration(), Microsoft.Fast.Components.FluentUI.ConfigurationGenerator.GetEmojiConfiguration());
-//builder.Services.AddFluentUIComponents(configUI);
+
+
+
 
 if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING")))
 {

@@ -1,4 +1,5 @@
 ﻿@using Microsoft.Extensions.Options
+@using Microsoft.Fast.Components.FluentUI
 @inject NavigationManager NavigationManager
 
 <div style="margin:10px">
@@ -10,7 +11,8 @@
 
         <div style="width:30%">
             <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>NavigateBackClick())>
-                <FluentIcon Name="@FluentIcons.ArrowCircleLeft"  Slot="start" Size="@IconSize.Size20" Filled=true />
+                <FluentIcon Value="@(new Icons.Regular.Size16.ArrowCircleLeft())"
+                            Appearance="Appearance.Filled" />
                 Back
             </FluentButton>
         </div>

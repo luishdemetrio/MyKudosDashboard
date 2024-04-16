@@ -86,11 +86,11 @@
                     </button>
                     <div class="dropdown-content">
                         <a href="#" @onclick=EditReplyOnClick>
-                            <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
+                            <FluentIcon Value="@(new Icons.Filled.Size16.Edit())" />
                     
                         </a>
                         <a href="#" @onclick=DeleteReplyOnClick>
-                            <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
+                            <FluentIcon Value="@(new Icons.Filled.Size16.Delete())" />
                     
                         </a>
                 
@@ -107,16 +107,19 @@
 
 <div style="float:left;margin-left:37px;padding-top: 0px">
 
-    <FluentButton   id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
-                    @onclick=@(()=>LikeCommentClick(Reply))
+    <FluentButton id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
+                  @onclick=@(()=>LikeCommentClick(Reply))
                   Disabled=@_isLikeButtonDisabled>
-        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                    Filled=@FilledLikeComments(@Reply) />
+
+        <FluentIcon Value="@(new Icons.Regular.Size16.Heart())"
+                    Appearence=@FilledLikeComments(@Reply) />
+
         <div @ref=_numberOfLikeComments>@Reply.Likes.Count()</div>
         
     </FluentButton>
 
-    <FluentTooltip Anchor=@($"reply_{Reply.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
+    <FluentTooltip Anchor=@($"reply_{Reply.Id}") 
+                   Position=TooltipPosition.Top>
 
      
         @if (Reply.Likes.Count() > 0)
@@ -125,7 +128,7 @@
                 @foreach (var like in Reply.Likes)
                 {
                     <li>
-                        <div>
+                        <div style="max-width: 500px; text-wrap: nowrap;">
                             <img src=@like.Photo
                                  style="height: 26px;width: 26px;border-radius: 50%;" />
                             <span style="margin-left:5px">@like.Name</span>
@@ -141,12 +144,13 @@
     @if(_isReplyCommendReadOnly == false)
     {
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
+
+            <FluentIcon Value="@(new Icons.Filled.Size16.Save())" />
             Save Changes
         </FluentButton>
 
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=true />
+            <FluentIcon Value="@(new Icons.Filled.Size16.Dismiss())" />
             Cancel
         </FluentButton>
     }
@@ -206,13 +210,14 @@
         return (ReplyUser != null && Reply.FromPerson.Id == ReplyUser.UserProfileId);
     }
 
-    private bool FilledLikeComments(CommentsResponse item)
+    private string FilledLikeComments(CommentsResponse item)
     {
-        bool filled = false;
+        string filled = string.Empty;
 
         @if (CommonVariables.User != null)
         {
-            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
+            if (item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId))
+                filled = "Appearance.Filled";
         }
 
         return filled;

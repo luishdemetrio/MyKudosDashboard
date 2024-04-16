@@ -1,4 +1,5 @@
-﻿@using MyKudos.Gateway.Domain.Models;
+﻿@using Microsoft.Fast.Components.FluentUI
+@using MyKudos.Gateway.Domain.Models;
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using MyKudosDashboard.Common;
@@ -49,7 +50,7 @@
 
 
                                 <FluentButton style="margin-left:20px;">
-                                    <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
+                                    <FluentIcon Value="@(new Icons.Regular.Size16.Comment())" />
                                     <div @ref=_numberOfComments>@KudosItem.Comments.Count()</div>
 
                                 </FluentButton>
@@ -58,12 +59,22 @@
                                               @onclick=@(()=>LikeKudosClick(KudosItem))
                                               Disabled=@_isLikeButtonDisabled>
 
-                                    <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                                                Filled=@FilledLikeKudos(KudosItem) />
                                     @KudosItem.Likes.Count()
+
+                                    @if (FilledLikeKudos(KudosItem))
+                                    {
+                                        <FluentIcon Value="@(new Icons.Filled.Size16.Heart())" />
+                                    }
+                                    else
+                                    {
+                                        <FluentIcon Value="@(new Icons.Regular.Size16.Heart())" />
+                                    }
+
+                                    
                                 </FluentButton>
 
-                                <FluentTooltip Anchor=@($"Details_{KudosItem.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Bottom>
+                                <FluentTooltip Anchor=@($"Details_{KudosItem.Id}")
+                                               Position=TooltipPosition.Top>
 
                                     @if (KudosItem.Likes.Count() > 0)
                                     {
@@ -71,7 +82,7 @@
                                             @foreach (var like in KudosItem.Likes)
                                             {
                                                 <li>
-                                                    <div>
+                                                    <div style="max-width: 500px; text-wrap: nowrap;">
                                                         <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
                                                              style="height: 26px;width: 26px;border-radius: 50%;" />
                                                         <span style="margin-left:5px">@like.Name</span>
@@ -114,7 +125,8 @@
 
                             <FluentButton class="small55" style="margin-left:60px;padding-top: 0px;height: 28px;"
                                           @onclick=@(()=>PostMessageClick()) disabled=@btnSendKudosDisabled>
-                                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=true />
+                                
+                                <FluentIcon Value="@(new Icons.Filled.Size16.Comment())" />
                                 @Localizer["Post"]
                             </FluentButton>
 
@@ -222,6 +234,7 @@
         @if (CommonVariables.User != null)
         {
             filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
+            
         }
 
         return filled;

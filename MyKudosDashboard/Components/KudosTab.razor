@@ -1,4 +1,5 @@
-﻿@using MyKudos.Gateway.Domain.Models;
+﻿@using Microsoft.Fast.Components.FluentUI
+@using MyKudos.Gateway.Domain.Models;
 @using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
@@ -16,29 +17,40 @@
 <div class="card-body " style="padding-left:2vh">
 
     <FluentTabs  style="z-index:auto;">
+
         @if (CommonVariables.ShowAllKudosTab)
         {
-            <FluentTab Text=@Localizer["All"] style="z-index:auto" @onclick=OnTabAllClick />
+            <FluentTab style="z-index:auto" @onclick=OnTabAllClick >
+                <Header>
+                    @Localizer["All"]
+                </Header>
+                <Content>
+                    <KudosList @ref=AllKudosTab TypeTab=KudosTypeTab.All ReplyCallBack=@ReplyKudos />
+                </Content>
+                
+            </FluentTab>
         }
         
-        <FluentTab Text=@Localizer["KudosToMe"] style="z-index:auto" @onclick=OnTabToMeClick />
-        <FluentTab Text=@Localizer["KudosFromMe"] style="z-index:auto" @onclick=OnTabFromMeClick />
+        <FluentTab  style="z-index:auto" @onclick=OnTabToMeClick >
+            <Header>
+                @Localizer["KudosToMe"]
+            </Header>
+            <Content>
+                <KudosList @ref=ToMeKudosTab TypeTab=KudosTypeTab.ToMe ReplyCallBack=@ReplyKudos />
+            </Content>
+        </FluentTab>
 
-        @if (CommonVariables.ShowAllKudosTab)
-        {
-            <FluentTabPanel class="nav-item">
-                <KudosList @ref=AllKudosTab TypeTab=KudosTypeTab.All   ReplyCallBack=@ReplyKudos   />
-            </FluentTabPanel>
-        }
-
-            <FluentTabPanel class="nav-item" >
-            <KudosList @ref=ToMeKudosTab TypeTab =KudosTypeTab.ToMe ReplyCallBack=@ReplyKudos />
-            </FluentTabPanel>
-
-            <FluentTabPanel class="nav-item">
+        <FluentTab style="z-index:auto" @onclick=OnTabFromMeClick >
+            <Header>
+                @Localizer["KudosFromMe"]
+            </Header>
+            <Content>
                 <KudosList @ref=FromMeKudosTab TypeTab=KudosTypeTab.FromMe ReplyCallBack=@ReplyKudos />
-            </FluentTabPanel>   
+            </Content>
             
+        </FluentTab>
+
+
     </FluentTabs>
 
 </div>
@@ -84,8 +96,6 @@
 
             KudosTabView.KudosDeletedCallback = KudosDeleted;
             KudosTabView.KudosMessageUpdatedCallBack = KudosMessageUpdated;
-
-
 
         }
 
