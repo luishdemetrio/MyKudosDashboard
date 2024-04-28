@@ -8,14 +8,14 @@ using Newtonsoft.Json.Linq;
 
 namespace SuperKudos.Copilot.Bots;
 
-public class KudosCopilotChatReplyActionCommand : IActionCommand
+public class ReplyActionCommand : IActionCommand
 {
     private IRestClientHelper _restClientHelper;
     private string _gatewayServiceUrl;
 
     private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "KudosLikedCard.json");
 
-    public KudosCopilotChatReplyActionCommand(IRestClientHelper clientHelper, IConfiguration configuration)
+    public ReplyActionCommand(IRestClientHelper clientHelper, IConfiguration configuration)
     {
         _restClientHelper = clientHelper;
 

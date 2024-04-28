@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
-  "version": "1.0.18",
+  "version": "1.0.22",
   "id": "${{TEAMS_APP_ID}}",
   "packageName": "com.microsoft.teams.extension",
   "developer": {
@@ -157,6 +157,36 @@
               "name": "eu",
               "title": "The name of the person",
               "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "draftKudos",
+          "context": [
+            "commandBox",
+            "message"
+          ],
+          "description": "draft a kudos to person",
+          "title": "draft a kudos to person",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "person",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            },
+            {
+              "name": "me",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            },
+            {
+              "name": "message",
+              "title": "The kudos message'",
+              "description": "The kudos message to be send",
               "inputType": "text"
             }
           ]

@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace SuperKudos.Copilot.Bots;
 
-public class KudosCopilotChatLikeActionCommand : IActionCommand
+public class LikeActionCommand : IActionCommand
 {
 
     private IRestClientHelper _restClientHelper;
@@ -19,7 +19,7 @@ public class KudosCopilotChatLikeActionCommand : IActionCommand
 
     private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "KudosLikedCard.json");
 
-    public KudosCopilotChatLikeActionCommand(IRestClientHelper clientHelper, IConfiguration configuration)
+    public LikeActionCommand(IRestClientHelper clientHelper, IConfiguration configuration)
     {
         _restClientHelper = clientHelper;
 

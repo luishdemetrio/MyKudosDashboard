@@ -17,7 +17,7 @@ public interface IKudosFetchTask
     Task<MessagingExtensionActionResponse> SendKudosEmbeddedWebView(ITurnContext<IInvokeActivity> turnContext);
 }
 
-public class KudosFetchTask : IKudosFetchTask
+public class SendKudosFetchTask : IKudosFetchTask
 {
     private readonly string _adaptiveCardSendKudosFilePath = Path.Combine(".", "Resources", "SendKudosCard.json");
 
@@ -29,7 +29,7 @@ public class KudosFetchTask : IKudosFetchTask
 
     private string _sendKudosPage;
 
-    public KudosFetchTask(IRestClientHelper clientHelper, IConfiguration configuration)
+    public SendKudosFetchTask(IRestClientHelper clientHelper, IConfiguration configuration)
     {
         _restClientHelper = clientHelper;
         _gatewayServiceUrl = configuration["GatewayServiceUrl"];
