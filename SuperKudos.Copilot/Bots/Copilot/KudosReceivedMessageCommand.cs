@@ -56,8 +56,10 @@ public class KudosReceivedMessageCommand : IMessageCommand
                                                         kudosId = package.Id,
                                                         userProfileId = person.Id,
                                                         fromPersonImage = package.From.Photo,
-                                                        recognition = package.Title
-                                                    });
+                                                        recognition = package.Title,
+                                                        likeButtonTittle = "Like",
+                                                        status = string.Empty
+            });
 
             var adaptiveCard = AdaptiveCard.FromJson(adaptiveCardJson).Card;
           

@@ -32,14 +32,10 @@ public class ReplyActionCommand : IActionCommand
 
         var kudosId = data.Value<int>("kudosId");
         var userProfileId = new Guid(data.Value<string>("userProfileId"));
-        var message = data.Value<string>("replyText");
-        var sentTo = data.Value<string>("sentTo");
-        var sentFrom = data.Value<string>("sendFrom");
-        var reply = data.Value<string>("reply");
-        var sentOn = data.Value<DateTime>("sentOn");
+        var reply = data.Value<string>("replyText");
 
 
-        var comments= new CommentsRequest { KudosId = kudosId,
+        var comments = new CommentsRequest { KudosId = kudosId,
                                          FromPersonId = userProfileId, 
                                          Date = DateTime.Now, 
                                          Message = reply };
@@ -54,31 +50,41 @@ public class ReplyActionCommand : IActionCommand
 
         var previewCard = new ThumbnailCard { Title = "Super Kudos" };
 
+        var recognition = data.Value<string>("recognition");
+        var sentTo = data.Value<string>("sentTo");
+        var sentFrom = data.Value<string>("sentFrom");
+        var fromPersonImage = data.Value<string>("fromPersonImage");
+        var message = data.Value<string>("message");
+        var sentOn = data.Value<DateTime>("sentOn");
+
         var adaptiveCardJson = template.Expand(new
         {
             name = sentTo,
-            description = message,
+            recognition = recognition,
+            fromPersonImage = fromPersonImage,
+            message = message,
             from = sentFrom,
             senton = sentOn,
             kudosId = kudosId,
-            userProfileId = userProfileId
+            userProfileId = userProfileId,
+            status = "Reply sent!"
         });
 
         var adaptiveCard = AdaptiveCard.FromJson(adaptiveCardJson).Card;
 
-        var attachment = new MessagingExtensionAttachment
-        {
-            ContentType = AdaptiveCard.ContentType,
-            Content = adaptiveCard,
-            Preview = previewCard.ToAttachment()
-        };
+        //var attachment = new MessagingExtensionAttachment
+        //{
+        //    ContentType = AdaptiveCard.ContentType,
+        //    Content = adaptiveCard,
+        //    Preview = previewCard.ToAttachment()
+        //};
 
 
         var response = new AdaptiveCardInvokeResponse()
         {
-            StatusCode = 200,
-            Type = "application/vnd.microsoft.activity.message",
-            Value = attachment
+            StatusCode = StatusCodes.Status200OK,
+            Type = AdaptiveCard.ContentType,
+            Value = adaptiveCard
         };
 
         return response;

@@ -2,7 +2,7 @@
   "type": "AdaptiveCard",
   "actions": [
     {
-      "type": "Action.Submit",
+      "type": "Action.Execute",
       "title": "Send Kudos",
       "url": "https://teams.microsoft.com/l/app/266d918f-8feb-4683-a9fb-7f31ee2c4d8c",
       "verb": "send-kudos",

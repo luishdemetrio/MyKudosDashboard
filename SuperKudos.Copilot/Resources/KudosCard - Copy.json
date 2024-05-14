@@ -144,7 +144,13 @@
       "id": "likeButton",
       "data": {
         "kudosId": "${kudosId}",
-        "userProfileId": "${userProfileId}"
+        "userProfileId": "${userProfileId}",
+        "name": "${name}",
+        "recognition": "${recognition}",
+        "fromPersonImage": "${fromPersonImage}",
+        "from": "${from}",
+        "sendOn": "${sendOn}",
+        "message": "${message}"
       }
     },
     {

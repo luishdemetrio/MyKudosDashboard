@@ -122,23 +122,30 @@
       "size": "Medium",
       "fontType": "Default",
       "isSubtle": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "${status}",
+      "wrap": true,
+      "color": "Accent"
     }
   ],
   "actions": [
     {
       "type": "Action.Execute",
-      "title": "👍 Like",
+      "title": "${likeButtonTittle}",
       "verb": "send-like",
       "id": "likeButton",
       "data": {
-        "msteams": {
-          "type": "messageBack",
-          "displayText": "Liked",
-          "text": "Liked",
-          "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"from value\"}"
-        },
         "kudosId": "${kudosId}",
-        "userProfileId": "${userProfileId}"
+        "userProfileId": "${userProfileId}",
+        "sentTo": "${name}",
+        "recognition": "${recognition}",
+        "fromPersonImage": "${fromPersonImage}",
+        "sentFrom": "${from}",
+        "sendOn": "${sentOn}",
+        "message": "${message}",
+        "status": "Like sent!"
       }
     },
     {
@@ -161,19 +168,18 @@
             "verb": "send-reply",
             "id": "replyButton",
             "data": {
-              "msteams": {
-                "type": "messageBack",
-                "displayText": "I clicked this button",
-                "text": "text to bots",
-                "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"from value\"}"
-              },
-
-              "extraData": {
-                "id": "sendButton",
-                "replyText": "${replyText}",
-                "kudosId": "${kudosId}",
-                "userProfileId": "${userProfileId}"
-              }
+              "id": "sendButton",
+              "replyText": "${replyText}",
+              "kudosId": "${kudosId}",
+              "userProfileId": "${userProfileId}",
+              "sentTo": "${name}",
+              "recognition": "${recognition}",
+              "fromPersonImage": "${fromPersonImage}",
+              "sentFrom": "${from}",
+              "sentOn": "${sentOn}",
+              "message": "${message}",
+              "reply": "${replyText}",
+              "status":  "Reply sent!"
             }            
           }
         ]

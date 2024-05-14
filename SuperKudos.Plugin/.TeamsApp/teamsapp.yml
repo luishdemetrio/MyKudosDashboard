@@ -48,7 +48,7 @@ provision:
           # variable before ARM deployment.
           parameters: ./infra/azure.parameters.json
           # Required when deploying ARM template
-          deploymentName: Create-resources-for-mxt
+          deploymentName: Create-resources-for-me
       # Teams Toolkit will download this bicep CLI version from github for you,
       # will use bicep CLI in PATH if you remove this config.
       bicepCliVersion: v0.9.1
@@ -91,14 +91,12 @@ provision:
     writeToEnvironmentFile:
       titleId: M365_TITLE_ID
       appId: M365_APP_ID
-
 # Triggered when 'teamsapp deploy' is executed
 deploy:
   - uses: cli/runDotnetCommand
     with:
       args: publish --configuration Release SuperKudos.Plugin.csproj
       workingDirectory: ../SuperKudos.Plugin
-
   # Deploy your application to Azure App Service using the zip deploy feature.
   # For additional details, refer to https://aka.ms/zip-deploy-to-app-services.
   - uses: azureAppService/zipDeploy
@@ -111,4 +109,4 @@ deploy:
       # or add it to your environment variable file.
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
       workingDirectory: ../SuperKudos.Plugin
-projectId: a390ceb0-7d02-4681-a4ee-0cdb00dd27f3
+projectId: dfd456a4-b37c-4fe1-bec2-06d82de657ae

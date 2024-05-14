@@ -30,14 +30,14 @@ public class SendKudosMessageCommand : IMessageCommand
     public Task<MessagingExtensionResponse> ViewResponse(ITurnContext<IInvokeActivity> turnContext, MessagingExtensionQuery query)
     {
 
-        
-        var previewCard = new ThumbnailCard { Title = "Super Kudos" };
+        //var previewCard = new ThumbnailCard { Title = "Super Kudos" };
+        var previewCard = new ThumbnailCard ();
 
         var sentTo = query?.Parameters?[0]?.Value as string;
 
         var sentFrom = query?.Parameters?[1]?.Value as string ;
 
-        var message = query?.Parameters?[2]?.Value as string;
+       // var message = query?.Parameters?[2]?.Value as string;
 
         var templateJson = System.IO.File.ReadAllText(_adaptiveCardFilePath);
 
@@ -47,8 +47,8 @@ public class SendKudosMessageCommand : IMessageCommand
         var adaptiveCardJson = template.Expand(new
         {
             name = sentTo,
-            from = sentFrom,
-            copilot_generateText= message
+            from = sentFrom//,
+            //copilot_generateText= message
 
         });
 

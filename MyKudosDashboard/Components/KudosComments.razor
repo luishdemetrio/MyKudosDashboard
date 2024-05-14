@@ -450,9 +450,9 @@
         t.Wait();
 
 
-        var comments = _comments.First(c => c.Id == pComments.Id);
+        var comments = _comments.FirstOrDefault (c => c.Id == pComments.Id);
 
-        if (_comments.Contains(comments))
+        if (_comments  != null && _comments.Contains(comments))
             _comments.Remove(comments);
 
         var t2 = InvokeAsync(() =>

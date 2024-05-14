@@ -40,12 +40,11 @@ public class SearchApp : TeamsActivityHandler
             case "findKudosReceived":
             case "findKudosSentToMe":
             case "findRecognitionsReceived":
-            case "findRecognitionsSentToMeBr":
-
+            
                 messageCommand = new KudosReceivedMessageCommand(_restClientHelper, _configuration);
                 break;
 
-            case "draftKudos":
+            case "sendKudos":
 
                 messageCommand = new SendKudosMessageCommand(_restClientHelper, _configuration);
                 break;
