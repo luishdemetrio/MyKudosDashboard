@@ -1,13 +1,9 @@
 ﻿using AdaptiveCards;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
-using Microsoft.Bot.Schema.Teams;
-using Microsoft.Graph.Models;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using Newtonsoft.Json.Linq;
-using System.Threading;
-using System.Xml.Linq;
 
 namespace SuperKudos.Copilot.Bots;
 
@@ -53,10 +49,6 @@ public class LikeActionCommand : IActionCommand
 
         var template = new AdaptiveCards.Templating.AdaptiveCardTemplate(templateJson);
 
-        var previewCard = new ThumbnailCard { Title = "Super Kudos" };
-
-        
-
         var adaptiveCardJson = template.Expand(new
         {
             name = sentTo,
@@ -72,14 +64,6 @@ public class LikeActionCommand : IActionCommand
         });
 
         var adaptiveCard = AdaptiveCard.FromJson(adaptiveCardJson).Card;
-
-        //var attachment = new MessagingExtensionAttachment
-        //{
-        //    ContentType = AdaptiveCard.ContentType,
-        //    Content = adaptiveCard,
-        //    Preview = previewCard.ToAttachment()
-        //};
-
 
         var response = new AdaptiveCardInvokeResponse()
         {

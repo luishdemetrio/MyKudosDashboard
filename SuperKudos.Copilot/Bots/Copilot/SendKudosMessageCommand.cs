@@ -30,8 +30,7 @@ public class SendKudosMessageCommand : IMessageCommand
     public Task<MessagingExtensionResponse> ViewResponse(ITurnContext<IInvokeActivity> turnContext, MessagingExtensionQuery query)
     {
 
-        //var previewCard = new ThumbnailCard { Title = "Super Kudos" };
-        var previewCard = new ThumbnailCard ();
+        
 
         var sentTo = query?.Parameters?[0]?.Value as string;
 
@@ -54,13 +53,17 @@ public class SendKudosMessageCommand : IMessageCommand
 
         var adaptiveCard = AdaptiveCard.FromJson(adaptiveCardJson).Card;
 
-
+        // create the preview card
+        // shown in the search results in Teams UI
+        // shown in the references section of Copilot messages
+        var previewCard = new ThumbnailCard { Title = "Super Kudos" }
+        .ToAttachment() ;
 
         var attachment = new MessagingExtensionAttachment
         {
             ContentType = AdaptiveCard.ContentType,
             Content = adaptiveCard,
-            Preview = previewCard.ToAttachment()
+            Preview = previewCard
         };
 
         var response = new MessagingExtensionResponse
