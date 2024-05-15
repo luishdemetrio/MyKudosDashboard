@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
-  "version": "1.0.18",
+  "version": "1.1.1",
   "id": "${{TEAMS_APP_ID}}",
   "packageName": "com.microsoft.teams.extension",
   "developer": {
@@ -19,8 +19,8 @@
     "full": "Super Kudos Chat"
   },
   "description": {
-    "short": "Shows the kudos or recognitions sent or received by a person.",
-    "full": "Find the kudos send or received by a person on a period of time"
+    "short": "Shows the kudos or recognitions received by a person and allows sending kudos.",
+    "full": "Super Kudos is an innovative app designed to enhance employee recognition and engagement. It allows users to ask for the kudos receiveid in a period of time and allows users to send kudos to their peers."
   },
   "accentColor": "#FFFFFF",
   "bots": [],
@@ -47,8 +47,8 @@
             "message",
             "commandBox"
           ],
-          "description": "what kudos that I have received",
-          "title": "Show me the kudos I received",
+          "description": "Retrieve the kudos/recognitions that a person received",
+          "title": "what kudos that I received",
           "type": "query",
           "parameters": [
             {
@@ -58,9 +58,9 @@
               "inputType": "text"
             },
             {
-              "name": "I",
+              "name": "person",
               "title": "The name of the person",
-              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "description": "Refers to the name of the person that is signed and searching for information. Output: The name of the person that is signed on.",
               "inputType": "text"
             }
           ]
@@ -114,47 +114,23 @@
           ]
         },
         {
-          "id": "findRecognitionsSentToMe",
+          "id": "sendKudos",
           "context": [
             "commandBox",
             "message"
           ],
-          "description": "what kudos was sent to me",
-          "title": "Show recognitions sent to me",
+          "description": "Send a personalized kudos to a colleague as a token of appreciation.",
+          "title": "Send Kudos",
           "type": "query",
           "parameters": [
             {
-              "name": "time",
-              "title": "time",
-              "description": "Number of days until today to find kudos. No future dates. Output: Number",
-              "inputType": "date"
-            },
-            {
-              "name": "me",
+              "name": "person",
               "title": "The name of the person",
               "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
               "inputType": "text"
-            }
-          ]
-        },
-        {
-          "id": "findRecognitionsSentToMeBr",
-          "context": [
-            "commandBox",
-            "message"
-          ],
-          "description": "quais reconhecimentos foram enviados para mim?",
-          "title": "kudos que eu recebi?",
-          "type": "query",
-          "parameters": [
-            {
-              "name": "time",
-              "title": "time",
-              "description": "Number of days until today to find kudos. No future dates. Output: Number",
-              "inputType": "date"
             },
             {
-              "name": "eu",
+              "name": "me",
               "title": "The name of the person",
               "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
               "inputType": "text"

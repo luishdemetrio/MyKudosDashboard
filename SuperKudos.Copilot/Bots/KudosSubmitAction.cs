@@ -11,13 +11,9 @@ using Newtonsoft.Json.Linq;
 
 namespace SuperKudos.Copilot.Bots;
 
-public interface IKudosSubmitAction
-{
-    Task<MessagingExtensionActionResponse> SendKudosSubmitAction(ITurnContext<IInvokeActivity> turnContext,
-                                                                 MessagingExtensionAction action);
-}
 
-public class KudosSubmitAction : IKudosSubmitAction
+
+public class KudosSubmitAction : ISubmitAction
 {
     private IRestClientHelper _restClientHelper;
     private string _gatewayServiceUrl;
@@ -34,7 +30,7 @@ public class KudosSubmitAction : IKudosSubmitAction
        
     }
 
-    public async Task<MessagingExtensionActionResponse> SendKudosSubmitAction(ITurnContext<IInvokeActivity> turnContext,
+    public async Task<MessagingExtensionActionResponse> SubmitAction(ITurnContext<IInvokeActivity> turnContext,
                                                                               MessagingExtensionAction action)
     {
 

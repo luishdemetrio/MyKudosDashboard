@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -15,18 +15,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.10.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.3" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.2" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.2" />
+    <PackageReference Include="Azure.Identity" Version="1.11.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.22.3" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.22.3" />
     <PackageReference Include="AdaptiveCards" Version="3.1.0" />
     <PackageReference Include="AdaptiveCards.Templating" Version="1.5.0" />
-    <PackageReference Include="Microsoft.Graph" Version="5.44.0" />
+    <PackageReference Include="Microsoft.Graph" Version="5.52.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MyKudos.Gateway.Domain\MyKudos.Gateway.Domain.csproj" />
     <ProjectReference Include="..\MyKudos.RestHelper\MyKudos.Communication.Helper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="env\" />
   </ItemGroup>
 
 </Project>

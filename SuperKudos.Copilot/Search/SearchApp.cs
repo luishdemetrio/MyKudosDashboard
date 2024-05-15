@@ -1,7 +1,5 @@
-﻿using AdaptiveCards;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Teams;
-using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using MyKudos.Communication.Helper.Interfaces;
@@ -11,15 +9,14 @@ namespace SuperKudos.Copilot.Search;
 
 public class SearchApp : TeamsActivityHandler
 {
-
     private IRestClientHelper _restClientHelper;
     private IConfiguration _configuration;
 
     private IKudosFetchTask _sendKudosFetchTask;
-    private IKudosSubmitAction _kudosSubmitAction;
+    private ISubmitAction _kudosSubmitAction;
     public SearchApp(IRestClientHelper clientHelper, IConfiguration configuration, 
                      IKudosFetchTask sendKudosFetchTask,
-                     IKudosSubmitAction kudosSubmitAction)
+                     ISubmitAction kudosSubmitAction)
     {
         _restClientHelper = clientHelper;
         _configuration = configuration;
@@ -35,8 +32,6 @@ public class SearchApp : TeamsActivityHandler
                                                     MessagingExtensionQuery query,
                                                     CancellationToken cancellationToken)
     {
-
-
         IMessageCommand messageCommand = null;
         MessagingExtensionResponse response = null;
 
@@ -45,8 +40,13 @@ public class SearchApp : TeamsActivityHandler
             case "findKudosReceived":
             case "findKudosSentToMe":
             case "findRecognitionsReceived":
-            case "findRecognitionsSentToMeBr":
-                messageCommand = new KudosCopilotChatMessageCommand(_restClientHelper, _configuration);
+            
+                messageCommand = new KudosReceivedMessageCommand(_restClientHelper, _configuration);
+                break;
+
+            case "sendKudos":
+
+                messageCommand = new SendKudosMessageCommand(_restClientHelper, _configuration);
                 break;
         }
 
@@ -58,7 +58,7 @@ public class SearchApp : TeamsActivityHandler
         return response;
 
     }
-
+   
     //Action handler for the adaptive card of Copilot
     protected override async Task<AdaptiveCardInvokeResponse> OnAdaptiveCardInvokeAsync(
                                                                 ITurnContext<IInvokeActivity> turnContext,
@@ -71,11 +71,14 @@ public class SearchApp : TeamsActivityHandler
         switch (invokeValue.Action.Verb)
         {
             case "send-like":
-                actionCommand = new KudosCopilotChatLikeActionCommand(_restClientHelper, _configuration);
+                actionCommand = new LikeActionCommand(_restClientHelper, _configuration);
                 break;
 
             case "send-reply":
-                actionCommand = new KudosCopilotChatReplyActionCommand(_restClientHelper, _configuration);
+                actionCommand = new ReplyActionCommand(_restClientHelper, _configuration);
+                break;
+            case "send-kudos":
+                
                 break;
         }
 
@@ -90,23 +93,21 @@ public class SearchApp : TeamsActivityHandler
                                                                         ITurnContext<IInvokeActivity> turnContext, 
                                                                         MessagingExtensionAction action,
                                                                         CancellationToken cancellationToken)
-    {
-        
-        //return await _sendKudosFetchTask.SendKudosCreateFormCard(turnContext);
-
+    {   
          return await _sendKudosFetchTask.SendKudosEmbeddedWebView(turnContext);
 
     }
 
     
-    protected override async Task<MessagingExtensionActionResponse> OnTeamsMessagingExtensionSubmitActionAsync(
-                                                                        ITurnContext<IInvokeActivity> turnContext, 
-                                                                        MessagingExtensionAction action, 
-                                                                        CancellationToken cancellationToken)
-    {
-        return await _kudosSubmitAction.SendKudosSubmitAction(turnContext, action);
+    //protected override async Task<MessagingExtensionActionResponse> OnTeamsMessagingExtensionSubmitActionAsync(
+    //                                                                    ITurnContext<IInvokeActivity> turnContext, 
+    //                                                                    MessagingExtensionAction action, 
+    //                                                                    CancellationToken cancellationToken)
+    //{
 
-    }
+    //    return await _kudosSubmitAction.SubmitAction(turnContext, action);
+
+    //}
 
 }
 

@@ -2,34 +2,132 @@
   "type": "AdaptiveCard",
   "body": [
     {
-      "type": "TextBlock",
-      "text": "${name}",
-      "wrap": true,
-      "size": "large"
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "items": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "text": "${name}",
+              "wrap": true,
+              "size": "Large"
+            },
+            {
+              "type": "TextBlock",
+              "spacing": "Small",
+              "text": "Received a **${recognition}** recognition.",
+              "isSubtle": true,
+              "wrap": true,
+              "size": "Medium"
+            },
+            {
+              "type": "ColumnSet",
+              "columns": [
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "spacing": "None",
+                      "text": "Sent by:",
+                      "isSubtle": true,
+                      "wrap": true,
+                      "separator": true,
+                      "size": "Medium"
+                    }
+                  ],
+                  "verticalContentAlignment": "Center"
+                },
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "Image",
+                      "style": "Person",
+                      "url": "${fromPersonImage}",
+                      "size": "Small",
+                      "width": "36px",
+                      "height": "36px"
+                    }
+                  ]
+                },
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "spacing": "Small",
+                      "text": "${from}",
+                      "isSubtle": true,
+                      "wrap": true,
+                      "size": "Medium",
+                      "weight": "Bolder"
+                    }
+                  ],
+                  "verticalContentAlignment": "Center"
+                }
+              ]
+            },
+            {
+              "type": "ColumnSet",
+              "columns": [
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "spacing": "None",
+                      "text": "Sent on:",
+                      "isSubtle": true,
+                      "wrap": true,
+                      "separator": true,
+                      "size": "Medium"
+                    }
+                  ],
+                  "verticalContentAlignment": "Center"
+                },
+                {
+                  "type": "Column",
+                  "width": "auto",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "spacing": "Small",
+                      "text": "${sentOn}",
+                      "isSubtle": true,
+                      "wrap": true,
+                      "size": "Medium",
+                      "weight": "Bolder"
+                    }
+                  ],
+                  "verticalContentAlignment": "Center"
+                }
+              ]
+            }
+          ],
+          "width": "stretch"
+        }
+      ]
     },
     {
       "type": "TextBlock",
-      "text": "${description}",
+      "text": "${message}",
       "wrap": true,
-      "size": "Medium"
-    },
-    {
-      "type": "TextBlock",
-      "text": "From: ${from}",
-      "wrap": true,
-      "size": "Small"
-    },
-    {
-      "type": "TextBlock",
-      "text": "Sent on: ${senton}",
-      "wrap": true,
-      "size": "Small"
+      "size": "Medium",
+      "fontType": "Default",
+      "isSubtle": true
     }
   ],
   "actions": [
     {
       "type": "Action.Execute",
-      "title": "👍 Liked",
+      "title": "🩷 Liked",
       "verb": "send-like",
       "id": "likeButton",
       "data": {
@@ -57,18 +155,25 @@
             "verb": "send-reply",
             "id": "replyButton",
             "data": {
-              "id": "sendButton",
-              "replyText": "${replyText}",
-              "kudosId": "${kudosId}",
-              "userProfileId": "${userProfileId}"
+              "msteams": {
+                "type": "messageBack",
+                "displayText": "I clicked this button",
+                "text": "text to bots",
+                "value": "{\"bfKey\": \"bfVal\", \"conflictKey\": \"from value\"}"
+              },
 
+              "extraData": {
+                "id": "sendButton",
+                "replyText": "${replyText}",
+                "kudosId": "${kudosId}",
+                "userProfileId": "${userProfileId}"
+              }
             }
           }
-          
         ]
       }
     }
   ],
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-  "version": "1.4"
+  "version": "1.5"
 }

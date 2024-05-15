@@ -8,14 +8,14 @@ using SuperKudos.Copilot.Helpers;
 
 namespace SuperKudos.Copilot.Bots;
 
-public class KudosCopilotChatMessageCommand : IMessageCommand
+public class KudosReceivedMessageCommand : IMessageCommand
 {
     private readonly string _adaptiveCardFilePath = Path.Combine(".", "Resources", "KudosCard.json");
 
     private IRestClientHelper _restClientHelper;
     private string _gatewayServiceUrl;
 
-    public KudosCopilotChatMessageCommand(IRestClientHelper clientHelper, IConfiguration configuration)
+    public KudosReceivedMessageCommand(IRestClientHelper clientHelper, IConfiguration configuration)
     {
         _restClientHelper = clientHelper;
         _gatewayServiceUrl = configuration["GatewayServiceUrl"];
@@ -56,8 +56,10 @@ public class KudosCopilotChatMessageCommand : IMessageCommand
                                                         kudosId = package.Id,
                                                         userProfileId = person.Id,
                                                         fromPersonImage = package.From.Photo,
-                                                        recognition = package.Title
-                                                    });
+                                                        recognition = package.Title,
+                                                        likeButtonTittle = "Like",
+                                                        status = string.Empty
+            });
 
             var adaptiveCard = AdaptiveCard.FromJson(adaptiveCardJson).Card;
           
