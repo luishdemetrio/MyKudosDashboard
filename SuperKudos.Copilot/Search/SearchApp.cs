@@ -44,7 +44,7 @@ public class SearchApp : TeamsActivityHandler
                 messageCommand = new KudosReceivedMessageCommand(_restClientHelper, _configuration);
                 break;
 
-            case "sendKudos":
+            case "draftKudos":
 
                 messageCommand = new SendKudosMessageCommand(_restClientHelper, _configuration);
                 break;
@@ -78,7 +78,7 @@ public class SearchApp : TeamsActivityHandler
                 actionCommand = new ReplyActionCommand(_restClientHelper, _configuration);
                 break;
             case "send-kudos":
-                
+                actionCommand = new SendKudosActionCommand(_restClientHelper, _configuration);
                 break;
         }
 

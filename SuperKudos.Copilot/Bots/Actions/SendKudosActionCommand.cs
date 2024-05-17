@@ -5,6 +5,7 @@ using Microsoft.Bot.Schema.Teams;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using MyKudos.Communication.Helper.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace SuperKudos.Copilot.Bots;
 
@@ -47,7 +48,9 @@ public class SendKudosActionCommand : IActionCommand
         string fromPersonId = string.Empty;
         //string fromPersonName = string.Empty;
 
-        
+        // Get the data object from the invokeValue
+        JObject data = (JObject)invokeValue.Action.Data;
+
 
         return null;
     }

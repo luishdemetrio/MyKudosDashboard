@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
-  "version": "1.1.1",
+  "version": "1.1.7",
   "id": "${{TEAMS_APP_ID}}",
   "packageName": "com.microsoft.teams.extension",
   "developer": {
@@ -59,8 +59,8 @@
             },
             {
               "name": "person",
-              "title": "The name of the person",
-              "description": "Refers to the name of the person that is signed and searching for information. Output: The name of the person that is signed on.",
+              "title": "The name of the signed-in user",
+              "description": "Specifies the signed-in user's name, and not the 'me' pronoun. Output: The name of the signed-in user.",
               "inputType": "text"
             }
           ]
@@ -114,25 +114,31 @@
           ]
         },
         {
-          "id": "sendKudos",
+          "id": "draftKudos",
           "context": [
             "commandBox",
             "message"
           ],
-          "description": "Send a personalized kudos to a colleague as a token of appreciation.",
-          "title": "Send Kudos",
+          "description": "Draft or send a kudos or recognition message to a receipient person.",
+          "title": "Draft or send Kudos to a person",
           "type": "query",
           "parameters": [
             {
-              "name": "person",
-              "title": "The name of the person",
-              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "name": "sentTo",
+              "title": "Person's receipient name",
+              "description": "The name of the person that will receive the kudos or recognition. Output: The name of the receipient person",
               "inputType": "text"
             },
             {
-              "name": "me",
-              "title": "The name of the person",
-              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "name": "sentFrom",
+              "title": "The name of the signed-in user",
+              "description": "Specifies the signed-in user's name, and not the 'me' pronoun. Output: The name of the signed-in user.",
+              "inputType": "text"
+            },
+            {
+              "name": "LLM content",
+              "title": "The LLM content returned",
+              "description": "The large language model content result returned to Copilot. Output: The LLM result.",
               "inputType": "text"
             }
           ]

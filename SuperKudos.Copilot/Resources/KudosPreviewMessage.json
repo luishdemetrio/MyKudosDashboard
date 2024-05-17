@@ -4,11 +4,22 @@
     {
       "type": "Action.Execute",
       "title": "Send Kudos",
-      "url": "https://teams.microsoft.com/l/app/266d918f-8feb-4683-a9fb-7f31ee2c4d8c",
       "verb": "send-kudos",
       "id": "sendkudos"
     }
   ],
   "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-  "version": "1.5"
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "From: ${from}",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "To: ${to}",
+      "wrap": true
+    }
+  ]
 }

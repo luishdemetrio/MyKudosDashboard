@@ -5,6 +5,8 @@ using Microsoft.Bot.Schema;
 using Microsoft.Bot.Schema.Teams;
 using Microsoft.Graph.Models;
 using MyKudos.Communication.Helper.Interfaces;
+using SuperKudos.Copilot.Helpers;
+using System.Diagnostics;
 using static System.Collections.Specialized.BitVector32;
 
 namespace SuperKudos.Copilot.Bots;
@@ -30,41 +32,42 @@ public class SendKudosMessageCommand : IMessageCommand
     public Task<MessagingExtensionResponse> ViewResponse(ITurnContext<IInvokeActivity> turnContext, MessagingExtensionQuery query)
     {
 
-        
+        var sentTo = MessageExtensionHelper.GetQueryData(query.Parameters, "sentTo");
 
-        var sentTo = query?.Parameters?[0]?.Value as string;
+        var sentFrom = MessageExtensionHelper.GetQueryData(query.Parameters, "sentFrom");
 
-        var sentFrom = query?.Parameters?[1]?.Value as string ;
+        Debug.WriteLine($"🔍 sentTo: {sentTo}");
+        Debug.WriteLine($"🔍 sentFrom: {sentFrom}");
 
-       // var message = query?.Parameters?[2]?.Value as string;
+        // create the preview card
+        // shown in the search results in Teams UI
+        // shown in the references section of Copilot messages
+        var previewCard = new ThumbnailCard { Title = "Super Kudos" };
+
+        // var message = query?.Parameters?[2]?.Value as string;
 
         var templateJson = System.IO.File.ReadAllText(_adaptiveCardFilePath);
 
         var template = new AdaptiveCards.Templating.AdaptiveCardTemplate(templateJson);
 
-
         var adaptiveCardJson = template.Expand(new
         {
-            name = sentTo,
-            from = sentFrom//,
-            //copilot_generateText= message
-
+            to = sentTo,
+            from = sentFrom
         });
 
         var adaptiveCard = AdaptiveCard.FromJson(adaptiveCardJson).Card;
-
-        // create the preview card
-        // shown in the search results in Teams UI
-        // shown in the references section of Copilot messages
-        var previewCard = new ThumbnailCard { Title = "Super Kudos" }
-        .ToAttachment() ;
 
         var attachment = new MessagingExtensionAttachment
         {
             ContentType = AdaptiveCard.ContentType,
             Content = adaptiveCard,
-            Preview = previewCard
+            Preview = previewCard.ToAttachment()
         };
+
+        // create an an array of attachments to be sent in the response
+        var attachments = new List<MessagingExtensionAttachment>();
+        attachments.Add(attachment);
 
         var response = new MessagingExtensionResponse
         {
@@ -72,11 +75,11 @@ public class SendKudosMessageCommand : IMessageCommand
             {
                 Type = "result",
                 AttachmentLayout = "list",
-                Attachments = new List<MessagingExtensionAttachment> { attachment }
+                Attachments = attachments
             }
         };
 
-        return Task.FromResult(response);
+        return Task.FromResult(response as MessagingExtensionResponse);
 
     }
 }
