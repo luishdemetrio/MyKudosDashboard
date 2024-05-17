@@ -5,6 +5,7 @@ using Microsoft.Bot.Schema.Teams;
 using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using SuperKudos.Copilot.Helpers;
+using System.Diagnostics;
 
 namespace SuperKudos.Copilot.Bots;
 
@@ -24,6 +25,9 @@ public class KudosReceivedMessageCommand : IMessageCommand
     public async Task<MessagingExtensionResponse> ViewResponse(ITurnContext<IInvokeActivity> turnContext,
                                                                MessagingExtensionQuery query)
     {
+
+        Debug.WriteLine($"🔍 name: {query?.Parameters?[1]?.Value}");
+        Debug.WriteLine($"🔍 number of days: {query?.Parameters?[0]?.Value}");
 
         var templateJson = System.IO.File.ReadAllText(_adaptiveCardFilePath);
 
