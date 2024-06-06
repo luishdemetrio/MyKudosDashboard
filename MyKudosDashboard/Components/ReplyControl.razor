@@ -1,11 +1,12 @@
 ﻿@using MyKudos.Gateway.Domain.Models;
+@using MyKudosDashboard.Common
 @using MyKudosDashboard.Interfaces;
 @using MyKudosDashboard.Models;
 @using Microsoft.Fast.Components.FluentUI
 
 @inject IReplyView ReplyView
 @inject IJSRuntime JSRuntime
-
+@inject KudosCommonVariables CommonVariables;
 
 <style>
 /* Style The Dropdown Button */
@@ -54,17 +55,19 @@
 }
 </style>
 
-<div style="width:100%;padding-bottom: 0px">
+<div style="width:100%;margin-top: 2vh">
 
-    <div style="height: auto;width:100%">
-        <div style="width:50px;margin-top:0px;padding-top: 5px">
-            <img src=@((Reply.FromPerson.Photo.Contains("data")) ? Reply.FromPerson.Photo : $"data:image /png;base64,{Reply.FromPerson.Photo}") style="height:40px;width:40px;float:left;border-radius: 50%" />
+    <div style="height: auto;width:100%;display:flex">
+        <div style=";margin-top:0px;padding-top: 5px">
+            <img src=@((Reply.FromPerson.Photo.Contains("data")) ? Reply.FromPerson.Photo : $"data:image /png;base64,{Reply.FromPerson.Photo}") 
+                 style="height:3vh;width:3vh;float:left;border-radius: 50%;vertical-align:central" />
         </div>
 
-        <div style="width:90%;margin-bottom: 0px;">
+        <div style="width:100%;margin-bottom: 0px;display:flex">
 
        
-            <div class="form-group small55" style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;width:90%">
+            <div class="form-group small55" 
+                 style="background-color:#e9ecef;margin-bottom: 0px; display:inline-block;height:auto;overflow-x:hidden;width:90%;margin-left:1vh">
                 <small for="formGroupExampleInput2">@Reply.FromPerson.Name</small>
                 <textarea id=@($"textareareply_{@Reply.Id}") type ="text" class="form-control"
                           Readonly=@_isReplyCommendReadOnly
@@ -85,11 +88,11 @@
                     </button>
                     <div class="dropdown-content">
                         <a href="#" @onclick=EditReplyOnClick>
-                            <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
+                            <FluentIcon Value="@(new Icons.Filled.Size16.Edit())" />
                     
                         </a>
                         <a href="#" @onclick=DeleteReplyOnClick>
-                            <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
+                            <FluentIcon Value="@(new Icons.Filled.Size16.Delete())" />
                     
                         </a>
                 
@@ -104,18 +107,32 @@
     </div>
 </div>
 
-<div style="float:left;margin-left:37px;padding-top: 0px">
+<div style=";margin-left:37px;padding-top: 0px">
 
-    <FluentButton   id=@($"reply_{@Reply.Id}") style="margin-left:20px;padding-top: 0px;height: 28px;" 
-                    @onclick=@(()=>LikeCommentClick(Reply))
+    <FluentButton id=@($"reply_{@Reply.Id}") style="flex-wrap:nowrap;" 
+                  @onclick=@(()=>LikeCommentClick(Reply))
                   Disabled=@_isLikeButtonDisabled>
-        <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                    Filled=@FilledLikeComments(@Reply) />
+    <div style="display:flex">
+            
         <div @ref=_numberOfLikeComments>@Reply.Likes.Count()</div>
+
+            @if (FilledLikeComments(@Reply))
+            {
+                <FluentIcon Value="@(new Icons.Filled.Size16.Heart())"
+                            Style="margin-left:1vh" />
+
+            }else{
+                <FluentIcon Value="@(new Icons.Regular.Size16.Heart())"
+                            Style="margin-left:1vh" />
+
+            }
+            
         
+    </div>    
     </FluentButton>
 
-    <FluentTooltip Anchor=@($"reply_{Reply.Id}") Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
+    <FluentTooltip Anchor=@($"reply_{Reply.Id}") 
+                   Position=TooltipPosition.Top>
 
      
         @if (Reply.Likes.Count() > 0)
@@ -124,7 +141,7 @@
                 @foreach (var like in Reply.Likes)
                 {
                     <li>
-                        <div>
+                        <div style="max-width: 500px; text-wrap: nowrap;">
                             <img src=@like.Photo
                                  style="height: 26px;width: 26px;border-radius: 50%;" />
                             <span style="margin-left:5px">@like.Name</span>
@@ -140,12 +157,13 @@
     @if(_isReplyCommendReadOnly == false)
     {
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
+
+            <FluentIcon Value="@(new Icons.Filled.Size16.Save())" />
             Save Changes
         </FluentButton>
 
         <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditMessageClick())>
-            <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=true />
+            <FluentIcon Value="@(new Icons.Filled.Size16.Dismiss())" />
             Cancel
         </FluentButton>
     }
@@ -158,9 +176,6 @@
     
     [Parameter]
     public CommentsResponse Reply { get; set; }
-
-    [Parameter]
-    public UserProfile ReplyUser { get; set; }
 
     public delegate void DeleteCommentCallBack(CommentsResponse comments);
 
@@ -187,30 +202,32 @@
     {
         bool filled = false;
 
-        @if (ReplyUser != null)
+        @if (CommonVariables.User != null)
         {
-            filled = item.Likes.Any(l => l.Id== ReplyUser.UserProfileId);
+            filled = item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
         }
 
         return filled;
     }
     private bool LikeDisabled(CommentsResponse item)
     {
-        return item.FromPerson.Id == ReplyUser.UserProfileId;
+        return item.FromPerson.Id == CommonVariables.User.UserProfileId;
     }
 
     private bool CanEditOrDeleteComment()
     {
-        return (Reply.FromPerson.Id == ReplyUser.UserProfileId);
+        
+        return (CommonVariables.User != null && Reply.FromPerson.Id == CommonVariables.User.UserProfileId);
     }
 
     private bool FilledLikeComments(CommentsResponse item)
     {
         bool filled = false;
 
-        @if (ReplyUser != null)
+        @if (CommonVariables.User != null)
         {
-            filled = item.Likes.Any(l => l.Id == ReplyUser.UserProfileId);
+            return item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId);
+
         }
 
         return filled;
@@ -226,7 +243,7 @@
         try
         {
 
-            if (item.Likes.Any(l => l.Id == ReplyUser.UserProfileId))
+            if (item.Likes.Any(l => l.Id == CommonVariables.User.UserProfileId))
             {
                 var t = InvokeAsync(() =>
                   {
@@ -235,9 +252,9 @@
                                  KudosId: item.Id,
                                  FromPerson: new Person
                                   {
-                                      Id = ReplyUser.UserProfileId,
-                                      Name = ReplyUser.DisplayName,
-                                      Photo = ReplyUser.Photo96x96
+                                         Id = CommonVariables.User.UserProfileId,
+                                         Name = CommonVariables.User.DisplayName,
+                                      Photo = CommonVariables.User.Photo96x96
                                   }));
                   });
                 t.Wait();
@@ -253,15 +270,15 @@
                                 KudosId: item.Id,
                                 FromPerson: new Person
                                 {
-                                    Id = ReplyUser.UserProfileId,
-                                    Name = ReplyUser.DisplayName,
-                                    Photo = ReplyUser.Photo96x96
+                                    Id = CommonVariables.User.UserProfileId,
+                                        Name = CommonVariables.User.DisplayName,
+                                        Photo = CommonVariables.User.Photo
                                 }));
                   });
                 t.Wait();
             }
 
-            UpdateLikes(item.Id, ReplyUser.UserProfileId);
+            UpdateLikes(item.Id, CommonVariables.User.UserProfileId);
 
         }
         finally
@@ -292,8 +309,8 @@
                 Reply.Likes.Add(new Person()
                     {
                         Id = personId,
-                        Name = ReplyUser.DisplayName,
-                        Photo = ReplyUser.Photo96x96
+                        Name = CommonVariables.User.DisplayName,
+                        Photo = CommonVariables.User.Photo
                     });
             }
             else

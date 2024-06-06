@@ -184,8 +184,4 @@ public class KudosTabView : IKudosTabView,
         KudosMessageUpdatedCallBack?.Invoke(message);
     }
 
-    public void ExportToCsv()
-    {
-        
-    }
 }

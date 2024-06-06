@@ -1,0 +1,86 @@
+﻿@using Microsoft.Fast.Components.FluentUI
+
+ <style>
+    fluent-card {
+        padding: 5px;
+        margin: 5px;
+        height: 55px
+    }
+
+    fluent-horizontal-scroll {
+        max-width: 620px;
+        margin-top: 20px;
+        margin-left: 0px;
+        margin-right: 10px;
+    }
+
+    .both-gradient {
+        --scroll-fade-next: var(--fill-color);
+        --scroll-fade-previous: var(--fill-color)
+    }
+
+    .top-align {
+        --scroll-align: flex-start
+    }
+
+    .bottom-align {
+        --scroll-align: flex-end
+    }
+</style> 
+
+<FluentDialog @ref=SendKudosFluentDialog
+               aria-label="Simple dialog" Modal="true"
+              class="both-gradient" 
+              style=@Style
+              Hidden=@ModalHidden>
+
+    <div>
+        <button style="float:right;padding-right:5px;color: red"
+                type="button" class="close" data-dismiss="modal" aria-label="Close" 
+                @onclick=@(() => Hide())>
+            <span aria-hidden="true">&times;</span>
+        </button>
+
+        
+        <SendKudos sendKudosCallBack=@SendCallBack />
+    </div>
+
+</FluentDialog>
+
+@code {
+
+    [Parameter]
+    public bool ModalHidden { get; set; } = true;
+
+    [Parameter]
+    public SendKudosCallBack sendKudosCallBack { get; set; }
+    public delegate void SendKudosCallBack();
+
+    [Parameter]
+    public string Style { get; set; } = "--dialog-height: 95vh;--dialog-width: calc(40vw + 180px);";
+
+    private FluentDialog SendKudosFluentDialog;
+
+    public async Task SendKudosModal()
+    {
+        ModalHidden = false;
+
+        await InvokeAsync(StateHasChanged);
+
+        await Task.CompletedTask;
+    }
+
+    private void SendCallBack()
+    {
+        sendKudosCallBack?.Invoke();
+
+        //close dialog
+        Hide();
+    }
+
+    public void Hide()
+    {
+        ModalHidden = true;
+        StateHasChanged();
+    }
+}

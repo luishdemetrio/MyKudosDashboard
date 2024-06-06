@@ -1,0 +1,198 @@
+﻿@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Microsoft.Fast.Components.FluentUI
+@using MyKudos.Gateway.Domain.Models
+@using MyKudosDashboard.Common
+
+@inject IStringLocalizer<App> Localizer;
+@inject KudosCommonVariables CommonVariables;
+
+<style>
+    .navbar {
+        background-color: lightgray;
+        overflow: hidden;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        
+    }
+
+    /* Style the links inside the navigation bar */
+    .navbar a {
+        float: left;
+        display: block;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 2vh 2vh;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    /* Change the color of links on hover */
+    .navbar a:hover {
+        background-color: #ddd;
+        color: black;
+    }
+
+    /* Add a color to the active/current link */
+    .navbar a.active {
+        background-color: #04AA6D;
+        color: white;
+    }
+
+</style>
+
+<div>
+
+    <div class="content" style="width:100%;overflow-y: hidden;
+            overflow-x: hidden; height:90%">
+
+        @switch (_currentTab)
+        {
+            case "profile":
+
+                <div>
+
+                    <h3 class="my-0 fw-normal"
+                        style="height: 28px; align-items: center;justify-content: center;display: flex">
+                        🚀 @Localizer["Profile"]
+                    </h3>
+
+
+                    <UserProfileScore @ref=_userProfileScore ShowSendKudosButton=false />
+                
+                </div>
+                
+                break;
+
+            case "feed":
+                <KudosTab @ref=_kudosTab ReplyCallBack=@ReplyCallBack />
+                break;
+
+            case "leaderboard":
+
+                <div>
+
+                    <h3 class="my-0 fw-normal"
+                        style="height: 28px; align-items: center;justify-content: center;display: flex">
+                        🥇 @Localizer["TopContributors"]
+                    </h3>
+
+                    <TopContributors @ref=_topContributors />
+
+                </div>
+
+                break;
+
+            case "sendkudos":
+
+                    <SendKudos sendKudosCallBack=@SendKudosCallBack />
+
+                break;     
+        }
+
+        <KudosCommentsDialog @ref=_replyKudos ModalHidden=true 
+                             Style="--dialog-height: 100%;--dialog-width: 100%;margin-left:1vh" />
+
+    </div>
+
+    <div class="navbar gap-1 border-0" style="height:8vh;padding-top:0px; padding-bottom:0px">
+        <NavLink  @onclick=@(()=>HandleNavLinkClick("profile")) >
+           <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Person())"
+                                 style="width: 2.5vh; height: 2.5vh" />
+                </div>   
+               @*  <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Profile"]
+                </div>     *@ 
+            </div>
+
+            
+            </NavLink>
+    
+         <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>
+              <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.News())"
+                                style="width: 2.5vh; height: 2.5vh" Size=IconSize.Size12 />                    
+                </div>                  
+            </div>
+        </NavLink>
+            <NavLink @onclick=@(()=>HandleNavLinkClick("sendkudos"))>
+             <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Send())"
+                                Appearance="Appearance.Filled" style="width: 2.5vh; height: 2.5vh"
+                                 />
+                </div>                   
+            </div>
+            </NavLink>
+            
+        <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>
+             <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.List())"
+                                Appearance="Appearance.Filled" style="width: 2.5vh; height: 2.5vh"
+                                 />
+                </div>                  
+            </div>
+            </NavLink>
+    </div>
+
+</div>
+
+
+@code {
+
+    private UserProfileScore _userProfileScore;
+
+    private KudosTab _kudosTab;
+
+    private string _currentTab;
+
+    private TopContributors _topContributors;
+
+    private KudosResponse _currentKudos;
+
+    private KudosCommentsDialog _replyKudos;
+
+    private SendKudosDialog _sendKudosPanel;
+    private bool _sendKudosIsHidden = true;
+
+    private void HandleNavLinkClick(string tab)
+    {
+        _currentTab = tab;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _currentTab = "feed";
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task SendKudosClick()
+    {
+        _sendKudosIsHidden = false;
+
+        await _sendKudosPanel.SendKudosModal();
+    }
+
+    private void SendKudosCallBack()
+    {
+        _currentTab = "feed";
+        StateHasChanged();
+    }
+
+    private void ReplyCallBack(KudosResponse pKudos)
+    {
+        _currentKudos = pKudos;        
+        _replyKudos.ShowModal(pKudos);
+        StateHasChanged();
+    }
+
+}

@@ -9,4 +9,6 @@ public interface IUserGateway
     Task<string> GetUserPhoto(string userid);
 
     Task<UserProfile> GetUserInfo(string userid);
+
+    
 }

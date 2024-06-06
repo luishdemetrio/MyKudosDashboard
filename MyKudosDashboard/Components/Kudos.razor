@@ -1,7 +1,8 @@
 ﻿@using Microsoft.Extensions.Localization
 @using System.Globalization
+@using Microsoft.Fast.Components.FluentUI
 @using MyKudos.Gateway.Domain.Models;
-@using MyKudosDashboard.Common
+@using MyKudosDashboard.Common;
 
 @inject IStringLocalizer<App> Localizer
 @inject IJSRuntime JSRuntime
@@ -64,7 +65,7 @@
 
 @* <div id="confetti-container" ></div> *@
 
-<div  class="profile" data-is-focusable="true" style="width:100%;z-index:auto">
+<div class="profile" data-is-focusable="true" style="clear: both;width:100%;z-index:auto">
 
 
     @* if the kudos was sent by the current user, the user can edit or delete it *@
@@ -79,11 +80,14 @@
                 </button>
                 <div class="dropdown-content">
                     <a href="#" @onclick=EditKudosOnClick>
-                        <FluentIcon Name="@FluentIcons.Edit" Slot="start" Size="@IconSize.Size16" Filled=true />
+                        <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" 
+                                    Style="margin-left: 10px; vertical-align: top;" 
+                                    Appearance="Appearance.Filled" />
 
                     </a>
                     <a href="#" @onclick=DeleteKudosOnClick>
-                        <FluentIcon Name="@FluentIcons.Delete" Slot="start" Size="@IconSize.Size16" Filled=true />
+                        <FluentIcon Value="@(new Icons.Regular.Size16.Delete())"
+                                    Appearance="Appearance.Filled" />
 
                     </a>
 
@@ -95,44 +99,48 @@
     @*In case of an individual kudos, the image size is bigger*@
     @if (KudosItem.Receivers.Count == 1)
     {
-        <div class="info" style="float:left">
-            <img src=@KudosItem.Receivers[0].Photo style="height:8vh;width:8vh;float:left;border-radius: 50%" />
+        <div style="display: grid; grid-template-columns: 1fr 8fr ">
+            <div class="info" style="float:left;">
+                <img src=@KudosItem.Receivers[0].Photo 
+                     style="height:7vh;width:7vh;float:left;border-radius: 50%;" />
+            </div>
+
+            <div >
+                <h5 style="grid-column: 1 / span 3;;padding-left:10px;padding-top:2vh">@KudosItem.Receivers[0].Name</h5>
+            </div>
         </div>
+
     }
 
-
-    <div class="info" style="width:80%;padding-left:1vw">
-
-        <ul class="list-unstyled" >
-
+    <div style="display: flex; flex-wrap: wrap;">
             @*In case of an individual kudos, the name is also displayed*@
-            @if (KudosItem.Receivers.Count == 1)
-            {
-                <li>
-                    <h5>@KudosItem.Receivers[0].Name</h5>
-                </li>
-            }
-            else
+            @if (KudosItem.Receivers.Count > 1)            
             {
                 @*for multiple kudos, it's shown just the pictures for better visualization*@
                 foreach (var receiver in KudosItem.Receivers)
                 {
-                    <li >
+                    
                         <div class="small55" id=@("receiver_" + receiver.Id.ToString())>
+                            
                             <img src=@receiver.Photo
+                                 style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
 
-                                    style="height: 7vh;width: 7vh;border-radius: 50%;margin-top:1vh;margin-left:1vw;margin-right:1vw" />
                             <small style="display:block; text-align:center">@receiver.GivenName</small>
+
                             <FluentTooltip Anchor=@("receiver_" + receiver.Id.ToString()) Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
                                 <span style="margin-left:5px">@receiver.Name</span>
                             </FluentTooltip>
-                            </div>
-                       
-                    </li>
-                }
-            }
 
-            <li>
+                        </div>
+                       
+                    
+                }
+                
+            }
+        </div>
+
+    <div class="info" style="width:94%;padding-left:4vh">
+    
                 <div class="text-wrap small55" style="width: 100%;margin-top:1vh">
                     @if (KudosItem.Receivers.Count == 1)
                     {
@@ -144,9 +152,8 @@
                     }
 
                 </div>
-            </li>
-
-            <li>
+            
+       
                 <div class="small55" style="width: 100%;margin-top:0.5vh">
                     <small style="margin-right:5px;">@Localizer["SentBy"]:</small>
                     <img src=@KudosItem.From.Photo
@@ -154,17 +161,17 @@
                     <small style="margin-left:5px;font-weight: bold">@KudosItem.From.Name</small>
                 </div>
 
-            </li>
+            
 
-            <li>
+            
                 <div class="small55">
                     <small style="margin-right:5px">@Localizer["SentOn"]:</small>
 
                     <small style="margin-left:5px">@KudosItem.SendOn</small>
                 </div>
 
-            </li>
-        </ul>
+            
+       
     </div>
 
     <div class="card-body small55" style="width:100%;padding: 0px;border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);">
@@ -188,57 +195,80 @@
 
 
                 <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>SaveEditKudosClick())>
-                    <FluentIcon Name="@FluentIcons.Save" Slot="start" Size="@IconSize.Size16" Filled=true />
+                    
+                    <FluentIcon Value="@(new Icons.Filled.Size16.Save())" />
+                    
                     Save Changes
                 </FluentButton>
 
                 <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>CancelEditKudosClick())>
-                    <FluentIcon Name="@FluentIcons.Dismiss" Slot="start" Size="@IconSize.Size16" Filled=true />
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Dismiss())"
+                                Appearance="Appearance.Filled" />
                     Cancel
                 </FluentButton>
             }
 
         </div>
 
-        <div style="float:right;margin:2vh">
+        <div style="float:right;margin:2vh; text-wrap: nowrap;">
 
             <FluentButton style="margin-left:20px;" @onclick=@(()=>ReplyKudos(KudosItem))>
-                <FluentIcon Name="@FluentIcons.Comment" Slot="start" Size="@IconSize.Size16" Filled=false />
-                <div>
-                    @KudosItem.Comments.Count()
+
+                <div style="display:flex">
+
+                @KudosItem.Comments.Count()
+
+                <FluentIcon Value="@(new Icons.Regular.Size16.Comment())"
+                            Style="margin-left:2px" />               
+                
+                    
                 </div>
             </FluentButton>
 
             <FluentButton id=@KudosItem.Id.ToString() style="margin-left:20px;" @onclick=@(()=>LikeKudosClick(KudosItem))
                           Disabled=@_isLikeButtonDisabled>
+                
+                 <div style="display:flex">
 
-                <FluentIcon Name="@FluentIcons.Heart" Slot="start" Size="@IconSize.Size16"
-                            Filled=@Filled(KudosItem) />
+                    <div @ref=numberOfLikes[KudosItem.Id] id=@($"likevalue_{KudosItem.Id}")>
+                         @KudosItem.Likes.Count()
+                </div>
 
-                <div @ref=numberOfLikes[KudosItem.Id] id=@($"likevalue_{KudosItem.Id}")>
-                    @KudosItem.Likes.Count()
+                @if (Filled(KudosItem))
+                {
+                    <FluentIcon Value="@(new Icons.Filled.Size16.Heart())"
+                                Style="margin-left:2px" />
+                }
+                else
+                {
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Heart())"
+                                Style="margin-left:2px" />
+                }               
+
                 </div>
 
             </FluentButton>
 
-            <FluentTooltip Anchor=@KudosItem.Id.ToString() Position=Microsoft.Fast.Components.FluentUI.TooltipPosition.Top>
-
-                @if (KudosItem.Likes.Count() > 0)
-                {
-                    <ul class="list-unstyled ">
-                        @foreach (var like in KudosItem.Likes)
-                        {
-                            <li>
-                                <div>
-                                    <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
-                                         style="height: 26px;width: 26px;border-radius: 50%;" />
-                                    <span style="margin-left:5px">@like.Name</span>
-                                </div>
-                            </li>
-                        }
-                    </ul>
-                }
-
+            <FluentTooltip Anchor=@KudosItem.Id.ToString() 
+                           Position=TooltipPosition.Top
+                           >
+                <div >
+                    @if (KudosItem.Likes.Count() > 0)
+                    {
+                        <ul class="list-unstyled ">
+                            @foreach (var like in KudosItem.Likes)
+                            {
+                                <li>
+                                    <div style="max-width: 500px; text-wrap: nowrap;">
+                                        <img src=@((like.Photo.Contains("data")) ? like.Photo : $"data:image /png;base64,{like.Photo}")
+                                             style="height: 26px;width: 26px;border-radius: 50%;" />
+                                        <span style="margin-left:5px">@like.Name</span>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
             </FluentTooltip>
 
         </div>
@@ -293,23 +323,6 @@
     private string _originalMessage;
 
     private Dictionary<int, ElementReference> numberOfLikes = new();
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         // Attach a listener to the textarea for input changes
-    //         await JSRuntime.InvokeVoidAsync("attachTextareaListener", $"textareareply_{@KudosItem.Id}",
-    //                                         DotNetObjectReference.Create(this));
-    //     }
-    // }
-
-    // [JSInvokable]
-    // public async Task PlayConfettiAnimation()
-    // {
-    //     // Trigger the JavaScript function to create the explosion-like confetti
-    //     await JSRuntime.InvokeVoidAsync("triggerConfettiExplosion");
-    // }
 
     private void EditKudosOnClick()
     {
@@ -372,6 +385,13 @@
         }
 
         return filled;
+    }
+
+
+    private enum IconType
+    {
+        Comment,
+        Heart
     }
 
     private async Task ReplyKudos(KudosResponse kudos)

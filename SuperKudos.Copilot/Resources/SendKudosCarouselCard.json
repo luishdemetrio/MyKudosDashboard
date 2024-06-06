@@ -1,0 +1,102 @@
+{
+  "type": "AdaptiveCard",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "👏 Enviar Reconhecimento",
+          "size": "Large",
+          "weight": "Bolder"
+        },
+        {
+          "type": "TextBlock",
+          "text": "To: ${ToPersonName}",
+          "size": "Medium",
+          "weight": "Lighter"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Escolha o comportamento:",
+          "size": "Medium",
+          "weight": "Bolder"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "🤝 Abertura e Colaboração",
+          "weight": "Bolder",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "FALAMOS COM FRANQUEZA",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "Usando fatos e dados, com gentileza e não deixamos passar conversar construtivas. Temos coragem de ter conversas difíceis quando necessário.",
+          "wrap": true
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "Input.Text",
+          "id": "messageInput",
+          "placeholder": "Write your message here...",
+          "isMultiline": true
+        }
+      ]
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "📩 Enviar",
+          "data": {
+            "recognition": "${selectedBehavior}",
+            "message": "${messageInput}",
+            "toPersonId": "${ToPersonId}",
+            "fromPersonId": "${FromPersonId}"
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.ShowCard",
+      "title": "Previous",
+      "card": {
+        "type": "AdaptiveCard",
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "Previous card content goes here..."
+          }
+        ]
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Next",
+      "data" : "Next"
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.5"
+}

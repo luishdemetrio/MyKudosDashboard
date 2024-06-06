@@ -1,0 +1,102 @@
+﻿@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Microsoft.Fast.Components.FluentUI
+
+@inject IStringLocalizer<App> Localizer;
+
+@inject NavigationManager NavigationManager
+
+<style>
+    .navbar {
+        background-color: lightgray;
+        overflow: hidden;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+
+        /* Style the links inside the navigation bar */
+        .navbar a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        /* Change the color of links on hover */
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        /* Add a color to the active/current link */
+        .navbar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        .nav-link {
+            float: left;
+            display: block;
+            color: white
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .nav-link.active {
+            color: blue;
+            
+        }
+
+       
+
+</style>
+
+<div>
+     <div class="navbar gap-1 border-0" style="height:8vh;padding-top:0px; padding-bottom:0px">
+        <NavLink  @onclick=@(()=>HandleNavLinkClick("profile")) >
+           <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.Person())" style="width: 2.5vh; height: 2.5vh" />
+                </div>   
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Profile"]
+                </div>     
+            </div>
+
+            
+            </NavLink>
+        <NavLink @onclick=@(()=>HandleNavLinkClick("feed"))>
+              <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.News())" style="width: 2.5vh; height: 2.5vh" />
+                </div>   
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Feed"]
+                </div>     
+            </div>
+            </NavLink>
+        <NavLink @onclick=@(()=>HandleNavLinkClick("leaderboard"))>
+             <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    <FluentIcon Value="@(new Icons.Regular.Size16.List())" style="width: 2.5vh; height: 2.5vh" />
+                </div>   
+                <div style="flex: 50%;"> <!-- This will take up half the width -->
+                    @Localizer["Leaderboard"]
+                </div>     
+            </div>
+            </NavLink>
+    </div>
+</div>
+
+@code {
+    private void HandleNavLinkClick(string tab)
+    {
+        NavigationManager.NavigateTo("/MobileComments");
+    }
+}

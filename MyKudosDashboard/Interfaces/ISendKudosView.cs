@@ -7,7 +7,9 @@ public interface ISendKudosView
 
     Task<IEnumerable<RecognitionViewModel>> GetRecognitionsAsync();
 
-    Task<IEnumerable<Person>> GetUsersAsync(string name);
+    Task<IEnumerable<Person>> GetUserProfile(string name);
+
+    Task<UserProfile> GetUserById(string userId);
 
     Task<string> Send(SendKudosRequest kudos);
 

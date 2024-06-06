@@ -1,0 +1,73 @@
+﻿@page "/kudos"
+@using MyKudosDashboard.Common
+@using MyKudosDashboard.Components;
+
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration;
+@inject KudosCommonVariables CommonVariables;
+
+<style>
+    h1 {
+        font-size: 5.9vw;
+    }
+
+    h2 {
+        font-size: 3.0vh;
+    }
+
+    h4 {
+        font-size: 2.5vh;
+    }
+
+    p {
+        font-size: 2vmin;
+    }
+
+    .small40 {
+        font-size: calc(0.40em + 1vmin)
+    }
+
+
+    .small55 {
+        font-size: calc(0.50em + 1vmin)
+    }
+
+    .small60 {
+        font-size: calc(0.60em + 1vmin)
+    }
+
+</style>
+<div>
+    
+    <SendMultiKudos IsRunningViaChat=true 
+                    ToUserId=@GetUserId("touserid")
+                    FromUserId=@GetUserId("fromuserid") />
+
+                    
+</div>
+
+
+@code
+{
+
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            CommonVariables.UsesAzureOpenAI = bool.Parse(Configuration["AZURE_OPENAI_ENABLED"]);
+        }
+
+    }
+
+    private string GetUserId(string queryString)
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        var toUserId = query[queryString];
+
+        return toUserId;
+    }
+}

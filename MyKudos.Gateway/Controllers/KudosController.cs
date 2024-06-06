@@ -52,11 +52,11 @@ public class KudosController : Controller
     /// <param name="managerId"></param>
     /// <returns></returns>
     [HttpGet(Name = "GetKudos")]
-    public async Task<IEnumerable<KudosResponse>> Get(int pageNumber = 1, Guid? managerId = null, 
+    public async Task<IEnumerable<KudosResponse>> Get(int pageNumber , int pageSize, Guid? managerId = null, 
                                                       int? sentOnYear = null)
     {
         //get kudos
-        var kudos = await _kudosService.GetKudosAsync(pageNumber, managerId, sentOnYear);
+        var kudos = await _kudosService.GetKudosAsync(pageNumber, pageSize, managerId, sentOnYear);
 
 
         return KudosHelper.GetKudos(kudos, _defaultProfilePicture, false);
@@ -69,8 +69,8 @@ public class KudosController : Controller
     /// <param name="pageNumber"></param>
     /// <param name="managerId"></param>
     /// <returns></returns>
-    [HttpGet("GetKudosByName/{name},{pageSize},{fromNumberOfDays}")]
-    public async Task<IEnumerable<KudosResponse>> Get(string name, int pageSize=10, int fromNumberOfDays=0, bool useSmallPhoto = true)
+    [HttpGet("GetKudosByName")]
+    public async Task<IEnumerable<KudosResponse>> Get(string name, int pageSize, int fromNumberOfDays=0, bool useSmallPhoto = true)
     {
         //get kudos
         var kudos = await _kudosService.GetKudosByName(name, pageSize, fromNumberOfDays);

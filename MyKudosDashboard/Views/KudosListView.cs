@@ -1,4 +1,5 @@
-﻿using MyKudos.Gateway.Domain.Models;
+﻿using Azure.AI.OpenAI;
+using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Common;
 using MyKudosDashboard.Interfaces;
 using System.Collections.Concurrent;
@@ -17,17 +18,32 @@ public class KudosListView : IKudosListView
 
     private KudosCommonVariables _commonVariables;
 
-    private int _currentYear;
+    private int _currentYearKudosAll;
+    private int _currentYearKudosSent;
+    private int _currentYearKudosReceived;
+    private int _currentYearTopContributors;
+    private int _currentYearExportToCsv;
 
-    public KudosListView(IKudosGateway gatewayService, 
+    private int _pageSize;
+
+    public KudosListView(IKudosGateway gatewayService,
                          KudosCommonVariables commonVariables,
                          IConfiguration config)
     {
         _gatewayService = gatewayService;
         _commonVariables = commonVariables;
 
-        _currentYear = int.Parse(config["CurrentYear"]);
+        int.TryParse(config["CurrentYearKudosAll"], out _currentYearKudosAll);
 
+        int.TryParse(config["CurrentYearKudosSent"], out _currentYearKudosSent);
+
+        int.TryParse(config["CurrentYearKudosReceived"], out _currentYearKudosReceived);
+
+        int.TryParse(config["CurrentYearTopContributor"], out _currentYearTopContributors);
+
+        int.TryParse(config["CurrentYearExportToCsv"], out _currentYearExportToCsv);
+
+        int.TryParse(config["pageSize"], out _pageSize);
     }
 
     private async void LoadKudoListAgain()
@@ -92,24 +108,25 @@ public class KudosListView : IKudosListView
     public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber)
     {
       
-        return await _gatewayService.GetKudos(pageNumber, _commonVariables.GetManagerId().ToString(), _currentYear);
+        return await _gatewayService.GetKudos(pageNumber, _pageSize, _commonVariables.GetManagerId().ToString(), 
+                                              _currentYearKudosAll);
            
     }
 
     public async Task<IEnumerable<KudosResponse>> GetKudosToMe(int pageNumber)
     {
         return await _gatewayService.GetKudosToMe(_commonVariables.User.UserProfileId.ToString(),
-                                                  pageNumber,  
+                                                  pageNumber, _pageSize,
                                                   _commonVariables.GetManagerId().ToString(),
-                                                  _currentYear);
+                                                  _currentYearKudosReceived);
     }
 
     public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(int pageNumber)
     {
         return await _gatewayService.GetKudosFromMe(_commonVariables.User.UserProfileId.ToString(), 
-                                                    pageNumber,
+                                                    pageNumber, _pageSize,
                                                     _commonVariables.GetManagerId().ToString(),
-                                                    _currentYear);
+                                                    _currentYearKudosSent   );
     }
 
     public async Task<bool> UpdateKudos(KudosMessage kudos)
@@ -139,32 +156,38 @@ public class KudosListView : IKudosListView
         if (_commonVariables.User.IsAdmin)
         {
             //Get All Kudos
-            kudos = await _gatewayService.GetKudos(0, string.Empty, _currentYear);
+            kudos = await _gatewayService.GetKudos(0, 0, string.Empty, _currentYearExportToCsv);
 
         }
         else if (_commonVariables.HasDirectReports)
         {
             //Get the kudos from his/her direct reports
-            kudos = await _gatewayService.GetKudos(0, _commonVariables.GetManagerId().ToString(), _currentYear);
+            kudos = await _gatewayService.GetKudos(0, 0, _commonVariables.User.UserProfileId.ToString(), _currentYearExportToCsv);
         }
         else
         {
-            //Get the kudos received and sent
-            kudos = await GetKudosToMe(0);
+            //Get the kudos received 
+            var kudosReceived = await GetKudosToMe(0);
 
-            kudos.Concat(await GetKudosFromMe(0));
-            
+            // Concatenate the kudos that I sent
+            var kudosSent = await GetKudosFromMe(0);
+
+            kudos = kudosReceived.Union(kudosSent);
+
         }
 
        
         var sb = new StringBuilder();
-        sb.AppendLine("Title;Message;SendOn;NumberOfLikes;NumberOfComments;From;Receivers;EMail");
+        sb.AppendLine("Title;Message;Recognition;SendOn;NumberOfLikes;NumberOfComments;From;Receivers;FromEmail;ToEmail");
         foreach (var item in kudos)
         {
-            var receivers = string.Join(";", item.Receivers.Select(r => r.Name));
+            var receiverNames = string.Join(",", item.Receivers.Select(r => r.Name));
+
+            var receiverEmails = string.Join(",", item.Receivers.Select(r => r.EMail));
+
             sb.AppendLine($"{item.Title};{item.Message.Replace("\n", "").Replace(";", ".")};" +
-                $"{item.SendOn};{item.Likes.Count};" +
-                $"{item.Comments.Count};{item.From.Name};{receivers};{item.From.EMail}");
+                $"{item.Title};{item.SendOn};{item.Likes.Count};" +
+                $"{item.Comments.Count};{item.From.Name};{receiverNames};{item.From.EMail};{receiverEmails}");
         }
 
         return sb.ToString();

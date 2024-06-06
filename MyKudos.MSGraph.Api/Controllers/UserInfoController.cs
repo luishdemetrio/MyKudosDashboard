@@ -20,4 +20,6 @@ public class UserInfoController : Controller
     {
         return _graphService.GetUserInfo(users);
     }
+
+    
 }

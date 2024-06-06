@@ -1,4 +1,5 @@
-﻿using MyKudos.Communication.Helper.Interfaces;
+﻿using Azure.AI.OpenAI;
+using MyKudos.Communication.Helper.Interfaces;
 using MyKudos.Gateway.Domain.Models;
 using MyKudosDashboard.Interfaces;
 
@@ -13,29 +14,34 @@ public class GatewayService : IKudosGateway
 
     private readonly ILogger<GatewayService> _logger;
 
+    
     public GatewayService(IConfiguration config, IRestClientHelper restClientHelper, ILogger<GatewayService> log)
     {
         _gatewayServiceUrl = config["GatewayServiceUrl"];
         _restClientHelper = restClientHelper;
         _logger = log;
+
     }
 
 
-    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber, string userManagerId, int sentOnYear)
+    public async Task<IEnumerable<KudosResponse>> GetKudos(int pageNumber,  int pageSize, string userManagerId, int sentOnYear)
     {
-        return await GetKudosData($"kudos/?pageNumber={pageNumber}", userManagerId, sentOnYear);
+        return await GetKudosData($"kudos/?pageNumber={pageNumber}&pageSize={pageSize}",  userManagerId, sentOnYear);
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber, string userManagerId,
+    public async Task<IEnumerable<KudosResponse>> GetKudosFromMe(string userId, int pageNumber, int pageSize, 
+                                                                 string userManagerId,
                                                                  int sentOnYear)
     {
-        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}", userManagerId, sentOnYear);
+        return await GetKudosData($"kudosfromme/?userid={userId}&pageNumber={pageNumber}&pageSize={pageSize}", 
+                                    userManagerId, sentOnYear);
     }
 
-    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber, string userManagerId, 
+    public async Task<IEnumerable<KudosResponse>> GetKudosToMe(string userId, int pageNumber, int pageSize,
+                                                               string userManagerId, 
                                                                int sentOnYear)
     {
-        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}", userManagerId, sentOnYear);
+        return await GetKudosData($"kudosTome/?userid={userId}&pageNumber={pageNumber}&pageSize={pageSize}", userManagerId, sentOnYear);
     }
 
     private async Task<IEnumerable<KudosResponse>> GetKudosData(string endpoint, string userManagerId, int sentOnYear)

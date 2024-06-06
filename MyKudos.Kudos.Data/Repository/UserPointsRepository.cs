@@ -41,7 +41,7 @@ public class UserPointsRepository : IUserPointsRepository
 
         var parameterSentOnYear = new SqlParameter("@SentOnYear", SqlDbType.Int)
         {
-            Value = sentOnYear.HasValue ? sentOnYear : DateTime.Today.Year 
+            Value = sentOnYear.HasValue ? sentOnYear : 0
         };
 
         var result = _context.Set<UserPoint>().FromSqlRaw(

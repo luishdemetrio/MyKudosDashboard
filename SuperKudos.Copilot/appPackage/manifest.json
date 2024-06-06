@@ -1,0 +1,179 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.1.7",
+  "id": "${{TEAMS_APP_ID}}",
+  "packageName": "com.microsoft.teams.extension",
+  "developer": {
+    "name": "Teams App, Inc.",
+    "websiteUrl": "https://www.example.com",
+    "privacyUrl": "https://www.example.com/privacy",
+    "termsOfUseUrl": "https://www.example.com/termofuse"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Super Kudos Chat ${{APP_NAME_SUFFIX}}",
+    "full": "Super Kudos Chat"
+  },
+  "description": {
+    "short": "Shows the kudos or recognitions received by a person and allows sending kudos.",
+    "full": "Super Kudos is an innovative app designed to enhance employee recognition and engagement. It allows users to ask for the kudos receiveid in a period of time and allows users to send kudos to their peers."
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [],
+  "composeExtensions": [
+    {
+      "botId": "${{BOT_ID}}",
+      "commands": [
+
+        {
+          "id": "createCard",
+          "context": [
+            "compose",
+            "message",
+            "commandBox"
+          ],
+          "description": "Command to run action to create a Card from Compose Box",
+          "title": "Create Card",
+          "type": "action",
+          "fetchTask": true
+        },
+        {
+          "id": "findKudosReceived",
+          "context": [
+            "message",
+            "commandBox"
+          ],
+          "description": "Retrieve the kudos/recognitions that a person received",
+          "title": "what kudos that I received",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "Number of days until today to find kudos. No future dates. Output: Number",
+              "inputType": "text"
+            },
+            {
+              "name": "person",
+              "title": "The name of the signed-in user",
+              "description": "Specifies the signed-in user's name, and not the 'me' pronoun. Output: The name of the signed-in user.",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "findRecognitionsReceived",
+          "context": [
+            "message",
+            "commandBox"
+          ],
+          "description": "what recognitions I received",
+          "title": "what kudos I received",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "Number of days from today for which to find tasks. Output: Datetime",
+              "inputType": "date"
+            },
+            {
+              "name": "I",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "findKudosSentToMe",
+          "context": [
+            "commandBox",
+            "message"
+          ],
+          "description": "what kudos was sent to me",
+          "title": "show the kudos was sent to me",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "time",
+              "title": "time",
+              "description": "The time period used to search the kudos received",
+              "inputType": "date"
+            },
+            {
+              "name": "me",
+              "title": "The name of the person",
+              "description": "The name of the person that is signed and searching for information. Output: The name of the person that is signed",
+              "inputType": "text"
+            }
+          ]
+        },
+        {
+          "id": "draftKudos",
+          "context": [
+            "commandBox",
+            "message"
+          ],
+          "description": "Draft or send a kudos or recognition message to a receipient person.",
+          "title": "Draft or send Kudos to a person",
+          "type": "query",
+          "parameters": [
+            {
+              "name": "sentTo",
+              "title": "Person's receipient name",
+              "description": "The name of the person that will receive the kudos or recognition. Output: The name of the receipient person",
+              "inputType": "text"
+            },
+            {
+              "name": "sentFrom",
+              "title": "The name of the signed-in user",
+              "description": "Specifies the signed-in user's name, and not the 'me' pronoun. Output: The name of the signed-in user.",
+              "inputType": "text"
+            },
+            {
+              "name": "LLM content",
+              "title": "The LLM content returned",
+              "description": "The large language model content result returned to Copilot. Output: The LLM result.",
+              "inputType": "text"
+            }
+          ]
+        }
+      ],
+      "messageHandlers": [
+        {
+          "type": "link",
+          "value": {
+            "domains": [
+              "superkudosdashboard.azurewebsites.net",
+              "localhost:44302"
+            ],
+            "supportsAnonymizedPayloads": true
+          }
+        }
+      ]
+    }
+  ],
+
+  "configurableTabs": [],
+  "staticTabs": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "devicePermissions": [
+    "geolocation",
+    "media",
+    "notifications",
+    "midi",
+    "openExternal"
+  ],
+  "validDomains": [
+    "superkudosdashboard.azurewebsites.net",
+    "localhost:44302"
+  ]
+}

@@ -1,4 +1,6 @@
 ﻿@using Microsoft.Extensions.Options
+@using Microsoft.Fast.Components.FluentUI
+
 @inject NavigationManager NavigationManager
 
 <div style="margin:10px">
@@ -10,39 +12,51 @@
 
         <div style="width:30%">
             <FluentButton style="margin-left:5px;padding-top: 0px;height: 28px;" @onclick=@(()=>NavigateBackClick())>
-                <FluentIcon Name="@FluentIcons.ArrowCircleLeft"  Slot="start" Size="@IconSize.Size20" Filled=true />
+                <FluentIcon Value="@(new Icons.Regular.Size16.ArrowCircleLeft())"
+                            Appearance="Appearance.Filled" />
                 Back
             </FluentButton>
         </div>
     </div>    
 
     <FluentTabs Orientation="Orientation.Vertical" style="width:80%">
+        @* style="margin-left:50px; margin-top:10px *@
+        <FluentTab >
+             <Header>
+                Recognition Group
+                </Header>
+                <Content >
+                <RecognitionGroupAdmin />
+            </Content>
+        </FluentTab>
 
-        <FluentTab>Recognition Group</FluentTab>
-        <FluentTab>Recognition</FluentTab>
-        <FluentTab>Administrators</FluentTab>        
-        <FluentTab>Score</FluentTab>
-        <FluentTab>Azure Open AI</FluentTab>
+        <FluentTab>
+             <Header>
+                Recognition
+                </Header>
+                <Content>
+                <RecognitionAdmin />
+            </Content>
+        </FluentTab>
 
-        <FluentTabPanel style="margin-left:50px; margin-top:10px">
-            <RecognitionGroupAdmin/>          
-        </FluentTabPanel>
+        <FluentTab>
+            <Header>
+                Administrators
+            </Header>
+            <Content>
+                <AdminUsers />
+            </Content>
+        </FluentTab>        
+        <FluentTab>
+            <Header>
+                Score
+            </Header>
+            <Content>
+                <Score />
+            </Content>
+        </FluentTab>
+        
 
-        <FluentTabPanel style="margin-left:50px; margin-top:10px">
-            <RecognitionAdmin />
-        </FluentTabPanel>
-
-        <FluentTabPanel style="margin-left:50px; margin-top:10px">
-            <AdminUsers />
-        </FluentTabPanel>
-
-        <FluentTabPanel style="margin-left:50px; margin-top:10px">
-            <Score />
-        </FluentTabPanel>
-
-        <FluentTabPanel style="margin-left:50px; margin-top:10px">
-            <AzureOpenAI />
-        </FluentTabPanel>
 
     </FluentTabs>
 </div>

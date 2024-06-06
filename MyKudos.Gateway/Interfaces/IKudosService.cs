@@ -3,14 +3,16 @@ namespace MyKudos.Gateway.Interfaces;
 
 public interface IKudosService
 {
-    Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber, Guid? managerId = null,
-                                                               int? sentOnYear = null);
+    Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosAsync(int pageNumber, int pageSize, Guid? managerId = null,
+                                                  int? sentOnYear = null);
 
-    Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber, 
+    Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosFromMeAsync(string userId, int pageNumber,
+                                                                     int pageSize,
                                                                      Guid? managerId = null, 
                                                                      int? sentOnYear = null);
 
     Task<IEnumerable<Kudos.Domain.Models.Kudos>> GetKudosToMeAsync(string userId, int pageNumber, 
+                                                                   int pageSize,           
                                                                    Guid? managerId = null, 
                                                                    int? sentOnYear = null);
     

@@ -12,7 +12,8 @@
 <div class="card-body w-auto">
 
     
-    <div class="list-group list-group-checkable d-grid gap-1 border-0 " style="height:82vh;overflow-y:scroll;overflow:auto;width:100%">
+    <div class="list-group list-group-checkable d-grid gap-1 border-0 " 
+         style="z-index: auto ;height:78vh;overflow-y:scroll;width:100%;overflow:auto;padding-left:2vh">
 
 
          @if (_isLoaded)
@@ -20,18 +21,23 @@
 
             @foreach (var item in _topContributors)
             {
-
-                <div class="profile" style="padding-top: 0px;padding-bottom: 0px;">
-                    <div class="avatar">
-                        <img src=@item.Photo style="height:7vh;width:7vh;border-radius: 50%" />
+                <div style="display: grid; grid-template-columns: 1fr 8fr;margin-top:2vh ">
+                    <div class="info" style="float:left">
+                        <img src=@item.Photo
+                             style="height:7vh;width:7vh;float:left;border-radius: 50%" />
                     </div>
-                    <div class="info">
-                        <small class="small60">@item.Name</small>
-                        <h2 class="card-title pricing-card-title" style="padding-bottom:1vh">
-                            @item.Score<small class="text-muted fw-light" style="margin-left: 3px;">@Localizer["Points"]</small>
+
+                    <div>
+                        <small class="small65" style="grid-column: 1 / span 3;margin-top:1vh;padding-left:10px">
+                            @item.Name</small>
+                        <h2 class="card-title pricing-card-title" style="padding-bottom:1vh;grid-column: 1 / span 3;padding-left:10px">
+                            @item.Score
+                            <small class="text-muted fw-light" style="margin-left: 3px;">@Localizer["Points"]</small>
                         </h2>
                     </div>
                 </div>
+
+               
             }
          }
 
@@ -41,8 +47,6 @@
 
 @code {
 
-    [Parameter]
-    public UserProfile User { get; set; }
 
     private IEnumerable<MyKudos.Gateway.Domain.Models.TopContributors> _topContributors;
     private bool _isLoaded = false;
@@ -60,9 +64,9 @@
     {
         base.OnAfterRender(firstRender);
 
-        if (User != null)
+        if (CommonVariables != null)
         {
-            TopContributorsView.RegisterObserver(User.UserProfileId.ToString());
+            TopContributorsView.RegisterObserver(CommonVariables.User.UserProfileId.ToString());
         }
 
         if (firstRender)
