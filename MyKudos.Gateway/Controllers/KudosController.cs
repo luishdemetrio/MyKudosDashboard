@@ -69,7 +69,7 @@ public class KudosController : Controller
     /// <param name="pageNumber"></param>
     /// <param name="managerId"></param>
     /// <returns></returns>
-    [HttpGet("GetKudosByName/{name},{pageSize},{fromNumberOfDays}")]
+    [HttpGet("GetKudosByName")]
     public async Task<IEnumerable<KudosResponse>> Get(string name, int pageSize, int fromNumberOfDays=0, bool useSmallPhoto = true)
     {
         //get kudos

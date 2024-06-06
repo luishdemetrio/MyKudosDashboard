@@ -92,7 +92,7 @@ public class KudosReceivedMessageCommand : IMessageCommand
     private async Task<IEnumerable<KudosResponse>> FindKudos(string name, int fromNumberOfDays)
     {
         
-        return await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}Kudos/GetKudosByName/{name},10,{fromNumberOfDays}");
+        return await _restClientHelper.GetApiData<IEnumerable<KudosResponse>>($"{_gatewayServiceUrl}Kudos/GetKudosByName?name={name}&pageSize=10&fromNumberOfDays={fromNumberOfDays}&useSmallPhoto=true");
       
     }
 }
